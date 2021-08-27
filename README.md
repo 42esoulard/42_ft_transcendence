@@ -1,12 +1,17 @@
 # 42_ft_transcendence
 
-### TECHS USED + DOC AND TUTORIALS
-## FRONTEND: TBD typescript front framework (Angular?)
 
-## BACKEND: NestJS
+# TECHS USED + DOC AND TUTORIALS
+
+### FRONTEND: TBD typescript front framework (Angular?)
+
+### BACKEND: NestJS
 [A 1h intro video](https://www.youtube.com/watch?v=F_oOtaxb0L8)
 
-## DB: PostgreSQL
+### DB: PostgreSQL
+
+
+# CHECKLIST
 
 ### SECURITY
   - Passwords stored in the db should be encrypted
