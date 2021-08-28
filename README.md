@@ -13,6 +13,8 @@
 
   - ### DB: PostgreSQL
 
+  - ### DOCKER && DOCKER-COMPOSE
+
 
 # CHECKLIST
 
