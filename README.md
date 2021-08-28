@@ -3,12 +3,15 @@
 
 # TECHS USED + DOC AND TUTORIALS
 
-### FRONTEND: TBD typescript front framework (Angular?)
+  - ### JAVASCRIPT
+      [You Don't Know JS: a free online 6 parts book for in depth understanding of JS](https://github.com/getify/You-Dont-Know-JS/tree/1st-ed)
 
-### BACKEND: NestJS
-[A 1h intro video](https://www.youtube.com/watch?v=F_oOtaxb0L8)
+  - ### FRONTEND: TBD typescript front framework (Angular?)
 
-### DB: PostgreSQL
+  - ### BACKEND: NestJS
+    [A 1h intro video](https://www.youtube.com/watch?v=F_oOtaxb0L8)
+
+  - ### DB: PostgreSQL
 
 
 # CHECKLIST
