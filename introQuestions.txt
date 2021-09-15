@@ -1,0 +1,4 @@
+1) Qui connait quoi ?
+2) Quel plan d'attaque ? Par où commencer ? 
+Docker > DB > login > profiles > user ranks > chat > game
+3) Reu 1x par semaine ? Quel jour/heure? 42/Discord ?
