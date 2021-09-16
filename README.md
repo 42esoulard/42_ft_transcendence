@@ -3,13 +3,14 @@
 # [MINDMAP](https://app.mindmup.com/map/_free/2021/09/25828b20168011ecb33a8fface99c92d) (!careful, it's public and if we save it the url needs to be updated)
 
 # TECHS USED + DOC AND TUTORIALS
+  - ### [FT_TRANSCENDENCE DOC](https://github.com/qingqingqingli/ft_transcendence/wiki)
 
   - ### JAVASCRIPT
       [You Don't Know JS: a free online 6 parts book for in depth understanding of JS](https://github.com/getify/You-Dont-Know-JS/tree/1st-ed)
 
-  - ### FRONTEND: TBD typescript front framework (Vue?Angular?)
-      Google says Vue performs better regarding memory allocation, is lighter, and easier to learn than Angular. Sooo...
-
+  - ### FRONTEND: VueJS - a typescript framework
+      Google says Vue performs better regarding memory allocation, is lighter, and easier to learn than Angular. Sooo... 
+      [Net Ninja: Vue 3](https://www.youtube.com/watch?v=YrxBCBibVo0&list=PL4cUxeGkcC9hYYGbV60Vq3IXYNfDk8At1)
   - ### BACKEND: NestJS
     [A 1h intro video](https://www.youtube.com/watch?v=F_oOtaxb0L8)
 

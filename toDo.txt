@@ -1,0 +1,11 @@
+23/09/21: 
+1) Mettre en place le fichier d'orga: excel ? trello ?
+    qui fait quoi ? qu'est ce qu'il reste a faire ? 
+2) Arborescence des données qu'on veut stocker
+  -Arborescence des endpoints/pseudocode qu'on veut 
+      swagger pour connecter le back et le front, défini en commun, puis le front peut anticiper les endpoints qui seront crées par le back 
+      SDK: fonctions intermédiaires 
+3) Etude de docker-compose et Postgres en solo
+3.5) Etude de docker-compose et de Postgres avec Julien: discord, partage d'écran
+4) Etude de VueJS (front)
+5) Etude de NestJS (back)
