@@ -7,5 +7,5 @@
       SDK: fonctions intermédiaires 
 3) Etude de docker-compose et Postgres en solo
 3.5) Etude de docker-compose et de Postgres avec Julien: discord, partage d'écran
-4) Etude de VueJS (front)
+4) Etude de VueJS (front, netninja)
 5) Etude de NestJS (back)
