@@ -53,7 +53,7 @@
   - Check and protection against user inputs/forms (see SQL defence tutorial above + [JS validation API](https://www.w3schools.com/js/js_validation_api.asp))
 
 ### USER ACCOUNT
-  - log in with 42 OAuth (API):[42API doc](https://api.intra.42.fr/apidoc), [Introduction to OAuth 2](https://www.digitalocean.com/community/tutorials/an-introduction-to-oauth-2),[Fat IBM tutorial](https://www.ibm.com/docs/en/acfc?topic=endpoint-tutorial-securing-api-by-using-oauth-20)
+  - log in with 42 OAuth (API):[42API doc](https://api.intra.42.fr/apidoc), [Introduction to OAuth 2](https://www.digitalocean.com/community/tutorials/an-introduction-to-oauth-2),[Fat IBM tutorial](https://www.ibm.com/docs/en/acfc?topic=endpoint-tutorial-securing-api-by-using-oauth-20), [NestJS auth doc](https://docs.nestjs.com/security/authentication#authentication), [A simpler Nest Auth tuto](https://www.nerd.vision/post/nestjs-third-party-oauth2-authentication), [passport-42](https://www.npmjs.com/package/passport-42)
   - 2-factor authentication can be activated (like google authenticator or an SMS etc...)[google authenticator](https://github.com/speakeasyjs/speakeasy), [SMS](https://cloud.google.com/identity-platform/docs/web/mfa)
   - can choose a display name (ALGO/DB)
   - A user has several victories and losses and other stats (ladder level, achievements...)(ALGO/DB)
