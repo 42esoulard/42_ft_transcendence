@@ -1,6 +1,6 @@
 # 42_ft_transcendence
 
-# [MINDMAP](https://app.mindmup.com/map/_free/2021/09/25828b20168011ecb33a8fface99c92d) (!careful, it's public and if we save it the url needs to be updated)
+### [MINDMAP](https://app.mindmup.com/map/_free/2021/09/25828b20168011ecb33a8fface99c92d) (!careful, it's public and if we save it the url needs to be updated)
 
 # TECHS USED + DOC AND TUTORIALS
   - ### [FT_TRANSCENDENCE DOC](https://github.com/qingqingqingli/ft_transcendence/wiki)
@@ -23,17 +23,35 @@
 
 
 # TEAM CONVENTIONS
-  - camelCase
-  - Clear module accesses!! (ie necessary documentation for each module like a README.md, self explanatory function names)
-  - At all times, we must have a board with a to do list, a who's-doing-what, a who-did-what
-  - Weekly organisation meeting (who did what, who struggles with what, who needs what)
-  - Git etiquette:
-      - git checkout -b my_branch
-      - do your commits, self-explanatory commit names
-      - git checkout main
-      - git pull
-      - git merge my_branch
-      - git push origin main
+-  #### camelCase #### 
+-  #### Clear module accesses!! (ie necessary documentation for each module like a README.md, self explanatory function names) #### 
+-  #### At all times, we must have a board with a to do list, a who's-doing-what, a who-did-what #### 
+-  #### Weekly organisation meeting (who did what, who struggles with what, who needs what) #### 
+
+# Git etiquette:
+1. Create and go to a new branch (by name or by element you're working on)  
+    `git checkout -b my_branch`  
+    
+2. Spend some time in your branch, do your work and commits there (give them self-explanatory commit names)  
+  2.1. (optional) If like me you're afraid of losing your local work but not ready to push to main yet, while in your branch you can always push to your remote branch:  `git push origin my_branch`  
+  2.2. (optional) if you actually lost your local branch for some unfortunate reason, dry your tears, create and checkout a new local branch and pull your remote branch from there (/!\ not in the main branch):  
+          `git checkout -b my_branch`  
+          `git pull origin my_branch`  
+          
+3. Once you're ready to push to the main branch, go to the main branch:  
+      `git checkout main`  
+      
+4. Get the freshest version of the main branch (to avoid unleashing hell if you haven't pulled your friend's latest glorious commit)  
+      `git pull`  
+      
+5.  Try to merge your branch with main  
+      `git merge my_branch`  
+  5.1. IF THERE'S CONFLICTS:  
+      - git and VSCode are letting you know which files and lines are conflicting. Stay on main, solve each conflict appropriately, commit the now fixed versions and try again from step 4!  
+      - If your attempt at merging is a mess and you panic (like I often do), you can always `git reset --hard`: /!\ **this will delete all the non-committed local changes** (the main branch will go back to its last committed state, your friend's latest glorious commit will be safe, and your committed work is still safe in your branch). Take a deep breath and try again from step 4.  
+      
+6. Once no conflicts are encountered upon merging our branch with main, we can push!  
+      `git push origin main`  
 
 
 # CHECKLIST
