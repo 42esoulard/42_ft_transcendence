@@ -1,0 +1,106 @@
+version: '3'
+
+services:
+
+  # backend Service with nestjs-express framework
+  backend:
+    build:
+      context: "./backend"
+      args:
+       NODE_VERSION: ${NODE_VERSION}
+    volumes:
+      - ./backend:/usr/src/app
+    ports:
+      - "3000:3000"
+      # - "9229:9229" #debug address
+    networks:
+      - network
+    environment:
+      NODE_ENV: development
+      MODE: DEV
+      PORT: 3000
+    env_file:
+    - database.env
+    command: sh -c "rm -rf ./dist && npm install && npm run start:dev"
+    # command: "tail -f"
+    depends_on:
+      - postgres
+  
+  # frontend Service with vuejs framework
+  frontend:
+    build:
+      context: "./frontend"
+      args:
+       NODE_VERSION: ${NODE_VERSION}
+    volumes:
+      - ./frontend:/usr/src/app
+    ports:
+      - "8080:8080"
+      # - "5000:3000" #For json-server (development)
+    networks:
+      - network
+    environment:
+      NODE_ENV: development
+      VUE_APP_API_URL: ${API_URL}
+    command: sh -c "npm install && npm run serve"
+    depends_on:
+      - postgres
+  
+
+  # PostgreSQL Service
+  postgres:
+    # image: postgres:${POSTGRES_VERSION}
+    build:
+      context: "./postgres"
+      args:
+       POSTGRES_VERSION: ${POSTGRES_VERSION}
+    networks:
+      - network
+    restart: on-failure
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./postgresdata:/var/lib/postgresql/data
+    container_name: ${POSTGRES_NAME}
+
+  # Adminer Service (database management tool)
+  adminer:
+    image: adminer:${ADMINER_VERSION}
+    networks:
+      - network
+    restart: on-failure
+    ports:
+      - "8000:8080"
+    environment:
+      ADMINER_DEFAULT_DB_DRIVER: ${DB_DRIVER}
+      ADMINER_DEFAULT_SERVER: ${DB_HOST}
+      ADMINER_DEFAULT_DB_NAME: ${DB_NAME}
+    depends_on:
+      - postgres
+    # container_name: "${ADMINER_NAME}"
+
+  # # Pgadmin Service (database management tool)
+  # pgadmin:
+  #   container_name: pgadmin
+  #   image: dpage/pgadmin4
+  #   ports:
+  #     - "8001:80"
+  #   links:
+  #     - "postgres"
+  #   environment:
+  #     PGADMIN_DEFAULT_PASSWORD: ${DB_PASSWORD}
+  #     PGADMIN_DEFAULT_EMAIL: test@test.fr
+  #   networks: 
+  #     - backend
+  #   depends_on:
+  #     - postgres
+
+  # Networks
+networks:
+  network:
+
+#  # Volumes
+# volumes:
+  # postgresdata:

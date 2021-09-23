@@ -1,0 +1,53 @@
+30/09/21
+[*Insert awesome talking points for the blessed day of september 30th*]
+
+------------------------------------------------------------
+
+23/09/21
+1) git: PR? shared access? 
+  > Sharing this repo! group it with julnolle content
+2) DefaultAPI from sdk: qu'est-ce qui est généré exactement ? 
+  > TOUT
+   Tous les fichiers dans sdk? ça copie les fonctions du back ? 
+  > OUI
+3) Discuss trello orga? 
+  > OK
+4) LE CHAT UTILISE T IL LA DB? 
+  > It will! 
+  LE JEU ? 
+  > Probably not, en tout cas pas les positions de jeu exactement
+  EST-CE QUE LES SOCKETS EPARGNENT LA DB? 
+  > yup! c'est tout l'intérêt (ne pas avoir à faire de requêtes serveur)
+
+Study Ideas
+- TS (netninja tuto: https://www.youtube.com/watch?v=2pZmKW9-I_k&list=PL4cUxeGkcC9gUgr39Q_yD6v-bSyMwKPUI)
+  + study decorators  
+- dto (intermédiaire pour ne pas exposer direct les obj de db) + mise en place DB:
+https://medium.com/@gausmann.simon/nestjs-typeorm-and-postgresql-full-example-development-and-project-setup-working-with-database-c1a2b1b11b8f
+- orga DB + schema db julnolle:
+https://www.youtube.com/channel/UC_emPzF9DZgK05QedIqbNDg/playlists
+https://dbdiagram.io/d/6148c3e3825b5b01460af366
+- share github access ? copy files from julnolle repo to mine, copy hidden files from root
+- cleanup trello
+- choisir une fonctionnalité au choix sur trello et s'y incrire pour la dev
+
+------------------------------------------------------------
+
+16/09/21
+
+1) Qui connait quoi ?
+julien: docker, db, chat
+basile: html css JS nestJS
+richard: html css JS 
+estelle: html css JS
+
+2) Quel plan d'attaque ? Par où commencer ? 
+Docker > DB > profiles > user ranks > chat > game
+---login
+3) Reu 1x par semaine ? Quel jour/heure? 42/Discord ?
+Jeudi 10h
+
+------------------------------------------------------------
+
+
+

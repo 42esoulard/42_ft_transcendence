@@ -1,86 +1,99 @@
-# 42_ft_transcendence
+# ft_transcendence
+Website for the mighty pong contest. With an admin view, chat with moderators, real-time multiplayer online games.
+Built with NestJS (back) and Vue.js (Front).
+Completely dockerized.
 
-# [MINDMAP](https://app.mindmup.com/map/_free/2021/09/25828b20168011ecb33a8fface99c92d) (!careful, it's public and if we save it the url needs to be updated)
+## Application structure:
+- [Vue.js 3](https://v3.vuejs.org/guide/introduction.html) as frontend accessible on http://localhost:8080
+- [NestJS](https://docs.nestjs.com/) as backend accessible on http://localhost:3000
+- a database [PostgreSQL](https://www.postgresql.org/docs/13/index.html)
+- [Adminer](https://www.adminer.org/en/) as database management tool accessible on http://localhost:8000
 
-# TECHS USED + DOC AND TUTORIALS
-  - ### [FT_TRANSCENDENCE DOC](https://github.com/qingqingqingli/ft_transcendence/wiki)
+## To run the application:
+NB: the installation process may take some times
+```sh
+$ cd ft_transcendence
+$ docker-compose up --build
+```
+The first time you run the application, the database is empty, you may want to seed the db with some users:
+```sh
+$ ./seed_db.sh
+```
+If errors occures after a git pull:
+```sh
+$ ./reset.sh
+```
+### The front is made of four routes:
+- `/`: simply welcome
+- `/users`: list all the users in database
+- `/adduser`: allows to add user in database
+- `/chat`: after entering a random username, a chat module is available. To test it, simply open a second window, enter a username and lets test
 
-  - ### JAVASCRIPT
-      [You Don't Know JS: a free online 6 parts book for in depth understanding of JS](https://github.com/getify/You-Dont-Know-JS/tree/1st-ed)
+### Backend endpoints are documented with OpenAPI:
+- to get the documentation UI: http://localhost:3000/api
+- to get the API specs as JSON format: http://localhost:3000/api-json
 
-  - ### FRONTEND: VueJS - a typescript framework
-      Google says Vue performs better regarding memory allocation, is lighter, and easier to learn than Angular. Sooo... 
-      [Net Ninja: Vue 3](https://www.youtube.com/watch?v=YrxBCBibVo0&list=PL4cUxeGkcC9hYYGbV60Vq3IXYNfDk8At1)
-  - ### BACKEND: NestJS
-    [A 1h intro video](https://www.youtube.com/watch?v=F_oOtaxb0L8)
+## In a nutshell
+The front communicates with the backend API via an sdk, generated thanks to the [OpenApi module (@nestjs/swagger)](https://docs.nestjs.com/openapi/introduction) nested by NestJs and the [swagger editor](https://editor.swagger.io/).  
+The chat is working with the [Websocket module (@nestjs/websockets)](https://docs.nestjs.com/websockets/gateways) in backside and the [socket.io-client](https://socket.io/docs/v4/) in frontside.   
+Finally, the database is connected to the backend via the package [@nestjs/typeorm](https://docs.nestjs.com/techniques/database).
 
-  - ### DB: PostgreSQL
-    [A very thorough tutorial](https://www.postgresqltutorial.com/)
+## Under the hood
+Both backend and frontend are made of a lot of files. Don't worry, the file multiplication is part of the frameworks structures but all are needed.
+### Backend
+The core of our code is organised as an MVC pattern, and stored into the `src` directory. Files are divided into [controllers](https://docs.nestjs.com/controllers), [modules](https://docs.nestjs.com/modules) and [providers](https://docs.nestjs.com/providers) (including services).  
+- `main.ts` is the entry file of our application, it creates the server (port 3000) and embed some config.  
+- `app.*.ts` are the main files of our application. Theses files are sufficient to run an "hello world" application, they are organised as an MVC patern:
+  - `Controllers`: Controllers are responsible for handling incoming requests and returning responses to the client. Controllers can be considered as the reflect of our API. 
+  - `Providers`: Here, we only have services, but we could also have repositories, factories, helpers, and so on. Services are responsible for all the logic of out codes: computing values, data storage and retrieval, etc.
+  - `Modules`: Modules helps us to organize our application structure. It links providers with controllers. Each application has at least one module, a root module.  
+Because our application will provide several features, we will find one module by feature. A feature module simply organizes code relevant for a specific feature, keeping code organized and establishing clear boundaries. Modules are, by convention, stored into folders named accordingly.
 
-  - ### DOCKER && DOCKER-COMPOSE
-    [Official tutorial](https://docs.docker.com/compose/gettingstarted/)
-    [Docker Compose Tutorial: advanced Docker made simple](https://www.educative.io/blog/docker-compose-tutorial)
+- `./users`: this folder contains module, controller and service to handle the "user" feature of our application. The idea of this feature is to save or retrieve users from our database. For instance, when the *user controller* recieves a GET request, it automatically ask the *user service* to make a database query, which returns all users stored in database. The *controller* can now create a response and send the content via http body.  
+In the `users` folder, you will find several others folders. These are just "helpers" which allows us validating data recieved via POST (`dto`), to describe what is a user (`interface`), and describe the "user" table of our database (`entity`).  
+- `./chat`: this folder contains the chat module feature. The service associated is called "gateway". Without entering into details, it makes our API compatible with the package socket.io, which manages the WebSocket. The WebSocket is a protocol that operates in a different way than HTTP. Thus, the first connection established between client - server - WebSocket is made by an http request (handcheck). The communication is then upgraded to websocket, the connection can go on a regular TCP socket.  
+- `./config`: this folder contains some backend configuration, mainly credentials to connect to the database.
+- `./migration` and `./scripts` contains utilitary functions to manage database, for development.
+#### Frontend
+The frontend file organization is way more simple than backend's.  
+Before all, it is important to notice that we don't use the [CDN](https://v3.vuejs.org/guide/installation.html#cdn) version of Vue.js, but the [self hosted](https://v3.vuejs.org/guide/installation.html#download-and-self-host) one, which supplies more features, like routes. With self-hosted installation, a lot of files are with `.vue` extension. These are simply files written in javascript or typescript, where all of our code is embedded. In these files, we need to respect a particular template (see [The Net Ninja tutorial](https://youtu.be/GWRvrSqnFbM?t=960)).  
+Before entering into details, some knowledges about Vue.js are necessary. If you don't know Vue.js, please follow some tutorials to learn vue.js, [The Net Ninja](https://www.youtube.com/c/TheNetNinja/playlists) make some tremendous one on [Youtube](https://www.youtube.com/playlist?list=PL4cUxeGkcC9hYYGbV60Vq3IXYNfDk8At1) !  
+  
+**Alright, in the `frontend` directory, you will notice several folders:**  
 
+- `./public`: contains the main html file (index.html) displayed by the browser. It is important to notice here the `<div id="app"></div>`.  
+- `./sdk`: which contains our autogenerated sdk. The sdk supplies a set of functions which simplifies the communication between backend and frontend. 
 
-# TEAM CONVENTIONS
-  - camelCase
-  - Clear module accesses!! (ie necessary documentation for each module like a README.md, self explanatory function names)
-  - At all times, we must have a board with a to do list, a who's-doing-what, a who-did-what
-  - Weekly organisation meeting (who did what, who struggles with what, who needs what)
-  - Git etiquette:
-      - git checkout -b my_branch
-      - do your commits, self-explanatory commit names
-      - git checkout main
-      - git pull
-      - git merge my_branch
-      - git push origin main
+- `./src`: contains the core of our application:  
 
+  - `main.ts`: Just as NestJS, the main.ts is the entry file of the frontend, it simply "mounts" all html generated by our application in place of the `<div id="app">` in index.html.  
+  - `App.vue`: is the main vue file, which calls all of the others embedded in the `views` folder (by the mean of [routes](vhttps://v3.vuejs.org/guide/routing.html#official-router)).  
+  - `views/*.vue`: they simply code the different pages of our application, using sdk's functions to GET/POST data from/to the backend. Here `Users.vue` get the list of users from database to display it. `AddUser.vue` codes for a form to POST a new user to database. `Chat.vue` is more tricky and allows to communicate with the WebSocket instanciated by the backend.  
+NB: these `.vue` files code for different "pages" of our website. Becareful, these ar not pages but simply components, displayed or not, by the mean of events. Our application is still a [Single Page Application](https://developer.mozilla.org/en-US/docs/Glossary/SPA) !  
 
-# CHECKLIST
+  - `./types`: simply contains some interfaces to create some custom types (ie. the *User* type).  
+  - `./router`: contains a kind of config file which handles routes, used in *App.vue*.
+## Some ressources
 
-### UI - The different pages / main nodes (predesign each):
-  - 0) login
-  - 1) User page: avatar + edit, name + edit, stats, friends (with their online/offline status + link to their profile + msg + unfriend)
-  - 2) Public user profile: avatar, name, stats, add friend
-  - 3) List of users ranked by best player ? (+ link to their profile)
-  - 4) List of channels
-  - 5) Chat
-  - 6) Game
+### Vue.js 3
+**Official documentation**: https://v3.vuejs.org/guide/introduction.html  
+**The Net Ninja tutorial on Youtube**: https://www.outube.com/watch?v=YrxBCBibVo0&list=PL4cUxeGkcC9hYYGbV60Vq3IXYNfDk8At1  
+**The Complete Guide to Vue 3 Plug-ins**: https://www.codemag.com/Article/2103071/The-Complete-Guide-to-Vue-3-Plug-ins-Part-2
 
-### SECURITY
-  - Passwords stored in the db should be encrypted:[pgcrypto](https://x-team.com/blog/storing-secure-passwords-with-postgresql/)
-  - Defense against SQL injections:[a good tutorial](https://blog.crunchydata.com/blog/preventing-sql-injection-attacks-in-postgresql)
-  - Check and protection against user inputs/forms (see SQL defence tutorial above + [JS validation API](https://www.w3schools.com/js/js_validation_api.asp))
+### NestJS
+**Official documentation**: https://docs.nestjs.com/  
+**codeconcept tutorial on Youtube (french)**: https://www.youtube.com/watch?v=PMva3v8K6h4&list=PLs_WqGRq69UiSaXX85NRUX4rkeiNP3K6l
 
-### USER ACCOUNT
-  - log in with 42 OAuth (API):[42API doc](https://api.intra.42.fr/apidoc), [Introduction to OAuth 2](https://www.digitalocean.com/community/tutorials/an-introduction-to-oauth-2),[Fat IBM tutorial](https://www.ibm.com/docs/en/acfc?topic=endpoint-tutorial-securing-api-by-using-oauth-20)
-  - 2-factor authentication can be activated (like google authenticator or an SMS etc...)[google authenticator](https://github.com/speakeasyjs/speakeasy), [SMS](https://cloud.google.com/identity-platform/docs/web/mfa)
-  - can choose a display name (ALGO/DB)
-  - A user has several victories and losses and other stats (ladder level, achievements...)(ALGO/DB)
-  - must have avatar generated or uploaded by the user(ALGO/DB)
-  - can add other users as friends, and see their current status (online, offline, in a game...)(ALGO/DB)
-  - match history (including duel, ladder) that can be consulted by anyone logged-in(ALGO/DB)
+### Node js
+**npm global or local packages**: https://nodejs.dev/learn/npm-global-or-local-packages
 
-### [CHAT: a tutorial with Vue 3, Socket.io and Nodejs](https://masteringbackend.com/posts/build-a-real-time-chat-app-with-vue-3-socket-io-and-nodejs/)
-  - Users must be able to create channels public/private or protected by a password
-  - Users must be able to send direct messages to other users
-  - Users must be able to block other user and therefore they will not see their messages anymore
-  - A user that creates a new channel is automatically its owner until he leaves the channel
-    - owner of a channel can add/change/remove a password to access the channel
-    - owner can select a user to be an administrator and is also an administrator of the channel
-    - administrator can ban or mute users for a certain amount of time
-  - Through the chat interface users should be able to ask other players to do a Pong match (Ping? Pong)
-  - Through the chat interface users must be able to see other players profiles
+### Database handling
+**TypeORM Entities**: https://typeorm.io/#/entities  
+**Using TypeORM with NestJS**: https://docs.nestjs.com/techniques/database
 
-### [GAME: JS/HTML/CSS pong tutorial](https://medium.com/nerd-for-tech/building-pong-with-javascript-c0dd0ab79c9c)
-  - play pong directly on the website and live against another player.[socket.io + nodeJS for continuous client-server communication](https://www.youtube.com/watch?v=w6EIMfJmpZ4)
-  - match-making system, user can join a game queue and are automatically matched with another player.(ALGO/DB)
-  - It can be on a canvas or it can be with 3d effects, it can be ugly but it must be a pong like the one from 1972.
-  - game customization options (power-ups, different maps etc) but the user must be able to play a default pong game without any added stuff.
-  - The game must be responsive!
-  - Other users can watch the game live without interfering in it.
+### Chat & WebSocket
+**Socket.IO official documentation**: https://socket.io/docs/v4  
+**Build a Real-time Chat App with Vue 3, Socket.io and Nodejs**: https://masteringbackend.com/posts/build-a-real-time-chat-app-with-vue-3-socket-io-and-nodejs/
 
-
-### REQUIREMENTS:
-  - Low latency!!!!!
-      - [Use async JS for API requests, DB handling and other slow stuff](https://javascript.info/async-await)
+### Generals
+**Build a NestJS - Vue.js app from scratch**: https://scotch.io/tutorials/building-a-modern-app-using-nestjs-mongodb-and-vuejs#toc-what-you-ll-build
