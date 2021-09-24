@@ -4,6 +4,7 @@
     <router-link to="/users">Users</router-link> |
     <router-link to="/adduser">Add User</router-link> |
     <router-link to="/chat">Chat</router-link>
+    <router-link to="/pong">Pong</router-link>
   </div>
   <router-view/>
 </template>
