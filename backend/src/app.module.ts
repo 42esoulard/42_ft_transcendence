@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { configService } from './config/config.service';
 import { UsersModule } from './users/users.module';
 import { ChatModule } from './chat/chat.module';
+import { AuthController } from './auth/auth.controller';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { ChatModule } from './chat/chat.module';
     UsersModule,
     ChatModule
   ],
-  controllers: [AppController],
+  controllers: [AppController, AuthController],
   providers: [AppService],
 })
 export class AppModule {}
