@@ -1,6 +1,6 @@
 # ft_transcendence
 Website for the mighty pong contest. With an admin view, chat with moderators, real-time multiplayer online games.
-Built with NestJS (back) and Vue.js (Front).
+Built with NestJS (back) and Vue3.js (Front).
 Completely dockerized.
 
 ## Application structure:
