@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as fs from "fs";
+import * as session from 'express-session';
+import * as passport from 'passport';
 // declare const module: any; // For Hot-Module Replacement
 
 async function bootstrap() {
@@ -18,12 +20,12 @@ async function bootstrap() {
     .setVersion('1.0')
     .addServer('http://localhost:' + process.env.PORT)
     .build();
-  const options: SwaggerDocumentOptions =  {
-      operationIdFactory: (
-        controllerKey: string,
-        methodKey: string
-      ) => methodKey
-    };
+  const options: SwaggerDocumentOptions = {
+    operationIdFactory: (
+      controllerKey: string,
+      methodKey: string
+    ) => methodKey
+  };
   const document = SwaggerModule.createDocument(app, config, options);
 
   // To save the api specification in root
@@ -38,6 +40,16 @@ async function bootstrap() {
   // }
   ////////////////////////////////////////
 
+  // apply the express-session middleware as global
+  app.use(
+    session({
+      secret: 'my-secret',
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
+  app.use(passport.initialize());
+  app.use(passport.session());
   await app.listen(process.env.PORT);
 }
 bootstrap();

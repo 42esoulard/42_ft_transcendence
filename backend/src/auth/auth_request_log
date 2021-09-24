@@ -627,4 +627,4 @@ route: Route { path: '/auth', stack: [ [Layer] ], methods: { get: true } },
 [Symbol(kTrailers)]: null,
 [Symbol(kTrailersCount)]: 0,
 [Symbol(RequestTimeout)]: undefined
-backend_1   | }
+ }

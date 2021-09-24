@@ -1,4 +1,4 @@
-import { Controller, Get, Redirect, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Redirect, Req, Res, Session, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { FortyTwoAuthGuard } from './fortytwo.guard';
 
@@ -26,4 +26,10 @@ export class AuthController {
     console.log(req.query);
     return req.query;
   }
+
+  @Get()
+  findAll(@Session() session: Record<string, any>) {
+    session.visits = session.visits ? session.visits + 1 : 1;
+  }
+
 }

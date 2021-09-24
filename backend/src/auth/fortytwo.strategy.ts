@@ -7,12 +7,12 @@ import { env } from 'process';
 export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
   constructor() {
     super({
-      authorizationURL: process.env['42_AUTH_URL'],
-      tokenURL: process.env['42_TOKEN_URL'],
+      // authorizationURL: process.env['42_AUTH_URL'],
+      // tokenURL: process.env['42_TOKEN_URL'],
       clientID: process.env['42_CLIENT_ID'],
       clientSecret: process.env['42_CLIENT_SECRET'],
       callbackURL: process.env['42_CALLBACK_URL'],
-      scope: null, 
+      scope: 'public', 
       profileFields: {
         'id': function (obj: any) { return String(obj.id); },
         'username': 'login',
@@ -28,8 +28,8 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
   }
 
   async validate(accessToken: string, refreshToken:string, profile, cb): Promise<any> {
-    const { firstname, lastname } = profile;
-    console.log(firstname, lastname);
+    const { username } = profile;
+    console.log(username);
   }
 
   // function(accessToken, refreshToken, profile, cb) {
