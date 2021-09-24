@@ -15,11 +15,12 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   private logger: Logger = new Logger('PongGateway');
 
-	position = {
+	private position = {
 				x: 200,
 				y: 200
   }
-  afterInit(server: any) {
+
+  afterInit(server: Server) {
     this.logger.log('init')
   }
   
