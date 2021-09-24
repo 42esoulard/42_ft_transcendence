@@ -7,6 +7,7 @@
 		<button v-on:click="move('up')"> Up </button>
 		<button v-on:click="move('down')"> Down </button>
 	</p>
+	<p> Use arrows (keyboard) or buttons to move </p>
 </template>
 
 <script>
@@ -26,6 +27,7 @@ export default({
 		},
 	created() {
 		this.socket = io('http://localhost:3000')
+		window.addEventListener("keydown", this.onKeyDown)
 	},
 	mounted() {
 		console.log('mounted')
@@ -41,6 +43,19 @@ export default({
 	methods: {
 		move(direction) {
 			this.socket.emit('move', direction)
+		},
+		onKeyDown(event) {
+			const codes = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+			if (!codes.includes(event.code))
+				return;
+			if (event.code === 'ArrowUp')
+				this.move('up')
+			else if (event.code === 'ArrowDown')
+				this.move('down')
+			else if (event.code === 'ArrowLeft')
+				this.move('left')
+			else if (event.code === 'ArrowRight')
+				this.move('right')
 		}
 	}
 })
