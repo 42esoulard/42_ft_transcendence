@@ -1,6 +1,6 @@
 import { Controller, Get, Redirect, Req, Res, Session, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { FortyTwoAuthGuard } from './fortytwo.guard';
+import { AuthenticatedGuard, FortyTwoAuthGuard } from './fortytwo.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -16,9 +16,11 @@ export class AuthController {
   redirect(@Res() res: Response) {
     res.send(200);
   }
-
+  
   @Get('status')
-  status() {
+  @UseGuards(AuthenticatedGuard)
+  status(@Req() req: any) {
+    return req.user;
   }
 
   @Get('logout')

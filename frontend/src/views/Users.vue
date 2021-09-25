@@ -2,7 +2,7 @@
   <h1>List of all users in database</h1>
   <div v-if="users.length">
     <div v-for="user in users" :key="user.id" class="user">
-      <h2>{{ user.firstname }} {{ user.lastname }}</h2>
+      <h2>{{ user.username }}</h2>
     </div>
   </div>
   <div v-else>
@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent, inject, onMounted, ref } from "vue";
 import { User } from "@/types/User";
-import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
+import { DefaultApi } from "sdk-client";
 
 export default defineComponent({
   name: "Users",

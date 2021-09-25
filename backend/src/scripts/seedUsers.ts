@@ -9,10 +9,10 @@ async function run() {
     .insert()
     .into(Users)
     .values([
-      { firstname: "Harry", lastname: "Potter", password: "password", salt: "salt" },
-      { firstname: "Ron", lastname: "Weasley", password: "password", salt: "salt" },
-      { firstname: "Hermione", lastname: "Granger", password: "password", salt: "salt" },
-      { firstname: "Severus", lastname: "Rogue", password: "password", salt: "salt" }
+      { username: "Harry", password: "password", salt: "salt", avatar: "path/to/avatar.img", two_fa: false },
+      { username: "Ron", password: "password", salt: "salt", avatar: "path/to/avatar.img", two_fa: false },
+      { username: "Hermione", password: "password", salt: "salt", avatar: "path/to/avatar.img", two_fa: false },
+      { username: "Severus", password: "password", salt: "salt", avatar: "path/to/avatar.img", two_fa: false }
     ])
     .execute();
   })

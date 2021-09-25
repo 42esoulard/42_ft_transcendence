@@ -44,6 +44,28 @@ export class UsersController {
 	}
 
 	/**
+	* Returns a user found in database by its username.
+	*/
+	@Get('/name/:username')
+	@ApiOkResponse({
+		description: 'The user has been found in database',
+		type: User,
+	})
+	@ApiNotFoundResponse({
+		description: 'User not found',
+	})
+	@ApiBadRequestResponse({
+		description: 'Invalid username supplied',
+	})
+	async getUserByUsername(@Param('username') username: string): Promise<User> {
+		const user: User = await this.userService.getUserByUsername(username)
+		if (user == undefined) {
+			throw new NotFoundException('User not found');
+		}
+		return user;
+	}
+
+	/**
 	* Save a new user to database from the POST body
 	*/
 	@Post()

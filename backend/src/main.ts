@@ -4,10 +4,16 @@ import { AppModule } from './app.module';
 import * as fs from "fs";
 import * as session from 'express-session';
 import * as passport from 'passport';
+// import { Db } from "typeorm-static";
+import { TypeORMSession } from './auth/entity/TypeORMSession.entity';
+import { TypeormStore } from 'connect-typeorm/out';
+import { getRepository } from 'typeorm';
 // declare const module: any; // For Hot-Module Replacement
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const sessionRepository = getRepository(TypeORMSession);
+
   app.enableCors({
     credentials: true,
     origin: ["http://localhost:8080", "http://127.0.0.1:8080"]
@@ -43,9 +49,14 @@ async function bootstrap() {
   // apply the express-session middleware as global
   app.use(
     session({
-      secret: 'my-secret',
+      cookie: {
+        maxAge: 86412345,
+      },
       resave: false,
       saveUninitialized: false,
+      store: new TypeormStore({})
+        .connect(sessionRepository),
+      secret: 'my-secret',
     }),
   );
   app.use(passport.initialize());

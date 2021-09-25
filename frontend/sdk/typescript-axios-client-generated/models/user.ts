@@ -28,13 +28,7 @@ export interface User {
      * @type {string}
      * @memberof User
      */
-    firstname: any;
-    /**
-     * 
-     * @type {string}
-     * @memberof User
-     */
-    lastname: any;
+    username: any;
     /**
      * 
      * @type {string}
@@ -47,4 +41,16 @@ export interface User {
      * @memberof User
      */
     salt: any;
+    /**
+     * 
+     * @type {string}
+     * @memberof User
+     */
+    avatar: any;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof User
+     */
+    twoFa: any;
 }

@@ -13,7 +13,7 @@ async function run(id: number) {
   if (userToUpdate === undefined) {
     throw new Error('The user doesnt exist into database, cannot update')
   }
-  userToUpdate.firstname = "Bla";
+  userToUpdate.username = "Bla";
   return userRepository.save(userToUpdate);
 }
 

@@ -24,7 +24,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleConnection() {
     // A client has connected
     this.connections++;
-    console.log("A client has connected");
+    // console.log("A client has connected");
     
     // Notify connected clients of current users
     this.server.emit('connections', this.connections);
@@ -33,7 +33,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleDisconnect() {
     // A client has disconnected
     this.connections--;
-    console.log("A client has disconnected");
+    // console.log("A client has disconnected");
     // Notify connected clients of current users
     this.server.emit('connections', this.connections);
   }

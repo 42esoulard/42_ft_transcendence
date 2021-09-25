@@ -1,7 +1,8 @@
 export class User {
 	id: number;
-	firstname: string;
-	lastname: string;
+	username: string;
 	password: string;
 	salt: string;
+	avatar: string;
+	two_fa: boolean;
 }

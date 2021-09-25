@@ -1,35 +1,44 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Strategy } from 'passport-42';
 import { PassportStrategy } from '@nestjs/passport';
 import { env } from 'process';
+import { FortyTwoUser } from './interfaces/42user.interface';
+import { AuthService } from './auth.service';
+import { User } from 'src/users/interfaces/user.interface';
 
 @Injectable()
 export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
-  constructor() {
+  constructor(
+    private readonly authService: AuthService
+    ) {
     super({
-      // authorizationURL: process.env['42_AUTH_URL'],
-      // tokenURL: process.env['42_TOKEN_URL'],
       clientID: process.env['42_CLIENT_ID'],
       clientSecret: process.env['42_CLIENT_SECRET'],
       callbackURL: process.env['42_CALLBACK_URL'],
-      scope: 'public', 
+      scope: 'public',
       profileFields: {
         'id': function (obj: any) { return String(obj.id); },
         'username': 'login',
-        // 'displayName': 'displayname',
-        // 'name.familyName': 'last_name',
-        // 'name.givenName': 'first_name',
-        // 'profileUrl': 'url',
-        // 'emails.0.value': 'email',
-        // 'phoneNumbers.0.value': 'phone',
-        // 'photos.0.value': 'image_url'
+        'displayName': 'displayname',
+        'lastname': 'last_name',
+        'firstname': 'first_name',
+        'profileUrl': 'url',
+        'emails.0.value': 'email',
+        'photo': 'image_url'
       }
     });
   }
 
-  async validate(accessToken: string, refreshToken:string, profile, cb): Promise<any> {
-    const { username } = profile;
-    console.log(username);
+  async validate(accessToken: string, refreshToken: string, profile, cb: Function): Promise<User> {
+    const { username, provider, firstname, lastname, photo } = profile;
+    console.log({ username, provider, firstname, lastname, photo });
+
+    const userProfile: FortyTwoUser = { username, photo };
+    const user = await this.authService.validateUser(userProfile);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return user;
   }
 
   // function(accessToken, refreshToken, profile, cb) {
