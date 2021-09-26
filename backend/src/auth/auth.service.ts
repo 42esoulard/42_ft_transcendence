@@ -22,7 +22,7 @@ export class AuthService implements AuthProvider {
   }
 
   //The following is not used because of usersService
-  createUser(userProfile: FortyTwoUser): Promise<User> {
+  createUser(userProfile: FortyTwoUser): Promise<User> | undefined {
     const { username, photo } = userProfile;
     return this.usersService.saveUser({ username: username, password: 'password', avatar: photo });
   }

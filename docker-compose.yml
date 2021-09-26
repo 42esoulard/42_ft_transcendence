@@ -49,11 +49,11 @@ services:
 
   # PostgreSQL Service
   postgres:
-    # image: postgres:${POSTGRES_VERSION}
-    build:
-      context: "./postgres"
-      args:
-       POSTGRES_VERSION: ${POSTGRES_VERSION}
+    image: postgres:${POSTGRES_VERSION}
+    # build:
+    #   context: "./postgres"
+    #   args:
+    #    POSTGRES_VERSION: ${POSTGRES_VERSION}
     networks:
       - network
     restart: on-failure

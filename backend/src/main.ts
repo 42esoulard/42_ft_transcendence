@@ -4,7 +4,6 @@ import { AppModule } from './app.module';
 import * as fs from "fs";
 import * as session from 'express-session';
 import * as passport from 'passport';
-// import { Db } from "typeorm-static";
 import { TypeORMSession } from './auth/entity/TypeORMSession.entity';
 import { TypeormStore } from 'connect-typeorm/out';
 import { getRepository } from 'typeorm';
