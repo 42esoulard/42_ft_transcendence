@@ -16,10 +16,14 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   private logger: Logger = new Logger('PongGateway');
 
 	private position = {
-				x: 200,
-				y: 200
+				player1: 200,
+				player2: 200
   }
 
+  private clients = {
+        client1: '',
+        client2: ''
+  }
 
   afterInit(server: Server) {
     this.logger.log('Initialized')
@@ -31,16 +35,26 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log('Client connected ' + client.id);
-    client.emit('position', this.position)
+    // client.emit('position', this.position)
   }
 
   @SubscribeMessage('move')
   handleMessage(client: Socket, message: {room: string, text: string}): void {
     this.logger.log('msg received: ' + message.text)
-    if (message.text === 'up')
-      this.position.y -= 5
-    if (message.text === 'down')
-      this.position.y += 5
+    if (client.id === this.clients.client1)
+    {
+      if (message.text === 'up')
+        this.position.player1 -= 5
+      if (message.text === 'down')
+        this.position.player1 += 5
+    }
+    if (client.id === this.clients.client2)
+    {
+      if (message.text === 'up')
+        this.position.player2 -= 5
+      if (message.text === 'down')
+        this.position.player2 += 5
+    }
     this.server.to(message.room).emit('position', this.position);
   }
 
@@ -48,6 +62,10 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleJoinRoom(client: Socket, room:string)
   {
     client.join(room)
+    if (!this.clients.client1)
+      this.clients.client1 = client.id
+    else if (!this.clients.client2)
+      this.clients.client2 = client.id
     client.emit('joinedRoom', room)
   }
   

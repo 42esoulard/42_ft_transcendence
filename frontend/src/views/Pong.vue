@@ -20,8 +20,10 @@ export default({
 	data() {
 		return {
 			context: {},
-			positionA: 0,
-			positionB: 0,
+			position: {
+				player1: 0,
+				player2: 0
+			},
 			socket: null,
 			room: '',
 			}
@@ -39,8 +41,8 @@ export default({
 			console.log('position received')
 			this.position = data
 			this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height)
-			this.context.fillRect(0, this.position.y, 20, 80)
-			this.context.fillRect(620, this.position.y, 20, 80)
+			this.context.fillRect(0, this.position.player1, 20, 80)
+			this.context.fillRect(620, this.position.player2, 20, 80)
 		})
 
 		this.socket.on('joinedRoom', data => {
