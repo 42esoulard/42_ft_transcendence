@@ -1,5 +1,6 @@
 export interface Message {
     message: any,
     type: number,
-    user: string
+    user: string,
+    room: string
 }

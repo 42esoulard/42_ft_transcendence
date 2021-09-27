@@ -40,11 +40,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('chat-message')
-  async onChat(@MessageBody() message: string, @ConnectedSocket() client: Socket) {
+  async onChat(@ConnectedSocket() client: Socket, message: { sender: string, msg: string, room: string }) {
     // client.emit('chat-message', message, (message) => console.log(message));
-    client.broadcast.emit('chat-message', message);
+    client.broadcast.to(message.room).emit('chat-message', message);
   }
   
+  @SubscribeMessage('joinRoom')
+  handleJoinRoom(client: Socket, room: string) {
+    client.join(room);
+    client.emit('joinedRoom', room);
+  }
+
+  @SubscribeMessage('leaveRoom')
+  handleLeaveRoom(client: Socket, room: string) {
+    client.leave(room);
+    client.emit('leftRoom', room);
+  }
+
   @SubscribeMessage('typing')
   async onTyping(@MessageBody() TypingUser: string, @ConnectedSocket() client: Socket) {
     client.broadcast.emit("typing", TypingUser);

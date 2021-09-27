@@ -30,14 +30,18 @@
       <div class="card bg-info" v-if="ready">
         <div class="card-header text-white">
           <h4>
-            My Chat App
-            <span class="float-right">{{ connections }} connections</span>
+            <div class="tab-row">
+              <button class="tab-btn" :class="{ active: activeRoom === 'general'}" @click="activeRoom = 'general'">General</button>
+              <button class="tab-btn" :class="{ active: activeRoom === 'random'}" @click="activeRoom = 'random'">Random</button>
+              <button class="tab-btn" :class="{ active: activeRoom === 'cat pics'}" @click="activeRoom = 'cat pics'">Cat Pics</button>
+            </div>
+            <span class="float-right">{{ connections }} online</span>
           </h4>
         </div>
         <ul class="list-group list-group-flush text-right">
           <small v-if="typing" class="text-white">{{ typing }} is typing</small>
           <li class="list-group-item" v-for="(message, i) in messages" :key="i">
-            <span :class="{ 'float-left': message.type === 1 }">
+            <span v-if="message.room == activeRoom" :class="{ 'float-left': message.type === 1 }">
               {{ message.message }}
               <small>:{{ message.user }}</small>
             </span>
@@ -62,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, watch } from "vue";
+import { computed, defineComponent, reactive, ref, watch } from "vue";
 import { io } from "socket.io-client";
 import { Message } from "@/types/Message";
 import { Info } from "@/types/Info";
@@ -88,18 +92,39 @@ export default defineComponent({
     const ready = ref(false);
     const info = reactive<Info[]>([]);
     const connections = ref(1);
+    const activeRoom = 'general';
 
-    // Doesn't work --> should send an event while browser is closed
+    const rooms = {
+      general: false,
+      random: false,
+      catPics: false
+    }
+
+    const isMemberOfActiveRoom = () => {
+      console.log(rooms[activeRoom]);
+      return rooms[activeRoom];
+    }
+
+    const toggleRoomMembership = () => {
+      if (isMemberOfActiveRoom()) {
+        socket.emit('leaveRoom', activeRoom);
+      } else {
+        socket.emit('joinRoom', activeRoom);
+      }
+    }
+
     window.onbeforeunload = () => {
       console.log("onbeforeunload");
       socket.emit("leave", username.value);
     };
 
     socket.on("chat-message", (data: any) => {
+      
       messages.push({
         message: data.message,
         type: 1,
         user: data.user,
+        room: activeRoom
       });
     });
 
@@ -111,11 +136,21 @@ export default defineComponent({
       typing.value = "";
     });
 
+    socket.on("joinedRoom", () => {
+      rooms[activeRoom] = true;
+    });
+
+    socket.on("leftRoom", () => {
+      rooms[activeRoom] = false;
+    });
+
     socket.on("join", (user: string) => {
       info.push({
         username: user,
         action: "joined",
       });
+      console.log('HERE')
+      toggleRoomMembership();
 
       setTimeout(() => {
         info.length = 0;
@@ -144,16 +179,24 @@ export default defineComponent({
     });
 
     const send = () => {
-      messages.push({
-        message: newMessage.value,
-        type: 0,
-        user: "Me",
-      });
+      
+      //check if user is member of active room
+      if (isMemberOfActiveRoom()) {
+      
+        messages.push({
+          message: newMessage.value,
+          type: 0,
+          user: "Me",
+          room: activeRoom
+        });
 
-      socket.emit("chat-message", {
-        message: newMessage.value,
-        user: username.value,
-      });
+        socket.emit("chat-message", {
+          message: newMessage.value,
+          user: username.value,
+        });
+      } else {
+        alert('You must join the room to send messages!')
+      }
       newMessage.value = "";
     }
 
@@ -172,6 +215,7 @@ export default defineComponent({
       ready,
       info,
       connections,
+      activeRoom
     };
   },
 });
@@ -181,5 +225,13 @@ export default defineComponent({
 #messages {
   height: 300px;
   overflow-y: scroll;
+}
+.tab-row {
+  padding-top: 20px;
+}
+
+.tab-btn.active {
+  color:aliceblue;
+  background: blue;  
 }
 </style>
