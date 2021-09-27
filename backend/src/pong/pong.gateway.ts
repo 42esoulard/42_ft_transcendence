@@ -37,10 +37,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('move')
   handleMessage(client: Socket, message: {room: string, text: string}): void {
     this.logger.log('msg received: ' + message.text)
-    if (message.text === 'right')
-      this.position.x += 5
-    if (message.text === 'left')
-      this.position.x -= 5
     if (message.text === 'up')
       this.position.y -= 5
     if (message.text === 'down')
