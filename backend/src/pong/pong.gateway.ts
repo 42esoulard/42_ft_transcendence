@@ -7,7 +7,7 @@ var position: {
   y: 200
 }
 
-@WebSocketGateway()
+@WebSocketGateway( { namespace: '/pong'})
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer()
@@ -20,8 +20,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				y: 200
   }
 
+
   afterInit(server: Server) {
-    this.logger.log('init')
+    this.logger.log('Initialized')
   }
   
   handleDisconnect(client: Socket) {
@@ -34,16 +35,30 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage('move')
-  handleMessage(client: Socket, text: string): void {
-    this.logger.log('msg received: ' + text)
-    if (text === 'right')
+  handleMessage(client: Socket, message: {room: string, text: string}): void {
+    this.logger.log('msg received: ' + message.text)
+    if (message.text === 'right')
       this.position.x += 5
-    if (text === 'left')
+    if (message.text === 'left')
       this.position.x -= 5
-    if (text === 'up')
+    if (message.text === 'up')
       this.position.y -= 5
-    if (text === 'down')
+    if (message.text === 'down')
       this.position.y += 5
-    this.server.emit('position', this.position);
+    this.server.to(message.room).emit('position', this.position);
+  }
+
+  @SubscribeMessage('joinRoom')
+  handleJoinRoom(client: Socket, room:string)
+  {
+    client.join(room)
+    client.emit('joinedRoom', room)
+  }
+  
+  @SubscribeMessage('leaveRoom')
+  handleLeaveRoom(client: Socket, room:string)
+  {
+    client.leave(room)
+    client.emit('leftRoom', room)
   }
 }
