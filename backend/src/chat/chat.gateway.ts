@@ -30,9 +30,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('connections', this.connections);
   }
   
-  async handleDisconnect() {
+  async handleDisconnect(@ConnectedSocket() client: Socket) {
     // A client has disconnected
     this.connections--;
+    client.disconnect();
     console.log("A client has disconnected");
     // Notify connected clients of current users
     this.server.emit('connections', this.connections);

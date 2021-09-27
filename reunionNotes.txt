@@ -27,7 +27,7 @@ https://medium.com/@gausmann.simon/nestjs-typeorm-and-postgresql-full-example-de
 - orga DB + schema db julnolle:
 https://www.youtube.com/channel/UC_emPzF9DZgK05QedIqbNDg/playlists
 https://dbdiagram.io/d/6148c3e3825b5b01460af366
-- share github access ? copy files from julnolle repo to mine, copy hidden files from root
+- share github access ? copy files from julnolle repo to mine, copy hidden files from root: OK
 - cleanup trello
 - choisir une fonctionnalité au choix sur trello et s'y incrire pour la dev
 

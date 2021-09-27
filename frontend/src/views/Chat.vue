@@ -87,7 +87,7 @@ export default defineComponent({
     const username = ref("");
     const ready = ref(false);
     const info = reactive<Info[]>([]);
-    const connections = ref(0);
+    const connections = ref(1);
 
     // Doesn't work --> should send an event while browser is closed
     window.onbeforeunload = () => {
