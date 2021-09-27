@@ -35,7 +35,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log('Client connected ' + client.id);
-    // client.emit('position', this.position)
+    client.emit('position', this.position)
   }
 
   @SubscribeMessage('move')
