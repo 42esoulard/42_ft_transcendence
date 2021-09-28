@@ -40,10 +40,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('chat-message')
-  async onChat(@ConnectedSocket() client: Socket, @MessageBody() message: string, @MessageBody() room: string) {
+  async onChat(@ConnectedSocket() client: Socket, @MessageBody() message) {
     // client.emit('chat-message', message, (message) => console.log(message));
-    console.log('in nest onChat', message, room)
+    console.log('in nest onChat', message.user, message.room)
     client.broadcast.emit('chat-message', message);
+  }
+
+  @SubscribeMessage('createRoom')
+  handleCreateRoom(@ConnectedSocket() client: Socket, @MessageBody() info) {
+    console.log('IN SERVER CREATEROOM', `${info.user} is the admin of the ${info.room} channel`)
+    client.emit('createdRoom', info.room);
+    client.broadcast.emit('addRoom', info.room)
   }
   
   @SubscribeMessage('joinRoom')

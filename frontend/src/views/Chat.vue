@@ -31,9 +31,11 @@
         <div class="card-header text-white">
           <h4>
             <select class="selectRoom">
-              <option class="optionRoom" @click="activeRoom = 'general'" :class="{ active: activeRoom === 'general'}" >General</option>
+              <option v-for="(value, room) in rooms" :key="room" class="optionRoom" @click="activeRoom = room" :id="room" >{{ room }}</option>
+              <!-- <option class="optionRoom" @click="activeRoom = 'general'" :class="{ active: activeRoom === 'general'}" >General</option>
               <option class="optionRoom" @click="activeRoom = 'random'" :class="{ active: activeRoom === 'random'}">Random</option>
-              <option class="optionRoom" @click="activeRoom = 'cat pics'" :class="{ active: activeRoom === 'cat pics'}">Cat Pics</option>
+              <option class="optionRoom" @click="activeRoom = 'cat pics'" :class="{ active: activeRoom === 'cat pics'}">Cat Pics</option> -->
+              <option class="optionRoom" @click="createRoom()">+</option>
               
               <!-- <button class="tab-btn" @click="activeRoom = 'general'" :class="{ active: activeRoom === 'general'}" >General</button>
               <button class="join-btn" @click="toggleRoomMembership()">+</button>
@@ -42,7 +44,8 @@
               <button class="tab-btn" @click="activeRoom = 'cat pics'" :class="{ active: activeRoom === 'cat pics'}">Cat Pics</button>
               <button class="join-btn" @click="toggleRoomMembership()">+</button> -->
             </select>
-            <button class="joinBtn" @click="toggleRoomMembership()">Join room</button>
+            <button v-if="!isMemberOfActiveRoom()" class="joinBtn" @click="toggleRoomMembership()">Join room</button>
+            <button v-else class="joinBtn" @click="toggleRoomMembership()">Leave room</button>
             <span class="float-right">{{ connections }} online</span>
           </h4>
         </div>
@@ -78,7 +81,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, watch } from "vue";
+import { computed, defineComponent, onMounted, onUpdated, reactive, ref, watch } from "vue";
 import { io } from "socket.io-client";
 import { Message } from "@/types/Message";
 import { Info } from "@/types/Info";
@@ -97,6 +100,7 @@ export default defineComponent({
     console.log("beforeRouteLeave");
     socket.emit("leave", 'a user');
   },
+
   setup() {
     const newMessage = ref("");
     const messages = reactive<Message[]>([]);
@@ -107,8 +111,14 @@ export default defineComponent({
     const connections = ref(1);
     const activeRoom = ref("general");
 
+    /* INITIALIZE FROM DB:
+        - rooms
+        - messages
+    */
+
+
     const rooms: { [key: string]: boolean } = reactive({
-      "general": false,
+      "general": true,
       "random": false,
       "catPics": false
     })
@@ -131,9 +141,25 @@ export default defineComponent({
       }
     }
 
+    const selectActiveRoom = () => {
+      console.log('IN SELECT ACTIVE', activeRoom.value)
+      setTimeout(() => { const selectedRoom = document.getElementById(activeRoom.value)!;
+      selectedRoom.setAttribute("selected", "true");}, 0);
+      //FIND A CLEANER SOLUTION TO WAIT FOR DOM ELEM TO BE CREATED
+    }
+
     const switchRoom = (newRoom: string) => {
       activeRoom.value = newRoom;
+      selectActiveRoom();
       console.log('switchroom to', activeRoom)
+    }
+
+    const createRoom = () => {
+      const newRoom = prompt("Name of the new channel:");
+      console.log('CREATE ROOM ', newRoom)
+      socket.emit('createRoom', {
+        user: username.value, 
+        room: newRoom });
     }
 
     window.onbeforeunload = () => {
@@ -168,14 +194,36 @@ export default defineComponent({
       rooms[activeRoom.value] = false;
     });
 
+    socket.on('createdRoom', (newRoom: string) => {
+      rooms[newRoom] = true;
+      activeRoom.value = newRoom;
+      messages.push({
+          message: `${username.value} has created the [${newRoom}] channel`,
+          type: 0,
+          user: username.value,
+          room: activeRoom.value
+        });
+
+        socket.emit("chat-message", {
+          user: username.value,
+          message: `${username.value} has created the [${newRoom}] channel`,
+          room: activeRoom.value
+        })
+      selectActiveRoom();
+      console.log('CREATEDROOM ', newRoom)
+    })
+
+    socket.on('addRoom', (newRoom: string) => {
+      rooms[newRoom] = false;
+      console.log('addedROOM ', newRoom)
+    })
+
     socket.on("join", (user: string) => {
       activeRoom.value = 'general';
       info.push({
         username: user,
         action: "joined",
       });
-
-      toggleRoomMembership();
 
       setTimeout(() => {
         info.length = 0;
@@ -215,12 +263,7 @@ export default defineComponent({
           user: "Me",
           room: activeRoom.value
         });
-        const tmp = {
-          user: username.value,
-          message: newMessage.value,
-          room: activeRoom.value
-        }
-        console.log('SENDING MSG: ', tmp.message, tmp.user, tmp.room)
+
         socket.emit("chat-message", {
           user: username.value,
           message: newMessage.value,
@@ -247,10 +290,12 @@ export default defineComponent({
       ready,
       info,
       connections,
+      rooms,
       activeRoom,
       switchRoom,
       toggleRoomMembership,
       isMemberOfActiveRoom,
+      createRoom,
       roomMessages
     };
   },
@@ -262,8 +307,14 @@ export default defineComponent({
   height: 300px;
   overflow-y: scroll;
 }
-.tab-row {
-  padding-top: 20px;
+.selectRoom {
+  padding-top: 5px;
+  border-radius: 10px;
+  font-size: 20px;
+}
+.joinBtn {
+  font-size: 18px;
+  margin-left:10px;
 }
 
 .optionRoom.active {
