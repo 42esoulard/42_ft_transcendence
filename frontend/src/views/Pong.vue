@@ -4,11 +4,7 @@
 	</p>
 	<canvas ref="game" width="640" height="480" style="border: 1px solid black">
 	</canvas>
-	<p>
-		<button v-on:click="SendMoveMsg('up')"> Up </button>
-		<button v-on:click="SendMoveMsg('down')"> Down </button>
-	</p>
-	<p> Use arrows (keyboard) or buttons to move </p>
+	<p> Use arrows (keyboard) to move </p>
 	
 </template>
 
@@ -43,19 +39,39 @@ export default({
 			this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height)
 			this.context.fillRect(0, this.position.player1, 20, 80)
 			this.context.fillRect(620, this.position.player2, 20, 80)
+			this.context.arc(320, 240, 10, 0, 2 * Math.PI)
+			this.context.fill()
 		})
 
 		this.socket.on('joinedRoom', data => {
 			this.room = data,
 			alert("Youve joined the game !")
 		})
-		
-		// this.username = prompt('Enter your username')
-		
+		this.socket.on('roomIsFull', () => {
+			alert("Sorry, room is full")
+		})
+		this.socket.on('opponentJoinedRoom', () => {
+			alert("Opponent has joined the game !")
+		})
+		this.socket.on('opponentLeftRoom', () => {
+			alert("Opponent has left the game !!")
+		})
 	},
+	
+	beforeRouteLeave()
+	{
+		if (this.room)
+		{
+			alert('Leaving the game')
+			this.socket.emit('leaveRoom', this.room)
+			console.log('leaving')
+		}
+	},
+
 	methods: {
 		SendMoveMsg(direction) {
-			this.socket.emit('move', {room: this.room, text: direction})
+			if (this.room)
+				this.socket.emit('move', {room: this.room, text: direction})
 		},
 		JoinRoom(roomName) {
 			this.socket.emit('joinRoom', roomName)
