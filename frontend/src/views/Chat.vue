@@ -133,16 +133,17 @@ export default defineComponent({
     }
 
     const toggleRoomMembership = () => {
-      console.log('toggling room')
+      // console.log('toggling room')
       if (isMemberOfActiveRoom()) {
         socket.emit('leaveRoom', activeRoom);
       } else {
         socket.emit('joinRoom', activeRoom);
       }
+      rooms[activeRoom.value] = !rooms[activeRoom.value];
     }
 
     const selectActiveRoom = () => {
-      console.log('IN SELECT ACTIVE', activeRoom.value)
+      // console.log('IN SELECT ACTIVE', activeRoom.value)
       setTimeout(() => { const selectedRoom = document.getElementById(activeRoom.value)!;
       selectedRoom.setAttribute("selected", "true");}, 0);
       //FIND A CLEANER SOLUTION TO WAIT FOR DOM ELEM TO BE CREATED
@@ -151,19 +152,19 @@ export default defineComponent({
     const switchRoom = (newRoom: string) => {
       activeRoom.value = newRoom;
       selectActiveRoom();
-      console.log('switchroom to', activeRoom)
+      // console.log('switchroom to', activeRoom)
     }
 
     const createRoom = () => {
       const newRoom = prompt("Name of the new channel:");
-      console.log('CREATE ROOM ', newRoom)
+      // console.log('CREATE ROOM ', newRoom)
       socket.emit('createRoom', {
         user: username.value, 
         room: newRoom });
     }
 
     window.onbeforeunload = () => {
-      console.log("onbeforeunload");
+      // console.log("onbeforeunload");
       socket.emit("leave", username.value);
     };
 
@@ -183,15 +184,6 @@ export default defineComponent({
 
     socket.on("stopTyping", () => {
       typing.value = "";
-    });
-
-    socket.on("joinedRoom", () => {
-      rooms[activeRoom.value] = true;
-      console.log('IN VUE JOINED ROOM: activeRoom', activeRoom, rooms[activeRoom.value])
-    });
-
-    socket.on("leftRoom", () => {
-      rooms[activeRoom.value] = false;
     });
 
     socket.on('createdRoom', (newRoom: string) => {
@@ -218,12 +210,15 @@ export default defineComponent({
       console.log('addedROOM ', newRoom)
     })
 
-    socket.on("join", (user: string) => {
+    socket.on("join", (user: string, connectionsNb: number) => {
       activeRoom.value = 'general';
       info.push({
         username: user,
         action: "joined",
       });
+
+      //updating connection nb for newcomer
+      socket.emit("get-connections")
 
       setTimeout(() => {
         info.length = 0;
@@ -242,6 +237,7 @@ export default defineComponent({
     });
 
     socket.on("connections", (data: number) => {
+      console.log("in connections", data)
       connections.value = data;
     });
 

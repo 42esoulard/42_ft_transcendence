@@ -39,30 +39,36 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('connections', this.connections);
   }
 
+  @SubscribeMessage('get-connections')
+  async getConnections(@ConnectedSocket() client: Socket) {
+    client.broadcast.emit('connections', this.connections)
+  }
+
   @SubscribeMessage('chat-message')
   async onChat(@ConnectedSocket() client: Socket, @MessageBody() message) {
-    // client.emit('chat-message', message, (message) => console.log(message));
     console.log('in nest onChat', message.user, message.room)
     client.broadcast.emit('chat-message', message);
   }
 
   @SubscribeMessage('createRoom')
   handleCreateRoom(@ConnectedSocket() client: Socket, @MessageBody() info) {
-    console.log('IN SERVER CREATEROOM', `${info.user} is the admin of the ${info.room} channel`)
+    // User has created a new chatroom
     client.emit('createdRoom', info.room);
+
+    //Notify other users of chatroom creation
     client.broadcast.emit('addRoom', info.room)
   }
   
   @SubscribeMessage('joinRoom')
   handleJoinRoom(client: Socket, room: string) {
+    // User has joined a chatroom
     client.join(room);
-    client.emit('joinedRoom', room);
   }
 
   @SubscribeMessage('leaveRoom')
   handleLeaveRoom(client: Socket, room: string) {
+    // User has left a chatroom
     client.leave(room);
-    client.emit('leftRoom', room);
   }
 
   @SubscribeMessage('typing')
@@ -79,12 +85,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('join')
   async onJoin(@MessageBody() user: string, @ConnectedSocket() client: Socket) {
     console.log(user, ' joined');
-    client.broadcast.emit("join", user);
+    // User has joined the chat
+    client.broadcast.emit("join", user, this.connections);
   }
   
   @SubscribeMessage('leave')
   async onLeave(@MessageBody() user: string, @ConnectedSocket() client: Socket) {
     console.log(user, ' left');
+    // User has left the chat
     client.broadcast.emit("leave", user);
   }
 }
