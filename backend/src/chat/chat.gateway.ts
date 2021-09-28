@@ -40,9 +40,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('chat-message')
-  async onChat(@ConnectedSocket() client: Socket, message: { sender: string, msg: string, room: string }) {
+  async onChat(@ConnectedSocket() client: Socket, @MessageBody() message: string, @MessageBody() room: string) {
     // client.emit('chat-message', message, (message) => console.log(message));
-    client.broadcast.to(message.room).emit('chat-message', message);
+    console.log('in nest onChat', message, room)
+    client.broadcast.emit('chat-message', message);
   }
   
   @SubscribeMessage('joinRoom')
