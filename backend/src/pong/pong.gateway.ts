@@ -30,6 +30,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
   
   handleDisconnect(client: Socket) {
+    if (client.id === this.clients.client1)
+      this.clients.client1 = ''
+    if (client.id === this.clients.client2)
+      this.clients.client2 = ''
+
     this.logger.log('Client disconected ' + client.id);
   }
   
@@ -61,18 +66,29 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('joinRoom')
   handleJoinRoom(client: Socket, room:string)
   {
+    if (this.clients.client1 && this.clients.client2)
+    {
+      this.logger.log('room is full')
+      client.emit('roomIsFull')
+      return
+    }
     client.join(room)
     if (!this.clients.client1)
       this.clients.client1 = client.id
     else if (!this.clients.client2)
       this.clients.client2 = client.id
     client.emit('joinedRoom', room)
+    client.to(room).emit('opponentJoinedRoom')
   }
   
   @SubscribeMessage('leaveRoom')
   handleLeaveRoom(client: Socket, room:string)
   {
+    if (client.id === this.clients.client1)
+      this.clients.client1 = ''
+    if (client.id === this.clients.client2)
+      this.clients.client2 = ''
+    client.to(room).emit('opponentLeftRoom')
     client.leave(room)
-    client.emit('leftRoom', room)
   }
 }
