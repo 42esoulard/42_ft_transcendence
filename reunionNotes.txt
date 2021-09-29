@@ -1,6 +1,30 @@
 30/09/21
 [*Insert awesome talking points for the blessed day of september 30th*]
 
+>>>> POST ALL THIS TO TRELLO <<<<
+
+ESTELLE:
+  - search swagger update script (maybe not automated or my data will explode)
+  - fix leave msg not appearing
+
+-> DB VS CHAT:
+    - add user <-> channel relationship (joined)
+    - muted/banned: what is "time"? is it a delay? if so we need a starting date. or 
+    we make muting/banning permanent and just note the starting time. 
+    - message writer_id > change it to author_id
+    - add get messages by channel
+
+-> GENERAL:
+  - should id be a string? More possibilities than just a number?
+  - TYPEORM IS NOT MAINTAINED AND APPARENTLY FULL OF BUGS. (portions of queries ignored?)
+  Alternative: MikroORM? 
+
+-> CHAT ALGO:
+  - if chan === private, must ask for admin authorization or be invited by a member
+  - chan creation details:
+    - chan name
+    - private? public? PWD > if pwd, set pwd
+    - 
 ------------------------------------------------------------
 
 23/09/21
