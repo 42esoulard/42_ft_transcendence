@@ -23,6 +23,14 @@ export class MessagesService {
 	}
 
 	/**
+	 * Lists all messages in a particular channel
+	 * nb: find() is a function from the typeORM library
+	*/
+	async getChannelMessages(chanId: number): Promise<Message[]> {
+		return await this.MessagesRepository.find({ channelId: chanId});
+	}
+
+	/**
 	* Gets a message in database by its id
 	* nb: findOne(id) is a function from the typeORM library
 	*/

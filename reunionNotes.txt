@@ -5,7 +5,12 @@
 
 ESTELLE:
   - search swagger update script (maybe not automated or my data will explode)
-  - fix leave msg not appearing
+  - fix leave msg not appearing: do we actually need this?
+    chat will automatically be joined upon general site authentication.
+    Then we'll just have to feature the online status of members, maybe by
+    channel even. but I think we don't need specific channel join/leave message.
+    We can put the "leave" message upon disconnection for exemple.
+  - add messages table initialization in db initialization
 
 -> DB VS CHAT:
     - add user <-> channel relationship (joined)
@@ -13,9 +18,11 @@ ESTELLE:
     we make muting/banning permanent and just note the starting time. 
     - message writer_id > change it to author_id
     - add get messages by channel
+    - should variable names in db related stuff not contain '-' or '_'? Swagger seems to treat
+    channel_id as channelId, which is a bit annoying
 
 -> GENERAL:
-  - should id be a string? More possibilities than just a number?
+  - should ids be a string? More possibilities than just a number?
   - TYPEORM IS NOT MAINTAINED AND APPARENTLY FULL OF BUGS. (portions of queries ignored?)
   Alternative: MikroORM? 
 

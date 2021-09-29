@@ -14,37 +14,37 @@
 /**
  * 
  * @export
- * @interface User
+ * @interface Message
  */
-export interface User {
+export interface Message {
     /**
      * 
      * @type {number}
-     * @memberof User
+     * @memberof Message
      */
     id: any;
     /**
      * 
-     * @type {string}
-     * @memberof User
+     * @type {number}
+     * @memberof Message
      */
-    firstname: any;
+    channelId: any;
+    /**
+     * 
+     * @type {number}
+     * @memberof Message
+     */
+    authorId: any;
     /**
      * 
      * @type {string}
-     * @memberof User
+     * @memberof Message
      */
-    lastname: any;
+    content: any;
     /**
      * 
-     * @type {string}
-     * @memberof User
+     * @type {Date}
+     * @memberof Message
      */
-    password: any;
-    /**
-     * 
-     * @type {string}
-     * @memberof User
-     */
-    salt: any;
+    createdAt: any;
 }

@@ -14,37 +14,25 @@
 /**
  * 
  * @export
- * @interface User
+ * @interface CreateMessageDto
  */
-export interface User {
+export interface CreateMessageDto {
     /**
      * 
      * @type {number}
-     * @memberof User
+     * @memberof CreateMessageDto
      */
-    id: any;
+    channelId: any;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateMessageDto
+     */
+    authorId: any;
     /**
      * 
      * @type {string}
-     * @memberof User
+     * @memberof CreateMessageDto
      */
-    firstname: any;
-    /**
-     * 
-     * @type {string}
-     * @memberof User
-     */
-    lastname: any;
-    /**
-     * 
-     * @type {string}
-     * @memberof User
-     */
-    password: any;
-    /**
-     * 
-     * @type {string}
-     * @memberof User
-     */
-    salt: any;
+    content: any;
 }

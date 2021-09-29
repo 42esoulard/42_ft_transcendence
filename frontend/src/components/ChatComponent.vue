@@ -26,29 +26,21 @@
           </div>
         </form>
       </div>
+      
       <h2 v-else>{{ username }}</h2>
       <div class="card bg-info" v-if="ready">
         <div class="card-header text-white">
           <h4>
             <select class="selectRoom">
               <option v-for="(value, room) in rooms" :key="room" class="optionRoom" @click="activeRoom = room" :id="room" >{{ room }}</option>
-              <!-- <option class="optionRoom" @click="activeRoom = 'general'" :class="{ active: activeRoom === 'general'}" >General</option>
-              <option class="optionRoom" @click="activeRoom = 'random'" :class="{ active: activeRoom === 'random'}">Random</option>
-              <option class="optionRoom" @click="activeRoom = 'cat pics'" :class="{ active: activeRoom === 'cat pics'}">Cat Pics</option> -->
               <option class="optionRoom" @click="createRoom()">+</option>
-              
-              <!-- <button class="tab-btn" @click="activeRoom = 'general'" :class="{ active: activeRoom === 'general'}" >General</button>
-              <button class="join-btn" @click="toggleRoomMembership()">+</button>
-              <button class="tab-btn" @click="activeRoom = 'random'" :class="{ active: activeRoom === 'random'}">Random</button>
-              <button class="join-btn" @click="toggleRoomMembership()">+</button>
-              <button class="tab-btn" @click="activeRoom = 'cat pics'" :class="{ active: activeRoom === 'cat pics'}">Cat Pics</button>
-              <button class="join-btn" @click="toggleRoomMembership()">+</button> -->
             </select>
             <button v-if="!isMemberOfActiveRoom()" class="joinBtn" @click="toggleRoomMembership()">Join room</button>
             <button v-else class="joinBtn" @click="toggleRoomMembership()">Leave room</button>
             <span class="float-right">{{ connections }} online</span>
           </h4>
         </div>
+
         <ul class="list-group list-group-flush text-right">
           <small v-if="typing" class="text-white">{{ typing }} is typing</small>
           <li class="list-group-item" v-for="(message, i) in roomMessages()" :key="i">
@@ -75,6 +67,7 @@
             </div>
           </form>
         </div>
+
       </div>
     </div>
   </div>
@@ -85,6 +78,7 @@ import { computed, defineComponent, onMounted, onUpdated, reactive, ref, watch }
 import { io } from "socket.io-client";
 import { Message } from "@/types/Message";
 import { Info } from "@/types/Info";
+import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
 
 const socket = io("http://localhost:3000");
 
@@ -102,6 +96,8 @@ export default defineComponent({
   },
 
   setup() {
+    const api = new DefaultApi();
+
     const newMessage = ref("");
     const messages = reactive<Message[]>([]);
     const typing = ref("");
@@ -110,6 +106,7 @@ export default defineComponent({
     const info = reactive<Info[]>([]);
     const connections = ref(1);
     const activeRoom = ref("general");
+    const responseData = ref(null);
 
     /* INITIALIZE FROM DB + UPDATE (on logout? on fixed interval? on fixed nb of messages?):
         - rooms
@@ -244,7 +241,7 @@ export default defineComponent({
         : socket.emit("stopTyping");
     });
 
-    const send = () => {
+    const send = async () => {
       
       // console.log('SENDING MSG: is member?', isMemberOfActiveRoom())
       //check if user is member of active room
@@ -265,6 +262,15 @@ export default defineComponent({
       } else {
         alert('You must join the room to send messages!')
       }
+
+      // await api.saveMessage({
+      //     channelId: activeRoom.value,
+      //     authorId: username.value, // /!\ THIS SHOULD BE THE USER ID
+      //     content: newMessage.value,
+      // })
+      // .then((res: any) => (responseData.value = res.data))
+      // .catch((err: any) => console.log(err.message));
+      
       newMessage.value = "";
     }
 

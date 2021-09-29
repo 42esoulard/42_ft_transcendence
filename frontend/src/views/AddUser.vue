@@ -22,7 +22,7 @@
 import { defineComponent, inject, ref } from "vue";
 // import axios from "axios";
 import SubmitSuccess from "@/components/SubmitSuccess.vue";
-import { DefaultApi } from "sdk-client";
+import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
 
 
 export default defineComponent({

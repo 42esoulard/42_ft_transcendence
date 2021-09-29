@@ -8,16 +8,16 @@ export class Messages {
   id: number;//STRING?
 
   @Column()
-  channel_id: number;//STRING?
+  channelId: number;//STRING?
 
   @Column()
-  author_id: number;//STRING?
+  authorId: number;//STRING?
 
   @Column()
   content: string;
 
   @Column()
-  created_at: Date;
+  createdAt: Date;
 
   // @BeforeInsert()
   // async hashPassword() {
