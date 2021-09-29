@@ -2,10 +2,14 @@ import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WsResponse, WebSocketServer } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 
-var position: {
-  x: 200,
-  y: 200
-}
+var BALL_SPEED = 1
+var INTERVAL_IN_MS = 20
+var CANVAS_WIDTH = 640
+var CANVAS_HEIGHT = 480
+var BALL_INITIAL_DIR_X = -2
+var BALL_INITIAL_DIR_Y = -1
+var BALL_RADIUS = 10
+
 
 @WebSocketGateway( { namespace: '/pong'})
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -17,7 +21,16 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	private position = {
 				player1: 200,
-				player2: 200
+				player2: 200,
+        ball: {
+          x: CANVAS_WIDTH / 2,
+          y: CANVAS_HEIGHT / 2
+        },
+  }
+
+  private ballDirection = {
+    x: BALL_INITIAL_DIR_X,
+    y: BALL_INITIAL_DIR_Y
   }
 
   private clients = {
@@ -25,6 +38,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         client2: ''
   }
 
+  private interval = null
+  
   afterInit(server: Server) {
     this.logger.log('Initialized')
   }
@@ -45,7 +60,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage('move')
   handleMessage(client: Socket, message: {room: string, text: string}): void {
-    this.logger.log('msg received: ' + message.text)
+    // this.logger.log('msg received: ' + message.text)
     if (client.id === this.clients.client1)
     {
       if (message.text === 'up')
@@ -59,6 +74,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.position.player2 -= 5
       if (message.text === 'down')
         this.position.player2 += 5
+
     }
     this.server.to(message.room).emit('position', this.position);
   }
@@ -79,8 +95,42 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.clients.client2 = client.id
     client.emit('joinedRoom', room)
     client.to(room).emit('opponentJoinedRoom')
+    this.interval = setInterval(() => {
+      this.moveBall(client, room)
+    }, INTERVAL_IN_MS)
   }
   
+  moveBall(client: Socket, room:string) {
+    // change direction if needed
+
+    // if touches wall
+    // up
+    if (this.position.ball.y <= BALL_RADIUS )
+    {
+      this.ballDirection.y = -this.ballDirection.y
+    }
+    // down
+    if (this.position.ball.y >= CANVAS_HEIGHT - BALL_RADIUS)
+    {
+      this.ballDirection.y = -this.ballDirection.y
+    }
+    // left
+    if (this.position.ball.x <= BALL_RADIUS)
+    {
+      this.ballDirection.x = -this.ballDirection.x
+    }
+    // right
+    if (this.position.ball.x >= CANVAS_WIDTH - BALL_RADIUS)
+    {
+      this.ballDirection.x = -this.ballDirection.x
+    }
+
+    // move ball in direction
+    this.position.ball.x += this.ballDirection.x * BALL_SPEED
+    this.position.ball.y += this.ballDirection.y * BALL_SPEED
+    client.emit('position', this.position)
+  }
+
   @SubscribeMessage('leaveRoom')
   handleLeaveRoom(client: Socket, room:string)
   {

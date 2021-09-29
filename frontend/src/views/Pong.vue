@@ -4,6 +4,8 @@
 	</p>
 	<canvas ref="game" width="640" height="480" style="border: 1px solid black">
 	</canvas>
+	<p> ball x {{ position.ball.x }} </p>
+	<p> ball y {{ position.ball.y }} </p>
 	<p> Use arrows (keyboard) to move </p>
 	
 </template>
@@ -18,7 +20,11 @@ export default({
 			context: {},
 			position: {
 				player1: 0,
-				player2: 0
+				player2: 0,
+				ball: {
+					x: 0,
+					y: 0
+				},
 			},
 			socket: null,
 			room: '',
@@ -34,18 +40,12 @@ export default({
 		this.context = this.$refs.game.getContext("2d");
 		
 		this.socket.on("position", data => {
-			console.log('position received')
-			this.position = data
-			this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height)
-			this.context.fillRect(0, this.position.player1, 20, 80)
-			this.context.fillRect(620, this.position.player2, 20, 80)
-			this.context.arc(320, 240, 10, 0, 2 * Math.PI)
-			this.context.fill()
+			this.draw(data)
 		})
 
 		this.socket.on('joinedRoom', data => {
-			this.room = data,
-			alert("Youve joined the game !")
+			this.room = data
+			// alert("Youve joined the game !")
 		})
 		this.socket.on('roomIsFull', () => {
 			alert("Sorry, room is full")
@@ -69,6 +69,19 @@ export default({
 	},
 
 	methods: {
+		draw(data)
+		{
+			console.log('position received')
+			this.position = data
+			this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height)
+
+			this.context.beginPath()
+			this.context.rect(0, this.position.player1, 20, 80)
+			this.context.rect(620, this.position.player2, 20, 80)
+			this.context.arc(this.position.ball.x, this.position.ball.y, 10, 0, Math.PI*2, false);
+			this.context.fill()
+			this.context.closePath()
+		},
 		SendMoveMsg(direction) {
 			if (this.room)
 				this.socket.emit('move', {room: this.room, text: direction})
