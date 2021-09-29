@@ -9,6 +9,7 @@ var CANVAS_HEIGHT = 480
 var BALL_INITIAL_DIR_X = -2
 var BALL_INITIAL_DIR_Y = -1
 var BALL_RADIUS = 10
+var RAQUET_LENGTH = 80
 
 
 @WebSocketGateway( { namespace: '/pong'})
@@ -95,6 +96,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.clients.client2 = client.id
     client.emit('joinedRoom', room)
     client.to(room).emit('opponentJoinedRoom')
+
     this.interval = setInterval(() => {
       this.moveBall(client, room)
     }, INTERVAL_IN_MS)
@@ -104,26 +106,35 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // change direction if needed
 
     // if touches wall
-    // up
-    if (this.position.ball.y <= BALL_RADIUS )
-    {
-      this.ballDirection.y = -this.ballDirection.y
-    }
-    // down
-    if (this.position.ball.y >= CANVAS_HEIGHT - BALL_RADIUS)
+    // up or down
+    if (this.position.ball.y <= BALL_RADIUS || this.position.ball.y >= CANVAS_HEIGHT - BALL_RADIUS)
     {
       this.ballDirection.y = -this.ballDirection.y
     }
     // left
     if (this.position.ball.x <= BALL_RADIUS)
     {
-      this.ballDirection.x = -this.ballDirection.x
+      if (this.position.ball.y >= this.position.player1 && this.position.ball.y <= (this.position.player1 + RAQUET_LENGTH))
+        this.ballDirection.x = -this.ballDirection.x
+      else
+      {
+        this.ballDirection.x = 0,
+        this.ballDirection.y = 0
+      }
     }
     // right
+
     if (this.position.ball.x >= CANVAS_WIDTH - BALL_RADIUS)
     {
-      this.ballDirection.x = -this.ballDirection.x
+      if (this.position.ball.y >= this.position.player2 && this.position.ball.y <= (this.position.player2 + RAQUET_LENGTH))
+        this.ballDirection.x = -this.ballDirection.x
+      else
+      {
+        this.ballDirection.x = 0,
+        this.ballDirection.y = 0
+      }
     }
+
 
     // move ball in direction
     this.position.ball.x += this.ballDirection.x * BALL_SPEED
