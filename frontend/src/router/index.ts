@@ -3,7 +3,9 @@ import Home from '../views/Home.vue'
 import AddUser from '../views/AddUser.vue'
 import Users from '../views/Users.vue'
 import Chat from '../views/Chat.vue'
-import Pong from '../views/Pong.vue'
+import PongPlay from '../views/Pong/PongPlay.vue'
+import PongGame from '../views/Pong/PongGame.vue'
+import PongWatch from '../views/Pong/PongWatch.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -29,7 +31,17 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/pong',
     name: 'Pong',
-    component: Pong
+    component: PongPlay
+  },
+  {
+    path: '/pong/:id',
+    name: 'PongGame',
+    component: PongGame
+  },
+  {
+    path: '/pong/watch',
+    name: 'PongWatch',
+    component: PongWatch
   },
 ]
 

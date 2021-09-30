@@ -1,4 +1,5 @@
 <template>
+	<h1> Game # {{ id }} </h1>
 	<p>
 		<button v-on:click="JoinRoom('default')"> Join Game </button>
 	</p>
@@ -12,11 +13,10 @@
 
 <script>
 import { io } from 'socket.io-client'
-
-export default({
-	name: 'Pong',
+export default {
 	data() {
 		return {
+			id: this.$route.params.id,
 			context: {},
 			position: {
 				player1: 0,
@@ -28,8 +28,8 @@ export default({
 			},
 			socket: null,
 			room: '',
-			}
-		},
+		}
+	},
 	created() {
 		this.socket = io('http://localhost:3000/pong')
 		window.addEventListener("keydown", this.onKeyDown)
@@ -99,5 +99,5 @@ export default({
 				this.SendMoveMsg('down')
 		}
 	}
-})
+}
 </script>
