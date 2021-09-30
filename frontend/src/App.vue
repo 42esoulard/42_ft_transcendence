@@ -3,7 +3,8 @@
     <router-link to="/">Home</router-link> |
     <router-link to="/users">Users</router-link> |
     <router-link to="/adduser">Add User</router-link> |
-    <router-link to="/chat">Chat</router-link>
+    <router-link to="/chat">Chat</router-link> |
+    <router-link to="/account">My Account</router-link>
   </div>
   <router-view/>
 </template>

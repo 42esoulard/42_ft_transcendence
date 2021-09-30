@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import AddUser from '../views/AddUser.vue'
 import Users from '../views/Users.vue'
 import Chat from '../views/Chat.vue'
+import UserAccount from '../views/UserAccount.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -24,6 +25,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/chat',
     name: 'Chat',
     component: Chat
+  },
+  {
+    path: '/account',
+    name: 'UserAccount',
+    component: UserAccount
   },
 ]
 

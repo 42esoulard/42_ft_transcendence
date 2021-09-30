@@ -29,4 +29,10 @@ export interface CreateUserDto {
      * @memberof CreateUserDto
      */
     password: any;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateUserDto
+     */
+    avatar?: any;
 }

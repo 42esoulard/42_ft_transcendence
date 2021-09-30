@@ -7,6 +7,7 @@ import * as passport from 'passport';
 import { TypeORMSession } from './auth/entity/TypeORMSession.entity';
 import { TypeormStore } from 'connect-typeorm/out';
 import { getRepository } from 'typeorm';
+import * as cookieParser from 'cookie-parser';
 // declare const module: any; // For Hot-Module Replacement
 
 async function bootstrap() {
@@ -15,7 +16,7 @@ async function bootstrap() {
 
   app.enableCors({
     credentials: true,
-    origin: ["http://localhost:8080", "http://127.0.0.1:8080"]
+    origin: ["http://localhost:8080", "http://127.0.0.1:8080", "https://api.intra.42.fr"]
   }); // Mandatory to interact w/ vue js which is on a different port
 
   //Setting up the OpenApi to generate client sdk
@@ -49,15 +50,19 @@ async function bootstrap() {
   app.use(
     session({
       cookie: {
-        maxAge: 86412345,
+        maxAge: 86400, //in seconds (1 day)
       },
       resave: false,
       saveUninitialized: false,
       store: new TypeormStore({})
         .connect(sessionRepository),
-      secret: 'my-secret',
+      secret: process.env.JWT_SECRET,
     }),
   );
+
+  // Need to enable cookie parser to read cookie between backend and frontend, containing acces token
+  app.use(cookieParser());
+
   app.use(passport.initialize());
   app.use(passport.session());
   await app.listen(process.env.PORT);

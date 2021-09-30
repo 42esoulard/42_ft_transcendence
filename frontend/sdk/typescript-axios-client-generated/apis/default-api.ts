@@ -164,6 +164,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @param {string} username 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserByUsername: async (username: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'username' is not null or undefined
+            if (username === null || username === undefined) {
+                throw new RequiredError('username','Required parameter username was null or undefined when calling getUserByUsername.');
+            }
+            const localVarPath = `/users/name/{username}`
+                .replace(`{${"username"}}`, encodeURIComponent(String(username)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -429,6 +468,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {string} username 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserByUsername(username: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getUserByUsername(username, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -456,7 +508,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async logout(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async logout(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).logout(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -493,7 +545,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async status(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async status(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).status(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -544,6 +596,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @param {string} username 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserByUsername(username: string, options?: any): AxiosPromise<User> {
+            return DefaultApiFp(configuration).getUserByUsername(username, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -563,7 +624,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        logout(options?: any): AxiosPromise<any> {
+        logout(options?: any): AxiosPromise<void> {
             return DefaultApiFp(configuration).logout(options).then((request) => request(axios, basePath));
         },
         /**
@@ -588,7 +649,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        status(options?: any): AxiosPromise<void> {
+        status(options?: any): AxiosPromise<any> {
             return DefaultApiFp(configuration).status(options).then((request) => request(axios, basePath));
         },
     };
@@ -637,6 +698,16 @@ export class DefaultApi extends BaseAPI {
      */
     public getUser(id: number, options?: any) {
         return DefaultApiFp(this.configuration).getUser(id, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * 
+     * @param {string} username 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getUserByUsername(username: string, options?: any) {
+        return DefaultApiFp(this.configuration).getUserByUsername(username, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 

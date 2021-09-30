@@ -1,16 +1,15 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { Strategy } from 'passport-42';
+import { Strategy, Profile } from 'passport-42';
 import { PassportStrategy } from '@nestjs/passport';
-import { env } from 'process';
-import { FortyTwoUser } from './interfaces/42user.interface';
-import { AuthService } from './auth.service';
-import { User } from 'src/users/interfaces/user.interface';
+import { FortyTwoUser } from '../interfaces/42user.interface';
+import { AuthService } from '../auth.service';
+import { User } from '../../users/interfaces/user.interface';
 
 @Injectable()
-export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
+export class FortyTwoStrategy extends PassportStrategy(Strategy, 'FortyTwoStrategy') {
   constructor(
     private readonly authService: AuthService
-    ) {
+  ) {
     super({
       clientID: process.env['42_CLIENT_ID'],
       clientSecret: process.env['42_CLIENT_SECRET'],
@@ -29,10 +28,9 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, profile, cb: Function): Promise<User> {
+  async validate(accessToken: string, refreshToken: string, profile: Profile, cb: Function): Promise<User> {
     const { username, provider, firstname, lastname, photo } = profile;
-    console.log({ username, provider, firstname, lastname, photo });
-
+    console.log(profile);
     const userProfile: FortyTwoUser = { username, photo };
     const user = await this.authService.validateUser(userProfile);
     if (!user) {
@@ -40,13 +38,4 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
     }
     return user;
   }
-
-  // function(accessToken, refreshToken, profile, cb) {
-  //   return profile.id
-
-  //   // User.findOrCreate({ fortytwoId: profile.id }, function (err, user) {
-  //   //   return cb(err, user);
-  //   // });
-  // }
-
 }

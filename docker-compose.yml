@@ -19,6 +19,7 @@ services:
       NODE_ENV: development
       MODE: DEV
       PORT: 3000
+      FRONT_URL: ${FRONT_URL}
     env_file:
     - database.env
     command: sh -c "rm -rf ./dist && npm install && npm run start:dev"

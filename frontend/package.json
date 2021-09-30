@@ -14,6 +14,7 @@
     "sdk-client": "sdk/typescript-axios-client-generated/",
     "socket.io-client": "^4.2.0",
     "vue": "^3.0.0",
+    "vue-jwt-decode": "^0.1.0",
     "vue-router": "^4.0.0-0"
   },
   "devDependencies": {

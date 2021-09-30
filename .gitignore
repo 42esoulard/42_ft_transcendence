@@ -6,4 +6,6 @@ build
 npm-debug.log
 postgres_data
 postgresdata
+api-spec.json
 # .env
+# database.env

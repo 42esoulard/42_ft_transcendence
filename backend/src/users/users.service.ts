@@ -43,7 +43,7 @@ export class UsersService {
 		// .select()
 		// .where("user.username = :username", { username: username })
 		// .getRawOne();
-		console.log('getUserByUsername', user);
+		// console.log('getUserByUsername', user);
 		return user;
 	}
 

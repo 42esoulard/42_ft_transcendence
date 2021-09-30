@@ -1,7 +1,16 @@
 #! /bin/bash
 # Resets node packages and transpiled files
 # before running the docker application.
-# You may execute this file after if errors after a git pull
+# NB. You may execute this file after if errors after a git pull
+# If you want to delete the database, add '-d' as argument: ./reset -d
+
+if [ $# -ge 1 ] && ([[ "$1" = '-d' ]] || [[ "$1" = '--database' ]]); then
+    rm -rf postgresdata
+    if [ $? == 1 ]; then
+        echo "run as sudo in order to delete database files"
+        exit 1
+    fi
+fi
 
 rm -rf backend/node_modules
 rm -rf frontend/node_modules

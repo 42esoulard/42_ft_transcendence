@@ -11,7 +11,7 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get(':favicon.ico')
+  @Get('favicon.ico')
   @ApiNoContentResponse({ description: 'No Content' })
   @HttpCode(204)
   create() {

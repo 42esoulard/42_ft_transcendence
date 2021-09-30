@@ -73,11 +73,11 @@ export default defineComponent({
   name: "Chat",
   components: {},
   beforePageLeave() {
-    console.log("beforePageLeave");
+    // console.log("beforePageLeave");
     socket.emit("leave", 'a user');
   },
   beforeRouteLeave() {
-    console.log("beforeRouteLeave");
+    // console.log("beforeRouteLeave");
     socket.emit("leave", 'a user');
   },
   setup() {
