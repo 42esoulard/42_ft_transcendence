@@ -28,8 +28,8 @@ export class AuthController {
       httpOnly: true,
     });
     // res.header('Authorization', `Bearer ${jwt.access_token}`)
-    // res.redirect(307, "http://localhost:8080/account");
-    res.sendStatus(200);
+    res.redirect(307, "http://localhost:8080/account");
+    // res.sendStatus(200);
   }
 
   @Get('status')
