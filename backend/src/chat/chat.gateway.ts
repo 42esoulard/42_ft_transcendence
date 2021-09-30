@@ -10,43 +10,44 @@ import {
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
+  namespace: '/chat',
   cors: {
-    origin: ["http://localhost:8080", "http://127.0.0.1:8080"],
+    origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
     credentials: true,
-  }
+  },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
-  
-  connections: number = 0;
+
+  connections = 0;
 
   async handleConnection() {
     // A client has connected
     this.connections++;
-    console.log("A client has connected");
-    
+    console.log('A client has connected');
+
     // Notify connected clients of current users
     this.server.emit('connections', this.connections);
   }
-  
+
   async handleDisconnect(@ConnectedSocket() client: Socket) {
     // A client has disconnected
     this.connections--;
     client.disconnect();
-    console.log("A client has disconnected");
+    console.log('A client has disconnected');
     // Notify connected clients of current users
     this.server.emit('connections', this.connections);
   }
 
   @SubscribeMessage('get-connections')
   async getConnections(@ConnectedSocket() client: Socket) {
-    client.broadcast.emit('connections', this.connections)
+    client.broadcast.emit('connections', this.connections);
   }
 
   @SubscribeMessage('chat-message')
   async onChat(@ConnectedSocket() client: Socket, @MessageBody() message) {
-    console.log('in nest onChat', message.user, message.room)
+    console.log('in nest onChat', message.user, message.room);
     client.broadcast.emit('chat-message', message);
   }
 
@@ -56,9 +57,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.emit('createdRoom', info.room);
 
     //Notify other users of chatroom creation
-    client.broadcast.emit('addRoom', info.room)
+    client.broadcast.emit('addRoom', info.room);
   }
-  
+
   @SubscribeMessage('joinRoom')
   handleJoinRoom(client: Socket, room: string) {
     // User has joined a chatroom
@@ -72,27 +73,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('typing')
-  async onTyping(@MessageBody() TypingUser: string, @ConnectedSocket() client: Socket) {
-    client.broadcast.emit("typing", TypingUser);
+  async onTyping(
+    @MessageBody() TypingUser: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.broadcast.emit('typing', TypingUser);
     console.log(TypingUser);
   }
-  
+
   @SubscribeMessage('stopTyping')
   async onStopTyping(@ConnectedSocket() client: Socket) {
-    client.broadcast.emit("stopTyping");
+    client.broadcast.emit('stopTyping');
   }
-  
+
   @SubscribeMessage('join')
   async onJoin(@MessageBody() user: string, @ConnectedSocket() client: Socket) {
     console.log(user, ' joined');
     // User has joined the chat
-    client.broadcast.emit("join", user, this.connections);
+    client.broadcast.emit('join', user, this.connections);
   }
-  
+
   @SubscribeMessage('leave')
-  async onLeave(@MessageBody() user: string, @ConnectedSocket() client: Socket) {
+  async onLeave(
+    @MessageBody() user: string,
+    @ConnectedSocket() client: Socket,
+  ) {
     console.log(user, ' left');
     // User has left the chat
-    client.broadcast.emit("leave", user);
+    client.broadcast.emit('leave', user);
   }
 }

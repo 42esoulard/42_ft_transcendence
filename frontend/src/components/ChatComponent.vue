@@ -80,7 +80,6 @@ import { Message } from "@/types/Message";
 import { Info } from "@/types/Info";
 import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
 
-const socket = io("http://localhost:3000");
 
 export default defineComponent({
   name: "ChatComponent",
@@ -88,16 +87,16 @@ export default defineComponent({
   
   beforePageLeave() {
     console.log("beforePageLeave");
-    socket.emit("leave", 'a user');
+    this.socket.emit("leave", 'a user');
   },
   beforeRouteLeave() {
     console.log("beforeRouteLeave");
-    socket.emit("leave", 'a user');
+    this.socket.emit("leave", 'a user');
   },
 
   setup() {
     const api = new DefaultApi();
-
+    const socket = io("http://localhost:3000/chat");
     const newMessage = ref("");
     const messages = reactive<Message[]>([]);
     const typing = ref("");
@@ -112,7 +111,6 @@ export default defineComponent({
         - rooms
         - messages
     */
-
 
     const rooms: { [key: string]: boolean } = reactive({
       "general": true,
@@ -263,13 +261,13 @@ export default defineComponent({
         alert('You must join the room to send messages!')
       }
 
-      // await api.saveMessage({
-      //     channelId: activeRoom.value,
-      //     authorId: username.value, // /!\ THIS SHOULD BE THE USER ID
-      //     content: newMessage.value,
-      // })
-      // .then((res: any) => (responseData.value = res.data))
-      // .catch((err: any) => console.log(err.message));
+      await api.saveMessage({
+          channelId: activeRoom.value,
+          authorId: username.value, // /!\ THIS SHOULD BE THE USER ID
+          content: newMessage.value,
+      })
+      .then((res: any) => (responseData.value = res.data))
+      .catch((err: any) => console.log(err.message));
       
       newMessage.value = "";
     }
@@ -280,6 +278,7 @@ export default defineComponent({
     }
 
     return {
+      socket,
       addUser,
       send,
       newMessage,
