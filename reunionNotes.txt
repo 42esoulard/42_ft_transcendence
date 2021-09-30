@@ -4,6 +4,7 @@
 >>>> POST ALL THIS TO TRELLO <<<<
 
 ESTELLE:
+  - add channels object
   - search swagger update script (maybe not automated or my data will explode)
   - fix leave msg not appearing: do we actually need this?
     chat will automatically be joined upon general site authentication.
@@ -13,17 +14,17 @@ ESTELLE:
   - add messages table initialization in db initialization
 
 -> DB VS CHAT:
-    - add user <-> channel relationship (joined)
-    - muted/banned: what is "time"? is it a delay? if so we need a starting date. or 
+    O add user <-> channel relationship (joined)
+    O muted/banned: what is "time"? is it a delay? if so we need a starting date. or 
     we make muting/banning permanent and just note the starting time. 
-    - message writer_id > change it to author_id
+    O message writer_id > change it to author_id
     - add get messages by channel
-    - should variable names in db related stuff not contain '-' or '_'? Swagger seems to treat
-    channel_id as channelId, which is a bit annoying
+    O should variable names in db related objects not contain '-' or '_'? ie Swagger seems to transform
+    "channel_id" into "channelId", which is a bit annoying
 
 -> GENERAL:
-  - should ids be a string? More possibilities than just a number?
-  - TYPEORM IS NOT MAINTAINED AND APPARENTLY FULL OF BUGS. (portions of queries ignored?)
+  O should ids be a string? More possibilities than just a number?
+  O TYPEORM IS NOT MAINTAINED AND APPARENTLY FULL OF BUGS. (portions of queries ignored?)
   Alternative: MikroORM? 
 
 -> CHAT ALGO:
@@ -45,7 +46,7 @@ ESTELLE:
   > OK
 4) LE CHAT UTILISE T IL LA DB? 
   > It will! 
-  LE JEU ? 
+  LE JEU ?
   > Probably not, en tout cas pas les positions de jeu exactement
   EST-CE QUE LES SOCKETS EPARGNENT LA DB? 
   > yup! c'est tout l'intérêt (ne pas avoir à faire de requêtes serveur)

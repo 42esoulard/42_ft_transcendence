@@ -1,19 +1,20 @@
 import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm';
 // import * as bcrypt from 'bcrypt';
 
-@Entity('messages')
-export class Messages {
+@Entity("channels")
+export class Channels {
+
   @PrimaryGeneratedColumn()
-  id: number; //STRING?
+  id: number;//STRING?
 
   @Column()
-  channelId: number; //STRING?
+  type: string;
 
   @Column()
-  authorId: number; //STRING?
+  password: string;
 
   @Column()
-  content: string;
+  ownerId: number;//STRING?
 
   @Column()
   createdAt: Date;
@@ -24,3 +25,4 @@ export class Messages {
   //   this.password = await bcrypt.hash(this.password, this.salt);
   // }
 }
+

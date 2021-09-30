@@ -1,9 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm';
 // import * as bcrypt from 'bcrypt';
 
-@Entity("users")
+@Entity('users')
 export class Users {
-
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -25,4 +24,3 @@ export class Users {
   //   this.password = await bcrypt.hash(this.password, this.salt);
   // }
 }
-
