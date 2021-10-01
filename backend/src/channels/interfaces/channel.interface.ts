@@ -2,6 +2,6 @@ export class Channel {
   id: number; //STRING?
   type: string;
   password: string;
-  ownerId: number; //STRING?
-  createdAt: Date;
+  owner_id: number; //STRING?
+  created_at: Date;
 }

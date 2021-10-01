@@ -16,5 +16,5 @@
     "migrationsDir": "src/migration"
   },
   "ssl": false,
-  "synchronize": false
+  "synchronize": true
 }

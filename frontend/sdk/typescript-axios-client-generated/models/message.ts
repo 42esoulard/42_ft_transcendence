@@ -43,7 +43,7 @@ export interface Message {
     content: any;
     /**
      * 
-     * @type {Date}
+     * @type {number}
      * @memberof Message
      */
     createdAt: any;

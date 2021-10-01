@@ -262,8 +262,8 @@ export default defineComponent({
       }
 
       await api.saveMessage({
-          channelId: activeRoom.value,
-          authorId: username.value, // /!\ THIS SHOULD BE THE USER ID
+          channelId: 1234,
+          authorId: 1234,
           content: newMessage.value,
       })
       .then((res: any) => (responseData.value = res.data))

@@ -5,7 +5,7 @@ import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm';
 export class Channels {
 
   @PrimaryGeneratedColumn()
-  id: number;//STRING?
+  id: number;
 
   @Column()
   type: string;
@@ -14,10 +14,10 @@ export class Channels {
   password: string;
 
   @Column()
-  ownerId: number;//STRING?
+  owner_id: number;
 
   @Column()
-  createdAt: Date;
+  created_at: Date;
 
   // @BeforeInsert()
   // async hashPassword() {

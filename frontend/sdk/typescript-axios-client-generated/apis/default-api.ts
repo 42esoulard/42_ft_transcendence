@@ -32,7 +32,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         create: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/{favicon}.ico`;
+            const localVarPath = `/favicon.ico`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;

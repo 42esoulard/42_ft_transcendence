@@ -1,7 +1,7 @@
 export class Message {
-  id: number; //STRING?
-  channelId: number; //STRING?
-  authorId: number; //STRING?
+  id: number; 
+  channel_id: number; 
+  author_id: number; 
+  created_at: number;
   content: string;
-  createdAt: Date;
 }
