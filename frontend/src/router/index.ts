@@ -33,6 +33,8 @@ const routes: Array<RouteRecordRaw> = [
     path: '/account',
     name: 'UserAccount',
     component: UserAccount
+  },
+  {
     path: '/pong',
     name: 'Pong',
     component: PongPlay
