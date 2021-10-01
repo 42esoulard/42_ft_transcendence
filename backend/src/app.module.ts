@@ -15,7 +15,7 @@ import { PongModule } from './pong/pong.module';
     UsersModule,
     ChatModule,
     AuthModule,
-    PassportModule.register({ session: true })
+    PassportModule.register({ session: true }),
     PongModule
   ],
   controllers: [AppController],
