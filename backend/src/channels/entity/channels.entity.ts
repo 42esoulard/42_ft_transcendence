@@ -7,9 +7,15 @@ export class Channels {
   id: number;
 
   @Column()
+  name: string;
+
+  @Column()
   type: string;
 
   @Column()
+  salt: string;
+
+  @Column({ nullable: true })
   password: string;
 
   @Column()

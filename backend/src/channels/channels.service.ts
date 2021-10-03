@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Channels } from './entity/channels.entity';
 import { CreateChannelDto } from './dto/createChannel.dto';
 // import { UpdateChannelDto } from './dto/updateChannel.dto';
-// import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChannelsService {
@@ -39,11 +39,20 @@ export class ChannelsService {
   async saveChannel(channelDto: CreateChannelDto): Promise<Channel> {
     const newChannel: Channel = {
       id: 1,
+      name: channelDto.name,
       owner_id: channelDto.ownerId,
       type: channelDto.type,
-      password: channelDto.password, //must be crypted
+      password: '',
       created_at: Math.floor(Date.now() / 1000),
     };
+    if (channelDto.type === 'password-protected') {
+      (newChannel.salt = await bcrypt.genSalt()),
+        (newChannel.password = await bcrypt.hash(
+          channelDto.password,
+          newChannel.salt,
+        )); //must be crypted
+    }
+
     return await this.ChannelsRepository.save(newChannel);
   }
 

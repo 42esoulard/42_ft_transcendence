@@ -150,10 +150,24 @@ export default defineComponent({
     }
 
     const createRoom = () => {
+      /* add form component here:
+
+        - Name? [check it doesn't exist yet in db]
+        - Type [radio buttons]: public? Private (newcomers must be invited by a member)?
+        password-protected (newcomers can join provided they know the room password)?
+        - If password-protected: [check regex OK, check password match]
+          1) please enter a password for the room (a-zA-Z0-9/*-+_):
+          2) please re-enter the password:
+          
+      */
       const newRoom = prompt("Name of the new channel:");
+    
       socket.emit('createRoom', {
-        user: username.value, 
-        room: newRoom });
+        name: newRoom,
+        owner_id: 1, //GET LOGGED IN USER ID
+        type: 'public',
+        password: 'password', //must be crypted
+        });
     }
 
     window.onbeforeunload = () => {
@@ -262,8 +276,8 @@ export default defineComponent({
       }
 
       await api.saveMessage({
-          channelId: 1234,
-          authorId: 1234,
+          channelId: 1234, // GET CHANNEL ID
+          authorId: 1234, // GET LOGGED IN USER ID
           content: newMessage.value,
       })
       .then((res: any) => (responseData.value = res.data))
