@@ -5,12 +5,12 @@ export class CreateChannelDto {
    * Channel id
    */
   // @ApiPropertyOptional()
-  // readonly id: number;//STRING?
+  // readonly id: number;
 
   /**
    * Id of the user who posted it
    */
-  readonly owner_id: number; //STRING?
+  readonly ownerId: number; //STRING?
 
   /**
    * Password for type protected_by_password

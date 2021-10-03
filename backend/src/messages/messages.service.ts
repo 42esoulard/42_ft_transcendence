@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Messages } from './entity/messages.entity';
 import { CreateMessageDto } from './dto/createMessage.dto';
-import { timestamp } from 'rxjs';
+// import { timestamp } from 'rxjs';
 // import { UpdateMessageDto } from './dto/updateMessage.dto';
 // import * as bcrypt from 'bcrypt';
 
@@ -42,17 +42,16 @@ export class MessagesService {
   }
 
   /**
-   * Saves a new message into db after generating pw hash and salt
+   * Saves a new message into db
    * nb: save(message) is a function from the typeORM library
    */
   async saveMessage(messageDto: CreateMessageDto): Promise<Message> {
-    // newMessage must be of type Message or CreateMessageDto ??
-    console.log(messageDto);
+    // console.log(messageDto);
     const newMessage: Message = {
-      channel_id: messageDto.channelId,
       id: 1,
-      content: messageDto.content,
+      channel_id: messageDto.channelId,
       author_id: messageDto.authorId,
+      content: messageDto.content,
       created_at: Math.floor(Date.now() / 1000),
     };
 

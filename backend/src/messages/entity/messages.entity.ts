@@ -4,13 +4,13 @@ import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm';
 @Entity('messages')
 export class Messages {
   @PrimaryGeneratedColumn()
-  id: number; //STRING?
+  id: number;
 
   @Column()
-  channel_id: number; //STRING?
+  channel_id: number;
 
   @Column()
-  author_id: number; //STRING?
+  author_id: number;
 
   @Column()
   content: string;

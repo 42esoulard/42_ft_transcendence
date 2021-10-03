@@ -33,13 +33,17 @@ export class ChannelsService {
   }
 
   /**
-   * Saves a new channel into db after generating pw hash and salt
+   * Saves a new channel into db
    * nb: save(channel) is a function from the typeORM library
    */
   async saveChannel(channelDto: CreateChannelDto): Promise<Channel> {
-    // newChannel must be of type Channel or CreateChannelDto ??
-    const newChannel: Channel = channelDto as Channel;
-
+    const newChannel: Channel = {
+      id: 1,
+      owner_id: channelDto.ownerId,
+      type: channelDto.type,
+      password: channelDto.password, //must be crypted
+      created_at: Math.floor(Date.now() / 1000),
+    };
     return await this.ChannelsRepository.save(newChannel);
   }
 

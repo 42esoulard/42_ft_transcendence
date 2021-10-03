@@ -1,9 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm';
 // import * as bcrypt from 'bcrypt';
 
-@Entity("channels")
+@Entity('channels')
 export class Channels {
-
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -17,7 +16,7 @@ export class Channels {
   owner_id: number;
 
   @Column()
-  created_at: Date;
+  created_at: number;
 
   // @BeforeInsert()
   // async hashPassword() {
@@ -25,4 +24,3 @@ export class Channels {
   //   this.password = await bcrypt.hash(this.password, this.salt);
   // }
 }
-

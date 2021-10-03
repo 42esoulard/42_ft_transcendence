@@ -7,7 +7,7 @@
 
 // export class UpdateUserDto extends CreateUserDto {
 // 	// @ApiProperty()
-// 	readonly id: number;//string?
+// 	readonly id: number;
 
 // 	// @ApiProperty()
 // 	// readonly content: string;

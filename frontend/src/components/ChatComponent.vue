@@ -86,11 +86,11 @@ export default defineComponent({
   components: {},
   
   beforePageLeave() {
-    console.log("beforePageLeave");
+    // console.log("beforePageLeave");
     this.socket.emit("leave", 'a user');
   },
   beforeRouteLeave() {
-    console.log("beforeRouteLeave");
+    // console.log("beforeRouteLeave");
     this.socket.emit("leave", 'a user');
   },
 
@@ -194,12 +194,12 @@ export default defineComponent({
           room: activeRoom.value
         })
       selectActiveRoom();
-      console.log('CREATEDROOM ', newRoom)
+      // console.log('CREATEDROOM ', newRoom)
     })
 
     socket.on('addRoom', (newRoom: string) => {
       rooms[newRoom] = false;
-      console.log('addedROOM ', newRoom)
+      // console.log('addedROOM ', newRoom)
     })
 
     socket.on("join", (user: string, connectionsNb: number) => {
@@ -229,7 +229,7 @@ export default defineComponent({
     });
 
     socket.on("connections", (data: number) => {
-      console.log("in connections", data)
+      // console.log("in connections", data)
       connections.value = data;
     });
 

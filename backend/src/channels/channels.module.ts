@@ -7,6 +7,6 @@ import { Channels } from './entity/channels.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Channels])],
   providers: [ChannelsService],
-  controllers: [ChannelsController]
+  controllers: [ChannelsController],
 })
 export class ChannelsModule {}

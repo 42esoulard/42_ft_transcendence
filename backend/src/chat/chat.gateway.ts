@@ -23,19 +23,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   connections = 0;
 
   async handleConnection() {
-    // A client has connected
-    this.connections++;
     console.log('A client has connected');
+    this.connections++;
 
     // Notify connected clients of current users
     this.server.emit('connections', this.connections);
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    // A client has disconnected
+    console.log('A client has disconnected');
     this.connections--;
     client.disconnect();
-    console.log('A client has disconnected');
     // Notify connected clients of current users
     this.server.emit('connections', this.connections);
   }
@@ -47,7 +45,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('chat-message')
   async onChat(@ConnectedSocket() client: Socket, @MessageBody() message) {
-    console.log('in nest onChat', message.user, message.room);
     client.broadcast.emit('chat-message', message);
   }
 
@@ -78,7 +75,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ) {
     client.broadcast.emit('typing', TypingUser);
-    console.log(TypingUser);
+    // console.log(TypingUser);
   }
 
   @SubscribeMessage('stopTyping')
