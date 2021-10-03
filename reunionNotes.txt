@@ -1,6 +1,26 @@
-30/09/21
-[*Insert awesome talking points for the blessed day of september 30th*]
+07/10/21
+[*INSERT AWESOME TALKING POINTS HERE*]
+- 
 
+30/09/21
+
+-> DB VS CHAT:
+    add user <-> channel relationship (joined)
+    muted/banned: what is "time"? is it a delay? if so we need a starting date. or 
+    we make muting/banning permanent and just note the starting time. 
+    Message writer_id > change it to author_id
+    Swagger seems to transform dto from "channel_id" into "channelId", no biggie but a bit annoying
+
+-> GENERAL:
+  Ids should be a number. Let's put ids everywhere for a uniform db.
+  TYPEORM IS NOT MAINTAINED AND APPARENTLY FULL OF BUGS. (portions of queries ignored?)
+  Alternative: MikroORM? 
+
+-> julnolle working on auth (front/back communication/CORS issues). Set db synchronization to true,
+no need to update entrypoint.sh for db building
+-> bbrunet working on pong. Added namespaces for socket versatility. No db sync yet
+-> rturcey built visual planning, working up to a front skeleton
+-> esoulard working on chat, had a beef with swagger, starting db sync
 ------------------------------------------------------------
 
 23/09/21
@@ -14,7 +34,7 @@
   > OK
 4) LE CHAT UTILISE T IL LA DB? 
   > It will! 
-  LE JEU ? 
+  LE JEU ?
   > Probably not, en tout cas pas les positions de jeu exactement
   EST-CE QUE LES SOCKETS EPARGNENT LA DB? 
   > yup! c'est tout l'intérêt (ne pas avoir à faire de requêtes serveur)
@@ -27,7 +47,7 @@ https://medium.com/@gausmann.simon/nestjs-typeorm-and-postgresql-full-example-de
 - orga DB + schema db julnolle:
 https://www.youtube.com/channel/UC_emPzF9DZgK05QedIqbNDg/playlists
 https://dbdiagram.io/d/6148c3e3825b5b01460af366
-- share github access ? copy files from julnolle repo to mine, copy hidden files from root
+- share github access ? copy files from julnolle repo to mine, copy hidden files from root: OK
 - cleanup trello
 - choisir une fonctionnalité au choix sur trello et s'y incrire pour la dev
 
