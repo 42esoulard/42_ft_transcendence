@@ -10,11 +10,8 @@ export class Users {
   @Column({ type: "varchar", length: 50, unique: true })
   username: string;
   
-  @Column({ type: "varchar", length: 255, nullable: true })
-  password: string;
-  
-  @Column({ type: "varchar", length: 255, nullable: true })
-  salt: string;
+  @Column({ type: "varchar", length: 50, unique: true, nullable: true })
+  forty_two_login: string;
   
   @Column({ type: "varchar", length: 255, nullable: true })
   avatar: string;

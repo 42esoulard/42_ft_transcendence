@@ -28,11 +28,5 @@ export interface CreateUserDto {
      * @type {string}
      * @memberof CreateUserDto
      */
-    password: any;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateUserDto
-     */
     avatar?: any;
 }

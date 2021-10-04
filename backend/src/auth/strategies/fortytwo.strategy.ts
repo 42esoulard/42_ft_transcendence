@@ -13,7 +13,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, 'FortyTwoStrate
     super({
       clientID: process.env['42_CLIENT_ID'],
       clientSecret: process.env['42_CLIENT_SECRET'],
-      callbackURL: process.env['42_CALLBACK_URL'],
+      callbackURL: 'http://localhost:8080/account',
       scope: 'public',
       profileFields: {
         'id': function (obj: any) { return String(obj.id); },
@@ -30,7 +30,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, 'FortyTwoStrate
 
   async validate(accessToken: string, refreshToken: string, profile: Profile, cb: Function): Promise<User> {
     const { username, provider, firstname, lastname, photo } = profile;
-    console.log(profile);
+    // console.log(profile);
     const userProfile: FortyTwoUser = { username, photo };
     const user = await this.authService.validateUser(userProfile);
     if (!user) {

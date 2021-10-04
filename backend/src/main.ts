@@ -7,8 +7,6 @@ import * as passport from 'passport';
 import { TypeORMSession } from './auth/entity/TypeORMSession.entity';
 import { TypeormStore } from 'connect-typeorm/out';
 import { getRepository } from 'typeorm';
-import * as cookieParser from 'cookie-parser';
-// declare const module: any; // For Hot-Module Replacement
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,7 +14,7 @@ async function bootstrap() {
 
   app.enableCors({
     credentials: true,
-    origin: ["http://localhost:8080", "http://127.0.0.1:8080", "https://api.intra.42.fr"]
+    origin: ["http://localhost:8080", "http://127.0.0.1:8080"]
   }); // Mandatory to interact w/ vue js which is on a different port
 
   //Setting up the OpenApi to generate client sdk
@@ -39,13 +37,6 @@ async function bootstrap() {
 
   SwaggerModule.setup('api', app, document);
 
-  // For Hot-Module Replacement
-  // if (module.hot) {
-  //   module.hot.accept();
-  //   module.hot.dispose(() => app.close());
-  // }
-  ////////////////////////////////////////
-
   // apply the express-session middleware as global
   app.use(
     session({
@@ -61,7 +52,8 @@ async function bootstrap() {
   );
 
   // Need to enable cookie parser to read cookie between backend and frontend, containing acces token
-  app.use(cookieParser());
+  // Not needed anymore, replaced by Authorization header
+  // app.use(cookieParser());
 
   app.use(passport.initialize());
   app.use(passport.session());

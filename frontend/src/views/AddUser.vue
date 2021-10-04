@@ -4,8 +4,6 @@
     <form @submit.prevent="handleSubmit">
       <label>username</label>
       <input type="text" v-model="username" />
-      <label>Password</label>
-      <input type="text" v-model="password" />
       <div>
         <button>Save User</button>
       </div>
@@ -30,14 +28,12 @@ export default defineComponent({
   setup() {
     // const api = inject("api") as any;
     const username = ref("");
-    const password = ref("");
     const responseData = ref(null);
     const api = new DefaultApi();
 
     const handleSubmit = async () => {
       await api.saveUser({
           username: username.value,
-          password: password.value,
         })
         .then((res: any) => (responseData.value = res.data))
         .catch((err: any) => console.log(err.message));
@@ -51,7 +47,7 @@ export default defineComponent({
       //   .catch((error) => {});
     };
 
-    return { username, password, responseData, handleSubmit };
+    return { username, responseData, handleSubmit };
   },
 });
 </script>
