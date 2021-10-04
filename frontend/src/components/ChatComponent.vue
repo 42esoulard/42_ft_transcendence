@@ -29,17 +29,21 @@
       
       <h2 v-else>{{ username }}</h2>
       <div class="card bg-info" v-if="ready">
+        <div v-if="newChannelForm" class="greyed-background" @click="newChannelForm = false"></div>
+
         <div class="card-header text-white">
           <h4>
             <select class="selectRoom">
               <option v-for="(value, room) in rooms" :key="room" class="optionRoom" @click="activeRoom = room" :id="room" >{{ room }}</option>
-              <option class="optionRoom" @click="createRoom()">+</option>
+              <option class="optionRoom" @click="newChannelForm = true">+</option>
             </select>
             <button v-if="!isMemberOfActiveRoom()" class="joinBtn" @click="toggleRoomMembership()">Join room</button>
             <button v-else class="joinBtn" @click="toggleRoomMembership()">Leave room</button>
             <span class="float-right">{{ connections }} online</span>
           </h4>
         </div>
+
+        <NewChannelForm v-if="newChannelForm" />
 
         <ul class="list-group list-group-flush text-right">
           <small v-if="typing" class="text-white">{{ typing }} is typing</small>
@@ -62,7 +66,7 @@
                 placeholder="Enter message here"
               />
               <div v-else>
-                <div class="form-control greyed">Join the room to send messages</div>
+                <div class="form-control greyed-input">Join the room to send messages</div>
               </div>
             </div>
           </form>
@@ -77,13 +81,13 @@
 import { computed, defineComponent, onMounted, onUpdated, reactive, ref, watch } from "vue";
 import { io } from "socket.io-client";
 import { Message } from "@/types/Message";
+import NewChannelForm from "@/components/NewChannelForm.vue"
 import { Info } from "@/types/Info";
 import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
 
-
 export default defineComponent({
   name: "ChatComponent",
-  components: {},
+  components: { NewChannelForm },
   
   beforePageLeave() {
     // console.log("beforePageLeave");
@@ -106,6 +110,7 @@ export default defineComponent({
     const connections = ref(1);
     const activeRoom = ref("general");
     const responseData = ref(null);
+    let newChannelForm = ref(false);
 
     /* INITIALIZE FROM DB + UPDATE (on logout? on fixed interval? on fixed nb of messages?):
         - rooms
@@ -150,6 +155,7 @@ export default defineComponent({
     }
 
     const createRoom = () => {
+      console.log("in create room")
       /* add form component here:
 
         - Name? [check it doesn't exist yet in db]
@@ -160,14 +166,8 @@ export default defineComponent({
           2) please re-enter the password:
           
       */
-      const newRoom = prompt("Name of the new channel:");
-    
-      socket.emit('createRoom', {
-        name: newRoom,
-        owner_id: 1, //GET LOGGED IN USER ID
-        type: 'public',
-        password: 'password', //must be crypted
-        });
+      newChannelForm.value = true;
+      console.log(newChannelForm);
     }
 
     window.onbeforeunload = () => {
@@ -193,6 +193,8 @@ export default defineComponent({
     });
 
     socket.on('createdRoom', (newRoom: string) => {
+      newChannelForm.value = false;
+
       rooms[newRoom] = true;
       activeRoom.value = newRoom;
       messages.push({
@@ -292,8 +294,10 @@ export default defineComponent({
     }
 
     return {
-      socket,
       addUser,
+
+      socket,
+      
       send,
       newMessage,
       messages,
@@ -302,13 +306,15 @@ export default defineComponent({
       ready,
       info,
       connections,
+
       rooms,
       activeRoom,
       switchRoom,
+      newChannelForm,
       toggleRoomMembership,
       isMemberOfActiveRoom,
       createRoom,
-      roomMessages
+      roomMessages,
     };
   },
 });
@@ -334,8 +340,15 @@ export default defineComponent({
   background: blue;  
 }
 
-.greyed {
+.greyed-input {
   background-color: gray;
   font-style: italic;
+}
+
+.greyed-background {
+  background-color: rgba(138, 138, 138, 0.424);
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 </style>

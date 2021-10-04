@@ -46,12 +46,38 @@ export class MessagesController {
   @ApiBadRequestResponse({
     description: 'Invalid ID supplied',
   })
-  async getMessage(@Param('id') id: number): Promise<Message> {
-    const message: Message = await this.messageService.getMessagebyId(id);
+  async getMessageById(@Param('id') id: number): Promise<Message> {
+    const message: Message = await this.messageService.getMessageById(id);
     if (message == undefined) {
       throw new NotFoundException('Message not found');
     }
     return message;
+  }
+
+  /**
+   * Returns a message found in database by its id.
+   */
+  @Get('/in/:channelId')
+  @ApiOkResponse({
+    description: "The channel's messages have been found in database",
+    type: Message,
+  })
+  @ApiNotFoundResponse({
+    description: 'Message not found',
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid ID supplied',
+  })
+  async getChannelMessages(
+    @Param('channelId') channelId: number,
+  ): Promise<Message[]> {
+    const messages: Message[] = await this.messageService.getChannelMessages(
+      channelId,
+    );
+    if (messages == undefined) {
+      throw new NotFoundException('Messages not found');
+    }
+    return messages;
   }
 
   /**

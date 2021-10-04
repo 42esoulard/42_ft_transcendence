@@ -12,7 +12,7 @@ export class Channels {
   @Column()
   type: string;
 
-  @Column()
+  @Column({ nullable: true })
   salt: string;
 
   @Column({ nullable: true })

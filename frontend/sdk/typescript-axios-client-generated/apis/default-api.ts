@@ -16,6 +16,8 @@ import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
+import { Channel } from '../models';
+import { CreateChannelDto } from '../models';
 import { CreateMessageDto } from '../models';
 import { CreateUserDto } from '../models';
 import { Message } from '../models';
@@ -94,6 +96,156 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChannelById: async (id: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getChannelById.');
+            }
+            const localVarPath = `/channels/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChannelByName: async (name: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            if (name === null || name === undefined) {
+                throw new RequiredError('name','Required parameter name was null or undefined when calling getChannelByName.');
+            }
+            const localVarPath = `/channels/name/{name}`
+                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} channelId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChannelMessages: async (channelId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'channelId' is not null or undefined
+            if (channelId === null || channelId === undefined) {
+                throw new RequiredError('channelId','Required parameter channelId was null or undefined when calling getChannelMessages.');
+            }
+            const localVarPath = `/messages/in/{channelId}`
+                .replace(`{${"channelId"}}`, encodeURIComponent(String(channelId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChannels: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/channels`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -131,10 +283,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMessage: async (id: number, options: any = {}): Promise<RequestArgs> => {
+        getMessageById: async (id: number, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
-                throw new RequiredError('id','Required parameter id was null or undefined when calling getMessage.');
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getMessageById.');
             }
             const localVarPath = `/messages/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -442,6 +594,48 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @param {CreateChannelDto} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        saveChannel: async (body: CreateChannelDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling saveChannel.');
+            }
+            const localVarPath = `/channels`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof body !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(body !== undefined ? body : {}) : (body || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {CreateMessageDto} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -592,6 +786,57 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getChannelById(id: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Channel>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getChannelById(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getChannelByName(name: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Channel>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getChannelByName(name, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @param {number} channelId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getChannelMessages(channelId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Message>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getChannelMessages(channelId, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getChannels(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Channel>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getChannels(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -608,8 +853,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getMessage(id: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Message>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getMessage(id, options);
+        async getMessageById(id: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Message>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getMessageById(id, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -715,6 +960,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {CreateChannelDto} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async saveChannel(body: CreateChannelDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Channel>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).saveChannel(body, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @param {CreateMessageDto} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -778,6 +1036,41 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChannelById(id: number, options?: any): AxiosPromise<Channel> {
+            return DefaultApiFp(configuration).getChannelById(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChannelByName(name: string, options?: any): AxiosPromise<Channel> {
+            return DefaultApiFp(configuration).getChannelByName(name, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} channelId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChannelMessages(channelId: number, options?: any): AxiosPromise<Message> {
+            return DefaultApiFp(configuration).getChannelMessages(channelId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChannels(options?: any): AxiosPromise<Array<Channel>> {
+            return DefaultApiFp(configuration).getChannels(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -790,8 +1083,8 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMessage(id: number, options?: any): AxiosPromise<Message> {
-            return DefaultApiFp(configuration).getMessage(id, options).then((request) => request(axios, basePath));
+        getMessageById(id: number, options?: any): AxiosPromise<Message> {
+            return DefaultApiFp(configuration).getMessageById(id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -861,6 +1154,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @param {CreateChannelDto} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        saveChannel(body: CreateChannelDto, options?: any): AxiosPromise<Channel> {
+            return DefaultApiFp(configuration).saveChannel(body, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {CreateMessageDto} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -915,6 +1217,45 @@ export class DefaultApi extends BaseAPI {
     }
     /**
      * 
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getChannelById(id: number, options?: any) {
+        return DefaultApiFp(this.configuration).getChannelById(id, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * 
+     * @param {string} name 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getChannelByName(name: string, options?: any) {
+        return DefaultApiFp(this.configuration).getChannelByName(name, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * 
+     * @param {number} channelId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getChannelMessages(channelId: number, options?: any) {
+        return DefaultApiFp(this.configuration).getChannelMessages(channelId, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getChannels(options?: any) {
+        return DefaultApiFp(this.configuration).getChannels(options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
@@ -929,8 +1270,8 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getMessage(id: number, options?: any) {
-        return DefaultApiFp(this.configuration).getMessage(id, options).then((request) => request(this.axios, this.basePath));
+    public getMessageById(id: number, options?: any) {
+        return DefaultApiFp(this.configuration).getMessageById(id, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
@@ -1005,6 +1346,16 @@ export class DefaultApi extends BaseAPI {
      */
     public redirect(options?: any) {
         return DefaultApiFp(this.configuration).redirect(options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * 
+     * @param {CreateChannelDto} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public saveChannel(body: CreateChannelDto, options?: any) {
+        return DefaultApiFp(this.configuration).saveChannel(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 

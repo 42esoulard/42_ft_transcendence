@@ -11,23 +11,37 @@ import * as bcrypt from 'bcrypt';
 export class ChannelsService {
   constructor(
     @InjectRepository(Channels)
-    private readonly ChannelsRepository: Repository<Channels>,
+    private readonly channelsRepository: Repository<Channels>,
   ) {}
+
+  private index: 1;
 
   /**
    * Lists all channels in database
    * nb: find() is a function from the typeORM library
    */
   async getChannels(): Promise<Channel[]> {
-    return await this.ChannelsRepository.find();
+    return await this.channelsRepository.find();
+  }
+
+  /**
+   * Gets a channel in database by its name
+   * nb: findOne(id) is a function from the typeORM library
+   */
+  async getChannelByName(name: string): Promise<Channel> {
+    const channel = await this.channelsRepository.findOne({
+      where: { name: name },
+    });
+    console.log('getChannelByName', channel);
+    return channel;
   }
 
   /**
    * Gets a channel in database by its id
    * nb: findOne(id) is a function from the typeORM library
    */
-  async getChannelbyId(id: number): Promise<Channel> {
-    const res = await this.ChannelsRepository.findOne(id);
+  async getChannelById(id: number): Promise<Channel> {
+    const res = await this.channelsRepository.findOne(id);
     console.log('res', res);
     return res;
   }
@@ -38,22 +52,24 @@ export class ChannelsService {
    */
   async saveChannel(channelDto: CreateChannelDto): Promise<Channel> {
     const newChannel: Channel = {
-      id: 1,
+      id: this.index,
       name: channelDto.name,
       owner_id: channelDto.ownerId,
       type: channelDto.type,
-      password: '',
+      salt: null,
+      password: null,
       created_at: Math.floor(Date.now() / 1000),
     };
-    if (channelDto.type === 'password-protected') {
+    if (newChannel.type === 'password-protected') {
       (newChannel.salt = await bcrypt.genSalt()),
         (newChannel.password = await bcrypt.hash(
           channelDto.password,
           newChannel.salt,
         )); //must be crypted
     }
+    this.index++;
 
-    return await this.ChannelsRepository.save(newChannel);
+    return await this.channelsRepository.save(newChannel);
   }
 
   /**
