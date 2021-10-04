@@ -4,9 +4,11 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configService } from './config/config.service';
 import { UsersModule } from './users/users.module';
+import { MessagesModule } from './messages/messages.module';
 import { ChatModule } from './chat/chat.module';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
+import { PongModule } from './pong/pong.module';
 
 @Module({
   imports: [
@@ -14,7 +16,9 @@ import { PassportModule } from '@nestjs/passport';
     UsersModule,
     ChatModule,
     AuthModule,
-    PassportModule.register({ session: true })
+    PassportModule.register({ session: true }),
+    PongModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
