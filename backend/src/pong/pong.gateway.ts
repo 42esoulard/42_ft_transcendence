@@ -20,6 +20,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   private logger: Logger = new Logger('PongGateway');
 
+ 
+  // private queue = null
+  
+  // private rooms = []
+
 	private position = {
 				player1: 200,
 				player2: 200,
@@ -58,6 +63,20 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.logger.log('Client connected ' + client.id);
     client.emit('position', this.position)
   }
+
+  // @SubscribeMessage('lookingForOpponent')
+  // handleNewClientInQueue(client: Socket)
+  // {
+  //   this.logger.log('new client in queue')
+  //   if (this.queue)
+  //   {
+  //     var room
+  //     room = this.createRoom(client)
+  //     this.queue = null
+  //   }
+  //   else
+  //     this.queue = client
+  // }
 
   @SubscribeMessage('move')
   handleMessage(client: Socket, message: {room: string, text: string}): void {
