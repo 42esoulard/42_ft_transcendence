@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateUserDto {
 	// @ApiPropertyOptional()
@@ -10,13 +10,13 @@ export class CreateUserDto {
 	readonly username: string;
 	
 	/**
-	* The password of the created user
+	* The 42 username of the created user
 	*/
-	readonly password: string;
+	readonly forty_two_login: string;  //OR 42 id (number so faster)?
 	
 	/**
-	 * The password of the created user
+	 * The avatar of the created user
 	 */
 	readonly avatar?: string;
-	
+
 }

@@ -11,6 +11,7 @@
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "eslint-plugin-vue": "^7.17.0",
+    "jwt-decode": "^3.1.2",
     "sdk-client": "sdk/typescript-axios-client-generated/",
     "socket.io-client": "^4.2.0",
     "vue": "^3.0.0",

@@ -10,60 +10,92 @@ import {
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
+  namespace: '/chat',
   cors: {
-    origin: ["http://localhost:8080", "http://127.0.0.1:8080"],
+    origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
     credentials: true,
-  }
+  },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
-  
-  connections: number = 0;
+
+  connections = 0;
 
   async handleConnection() {
-    // A client has connected
+    console.log('A client has connected');
     this.connections++;
-    // console.log("A client has connected");
-    
     // Notify connected clients of current users
     this.server.emit('connections', this.connections);
   }
-  
-  async handleDisconnect() {
-    // A client has disconnected
+
+  async handleDisconnect(@ConnectedSocket() client: Socket) {
+    console.log('A client has disconnected');
     this.connections--;
-    // console.log("A client has disconnected");
+    client.disconnect();
     // Notify connected clients of current users
     this.server.emit('connections', this.connections);
+  }
+
+  @SubscribeMessage('get-connections')
+  async getConnections(@ConnectedSocket() client: Socket) {
+    client.broadcast.emit('connections', this.connections);
   }
 
   @SubscribeMessage('chat-message')
-  async onChat(@MessageBody() message: string, @ConnectedSocket() client: Socket) {
-    // client.emit('chat-message', message, (message) => console.log(message));
+  async onChat(@ConnectedSocket() client: Socket, @MessageBody() message) {
     client.broadcast.emit('chat-message', message);
   }
-  
-  @SubscribeMessage('typing')
-  async onTyping(@MessageBody() TypingUser: string, @ConnectedSocket() client: Socket) {
-    client.broadcast.emit("typing", TypingUser);
-    console.log(TypingUser);
+
+  @SubscribeMessage('createRoom')
+  handleCreateRoom(@ConnectedSocket() client: Socket, @MessageBody() info) {
+    // User has created a new chatroom
+    client.emit('createdRoom', info.room);
+
+    //Notify other users of chatroom creation
+    client.broadcast.emit('addRoom', info.room);
   }
-  
+
+  @SubscribeMessage('joinRoom')
+  handleJoinRoom(client: Socket, room: string) {
+    // User has joined a chatroom
+    client.join(room);
+  }
+
+  @SubscribeMessage('leaveRoom')
+  handleLeaveRoom(client: Socket, room: string) {
+    // User has left a chatroom
+    client.leave(room);
+  }
+
+  @SubscribeMessage('typing')
+  async onTyping(
+    @MessageBody() TypingUser: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.broadcast.emit('typing', TypingUser);
+    // console.log(TypingUser);
+  }
+
   @SubscribeMessage('stopTyping')
   async onStopTyping(@ConnectedSocket() client: Socket) {
-    client.broadcast.emit("stopTyping");
+    client.broadcast.emit('stopTyping');
   }
-  
+
   @SubscribeMessage('join')
   async onJoin(@MessageBody() user: string, @ConnectedSocket() client: Socket) {
     console.log(user, ' joined');
-    client.broadcast.emit("join", user);
+    // User has joined the chat
+    client.broadcast.emit('join', user, this.connections);
   }
-  
+
   @SubscribeMessage('leave')
-  async onLeave(@MessageBody() user: string, @ConnectedSocket() client: Socket) {
+  async onLeave(
+    @MessageBody() user: string,
+    @ConnectedSocket() client: Socket,
+  ) {
     console.log(user, ' left');
-    client.broadcast.emit("leave", user);
+    // User has left the chat
+    client.broadcast.emit('leave', user);
   }
 }

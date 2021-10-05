@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configService } from './config/config.service';
 import { UsersModule } from './users/users.module';
+import { MessagesModule } from './messages/messages.module';
 import { ChatModule } from './chat/chat.module';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
@@ -16,7 +17,8 @@ import { PongModule } from './pong/pong.module';
     ChatModule,
     AuthModule,
     PassportModule.register({ session: true }),
-    PongModule
+    PongModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

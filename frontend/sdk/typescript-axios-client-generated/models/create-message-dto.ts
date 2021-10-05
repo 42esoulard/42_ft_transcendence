@@ -14,19 +14,25 @@
 /**
  * 
  * @export
- * @interface CreateUserDto
+ * @interface CreateMessageDto
  */
-export interface CreateUserDto {
+export interface CreateMessageDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateMessageDto
+     */
+    channelId: any;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateMessageDto
+     */
+    authorId: any;
     /**
      * 
      * @type {string}
-     * @memberof CreateUserDto
+     * @memberof CreateMessageDto
      */
-    username: any;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateUserDto
-     */
-    avatar?: any;
+    content: any;
 }

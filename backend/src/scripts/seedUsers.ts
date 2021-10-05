@@ -4,20 +4,20 @@ import { configService } from '../config/config.service';
 
 async function run() {
   await createConnection(configService.getTypeOrmConfig() as ConnectionOptions)
-  .then(connection => {
-    createQueryBuilder()
-    .insert()
-    .into(Users)
-    .values([
-      { username: "Harry", password: "password", salt: "salt", avatar: "path/to/avatar.img", two_fa: false },
-      { username: "Ron", password: "password", salt: "salt", avatar: "path/to/avatar.img", two_fa: false },
-      { username: "Hermione", password: "password", salt: "salt", avatar: "path/to/avatar.img", two_fa: false },
-      { username: "Severus", password: "password", salt: "salt", avatar: "path/to/avatar.img", two_fa: false }
-    ])
-    .execute();
-  })
+    .then(connection => {
+      createQueryBuilder()
+        .insert()
+        .into(Users)
+        .values([
+          { username: "Harry", avatar: "path/to/avatar.img" },
+          { username: "Ron", avatar: "path/to/avatar.img" },
+          { username: "Hermione", avatar: "path/to/avatar.img" },
+          { username: "Severus", avatar: "path/to/avatar.img" }
+        ])
+        .execute();
+    })
 }
 
 run()
-.then(_ => console.log('...wait for script to exit'))
-.catch(error => console.error('seed error', error));
+  .then(_ => console.log('...wait for script to exit'))
+  .catch(error => console.error('seed error', error));

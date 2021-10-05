@@ -19,8 +19,13 @@ export class AuthService implements AuthProvider {
       return user;
     } else {
       const { username, photo } = userProfile;
-      return this.usersService.saveUser({ username: username, password: 'password', avatar: photo });
+      return this.usersService.saveUser({ username: username, forty_two_login: username, avatar: photo });
     }
+  }
+
+  async validateJwtUser(username: string): Promise<User> {
+    const user: User = await this.usersService.getUserByUsername(username);
+    return user;
   }
 
   async login(user: User) {
@@ -29,18 +34,4 @@ export class AuthService implements AuthProvider {
       access_token: this.jwtService.sign(payload),
     };
   }
-
-  //The following is not used because of usersService
-  createUser(userProfile: FortyTwoUser): Promise<User> | undefined {
-    const { username, photo } = userProfile;
-    return this.usersService.saveUser({ username: username, password: 'password', avatar: photo });
-  }
-  findUserById() {
-    throw new Error('Method not implemented.');
-  }
-
-
-
-
-
 }
