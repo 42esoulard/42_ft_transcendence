@@ -29,7 +29,6 @@
       
       <h2 v-else>{{ username }}</h2>
       <div class="card bg-info" v-if="ready">
-        <div v-if="newChannelForm" class="greyed-background" @click="newChannelForm = false"></div>
 
         <div class="card-header text-white">
           <h4>
@@ -42,8 +41,6 @@
             <span class="float-right">{{ connections }} online</span>
           </h4>
         </div>
-
-        <NewChannelForm v-if="newChannelForm" />
 
         <ul class="list-group list-group-flush text-right">
           <small v-if="typing" class="text-white">{{ typing }} is typing</small>
@@ -74,7 +71,11 @@
 
       </div>
     </div>
+    <div z-index="-1" v-if="newChannelForm" class="greyed-background" @click="newChannelForm = false"></div>
+    <NewChannelForm z-index="-1" v-if="newChannelForm" :socket="socket" />
+
   </div>
+  
 </template>
 
 <script lang="ts">
@@ -85,7 +86,9 @@ import NewChannelForm from "@/components/NewChannelForm.vue"
 import { Info } from "@/types/Info";
 import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
 
-export default defineComponent({
+export const socket = io("http://localhost:3000/chat");
+
+export const ChatComponent = defineComponent({
   name: "ChatComponent",
   components: { NewChannelForm },
   
@@ -100,7 +103,7 @@ export default defineComponent({
 
   setup() {
     const api = new DefaultApi();
-    const socket = io("http://localhost:3000/chat");
+    // const socket = ref(io("http://localhost:3000/chat"));
     const newMessage = ref("");
     const messages = reactive<Message[]>([]);
     const typing = ref("");
@@ -318,6 +321,8 @@ export default defineComponent({
     };
   },
 });
+
+export default ChatComponent;
 </script>
 
 <style>
@@ -350,5 +355,8 @@ export default defineComponent({
   position: absolute;
   width: 100%;
   height: 100%;
+  top:0;
+  left:0;
 }
 </style>
+

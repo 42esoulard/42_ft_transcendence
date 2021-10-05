@@ -49,12 +49,12 @@
 <script lang="ts">
 import { ref } from "vue"
 import { defineComponent } from "vue";
+import { Socket, io } from "socket.io-client"
 import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
-import socket from "./ChatComponent.vue"
-
+import { socket } from "./ChatComponent.vue"
+ 
 export default defineComponent({
-  name: 'SubmitSuccess',
-  props: ['name', 'surname'],
+  name: 'NewChannelForm',
   setup() {
     const api = new DefaultApi();
 
@@ -109,16 +109,24 @@ export default defineComponent({
     }
     
     const checkInputs = () => {
-      console.log
+ 
       if (errors.length)
         return;
-      socket.emit('createRoom', {
-          name: channelName.value,
-          // ownerId: api.getCurrentUserId
-          ownerId: 1, // API MUST FETCH THE PROPER USER ID
-          type: channelType.value,
-          password: channelPassword.value
+      console.log(channelName.value, channelType.value, channelPassword.value)
+      api.saveChannel({
+        name: channelName.value,
+        // ownerId: api.getCurrentUserId
+        ownerId: 1, // API MUST FETCH THE PROPER USER ID
+        type: channelType.value,
+        password: channelPassword.value
       })
+      // socket.emit('createRoom', {
+      //     name: channelName.value,
+      //     // ownerId: api.getCurrentUserId
+      //     ownerId: 1, // API MUST FETCH THE PROPER USER ID
+      //     type: channelType.value,
+      //     password: channelPassword.value
+      // })
     }
 
     return {
@@ -145,6 +153,8 @@ export default defineComponent({
   width: 300px;
   padding: 15px;
   left: 50%;
+  top:50%;
+  margin-top: -150px;
   margin-left: -150px;
 }
 form {
@@ -183,7 +193,7 @@ input#name {
   list-style: none;
   padding: 0;
 }
-.error {
+/* .error {
 
-}
+} */
 </style>
