@@ -54,7 +54,7 @@ export class MessagesService {
       channel_id: messageDto.channelId,
       author_id: messageDto.authorId,
       content: messageDto.content,
-      created_at: Math.floor(Date.now() / 1000),
+      // created_at: Math.floor(Date.now() / 1000),
     };
 
     return await this.messagesRepository.save(newMessage);

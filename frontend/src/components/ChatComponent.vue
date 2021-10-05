@@ -158,19 +158,11 @@ export const ChatComponent = defineComponent({
     }
 
     const createRoom = () => {
-      console.log("in create room")
-      /* add form component here:
-
-        - Name? [check it doesn't exist yet in db]
-        - Type [radio buttons]: public? Private (newcomers must be invited by a member)?
-        password-protected (newcomers can join provided they know the room password)?
-        - If password-protected: [check regex OK, check password match]
-          1) please enter a password for the room (a-zA-Z0-9/*-+_):
-          2) please re-enter the password:
-          
-      */
+      // activates form component: 
       newChannelForm.value = true;
-      console.log(newChannelForm);
+      // once form component is validated, it shuts and calls api to 
+      // save the new channel and the new channel_member (with current user
+      // as admin)
     }
 
     window.onbeforeunload = () => {
@@ -198,7 +190,7 @@ export const ChatComponent = defineComponent({
     socket.on('createdRoom', (newRoom: string) => {
       newChannelForm.value = false;
 
-      rooms[newRoom] = true;
+      // rooms[newRoom] = true;
       activeRoom.value = newRoom;
       messages.push({
           message: `${username.value} has created the [${newRoom}] channel`,

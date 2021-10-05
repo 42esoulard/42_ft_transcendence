@@ -50,10 +50,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('createRoom')
   handleCreateRoom(@ConnectedSocket() client: Socket, @MessageBody() info) {
     // User has created a new chatroom
-    client.emit('createdRoom', info.room);
-
+    client.emit('createdRoom', info);
+    
     //Notify other users of chatroom creation
-    client.broadcast.emit('addRoom', info.room);
+    client.broadcast.emit('addRoom', info);
   }
 
   @SubscribeMessage('joinRoom')

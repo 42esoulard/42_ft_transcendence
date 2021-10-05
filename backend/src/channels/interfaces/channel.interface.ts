@@ -5,5 +5,4 @@ export class Channel {
   salt: string;
   password: string;
   owner_id: number;
-  created_at: number;
 }

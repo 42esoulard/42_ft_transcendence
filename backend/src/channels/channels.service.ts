@@ -58,7 +58,7 @@ export class ChannelsService {
       type: channelDto.type,
       salt: null,
       password: null,
-      created_at: Math.floor(Date.now() / 1000),
+      // created_at: Math.floor(Date.now() / 1000),
     };
     if (newChannel.type === 'password-protected') {
       (newChannel.salt = await bcrypt.genSalt()),

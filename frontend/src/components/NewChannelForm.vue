@@ -8,7 +8,7 @@
       2) please re-enter the password:
   -->
   <div class='formContainer'>
-    <form @submit.prevent='checkInputs()'>
+    <form @submit.prevent='submitInputs()'>
       <h2>New channel</h2>
 
       <label class="subtitle" for='name'>Channel name:*</label>
@@ -108,18 +108,28 @@ export default defineComponent({
       }
     }
     
-    const checkInputs = () => {
+    const submitInputs = () => {
  
       if (errors.length)
         return;
       console.log(channelName.value, channelType.value, channelPassword.value)
-      api.saveChannel({
+      const newChannel = api.saveChannel({
         name: channelName.value,
         // ownerId: api.getCurrentUserId
-        ownerId: 1, // API MUST FETCH THE PROPER USER ID
+        ownerId: 1, // API MUST FETCH THE CURRENT USER ID
         type: channelType.value,
         password: channelPassword.value
       })
+      .then(() => {
+        api.saveChannelMember({
+          //channelId: newChannel.channelId ? Does this work?
+          //userId: api.getUserId
+          //isAdmin: true
+        })
+        socket.emit('createRoom', channelName.value)
+      })
+      .catch((err) => console.log("Failed to create channel: ", err))
+
       // socket.emit('createRoom', {
       //     name: channelName.value,
       //     // ownerId: api.getCurrentUserId
@@ -137,7 +147,7 @@ export default defineComponent({
       checkName,
       checkPassword,
       checkPasswordConf,
-      checkInputs,
+      submitInputs,
       errors
 
     }
