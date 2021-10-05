@@ -3,7 +3,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Socket, Server } from 'socket.io';
 
 var BALL_SPEED = 1
-var INTERVAL_IN_MS = 20
+var INTERVAL_IN_MS = 50
 var CANVAS_WIDTH = 640
 var CANVAS_HEIGHT = 480
 var BALL_INITIAL_DIR_X = -2
@@ -158,7 +158,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // move ball in direction
     this.position.ball.x += this.ballDirection.x * BALL_SPEED
     this.position.ball.y += this.ballDirection.y * BALL_SPEED
-    client.emit('position', this.position)
+    this.server.to(room).emit('position', this.position)
+    // client.emit('position', this.position)
+
   }
 
   @SubscribeMessage('leaveRoom')
@@ -168,6 +170,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.clients.client1 = ''
     if (client.id === this.clients.client2)
       this.clients.client2 = ''
+    clearInterval(this.interval)
+
     client.to(room).emit('opponentLeftRoom')
     client.leave(room)
   }
