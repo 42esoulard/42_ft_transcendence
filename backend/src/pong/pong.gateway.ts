@@ -3,7 +3,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Socket, Server } from 'socket.io';
 
 var BALL_SPEED = 1
-var INTERVAL_IN_MS = 50
+var INTERVAL_IN_MS = 20
 var CANVAS_WIDTH = 640
 var CANVAS_HEIGHT = 480
 var BALL_INITIAL_DIR_X = -2

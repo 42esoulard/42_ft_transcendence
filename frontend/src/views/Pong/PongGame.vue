@@ -29,6 +29,7 @@ export default {
 			},
 			socket: null,
 			room: '',
+			playing: false
 		}
 	},
 	created() {
@@ -41,11 +42,13 @@ export default {
 		this.context = this.$refs.game.getContext("2d");
 		
 		this.socket.on("position", data => {
-			this.draw(data)
+			if (this.playing)
+				this.draw(data)
 		})
 
 		this.socket.on('joinedRoom', data => {
 			this.room = data
+			this.playing = true
 			// alert("Youve joined the game !")
 		})
 		this.socket.on('roomIsFull', () => {
@@ -65,6 +68,7 @@ export default {
 		{
 			alert('Leaving the game')
 			this.socket.emit('leaveRoom', this.room)
+			this.playing = false
 			console.log('leaving')
 		}
 	},
