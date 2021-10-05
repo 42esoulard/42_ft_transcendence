@@ -11,6 +11,17 @@
   <router-view/>
 </template>
 
+<script>
+import { io } from "socket.io-client"
+
+const clientSocket = io('http://localhost:3000/pong')
+
+export default clientSocket
+
+</script>
+
+
+
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

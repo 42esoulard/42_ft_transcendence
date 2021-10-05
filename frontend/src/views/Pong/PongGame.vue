@@ -13,6 +13,7 @@
 
 <script>
 import { io } from 'socket.io-client'
+import clientSocket from '../../App.vue'
 export default {
 	data() {
 		return {
@@ -31,7 +32,7 @@ export default {
 		}
 	},
 	created() {
-		this.socket = io('http://localhost:3000/pong')
+		this.socket = clientSocket
 		window.addEventListener("keydown", this.onKeyDown)
 		
 	},

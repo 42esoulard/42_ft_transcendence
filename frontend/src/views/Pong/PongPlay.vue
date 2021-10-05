@@ -11,7 +11,7 @@
 
 <script>
 import { io, Socket } from 'socket.io-client'
-
+import clientSocket from '../../App.vue'
 
 export default {
 	data() {
@@ -21,7 +21,8 @@ export default {
 		}
 	},
 	created() {
-		this.socket =  io('http://localhost:3000/pong')
+		this.socket = clientSocket
+		// this.socket =  io('http://localhost:3000/pong')
 	},
 	mounted() {
 		// this.socket.on('opponentFound', (ids) => {
