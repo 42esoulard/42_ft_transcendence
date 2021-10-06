@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Users } from './entity/users.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
-import * as bcrypt from 'bcrypt';
+import { UpdateUserTokenDto } from './dto/updateUserToken.dto';
 
 @Injectable()
 export class UsersService {
@@ -66,6 +66,12 @@ export class UsersService {
 	 * nb: save(user) is a function from the typeORM library
 	*/
 	async updateUser(updatedUser: UpdateUserDto): Promise<User> {
+		return await this.usersRepository.save(updatedUser);
+	}
+	/**
+	 * Updates a user refresh_token and its expiring_date into db
+	*/
+	async updateUserToken(updatedUser: UpdateUserTokenDto): Promise<User> {
 		return await this.usersRepository.save(updatedUser);
 	}
 }

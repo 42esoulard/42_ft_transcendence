@@ -3,5 +3,5 @@ import { FortyTwoUser } from "./42user.interface";
 
 export interface AuthProvider {
   validateUser(user: FortyTwoUser): Promise<User>;
-  login(user: any);
+  getAccessToken(user: User): Promise<{ access_token: string }>;
 }
