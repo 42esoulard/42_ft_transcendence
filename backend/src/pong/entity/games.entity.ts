@@ -2,11 +2,12 @@ import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, CreateDateColumn 
 
 @Entity('games')
 export class Game {
+
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: "varchar", length: 50, nullable: true })
-  game_mode	: string;
+  gameMode	: string;
   
   // @Column({ type: "int", nullable: true })
   // score_1: number;
@@ -15,7 +16,7 @@ export class Game {
   // score_2: number;
  
   @CreateDateColumn({ type: "timestamp", default: () => "now()" })
-  started_at: Date;
+  startedAt: Date;
  
   // @BeforeInsert()
   // async hashPassword() {
