@@ -8,9 +8,13 @@ import { Game } from './entity/games.entity';
 export class PongService {
 	constructor(@InjectRepository(Game) private readonly repo:Repository<Game>) {}
 	
+	findAll(): Promise<Game[]> {
+		return this.repo.find()
+	}
+
 	createGame(game: CreateGameDto) {
 		this.repo.save(game)
-		
+
 		console.log('game created')
 		console.log(game)
 	}
