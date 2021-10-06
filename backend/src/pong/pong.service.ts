@@ -12,10 +12,10 @@ export class PongService {
 		return this.repo.find()
 	}
 
-	createGame(game: CreateGameDto) {
-		this.repo.save(game)
+	createGame(game: CreateGameDto): Promise<Game> {
+		return this.repo.save(game)
 
-		console.log('game created')
-		console.log(game)
+		// console.log('game created')
+		// console.log(game)
 	}
 }

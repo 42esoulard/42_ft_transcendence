@@ -13,7 +13,7 @@ export class PongController {
 	}
 
 	@Post()
-	createGame(@Body() game: CreateGameDto) {
-		this.pongService.createGame(game)
+	createGame(@Body() game: CreateGameDto): Promise<Game> {
+		return this.pongService.createGame(game)
 	}
 }
