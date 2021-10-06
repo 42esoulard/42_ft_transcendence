@@ -1,5 +1,6 @@
 import { Users } from 'src/users/entity/users.entity';
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany, OneToMany } from 'typeorm';
+import { GameUser } from './gameUser.entity';
 
 @Entity('games')
 export class Game {
@@ -7,7 +8,7 @@ export class Game {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: "varchar", length: 50, nullable: true })
+  @Column({ type: "varchar", length: 50, nullable: true, default: 'classic' })
   gameMode	: string;
   
   @Column({ type: "int", nullable: true })
@@ -19,7 +20,10 @@ export class Game {
   @CreateDateColumn({ type: "timestamp", default: () => "now()" })
   startedAt: Date;
 
-  @ManyToMany(() => Users, user => user.games)
-  participants: Users[]
+  @OneToMany(() => GameUser, gameuser => gameuser.game)
+  users: GameUser[]
+
+  // @ManyToMany(() => Users, user => user.games)
+  // participants: Users[]
  
 }

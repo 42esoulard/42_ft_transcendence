@@ -1,6 +1,7 @@
 import { Game } from 'src/pong/entity/games.entity';
 import { GameStats } from 'src/pong/entity/gameStats.entity';
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, CreateDateColumn, OneToOne, ManyToMany, JoinTable } from 'typeorm';
+import { GameUser } from 'src/pong/entity/gameUser.entity';
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, CreateDateColumn, OneToOne, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 // import * as bcrypt from 'bcrypt';
 
 @Entity('users')
@@ -26,9 +27,12 @@ export class Users {
   @OneToOne(() => GameStats, gamestats => gamestats.user)
   gameStats: GameStats
 
-  @ManyToMany(() => Game, game => game.participants )
-  @JoinTable({name: "playsIn"})
-  games: Game[]
+  @OneToMany(() => GameUser, gameuser => gameuser.user)
+  games: GameUser[]
+
+  // @ManyToMany(() => Game, game => game.participants )
+  // @JoinTable({name: "playsIn"})
+  // games: Game[]
 
   // @BeforeInsert()
   // async hashPassword() {
