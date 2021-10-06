@@ -22,4 +22,9 @@ export class PongController {
 	endGame(@Param('id') id: string, @Body() score: EndGameDto): Promise<Game> {
 		return this.pongService.endGame(Number(id), score)
 	}
+
+	@Get('seed')
+	seed() {
+		this.pongService.seed()
+	}
 }
