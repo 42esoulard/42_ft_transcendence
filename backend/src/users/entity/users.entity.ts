@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, CreateDateColumn } from 'typeorm';
+import { Game } from 'src/pong/entity/games.entity';
+import { GameStats } from 'src/pong/entity/gameStats.entity';
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, CreateDateColumn, OneToOne, ManyToMany, JoinTable } from 'typeorm';
 // import * as bcrypt from 'bcrypt';
 
 @Entity('users')
@@ -20,7 +22,14 @@ export class Users {
   
   @CreateDateColumn({ type: "timestamp", default: () => "now()" })
   created_at: Date;
- 
+
+  @OneToOne(() => GameStats, gamestats => gamestats.user)
+  gameStats: GameStats
+
+  @ManyToMany(() => Game, game => game.participants )
+  @JoinTable({name: "playsIn"})
+  games: Game[]
+
   // @BeforeInsert()
   // async hashPassword() {
   //   this.salt = await bcrypt.genSalt();

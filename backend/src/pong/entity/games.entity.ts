@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, CreateDateColumn } from 'typeorm';
+import { Users } from 'src/users/entity/users.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany } from 'typeorm';
 
 @Entity('games')
 export class Game {
@@ -17,5 +18,8 @@ export class Game {
  
   @CreateDateColumn({ type: "timestamp", default: () => "now()" })
   startedAt: Date;
+
+  @ManyToMany(() => Users, user => user.games)
+  participants: Users[]
  
 }
