@@ -1,6 +1,35 @@
 07/10/21
 [*INSERT AWESOME TALKING POINTS HERE*]
-- 
+
+ESTELLE: 
+  - A PROPER PLAN:
+    - give up channel-member relation for now
+    - get channels db to work 
+      - Compulsory:
+        - create channel + save to db + sync to local channel array
+        - non creator member: retrieve created channels and sync local channel array
+        - trigger channel retrieval/local channel array sync upon connection,
+          (=upon "created channel" signal)
+
+      - Optional:
+        - set activeChannel to the newly created channel and update the select (activeChannel
+          is NOT synced to db)
+        - delete channel
+        - join/leave channel
+    - get messages to work
+      - Compulsory:
+        - write message
+          - save it to db
+          - sync local message array
+          - publish it to the chat
+
+    - get channel relationships to work:
+      - instead of syncing all channels,
+        only sync joined channels (aka membership table elements)
+        joinable channels...
+    
+  - add endpoint for available channels (non-joined publics chans)
+- endpoints for current logged in user id? login? username?
 
 30/09/21
 

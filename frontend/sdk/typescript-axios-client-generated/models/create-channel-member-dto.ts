@@ -14,31 +14,25 @@
 /**
  * 
  * @export
- * @interface Message
+ * @interface CreateChannelMemberDto
  */
-export interface Message {
+export interface CreateChannelMemberDto {
     /**
      * 
      * @type {number}
-     * @memberof Message
-     */
-    id: any;
-    /**
-     * 
-     * @type {number}
-     * @memberof Message
+     * @memberof CreateChannelMemberDto
      */
     channelId: any;
     /**
      * 
      * @type {number}
-     * @memberof Message
+     * @memberof CreateChannelMemberDto
      */
-    authorId: any;
+    userId: any;
     /**
      * 
-     * @type {string}
-     * @memberof Message
+     * @type {boolean}
+     * @memberof CreateChannelMemberDto
      */
-    content: any;
+    isAdmin: any;
 }

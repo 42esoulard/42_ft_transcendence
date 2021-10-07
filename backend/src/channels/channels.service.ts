@@ -32,7 +32,7 @@ export class ChannelsService {
     const channel = await this.channelsRepository.findOne({
       where: { name: name },
     });
-    console.log('getChannelByName', channel);
+    console.log('getChannelByName', name, channel);
     return channel;
   }
 
@@ -51,15 +51,10 @@ export class ChannelsService {
    * nb: save(channel) is a function from the typeORM library
    */
   async saveChannel(channelDto: CreateChannelDto): Promise<Channel> {
-    const newChannel: Channel = {
-      id: this.index,
-      name: channelDto.name,
-      owner_id: channelDto.ownerId,
-      type: channelDto.type,
-      salt: null,
-      password: null,
-      // created_at: Math.floor(Date.now() / 1000),
-    };
+    console.log("IN SAVE CHANNEL", channelDto)
+    const newChannel = this.channelsRepository.create(channelDto);
+    newChannel.owner_id = channelDto.ownerId;
+
     if (newChannel.type === 'password-protected') {
       (newChannel.salt = await bcrypt.genSalt()),
         (newChannel.password = await bcrypt.hash(
@@ -68,8 +63,9 @@ export class ChannelsService {
         )); //must be crypted
     }
     this.index++;
+    const createdChannel = await this.channelsRepository.save(newChannel);
 
-    return await this.channelsRepository.save(newChannel);
+    return createdChannel;
   }
 
   /**

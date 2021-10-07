@@ -12,18 +12,18 @@
       <h2>New channel</h2>
 
       <label class="subtitle" for='name'>Channel name:*</label>
-      <input required type="text" name='name' id='name' placeholder='My Cool Channel' minlength="1" maxlength="200" v-model="channelName" @input="checkName()">
+      <input required type="text" name='name' id='chanName' placeholder='My Cool Channel' minlength="1" maxlength="200" v-model="channelName" @input="checkName()">
       
       <div class="channelAccessContainer">
         <label class="subtitle">Channel access:*</label>
         <label class='radioContainer'  title='A public channel is visible and accessible to any member' id='public'>
-          <input type='radio' class='radioUnit' id='public' name='unit' value='public' v-model="channelType">Public
+          <input type='radio' class='radioUnit' id='chanPublic' name='unit' value='public' v-model="channelType">Public
         </label>
         <label class='radioContainer'  title='An invite-only channel is only accessible to members who have been invited to join by a channel member' id='Private (invite-only)'>
-          <input type='radio' class='radioUnit' id='private' name='unit' value='private' v-model="channelType">Private (invite-only)
+          <input type='radio' class='radioUnit' id='chanPrivate' name='unit' value='private' v-model="channelType">Private (invite-only)
         </label>
         <label class='radioContainer'  title='A password-protected channel is accessible to any member who possesses the channel password set by the admin' id='Private (password-protected)'>
-          <input type='radio' class='radioUnit' id='password-protected' name='unit' value='password-protected' v-model="channelType">Private (password-protected)
+          <input type='radio' class='radioUnit' id='chanPassword-protected' name='unit' value='password-protected' v-model="channelType">Private (password-protected)
         </label>
       </div>
 
@@ -32,13 +32,6 @@
         <input required type="text" name='password' id='password' placeholder="Password" minlength="8" maxlength="20" v-model="channelPassword" @input="checkPassword()">
         <label for='passwordConfirmation'>Please confirm the channel password:*</label>
         <input required type="text" name='passwordConfirmation' id='passwordConfirmation' placeholder="Password" v-model="channelPasswordConf" @input="checkPasswordConf()">
-      </div>
-
-      <div v-if="errors.length" class="errorsContainer">
-        <b>Please correct the following error(s):</b>
-        <ul class="errors">
-          <li class="error" v-for="error in errors" :key="error">{{ error }}</li>
-        </ul>
       </div>
 
       <button type='submit'>Submit</button>
@@ -70,27 +63,39 @@ export default defineComponent({
     const errors: Array<string> = [];
 
     const checkName = () => {
-      console.log(channelName)
+      const nameInput =  <HTMLInputElement>document.querySelector('input[id=\'chanName\']')!;
+
+      if (!/^[-_*-+/a-zA-Z0-9 ]*$/.test(nameInput.value)) {
+        nameInput.setCustomValidity("Channel name must be 8-20 characters long and only contain letters, numbers, spaces or the following symbols -_*-+/");
+        validName = false;
+        return;
+      }
+      else {
+        nameInput.setCustomValidity("");
+        validName = true;
+      }
+
       api.getChannelByName(channelName.value)
       .then(() => { 
-        if (validName) {
-          errors.push(channelName.value + " already exists")
-        }
+        nameInput.setCustomValidity("A channel named [" + channelName.value + "] already exists")
         validName = false;
+        
       })
       .catch(() => {
-        errors.splice(errors.indexOf(channelName.value + " already exists"), 1);
+        nameInput.setCustomValidity('');
         validName = true;
+        console.log(channelName.value + "not found")
       })
     }
 
     const checkPassword = () => {
+      const passwordInput = <HTMLInputElement>document.querySelector('input#password')!;
+
       if (!/^[-_*-+/a-zA-Z0-9]*$/.test(channelPassword.value)) {
-        if (validPassword)
-          errors.push("Channel password must be 8-20 characters long and only contain letters, numbers, or the following symbols -_*-+/");
+        passwordInput.setCustomValidity("Channel password must be 8-20 characters long and only contain letters, numbers, or the following symbols -_*-+/");
         validPassword = false;
       } else if (!validPassword) {
-        errors.splice(errors.indexOf("Channel password must be 8-20 characters long and only contain letters, numbers, or the following symbols -_*-+/"), 1)
+        passwordInput.setCustomValidity('');
         validPassword = true;
       }
       if (channelPasswordConf.value)
@@ -98,19 +103,27 @@ export default defineComponent({
     }
 
     const checkPasswordConf = () => {
+      const passwordConfirmationInput = <HTMLInputElement>document.querySelector('input#passwordConfirmation')!;
+
       if (channelPasswordConf.value !== channelPassword.value) {
-        if (validPasswordConf)
-          errors.push("Password and password confirmation don't match");
+        passwordConfirmationInput.setCustomValidity("Password and password confirmation don't match");
         validPasswordConf = false;
       } else if (!validPasswordConf) {
-        errors.splice(errors.indexOf("Password and password confirmation don't match"), 1);
+        passwordConfirmationInput.setCustomValidity('');
         validPasswordConf = true;
       }
     }
     
     const submitInputs = () => {
  
-      if (errors.length)
+      checkName();
+      if (channelType.value === 'password-protected') {
+        checkPassword();
+        checkPasswordConf();
+        if (!validPassword || !validPasswordConf)
+          return;
+      }
+      if (!validName)
         return;
       console.log(channelName.value, channelType.value, channelPassword.value)
       const newChannel = api.saveChannel({
@@ -120,23 +133,36 @@ export default defineComponent({
         type: channelType.value,
         password: channelPassword.value
       })
-      .then(() => {
-        api.saveChannelMember({
-          //channelId: newChannel.channelId ? Does this work?
-          //userId: api.getUserId
-          //isAdmin: true
-        })
-        socket.emit('createRoom', channelName.value)
+      .then((res) => {
+        socket.emit('createRoom', {
+          name: channelName.value,
+          // ownerId: api.getCurrentUserId
+          // ownerId: 1, // API MUST FETCH THE PROPER USER ID
+          type: channelType.value,
+          // password: channelPassword.value
       })
-      .catch((err) => console.log("Failed to create channel: ", err))
-
-      // socket.emit('createRoom', {
+        // console.log("AAA", res.data)
+        // console.log("BBB", res.data.ownerId)
+      //   api.saveChannelMember({
+      //     channelId: res.data.id,
+      //     userId: res.data.ownerId, // API MUST FETCH THE CURRENT USER ID
+      //     isAdmin: true
+      //   })
+      //   .then(() => {
+      //     socket.emit('createRoom', {
       //     name: channelName.value,
       //     // ownerId: api.getCurrentUserId
       //     ownerId: 1, // API MUST FETCH THE PROPER USER ID
       //     type: channelType.value,
       //     password: channelPassword.value
       // })
+      //   })
+      //   .catch((err) => console.log('Failed to join channel' + channelName.value + ':' + err));
+        // socket.emit('createRoom', channelName.value)
+      })
+      .catch((err) => console.log("Failed to create channel: ", err))
+
+      
     }
 
     return {

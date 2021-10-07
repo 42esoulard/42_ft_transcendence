@@ -53,10 +53,4 @@ export interface Channel {
      * @memberof Channel
      */
     ownerId: any;
-    /**
-     * 
-     * @type {number}
-     * @memberof Channel
-     */
-    createdAt: any;
 }

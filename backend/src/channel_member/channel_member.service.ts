@@ -71,7 +71,7 @@ export class ChannelMembersService {
       user_id: channelMemberDto.userId,
       is_admin: channelMemberDto.isAdmin,
     };
-
+    console.log('in save channel member', newChannel);
     return await this.channelMembersRepository.save(newChannel);
   }
 

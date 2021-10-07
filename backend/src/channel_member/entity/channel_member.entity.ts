@@ -6,12 +6,15 @@ import {
 } from 'typeorm';
 // import * as bcrypt from 'bcrypt';
 
-@Entity('channels')
+@Entity('channelMembers')
 export class ChannelMembers {
   @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
   channel_id: number;
 
-  @PrimaryGeneratedColumn()
+  @Column()
   user_id: number;
 
   @Column({ nullable: true })

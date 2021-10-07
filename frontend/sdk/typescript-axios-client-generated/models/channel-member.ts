@@ -14,31 +14,25 @@
 /**
  * 
  * @export
- * @interface Message
+ * @interface ChannelMember
  */
-export interface Message {
+export interface ChannelMember {
     /**
      * 
      * @type {number}
-     * @memberof Message
-     */
-    id: any;
-    /**
-     * 
-     * @type {number}
-     * @memberof Message
+     * @memberof ChannelMember
      */
     channelId: any;
     /**
      * 
      * @type {number}
-     * @memberof Message
+     * @memberof ChannelMember
      */
-    authorId: any;
+    userId: any;
     /**
      * 
-     * @type {string}
-     * @memberof Message
+     * @type {boolean}
+     * @memberof ChannelMember
      */
-    content: any;
+    isAdmin: any;
 }

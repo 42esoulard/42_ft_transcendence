@@ -33,9 +33,10 @@
         <div class="card-header text-white">
           <h4>
             <select class="selectRoom">
-              <option v-for="(value, room) in rooms" :key="room" class="optionRoom" @click="activeRoom = room" :id="room" >{{ room }}</option>
-              <option class="optionRoom" @click="newChannelForm = true">+</option>
+              <option v-for="(chan) in allChannels" :key="chan.name" class="optionRoom" @click="activeRoom = chan.name" :id="chan.name" >{{ chan.name }}</option>
             </select>
+            <button class="createBtn" @click="newChannelForm = true">Create Channel</button>
+
             <button v-if="!isMemberOfActiveRoom()" class="joinBtn" @click="toggleRoomMembership()">Join room</button>
             <button v-else class="joinBtn" @click="toggleRoomMembership()">Leave room</button>
             <span class="float-right">{{ connections }} online</span>
@@ -82,9 +83,11 @@
 import { computed, defineComponent, onMounted, onUpdated, reactive, ref, watch } from "vue";
 import { io } from "socket.io-client";
 import { Message } from "@/types/Message";
+import { Channel } from "@/types/Channel"
 import NewChannelForm from "@/components/NewChannelForm.vue"
 import { Info } from "@/types/Info";
 import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
+
 
 export const socket = io("http://localhost:3000/chat");
 
@@ -116,40 +119,91 @@ export const ChatComponent = defineComponent({
     let newChannelForm = ref(false);
 
     /* INITIALIZE FROM DB + UPDATE (on logout? on fixed interval? on fixed nb of messages?):
-        - rooms
+        - channels:
+          1) public joined channels
+          2) private joined channels
+          3) public non joined channels (aka available channels)
         - messages
     */
 
-    const rooms: { [key: string]: boolean } = reactive({
-      "general": true,
-      "random": false,
-      "catPics": false
-    })
+    // const rooms: { [key: string]: boolean } = reactive({
+    //   "general": true,
+    //   "random": false,
+    //   "catPics": false
+    // })
+
+    // let channels = api.getChannelsByMember(1) //API GET CURRENT USER ID
+    let joinedChannels = reactive<Channel[]>([]);
+    let availableChannels = reactive<Channel[]>([]);
+    let allChannels = ref<Channel[]>([]);
+
+    //This only gets joined channels. I need another endpoint for available channels.
+    // const updateChannelsList = async () => {
+      // await api.getChannelsByMember(1)//API GET CURRENT USER ID AS PARAM
+      // .then((res) => {
+      //   joinedChannels = [];
+      //   console.log(res.data)
+        // res.data.forEach(chan => {
+        //   api.getChannelById(chan.channel_id)
+        //   .then((res) => {
+        //     joinedChannels.push({
+        //       name: res.data.name,
+        //       type: res.data.type,
+        //       joined: true,
+        //     })
+        //   })
+        // })
+        //   channels.push({
+        //     name: chan.name,
+        //     type: chan.type,
+        //     joined: true
+        //   })
+        // })
+        // console.log("channels: ", channels)
+    //   })
+    // }
+
+    //This gets all channels (temporary before adding channel-members db table)
+    const updateChannelsList = async () => {
+      await api.getChannels()
+      .then((res) => {
+        allChannels.value = [];
+        console.log(res.data)
+        allChannels.value = res.data;
+      })
+    }
+    updateChannelsList();
 
     const roomMessages = () => {
       return messages.filter(msg => msg.room === activeRoom.value)
     }
 
-    const isMemberOfActiveRoom = () => {
+    const isMemberOfActiveRoom = async () => {
+      // await api.getChannelMember(1, 1) //REPLACE WITH GET CHANNEL ID, GET USER ID
+      // .then(() => {
 
-      return rooms[activeRoom.value];
+      // })
+      return true;
     }
 
     const toggleRoomMembership = () => {
 
-      if (isMemberOfActiveRoom()) {
-        socket.emit('leaveRoom', activeRoom);
-      } else {
-        socket.emit('joinRoom', activeRoom);
-      }
-      rooms[activeRoom.value] = !rooms[activeRoom.value];
+      // if (isMemberOfActiveRoom()) {
+      //   socket.emit('leaveRoom', activeRoom);
+      // } else {
+      //   socket.emit('joinRoom', activeRoom);
+      // }
+      // rooms[activeRoom.value] = !rooms[activeRoom.value];
     }
 
-    const selectActiveRoom = () => {
+  
 
+    const selectActiveRoom = () => {
+      console.log("in selectactiveroom" + activeRoom.value)
       setTimeout(() => { const selectedRoom = document.getElementById(activeRoom.value)!;
-      selectedRoom.setAttribute("selected", "true");}, 0);
-      //FIND A CLEANER SOLUTION TO WAIT FOR DOM ELEM TO BE CREATED
+      selectedRoom.setAttribute("selected", "true");}, 1000);
+      // FIND A CLEANER SOLUTION TO WAIT FOR DOM ELEM TO BE CREATED
+
     }
 
     const switchRoom = (newRoom: string) => {
@@ -187,30 +241,37 @@ export const ChatComponent = defineComponent({
       typing.value = "";
     });
 
-    socket.on('createdRoom', (newRoom: string) => {
+    socket.on('createdRoom', async (info: Channel) => {
       newChannelForm.value = false;
+      await api.getChannels()
+      .then((res) => {
+        allChannels.value = [];
+        console.log(res.data)
+        allChannels.value = res.data;
+        switchRoom(info.name);
+      })
+   
+      // MUST ADD MESSAGE TO DB
 
-      // rooms[newRoom] = true;
-      activeRoom.value = newRoom;
       messages.push({
-          message: `${username.value} has created the [${newRoom}] channel`,
+          message: `${username.value} has created the [${info.name}] channel`,
           type: 0,
           user: username.value,
           room: activeRoom.value
         });
 
-        socket.emit("chat-message", {
-          user: username.value,
-          message: `${username.value} has created the [${newRoom}] channel`,
-          room: activeRoom.value
-        })
-      selectActiveRoom();
+      socket.emit("chat-message", {
+        user: username.value,
+        message: `${username.value} has created the [${info.name}] channel`,
+        room: activeRoom.value
+      })
+      // selectActiveRoom();
       // console.log('CREATEDROOM ', newRoom)
     })
 
-    socket.on('addRoom', (newRoom: string) => {
-      rooms[newRoom] = false;
+    socket.on('addRoom', (info: Channel) => {
       // console.log('addedROOM ', newRoom)
+      updateChannelsList();
     })
 
     socket.on("join", (user: string, connectionsNb: number) => {
@@ -254,23 +315,23 @@ export const ChatComponent = defineComponent({
       
       // console.log('SENDING MSG: is member?', isMemberOfActiveRoom())
       //check if user is member of active room
-      if (isMemberOfActiveRoom()) {
+      // if (isMemberOfActiveRoom()) {
       
-        messages.push({
-          message: newMessage.value,
-          type: 0,
-          user: "Me",
-          room: activeRoom.value
-        });
+      //   messages.push({
+      //     message: newMessage.value,
+      //     type: 0,
+      //     user: "Me",
+      //     room: activeRoom.value
+      //   });
 
-        socket.emit("chat-message", {
-          user: username.value,
-          message: newMessage.value,
-          room: activeRoom.value
-        })
-      } else {
-        alert('You must join the room to send messages!')
-      }
+      //   socket.emit("chat-message", {
+      //     user: username.value,
+      //     message: newMessage.value,
+      //     room: activeRoom.value
+      //   })
+      // } else {
+      //   alert('You must join the room to send messages!')
+      // }
 
       await api.saveMessage({
           channelId: 1234, // GET CHANNEL ID
@@ -302,7 +363,9 @@ export const ChatComponent = defineComponent({
       info,
       connections,
 
-      rooms,
+      // rooms,
+      joinedChannels,
+      allChannels,
       activeRoom,
       switchRoom,
       newChannelForm,
@@ -327,7 +390,7 @@ export default ChatComponent;
   border-radius: 10px;
   font-size: 20px;
 }
-.joinBtn {
+.joinBtn, .createBtn {
   font-size: 18px;
   margin-left:10px;
 }
