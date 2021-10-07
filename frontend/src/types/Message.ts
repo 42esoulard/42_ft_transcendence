@@ -1,6 +1,5 @@
 export interface Message {
     message: any,
-    type: number,
-    user: string,
-    room: string
+    author: string,
+    channel: string
 }

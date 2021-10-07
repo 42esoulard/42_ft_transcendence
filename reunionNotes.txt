@@ -1,21 +1,21 @@
 07/10/21
-[*INSERT AWESOME TALKING POINTS HERE*]
+
+- only locally store messages from the activeChannel (NOT ALL CHANNELS)
+- when changing channel, api call to get channel messages 
+
+
+- innerjoin typeorm
+- typeorm db relations: https://www.youtube.com/watch?v=rKgZLVgdvAY
+- typeorm queryBuilder
+- how to secure a websocket connection? access token?
 
 ESTELLE: 
   - A PROPER PLAN:
     - give up channel-member relation for now
     - get channels db to work 
-      - Compulsory:
-        - create channel + save to db + sync to local channel array
-        - non creator member: retrieve created channels and sync local channel array
-        - trigger channel retrieval/local channel array sync upon connection,
-          (=upon "created channel" signal)
-
-      - Optional:
-        - set activeChannel to the newly created channel and update the select (activeChannel
-          is NOT synced to db)
         - delete channel
         - join/leave channel
+
     - get messages to work
       - Compulsory:
         - write message

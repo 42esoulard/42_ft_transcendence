@@ -46,9 +46,9 @@
         <ul class="list-group list-group-flush text-right">
           <small v-if="typing" class="text-white">{{ typing }} is typing</small>
           <li class="list-group-item" v-for="(message, i) in roomMessages()" :key="i">
-            <span :class="{ 'float-left': message.type === 1 }">
+            <span>
               {{ message.message }}
-              <small>:{{ message.user }}</small>
+              <small>:{{ message.author }}</small>
             </span>
           </li>
         </ul>
@@ -108,13 +108,17 @@ export const ChatComponent = defineComponent({
     const api = new DefaultApi();
     // const socket = ref(io("http://localhost:3000/chat"));
     const newMessage = ref("");
-    const messages = reactive<Message[]>([]);
+    const messages = reactive<Array<Message[]>>([]);
     const typing = ref("");
     const username = ref("");
     const ready = ref(false);
     const info = reactive<Info[]>([]);
     const connections = ref(1);
-    const activeRoom = ref("general");
+    let activeChannel: Channel = {
+      name: "General",
+      type: "public",
+      id: 0
+    };
     const responseData = ref(null);
     let newChannelForm = ref(false);
 
@@ -175,7 +179,8 @@ export const ChatComponent = defineComponent({
     updateChannelsList();
 
     const roomMessages = () => {
-      return messages.filter(msg => msg.room === activeRoom.value)
+      // return messages.filter(msg => msg.room === activeRoom.value)
+      return messages[activeChannel.id];
     }
 
     const isMemberOfActiveRoom = async () => {
@@ -198,17 +203,17 @@ export const ChatComponent = defineComponent({
 
   
 
-    const selectActiveRoom = () => {
-      console.log("in selectactiveroom" + activeRoom.value)
-      setTimeout(() => { const selectedRoom = document.getElementById(activeRoom.value)!;
+    const selectActiveChannel = () => {
+      console.log("in selectactivechannel" + activeChannel.name)
+      setTimeout(() => { const selectedRoom = document.getElementById(activeChannel.name)!;
       selectedRoom.setAttribute("selected", "true");}, 1000);
       // FIND A CLEANER SOLUTION TO WAIT FOR DOM ELEM TO BE CREATED
 
     }
 
-    const switchRoom = (newRoom: string) => {
-      activeRoom.value = newRoom;
-      selectActiveRoom();
+    const switchRoom = (info: Channel) => {
+      activeChannel = info;
+      selectActiveChannel();
     }
 
     const createRoom = () => {
@@ -225,11 +230,10 @@ export const ChatComponent = defineComponent({
 
     socket.on("chat-message", (data: any) => {
       
-      messages.push({
+      messages[activeChannel.id].push({
         message: data.message,
-        type: 1,
-        user: data.user,
-        room: data.room
+        author: data.user,
+        channel: data.room
       });
     });
 
@@ -248,22 +252,21 @@ export const ChatComponent = defineComponent({
         allChannels.value = [];
         console.log(res.data)
         allChannels.value = res.data;
-        switchRoom(info.name);
+        switchRoom(info);
       })
    
       // MUST ADD MESSAGE TO DB
 
-      messages.push({
+      messages[activeChannel.id].push({
           message: `${username.value} has created the [${info.name}] channel`,
-          type: 0,
-          user: username.value,
-          room: activeRoom.value
+          author: username.value,
+          channel: activeChannel.name
         });
 
       socket.emit("chat-message", {
-        user: username.value,
+        author: username.value,
         message: `${username.value} has created the [${info.name}] channel`,
-        room: activeRoom.value
+        channel: activeChannel.name
       })
       // selectActiveRoom();
       // console.log('CREATEDROOM ', newRoom)
@@ -275,7 +278,7 @@ export const ChatComponent = defineComponent({
     })
 
     socket.on("join", (user: string, connectionsNb: number) => {
-      activeRoom.value = 'general';
+      switchRoom(allChannels.value[0]);
       info.push({
         username: user,
         action: "joined",
@@ -314,32 +317,33 @@ export const ChatComponent = defineComponent({
     const send = async () => {
       
       // console.log('SENDING MSG: is member?', isMemberOfActiveRoom())
-      //check if user is member of active room
+      // check if user is member of active room
       // if (isMemberOfActiveRoom()) {
       
-      //   messages.push({
-      //     message: newMessage.value,
-      //     type: 0,
-      //     user: "Me",
-      //     room: activeRoom.value
-      //   });
+        messages[activeChannel.id].push({
+          message: newMessage.value,
+          author: username.value,
+          channel: activeChannel.name
+        });
 
-      //   socket.emit("chat-message", {
-      //     user: username.value,
-      //     message: newMessage.value,
-      //     room: activeRoom.value
-      //   })
+        socket.emit("chat-message", {
+          user: username.value,
+          message: newMessage.value,
+          channel: activeChannel.name,
+          channelId: activeChannel.id,
+          authorId: 1234,
+        })
       // } else {
       //   alert('You must join the room to send messages!')
       // }
 
-      await api.saveMessage({
-          channelId: 1234, // GET CHANNEL ID
-          authorId: 1234, // GET LOGGED IN USER ID
-          content: newMessage.value,
-      })
-      .then((res: any) => (responseData.value = res.data))
-      .catch((err: any) => console.log(err.message));
+      // await api.saveMessage({
+      //     channelId: 1234, // GET CHANNEL ID
+      //     authorId: 1234, // GET LOGGED IN USER ID
+      //     content: newMessage.value,
+      // })
+      // .then((res: any) => (responseData.value = res.data))
+      // .catch((err: any) => console.log(err.message));
       
       newMessage.value = "";
     }
@@ -363,16 +367,15 @@ export const ChatComponent = defineComponent({
       info,
       connections,
 
-      // rooms,
+      roomMessages,
       joinedChannels,
       allChannels,
-      activeRoom,
+      // activeChannel,
       switchRoom,
       newChannelForm,
       toggleRoomMembership,
       isMemberOfActiveRoom,
-      createRoom,
-      roomMessages,
+      createRoom
     };
   },
 });

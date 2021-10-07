@@ -65,21 +65,10 @@ export default defineComponent({
     const checkName = () => {
       const nameInput =  <HTMLInputElement>document.querySelector('input[id=\'chanName\']')!;
 
-      if (!/^[-_*-+/a-zA-Z0-9 ]*$/.test(nameInput.value)) {
-        nameInput.setCustomValidity("Channel name must be 8-20 characters long and only contain letters, numbers, spaces or the following symbols -_*-+/");
-        validName = false;
-        return;
-      }
-      else {
-        nameInput.setCustomValidity("");
-        validName = true;
-      }
-
       api.getChannelByName(channelName.value)
       .then(() => { 
         nameInput.setCustomValidity("A channel named [" + channelName.value + "] already exists")
         validName = false;
-        
       })
       .catch(() => {
         nameInput.setCustomValidity('');
