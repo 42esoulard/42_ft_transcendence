@@ -13,7 +13,7 @@
 
 <script>
 import { io } from 'socket.io-client'
-import clientSocket from '../../App.vue'
+import { clientSocket } from '../../App.vue'
 export default {
 	data() {
 		return {

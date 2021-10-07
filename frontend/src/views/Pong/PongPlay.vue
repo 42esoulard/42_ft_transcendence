@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import { io, Socket } from 'socket.io-client'
-import clientSocket from '../../App.vue'
+// import { io, Socket } from 'socket.io-client'
+import { clientSocket } from '../../App.vue'
 
 export default {
 	data() {

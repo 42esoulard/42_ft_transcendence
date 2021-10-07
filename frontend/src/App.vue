@@ -1,46 +1,35 @@
-<template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/users">Users</router-link> |
-    <router-link to="/adduser">Add User</router-link> |
-    <router-link to="/chat">Chat</router-link> |
-    <router-link to="/account">My Account</router-link> |
-    <router-link :to="{ name: 'Pong'}"> Pong </router-link> |
-    <router-link :to="{ name: 'PongWatch'}"> Watch </router-link>
-  </div>
-  <router-view/>
-</template>
-
-<script>
+<script lang="ts">
+import SideBar from "./components/SideBar.vue"
+import Header from "./components/Header.vue"
 import { io } from "socket.io-client"
 
-const clientSocket = io('http://localhost:3000/pong')
+export const clientSocket = io('http://localhost:3000/pong')
 
-export default clientSocket
+export default {
+  components: { SideBar, Header },
+  setup() {
+  }
+}
 
 </script>
 
+<template>
+  <Header />
+  <SideBar />
+  <router-view />
+</template>
 
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
+<style lang="scss">
+  @import "../sass/main.scss";
+  body {
+    //background: url("./assets/background.jpg");
+    background-color: white;
+  }
+  .app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: black;
+  }
 </style>
