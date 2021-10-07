@@ -27,4 +27,9 @@ export class PongController {
 	seed() {
 		this.pongService.seed()
 	}
+
+	@Get('id')
+	test() {
+		return this.pongService.getUserbyId(2)
+	}
 }

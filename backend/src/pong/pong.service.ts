@@ -60,6 +60,12 @@ export class PongService {
 
   }
 
+  async getUserbyId(id: number)
+  {
+    return this.userRepo.findOne(id, {
+      relations: ['games', 'gameStats']
+    })
+  }
 
 
 
