@@ -1,8 +1,9 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import api from "@/plugins/api.plugin";
 import '@fortawesome/fontawesome-free/js/all'
+import store from '@/store'
+// import api from "@/plugins/api.plugin";
 
 // Config for the sdk (not used anymore)
 const config = {
@@ -10,5 +11,6 @@ const config = {
 };
 
 createApp(App).use(router)
+  .use(store)
   // .use(api, config)
   .mount('.app')

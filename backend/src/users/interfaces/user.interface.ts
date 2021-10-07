@@ -4,4 +4,6 @@ export class User {
 	forty_two_login: string;
 	avatar: string;
 	two_fa: boolean;
+  refresh_token: string;
+  expiry_date: Date;
 }

@@ -5,6 +5,7 @@ import { FortyTwoUser } from './interfaces/42user.interface';
 import { AuthProvider } from './interfaces/auth.interface';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwtPayload.interface';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class AuthService implements AuthProvider {
@@ -28,10 +29,37 @@ export class AuthService implements AuthProvider {
     return user;
   }
 
-  async login(user: User) {
+  async getAccessToken(user: User) {
     const payload: JwtPayload = { username: user.username, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async getRefreshToken(id: number) {
+    const oneYearFromNow = new Date();
+    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+    
+    const refresh_token = {
+      id: id,
+      refresh_token: uuid(),
+      expiry_date: oneYearFromNow
+    };
+    this.usersService.updateUserToken(refresh_token)
+    return refresh_token.refresh_token;
+  }
+
+  async validRefreshToken(username: string, refresh_token: string): Promise<User> | null {
+    const user: User = await this.usersService.getUserByUsername(username);
+    console.log(user);
+    console.log('RT:', refresh_token);
+    if (user.refresh_token === refresh_token) {
+      console.log('exp:', user.expiry_date);
+      console.log('date:', new Date(Date.now()));
+      if (user.expiry_date > new Date(Date.now())) {
+        return user;
+      }
+    }
+    return null;
   }
 }
