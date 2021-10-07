@@ -32,8 +32,8 @@ export default {
 	methods: {
 		JoinQueue() {
 			// this.queuing = true,
-			// this.socket.emit('lookingForOpponent')
-			this.$router.push({ name: 'PongGame', params: {id: 'test'}})
+			this.socket.emit('joinGame', {userId: 2});
+			// this.$router.push({ name: 'PongGame', params: {id: 'test'}})
 		}
 	}
 }

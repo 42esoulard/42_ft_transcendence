@@ -1,6 +1,10 @@
 import { Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WsResponse, WebSocketServer } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { Repository } from 'typeorm';
+import { Game } from './entity/games.entity';
+import { GameUser } from './entity/gameUser.entity';
 
 var BALL_SPEED = 1
 var INTERVAL_IN_MS = 20
@@ -15,12 +19,19 @@ var RAQUET_LENGTH = 80
 @WebSocketGateway( { namespace: '/pong'})
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
+  constructor(
+    @InjectRepository(Game)
+    private readonly gameRepo: Repository<Game>,
+    @InjectRepository(GameUser)
+    private readonly gameUserRepo: Repository<GameUser>
+  ) {}
+
   @WebSocketServer()
   server: Server;
   
   private logger: Logger = new Logger('PongGateway');
 
- 
+  private userIds = []
   // private queue = null
   
   // private rooms = []
@@ -77,6 +88,43 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   //   else
   //     this.queue = client
   // }
+
+  @SubscribeMessage('joinGame')
+  handleJoinGameMessage(client: Socket, message: {userId: number})
+  {
+    this.logger.log('client joined game')
+    if (this.userIds.length < 2)
+      this.userIds.push(message.userId)
+    if (this.userIds.length == 2)
+      this.createGame(this.userIds[0], this.userIds[1])
+  }
+
+  async createGame(user1Id: number, user2Id: number)
+  {
+    this.logger.log('game created')
+    const game = this.gameRepo.create()
+    await this.gameRepo.save(game)
+
+    const user1game = this.gameUserRepo.create()
+    user1game.game = game
+    user1game.userId = user1Id
+    await this.gameUserRepo.save(user1game)
+    
+    const user2game = this.gameUserRepo.create()
+    user2game.game = game
+    user2game.userId = user2Id
+    await this.gameUserRepo.save(user2game)
+    this.endGame(user1game, user2game, false)
+  }
+  
+  async endGame(player1: GameUser, player2: GameUser, player1Won: boolean)
+  {
+    player1.won = player1Won
+    await this.gameUserRepo.save(player1)
+
+    player2.won = !player1Won
+    await this.gameUserRepo.save(player2)
+  }
 
   @SubscribeMessage('move')
   handleMessage(client: Socket, message: {room: string, text: string}): void {

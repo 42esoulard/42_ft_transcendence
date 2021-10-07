@@ -5,7 +5,7 @@ import { Game } from './games.entity';
 @Entity('gameUser')
 export class GameUser {
 
-	@Column({ type: "boolean"})
+	@Column({ type: "boolean", nullable: true})
   won: boolean;
 
 	// automatically created by the @ManyToOne, yet we add it "explicitly" in order to be able to specify the user by id
