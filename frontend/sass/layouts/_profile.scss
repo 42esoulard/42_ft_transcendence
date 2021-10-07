@@ -1,0 +1,36 @@
+.user-panel {
+  width: $user-width;
+  height: $user-height;
+  background-color: $user-background-color;
+  display: grid;
+  color: white;
+  grid-template-columns: $user-grid-columns;
+}
+
+.user-panel-left__avatar-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $user-panel-left-gap;
+  margin: $user-panel-left-margin;
+  padding: $user-panel-left-padding;
+  background-color: $user-panel-div-bg-color;
+}
+
+.user-panel-left__avatar-img {
+  width: $user-avatar-width;
+  height: auto;
+  border-radius: 50%;
+}
+
+.upload-icon {
+  margin-left: 0.5rem;
+}
+
+.user-panel-middle {
+  display: grid;
+  grid-template-rows: $user-panel-middle-grid-rows;
+  grid-template-columns: $user-panel-middle-grid-columns;
+  margin: $user-panel-middle-margin;
+  padding: $user-panel-middle-padding;
+}

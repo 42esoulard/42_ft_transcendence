@@ -1,0 +1,11 @@
+.button {
+  background-color: $button-bg-color;
+  width: $button-width;
+  border-radius: $button-border-radius;
+  border: $button-border;
+  font-family: $button-font;
+  color: $button-color;
+  &:hover {
+    @include button-hover;
+  }
+}

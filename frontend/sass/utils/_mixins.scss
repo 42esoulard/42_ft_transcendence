@@ -1,0 +1,4 @@
+@mixin button-hover () {
+  border: $button-hover-border;
+  background-color: $button-hover-bg-color;
+}

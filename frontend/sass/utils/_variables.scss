@@ -1,10 +1,7 @@
 //HEADER
 $header-bg-color: black;
 $header-text-color: white;
-
-$header-width: 4rem;
-$header-margin-bottom: 2rem;
-
+$header-height: 4rem;
 $header-font: "Saira";
 $header-font-size: 3rem;
 
@@ -12,7 +9,6 @@ $header-font-size: 3rem;
 $sidebar-bg-color: black;
 $sidebar-item-hover: rgba(255, 255, 255, 50%);
 $sidebar-text-color: white;
-
 $sidebar-top: 4rem;
 $sidebar-width: 6rem;
 $sidebar-padding: 0;
@@ -20,6 +16,33 @@ $sidebar-gap: 1rem;
 $sidebar-link-gap: 0.15rem;
 $sidebar-link-color: white;
 $sidebar-link-active-color: rgba(255, 255, 255, 30%);
-
 $sidebar-font: "Saira";
 $sidebar-font-size: 1rem;
+
+//PROFILE
+$user-width: 80%;
+$user-height: 80%;
+$user-background-color: rgba(0, 0, 0, 50%);
+$user-panel-div-bg-color: rgba(0, 0, 0, 100%);
+$user-grid-columns: 20% 50% 30%;
+$user-avatar-width: 100%;
+$user-panel-left-gap: 2rem;
+$user-panel-left-margin: 2rem;
+$user-panel-left-padding: 1rem;
+$user-panel-middle-grid-rows: 20% 40% 40%;
+$user-panel-middle-grid-columns: 50% 50%;
+$user-panel-middle-margin: 2rem 0;
+$user-panel-middle-padding: 1rem;
+
+
+
+//BUTTONS
+$button-bg-color: rgba(0, 0, 0, 80%);
+$button-width: 100%;
+$button-font: "Saira";
+$button-color: white;
+$button-border-radius: 5px;
+$button-border: 1px solid rgb(255, 255, 255, 70%);
+$button-hover-bg-color: black;
+$button-hover-border: 1px solid white;
+

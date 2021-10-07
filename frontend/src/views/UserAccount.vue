@@ -81,7 +81,7 @@ export default defineComponent({
 .user a {
   text-decoration: none;
 }
-img {
+.ua-img {
   width: 300px;
   height: 300px;
   border-radius: 300px;

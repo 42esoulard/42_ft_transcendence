@@ -2,22 +2,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: $header-width;
-
-  margin-bottom: $header-margin-bottom;
-
+  height: $header-height;
+  width: 100vw;
   background-color: $header-bg-color;
-
-  float: top;
-  position: relative;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  right: 0;
 }
  .header__title {
   color: $header-text-color;
-
   font-size: $header-font-size;
   font-family: $header-font;
  }
