@@ -49,12 +49,12 @@ export class PongService {
     await this.gameRepo.save(game1)
     
     const basilegame1 = this.gameUserRepo.create( { won: true})
-    basilegame1.user = basile
+    basilegame1.userId = basile.id
     basilegame1.game = game1
     await this.gameUserRepo.save(basilegame1)
 
     const juliengame1 = this.gameUserRepo.create( { won: false})
-    juliengame1.user = julien
+    juliengame1.userId = julien.id
     juliengame1.game = game1
     await this.gameUserRepo.save(juliengame1)
 
