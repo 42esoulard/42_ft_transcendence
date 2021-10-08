@@ -71,7 +71,7 @@ export default {
 		},
 		SendMoveMsg(direction) {
 			if (this.room)
-				this.socket.emit('move', {room: this.room, text: direction})
+				this.socket.emit('moveRacquet', {room: this.room, text: direction})
 		},
 		onKeyDown(event) {
 			const codes = ['ArrowUp', 'ArrowDown'];

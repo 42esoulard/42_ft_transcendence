@@ -172,7 +172,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
-  @SubscribeMessage('move')
+  @SubscribeMessage('moveRacquet')
   handleMessage(client: Socket, message: {room: string, text: string}): void {
     this.logger.log('msg received: ' + message.text)
     if (client.id === this.pongGame.getPlayer1Socket().id)
@@ -192,17 +192,23 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // this.server.to(message.room).emit('position', this.position);
   }
 
-  
-  moveBall(client: Socket, room:string) {
-    // change direction if needed
 
-    // if touches wall
-    // up or down
+  moveBall(client: Socket, room:string) {
+
+    this.changeBallDirectionIfWallHit()
+    this.position.ball.x += this.ballDirection.x * BALL_SPEED
+    this.position.ball.y += this.ballDirection.y * BALL_SPEED
+    this.server.to(room).emit('position', this.position)
+  }
+  
+  changeBallDirectionIfWallHit()
+  {
+    // if hit top or bottom walls
     if (this.position.ball.y <= BALL_RADIUS || this.position.ball.y >= CANVAS_HEIGHT - BALL_RADIUS)
     {
       this.ballDirection.y = -this.ballDirection.y
     }
-    // left
+    // if hit left left wall
     if (this.position.ball.x <= BALL_RADIUS)
     {
       if (this.position.ball.y >= this.position.player1 && this.position.ball.y <= (this.position.player1 + RACQUET_LENGTH))
@@ -213,8 +219,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.ballDirection.y = 0
       }
     }
-    // right
-
+    // if hit right wall
     if (this.position.ball.x >= CANVAS_WIDTH - BALL_RADIUS)
     {
       if (this.position.ball.y >= this.position.player2 && this.position.ball.y <= (this.position.player2 + RACQUET_LENGTH))
@@ -225,12 +230,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.ballDirection.y = 0
       }
     }
-
-    // move ball in direction
-    this.position.ball.x += this.ballDirection.x * BALL_SPEED
-    this.position.ball.y += this.ballDirection.y * BALL_SPEED
-    this.server.to(room).emit('position', this.position)
-
   }
 
   // @SubscribeMessage('leaveRoom')
