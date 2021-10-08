@@ -88,15 +88,17 @@ const getProfile = async () => {
     .get("http://localhost:3000/auth/profile")
     .then((response) => {
       store.state.user = response.data;
-      console.log(store.state.user);
+      // console.log(store.state.user);
     })
     .catch((err: any) => console.log(err.message));
 };
 
 router.beforeEach(async (to, from) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    await refreshToken();
-    await getProfile();
+    if (!store.state.user) {
+      await refreshToken();
+      await getProfile();
+    }
     console.log('user:', store.state.user)
     if (!store.state.user) {
       return '/login'; // redirected to login

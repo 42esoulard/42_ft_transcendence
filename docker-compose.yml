@@ -20,8 +20,9 @@ services:
       MODE: DEV
       PORT: 3000
       FRONT_URL: ${FRONT_URL}
+      BASE_URL: ${API_URL}
     env_file:
-    - database.env
+    - credentials.env
     command: sh -c "rm -rf ./dist && npm install && npm run start:dev"
     # command: "tail -f"
     depends_on:
@@ -43,6 +44,7 @@ services:
     environment:
       NODE_ENV: development
       VUE_APP_API_URL: ${API_URL}
+      VUE_APP_42_AUTH_URL: ${AUTH_URL}
     command: sh -c "npm install && npm run serve"
     depends_on:
       - postgres

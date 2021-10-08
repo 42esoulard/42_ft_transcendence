@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, NotFoundException, UseInterceptors, UploadedFile, Res, StreamableFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, NotFoundException, UseInterceptors, UploadedFile, Res, StreamableFile, UseGuards, BadRequestException, Req, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
@@ -7,8 +7,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { editFileName, imageFileFilter } from '../utils/files-upload.utils';
 import { createReadStream } from 'fs';
-import { join } from 'path';
-import { Response } from 'express';
+import { extname, join } from 'path';
+import { Request, Response } from 'express';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('users')
 export class UsersController {
@@ -26,24 +27,7 @@ export class UsersController {
 		return users;
 	}
 
-	/**
-	 * Return an avatar from its path
-	 */
-	@Get('avatar/:imgpath')
-	getAvatar(
-		@Param('imgpath') path: string,
-		@Res({ passthrough: true }) res: Response
-		): StreamableFile {
-		const file = createReadStream(join('./uploads/', path));
-		res.set({
-			'Content-Type': 'image/png',
-			'Content-Disposition': 'attachment; filename="avatar.png"',
-		});
-		return new StreamableFile(file);
-	}
-
-
-		// @Get(':imgpath')
+	// @Get(':imgpath')
 	// seeUploadedFile(@Param('imgpath') image, @Res() res: Response) {
 	// 	return res.sendFile(image, { root: './files' });
 	// }
@@ -109,22 +93,52 @@ export class UsersController {
 	 * @param file picture
 	 */
 	@Post('upload')
+	// @UseGuards(JwtAuthGuard)
 	@UseInterceptors(FileInterceptor('avatar', {
 		storage: diskStorage({
-			destination: './uploads',
+			destination: './uploads/avatars',
 			filename: editFileName,
 		}),
 		fileFilter: imageFileFilter,
+		limits: { fileSize: 1024 * 1024 } //(in bytes)
 	}))
-	uploadFile(@UploadedFile() file: Express.Multer.File) {
+	uploadFile(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
+		if (req.fileValidationError) {
+			throw new BadRequestException(req.fileValidationError);
+		}
+		if (!file) {
+			throw new BadRequestException('Invalid file');
+		}
+		this.userService.updateUser({ id: 1, avatar: `${process.env.BASE_URL}/users/avatars/${file.filename}` })
 		console.log(file);
 		const response = {
+			message: 'File has been uploaded successfully',
 			originalname: file.originalname,
 			filename: file.filename,
 		};
 		return response;
 	}
 
+	/**
+	* Returns an avatar from its finename
+	*/
+	@Get('/avatars/:imgpath')
+	getAvatar(
+		@Param('imgpath') filename: string,
+		@Res({ passthrough: true }) res: Response
+	) {
+		const file = createReadStream(join('./uploads/avatars/', filename))
+			.on('error', () => {
+				// throw new NotFoundException("Avatar not found");
+				res.sendStatus(404);
+			})
+		const ext = extname(filename).replace('.', '');
+		res.set({
+			'Content-Type': `image/${ext}`,
+			'Content-Disposition': 'attachment; filename="avatar.png"',
+		});
+		return new StreamableFile(file);
+	}
 
 	// @Post()
 	// @ApiCreatedResponse({
