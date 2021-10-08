@@ -16,7 +16,11 @@ export class GameUser {
 	@JoinColumn(({name: 'userId'}))
 	user: Users
 
-	@ManyToOne(() => Game, game => game.users, {primary: true})
+	@PrimaryColumn({ type: "number"})
+	gameId: number
+
+	@ManyToOne(() => Game, game => game.users)
+	@JoinColumn({ name: 'gameId'})
 	game: Game
 
  
