@@ -51,11 +51,11 @@ export class AuthService implements AuthProvider {
 
   async validRefreshToken(username: string, refresh_token: string): Promise<User> | null {
     const user: User = await this.usersService.getUserByUsername(username);
-    console.log(user);
-    console.log('RT:', refresh_token);
+    // console.log(user);
+    // console.log('RT:', refresh_token);
     if (user.refresh_token === refresh_token) {
-      console.log('exp:', user.expiry_date);
-      console.log('date:', new Date(Date.now()));
+      // console.log('exp:', user.expiry_date);
+      // console.log('date:', new Date(Date.now()));
       if (user.expiry_date > new Date(Date.now())) {
         return user;
       }

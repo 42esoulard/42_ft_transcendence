@@ -8,5 +8,6 @@ postgres_data
 postgresdata
 api-spec.json
 */package-lock.json
+./backend/uploads
 # .env
 # database.env
