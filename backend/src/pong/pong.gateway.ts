@@ -7,13 +7,14 @@ import { Game } from './entity/games.entity';
 import { GameUser } from './entity/gameUser.entity';
 
 var BALL_SPEED = 1
-var INTERVAL_IN_MS = 20
+var INTERVAL_IN_MS = 100
 var CANVAS_WIDTH = 640
 var CANVAS_HEIGHT = 480
 var BALL_INITIAL_DIR_X = -2
 var BALL_INITIAL_DIR_Y = -1
 var BALL_RADIUS = 10
-var RAQUET_LENGTH = 80
+var RACQUET_LENGTH = 80
+var RACQUET_SPEED = 2
 
 
 class player {
@@ -77,6 +78,14 @@ class pongGame {
   {
     return this.room
   }
+  public getPlayer1Socket()
+  {
+    return this.player1.clientSocket
+  }
+  public getPlayer2Socket()
+  {
+    return this.player2.clientSocket
+  }
 }
 
 @WebSocketGateway( { namespace: '/pong'})
@@ -97,8 +106,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   private pongGame: pongGame
   private waitingPlayer: player = null
   
-  // private rooms = []
-
 	private position = {
 				player1: 200,
 				player2: 200,
@@ -138,20 +145,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     client.emit('position', this.position)
   }
 
-  // @SubscribeMessage('lookingForOpponent')
-  // handleNewClientInQueue(client: Socket)
-  // {
-  //   this.logger.log('new client in queue')
-  //   if (this.queue)
-  //   {
-  //     var room
-  //     room = this.createRoom(client)
-  //     this.queue = null
-  //   }
-  //   else
-  //     this.queue = client
-  // }
-
   @SubscribeMessage('joinGame')
   async handleJoinGameMessage(client: Socket, message: {userId: number})
   {
@@ -170,54 +163,35 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       await this.pongGame.createGame()
       this.server.to(this.pongGame.getRoom()).emit('gameReadyToStart', this.pongGame.getRoom())
 
+      this.interval = setInterval(() => {
+        this.moveBall(client, this.pongGame.getRoom())
+      }, INTERVAL_IN_MS)
+
       // just to test that endGame works correctly
       this.pongGame.endGame(false)
     }
   }
 
-
   @SubscribeMessage('move')
   handleMessage(client: Socket, message: {room: string, text: string}): void {
-    // this.logger.log('msg received: ' + message.text)
-    if (client.id === this.clients.client1)
+    this.logger.log('msg received: ' + message.text)
+    if (client.id === this.pongGame.getPlayer1Socket().id)
     {
       if (message.text === 'up')
-        this.position.player1 -= 5
+        this.position.player1 -= RACQUET_SPEED
       if (message.text === 'down')
-        this.position.player1 += 5
+        this.position.player1 += RACQUET_SPEED
     }
-    if (client.id === this.clients.client2)
+    if (client.id === this.pongGame.getPlayer2Socket().id)
     {
       if (message.text === 'up')
-        this.position.player2 -= 5
+        this.position.player2 -= RACQUET_SPEED
       if (message.text === 'down')
-        this.position.player2 += 5
-
+        this.position.player2 += RACQUET_SPEED
     }
-    this.server.to(message.room).emit('position', this.position);
+    // this.server.to(message.room).emit('position', this.position);
   }
 
-  @SubscribeMessage('joinRoom')
-  handleJoinRoom(client: Socket, room:string)
-  {
-    if (this.clients.client1 && this.clients.client2)
-    {
-      this.logger.log('room is full')
-      client.emit('roomIsFull')
-      return
-    }
-    client.join(room)
-    if (!this.clients.client1)
-      this.clients.client1 = client.id
-    else if (!this.clients.client2)
-      this.clients.client2 = client.id
-    client.emit('joinedRoom', room)
-    client.to(room).emit('opponentJoinedRoom')
-
-    this.interval = setInterval(() => {
-      this.moveBall(client, room)
-    }, INTERVAL_IN_MS)
-  }
   
   moveBall(client: Socket, room:string) {
     // change direction if needed
@@ -231,7 +205,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // left
     if (this.position.ball.x <= BALL_RADIUS)
     {
-      if (this.position.ball.y >= this.position.player1 && this.position.ball.y <= (this.position.player1 + RAQUET_LENGTH))
+      if (this.position.ball.y >= this.position.player1 && this.position.ball.y <= (this.position.player1 + RACQUET_LENGTH))
         this.ballDirection.x = -this.ballDirection.x
       else
       {
@@ -243,7 +217,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     if (this.position.ball.x >= CANVAS_WIDTH - BALL_RADIUS)
     {
-      if (this.position.ball.y >= this.position.player2 && this.position.ball.y <= (this.position.player2 + RAQUET_LENGTH))
+      if (this.position.ball.y >= this.position.player2 && this.position.ball.y <= (this.position.player2 + RACQUET_LENGTH))
         this.ballDirection.x = -this.ballDirection.x
       else
       {
@@ -252,25 +226,23 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       }
     }
 
-
     // move ball in direction
     this.position.ball.x += this.ballDirection.x * BALL_SPEED
     this.position.ball.y += this.ballDirection.y * BALL_SPEED
     this.server.to(room).emit('position', this.position)
-    // client.emit('position', this.position)
 
   }
 
-  @SubscribeMessage('leaveRoom')
-  handleLeaveRoom(client: Socket, room:string)
-  {
-    if (client.id === this.clients.client1)
-      this.clients.client1 = ''
-    if (client.id === this.clients.client2)
-      this.clients.client2 = ''
-    clearInterval(this.interval)
+  // @SubscribeMessage('leaveRoom')
+  // handleLeaveRoom(client: Socket, room:string)
+  // {
+  //   if (client.id === this.clients.client1)
+  //     this.clients.client1 = ''
+  //   if (client.id === this.clients.client2)
+  //     this.clients.client2 = ''
+  //   clearInterval(this.interval)
 
-    client.to(room).emit('opponentLeftRoom')
-    client.leave(room)
-  }
+  //   client.to(room).emit('opponentLeftRoom')
+  //   client.leave(room)
+  // }
 }

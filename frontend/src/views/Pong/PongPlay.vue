@@ -39,9 +39,7 @@ export default {
 			//this.socket.emit('joinGame', {userId: this.$store.state.user.id});
 			
 			// pour l'instant on rentre l'id à la main, pour pouvoir tester plusieurs id differents
-			this.socket.emit('joinGame', {userId: 2});
-			
-			// this.$router.push({ name: 'PongGame', params: {id: 'test'}})
+			this.socket.emit('joinGame', {userId: 3});
 		}
 	}
 }

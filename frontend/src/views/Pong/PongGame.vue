@@ -1,8 +1,5 @@
 <template>
 	<h1> Game # {{ id }} </h1>
-	<p>
-		<button v-on:click="JoinRoom('default')"> Join Game </button>
-	</p>
 	<canvas ref="game" width="640" height="480" style="border: 1px solid black">
 	</canvas>
 	<p> ball x {{ position.ball.x }} </p>
@@ -28,8 +25,8 @@ export default {
 				},
 			},
 			socket: null,
-			room: '',
-			playing: false
+			room: this.$route.params.id,
+			playing: true
 		}
 	},
 	created() {
@@ -46,27 +43,12 @@ export default {
 				this.draw(data)
 		})
 
-		this.socket.on('joinedRoom', data => {
-			this.room = data
-			this.playing = true
-			// alert("Youve joined the game !")
-		})
-		this.socket.on('roomIsFull', () => {
-			alert("Sorry, room is full")
-		})
-		this.socket.on('opponentJoinedRoom', () => {
-			alert("Opponent has joined the game !")
-		})
-		this.socket.on('opponentLeftRoom', () => {
-			alert("Opponent has left the game !!")
-		})
 	},
 	
 	beforeRouteLeave()
 	{
 		if (this.room)
 		{
-			alert('Leaving the game')
 			this.socket.emit('leaveRoom', this.room)
 			this.playing = false
 			console.log('leaving')
@@ -90,9 +72,6 @@ export default {
 		SendMoveMsg(direction) {
 			if (this.room)
 				this.socket.emit('move', {room: this.room, text: direction})
-		},
-		JoinRoom(roomName) {
-			this.socket.emit('joinRoom', roomName)
 		},
 		onKeyDown(event) {
 			const codes = ['ArrowUp', 'ArrowDown'];
