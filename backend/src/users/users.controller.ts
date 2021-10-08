@@ -27,12 +27,6 @@ export class UsersController {
 		return users;
 	}
 
-	// @Get(':imgpath')
-	// seeUploadedFile(@Param('imgpath') image, @Res() res: Response) {
-	// 	return res.sendFile(image, { root: './files' });
-	// }
-
-
 	/**
 	* Returns a user found in database by its id.
 	*/
@@ -54,8 +48,6 @@ export class UsersController {
 		}
 		return user;
 	}
-
-
 
 	/**
 	* Returns a user found in database by its username.
@@ -87,13 +79,12 @@ export class UsersController {
 		return await this.userService.saveUser(newUser);
 	}
 
-
 	/**
 	 * Recieve user picture from frontend
 	 * @param file picture
 	 */
 	@Post('upload')
-	// @UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(FileInterceptor('avatar', {
 		storage: diskStorage({
 			destination: './uploads/avatars',
@@ -103,6 +94,7 @@ export class UsersController {
 		limits: { fileSize: 1024 * 1024 } //(in bytes)
 	}))
 	uploadFile(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
+		console.log(file);
 		if (req.fileValidationError) {
 			throw new BadRequestException(req.fileValidationError);
 		}
@@ -110,7 +102,6 @@ export class UsersController {
 			throw new BadRequestException('Invalid file');
 		}
 		this.userService.updateUser({ id: 1, avatar: `${process.env.BASE_URL}/users/avatars/${file.filename}` })
-		console.log(file);
 		const response = {
 			message: 'File has been uploaded successfully',
 			originalname: file.originalname,
@@ -118,24 +109,25 @@ export class UsersController {
 		};
 		return response;
 	}
-
+	
 	/**
-	* Returns an avatar from its finename
-	*/
+	 * Returns an avatar from its finename
+	 */
 	@Get('/avatars/:imgpath')
+	@UseGuards(JwtAuthGuard)
 	getAvatar(
 		@Param('imgpath') filename: string,
 		@Res({ passthrough: true }) res: Response
-	) {
-		const file = createReadStream(join('./uploads/avatars/', filename))
+		) {
+			const file = createReadStream(join('./uploads/avatars/', filename))
 			.on('error', () => {
 				// throw new NotFoundException("Avatar not found");
 				res.sendStatus(404);
 			})
-		const ext = extname(filename).replace('.', '');
-		res.set({
-			'Content-Type': `image/${ext}`,
-			'Content-Disposition': 'attachment; filename="avatar.png"',
+			const ext = extname(filename).replace('.', '');
+			res.set({
+				'Content-Type': `image/${ext}`,
+				'Content-Disposition': 'attachment; filename="avatar.png"',
 		});
 		return new StreamableFile(file);
 	}

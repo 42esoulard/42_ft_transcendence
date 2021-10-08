@@ -10,11 +10,20 @@
     <p>Two-Factor Auth activated: {{ user.two_fa }}</p>
     <p>Profile created at: {{ formatDate() }}</p>
     <button @click="logOut">LogOut</button>
+
+    <form
+      method="post"
+      @submit.prevent="postAvatar"
+      enctype="multipart/form-data"
+    >
+      <input @change="handleFile" type="file" ref="avatar" id="avatar" />
+      <button>Update avatar</button>
+    </form>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUpdated, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import axios from "axios";
 import { DefaultApi } from "sdk-client";
 import { useRouter } from "vue-router";
@@ -30,6 +39,8 @@ export default defineComponent({
     const router = useRouter();
 
     const user = ref<User>();
+    const avatar = ref();
+
     //To exchange cookie or auth header w/o in every req
     axios.defaults.withCredentials = true;
 
@@ -60,7 +71,44 @@ export default defineComponent({
       return null;
     };
 
-    return { user, getProfile, logOut, formatDate };
+    const handleFile = (
+      event: Event & {
+        target: HTMLInputElement & {
+          files: FileList;
+        };
+      }
+    ) => {
+      const { target } = event;
+      const { files } = target;
+      if (files.length === 0) {
+        return;
+      }
+      avatar.value = files[0];
+      console.log(avatar.value);
+    };
+
+    const postAvatar = () => {
+      const data = new FormData();
+      data.append("avatar", avatar.value);
+      axios
+        .post("http://localhost:3000/users/upload", data)
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (err) {
+          console.log(err);
+        });
+    };
+
+    return {
+      user,
+      getProfile,
+      logOut,
+      formatDate,
+      postAvatar,
+      handleFile,
+      avatar,
+    };
   },
 });
 </script>
