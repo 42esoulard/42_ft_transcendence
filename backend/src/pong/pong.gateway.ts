@@ -36,32 +36,46 @@ class pongGame {
     this.player1 = player1,
     this.player2 = player2 
   }
+  
+  private logger: Logger = new Logger('PongGateway');
+  private room: string
 
   async createGame()
   {
-    console.log('game created')
+    // create a game entity and save it to the database
+    this.logger.log('game created')
     const game = this.gameRepo.create()
     await this.gameRepo.save(game)
     this.player1.gameId = game.id
     this.player2.gameId = game.id
 
+    // create a GameUser entity for player 1 and save it to the database
     const user1game = this.gameUserRepo.create()
     user1game.gameId = this.player1.gameId
     user1game.userId = this.player1.userId
     await this.gameUserRepo.save(user1game)
     
+    // create a GameUser entity for player 2 and save it to the database
     const user2game = this.gameUserRepo.create()
     user2game.gameId = this.player2.gameId
     user2game.userId = this.player2.userId
     await this.gameUserRepo.save(user2game)
 
+
+    this.room = game.id.toString()
+    await this.player1.clientSocket.join(this.room)
+    await this.player2.clientSocket.join(this.room)
   }
   
   async endGame(player1Won: boolean)
   {
     await this.gameUserRepo.update({userId: this.player1.userId, gameId: this.player1.gameId}, { won: player1Won})
     await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.player2.gameId}, { won: !player1Won})
+  }
 
+  public getRoom()
+  {
+    return this.room
   }
 }
 
@@ -145,16 +159,18 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (!this.waitingPlayer)
     {
       this.waitingPlayer = new player(message.userId, client)
-      return
+      client.emit('waitingForOpponent')
     }
     else
     {
       const player2 = new player(message.userId, client)
       this.pongGame = new pongGame(this.waitingPlayer, player2, this.gameRepo, this.gameUserRepo)
-      await this.pongGame.createGame()
       delete this.waitingPlayer
       this.waitingPlayer = null
+      await this.pongGame.createGame()
+      this.server.to(this.pongGame.getRoom()).emit('gameReadyToStart', this.pongGame.getRoom())
 
+      // just to test that endGame works correctly
       this.pongGame.endGame(false)
     }
   }

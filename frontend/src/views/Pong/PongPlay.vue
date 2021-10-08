@@ -1,13 +1,15 @@
 
 <template>
-	<h1 v-if="!queuing"> Click to play ! </h1>
-	<p v-if="!queuing">
+  <div v-if="!queuing">
+    <h1>Click to play</h1>
 		<button v-on:click="JoinQueue()"> Join Game </button>
-	</p>
-	<div v-if="queuing"> 
-		Waiting for opponent...
-	</div>
+  </div>
+
+  <div v-else>
+		<p> Waiting for opponent... </p>
+  </div>
 </template>
+
 
 <script>
 // import { io, Socket } from 'socket.io-client'
@@ -25,13 +27,13 @@ export default {
 		// this.socket =  io('http://localhost:3000/pong')
 	},
 	mounted() {
-		// this.socket.on('opponentFound', (ids) => {
-			// this.$router.push({ name: 'PongGame', params: {id: ids}})
-		// })
+		this.socket.on('gameReadyToStart', (ids) => {
+			this.$router.push({ name: 'PongGame', params: {id: ids}})
+		})
 	},
 	methods: {
 		JoinQueue() {
-			// this.queuing = true,
+			this.queuing = true,
 
 			// a utiliser une fois que la route sera protegee
 			//this.socket.emit('joinGame', {userId: this.$store.state.user.id});
