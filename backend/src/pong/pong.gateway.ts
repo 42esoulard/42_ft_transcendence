@@ -16,6 +16,55 @@ var BALL_RADIUS = 10
 var RAQUET_LENGTH = 80
 
 
+class player {
+  constructor(userId: number, clientSocket: Socket) {
+    this.userId = userId,
+    this.clientSocket = clientSocket
+  }
+  userId: number;
+  clientSocket: Socket
+  gameId: number
+}
+
+class pongGame {
+  constructor(
+    private player1: player, 
+    private player2: player,
+    private readonly gameRepo: Repository<Game>,
+    private readonly gameUserRepo: Repository<GameUser>)
+  {
+    this.player1 = player1,
+    this.player2 = player2 
+  }
+
+  async createGame()
+  {
+    console.log('game created')
+    const game = this.gameRepo.create()
+    await this.gameRepo.save(game)
+    this.player1.gameId = game.id
+    this.player2.gameId = game.id
+
+    const user1game = this.gameUserRepo.create()
+    user1game.gameId = this.player1.gameId
+    user1game.userId = this.player1.userId
+    await this.gameUserRepo.save(user1game)
+    
+    const user2game = this.gameUserRepo.create()
+    user2game.gameId = this.player2.gameId
+    user2game.userId = this.player2.userId
+    await this.gameUserRepo.save(user2game)
+
+  }
+  
+  async endGame(player1Won: boolean)
+  {
+    await this.gameUserRepo.update({userId: this.player1.userId, gameId: this.player1.gameId}, { won: player1Won})
+    await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.player2.gameId}, { won: !player1Won})
+
+  }
+}
+
 @WebSocketGateway( { namespace: '/pong'})
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
@@ -31,8 +80,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   private logger: Logger = new Logger('PongGateway');
 
-  private userIds = []
-  // private queue = null
+  private pongGame: pongGame
+  private waitingPlayer: player = null
   
   // private rooms = []
 
@@ -90,41 +139,26 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   // }
 
   @SubscribeMessage('joinGame')
-  handleJoinGameMessage(client: Socket, message: {userId: number})
+  async handleJoinGameMessage(client: Socket, message: {userId: number})
   {
-    this.logger.log('client joined game')
-    if (this.userIds.length < 2)
-      this.userIds.push(message.userId)
-    if (this.userIds.length == 2)
-      this.createGame(this.userIds[0], this.userIds[1])
+    this.logger.log('client joined game. userId: ' + message.userId)
+    if (!this.waitingPlayer)
+    {
+      this.waitingPlayer = new player(message.userId, client)
+      return
+    }
+    else
+    {
+      const player2 = new player(message.userId, client)
+      this.pongGame = new pongGame(this.waitingPlayer, player2, this.gameRepo, this.gameUserRepo)
+      await this.pongGame.createGame()
+      delete this.waitingPlayer
+      this.waitingPlayer = null
+
+      this.pongGame.endGame(false)
+    }
   }
 
-  async createGame(user1Id: number, user2Id: number)
-  {
-    this.logger.log('game created')
-    const game = this.gameRepo.create()
-    await this.gameRepo.save(game)
-
-    const user1game = this.gameUserRepo.create()
-    user1game.game = game
-    user1game.userId = user1Id
-    await this.gameUserRepo.save(user1game)
-    
-    const user2game = this.gameUserRepo.create()
-    user2game.game = game
-    user2game.userId = user2Id
-    await this.gameUserRepo.save(user2game)
-    this.endGame(user1game, user2game, false)
-  }
-  
-  async endGame(player1: GameUser, player2: GameUser, player1Won: boolean)
-  {
-    player1.won = player1Won
-    await this.gameUserRepo.save(player1)
-
-    player2.won = !player1Won
-    await this.gameUserRepo.save(player2)
-  }
 
   @SubscribeMessage('move')
   handleMessage(client: Socket, message: {room: string, text: string}): void {
