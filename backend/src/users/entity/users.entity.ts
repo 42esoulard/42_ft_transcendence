@@ -21,6 +21,12 @@ export class Users {
   @Column({ type: "boolean", default: false })
   two_fa: boolean;
   
+  @Column({ type: "varchar", length: 36, nullable: true })
+  refresh_token: string;
+  
+  @Column({nullable: true })
+  expiry_date: Date;
+ 
   @CreateDateColumn({ type: "timestamp", default: () => "now()" })
   created_at: Date;
 

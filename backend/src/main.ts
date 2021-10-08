@@ -7,6 +7,7 @@ import * as passport from 'passport';
 import { TypeORMSession } from './auth/entity/TypeORMSession.entity';
 import { TypeormStore } from 'connect-typeorm/out';
 import { getRepository } from 'typeorm';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -52,8 +53,8 @@ async function bootstrap() {
   );
 
   // Need to enable cookie parser to read cookie between backend and frontend, containing acces token
-  // Not needed anymore, replaced by Authorization header
-  // app.use(cookieParser());
+  // Finally the method choosen, as localstorage not being safe
+  app.use(cookieParser());
 
   app.use(passport.initialize());
   app.use(passport.session());

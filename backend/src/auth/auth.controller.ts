@@ -4,6 +4,7 @@ import { User } from 'src/users/interfaces/user.interface';
 import { AuthService } from './auth.service';
 import { AuthenticatedGuard, FortyTwoAuthGuard } from './guards/fortytwo.guard';
 import { JwtAuthGuard } from './guards/jwt.guard';
+import { RefreshTokenAuthGuard } from './guards/refresh.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -27,34 +28,30 @@ export class AuthController {
 
   @Get('login')
   @UseGuards(FortyTwoAuthGuard)
-  async login(@Req() req: Request) {
-    const jwt = await this.authService.login(req.user as User);
-    console.log(jwt);
-    return jwt;
-  }
+  async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    
+    const jwt = await this.authService.getAccessToken(req.user);
+    const refresh_token = await this.authService.getRefreshToken(req.user.id);
+    // console.log(jwt);
+    // console.log(refresh_token);
 
-  @Get('redirect')
-  @UseGuards(FortyTwoAuthGuard)
-  async redirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const jwt = await this.authService.login(req.user as User);
-    console.log(jwt);
-
-    // res.cookie("jwt", jwt.access_token, {
-    //   httpOnly: true,
-    // });
-    res.header('Authorization', `Bearer ${jwt.access_token}`)
-    // res.redirect(307, "http://localhost:8080/account");
-    // res.sendStatus(200);
-    return jwt;
+    res.cookie('tokens', {access_token: jwt.access_token, refresh_token}, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 86400),
+    });
+    return { message: "Logged in successfully" };
   }
 
   @Get('refreshtoken')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(RefreshTokenAuthGuard)
   async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const jwt = await this.authService.login(req.user as User);
-    console.log(jwt);
-
-    return jwt;
+    const jwt = await this.authService.getAccessToken(req.user);
+    const refresh_token = await this.authService.getRefreshToken(req.user.id);
+    res.cookie('tokens', { access_token: jwt.access_token, refresh_token }, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 86400),
+    });
+    return { message: "Refresh token successfully" };
   }
 
   @Get('status')
@@ -65,14 +62,15 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  profile(@Req() req: Request) {
+  async profile(@Req() req: Request) {
     return req.user;
   }
 
   @Get('logout')
   logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     req.logOut();
-    return "Logged out";
+    res.clearCookie('tokens');
+    return { message: "Successfully logged out" };
   }
 
   @Get()

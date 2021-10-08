@@ -7,6 +7,9 @@ import UserAccount from '../views/UserAccount.vue'
 import PongPlay from '../views/Pong/PongPlay.vue'
 import PongGame from '../views/Pong/PongGame.vue'
 import PongWatch from '../views/Pong/PongWatch.vue'
+import Login from '../views/Login.vue';
+import store from "@/store";
+import axios from 'axios'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -15,14 +18,25 @@ const routes: Array<RouteRecordRaw> = [
     component: Home
   },
   {
+    path: '/login',
+    name: 'Login',
+    component: Login
+  },
+  {
     path: '/users',
     name: 'Users',
-    component: Users
+    component: Users,
+    meta: {
+      requiresAuth: true,
+    }
   },
   {
     path: '/adduser',
     name: 'AddUser',
-    component: AddUser
+    component: AddUser,
+    meta: {
+      requiresAuth: true,
+    }
   },
   {
     path: '/chat',
@@ -32,7 +46,10 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/account',
     name: 'UserAccount',
-    component: UserAccount
+    component: UserAccount,
+    meta: {
+      requiresAuth: true,
+    }
   },
   {
     path: '/pong',
@@ -55,5 +72,38 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+//To exchange cookie or auth header w/o in every req
+axios.defaults.withCredentials = true;
+
+const refreshToken = async () => {
+  await axios
+    .get("http://localhost:3000/auth/refreshtoken")
+    .then((response) => console.log(response))
+    .catch((err: any) => console.log(err.message));
+};
+
+const getProfile = async () => {
+  await axios
+    .get("http://localhost:3000/auth/profile")
+    .then((response) => {
+      store.state.user = response.data;
+      console.log(store.state.user);
+    })
+    .catch((err: any) => console.log(err.message));
+};
+
+router.beforeEach(async (to, from) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    await refreshToken();
+    await getProfile();
+    console.log('user:', store.state.user)
+    if (!store.state.user) {
+      return '/login'; // redirected to login
+    } else {
+      return true; // the route is allowed
+    }
+  }
+});
 
 export default router

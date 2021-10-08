@@ -7,6 +7,7 @@ import { SessionSerializer } from './utils/Serializer';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
+import { RefreshStrategy } from './strategies/refresh.strategy';
 
 @Module({
   controllers: [AuthController],
@@ -14,6 +15,7 @@ import { PassportModule } from '@nestjs/passport';
     AuthService,
     FortyTwoStrategy,
     JwtStrategy,
+    RefreshStrategy,
     SessionSerializer,
   ],
   imports: [
