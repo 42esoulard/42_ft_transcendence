@@ -1,5 +1,7 @@
 export interface Message {
-    message: any,
+    content: any,
     author: string,
-    channel: string
+    authorId: number,
+    channel: string,
+    channelId: number
 }
