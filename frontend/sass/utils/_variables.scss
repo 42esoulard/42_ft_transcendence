@@ -1,3 +1,9 @@
+//COLORS
+$prim-color: #00ffff;
+$second-color: adjust_hue($prim-color, 120);
+$third-color: adjust_hue($second-color, 120);
+$fourth-color: complement($prim-color);
+
 //HEADER
 $header-bg-color: black;
 $header-text-color: white;
@@ -11,7 +17,7 @@ $sidebar-item-hover: rgba(255, 255, 255, 50%);
 $sidebar-text-color: white;
 $sidebar-top: 4rem;
 $sidebar-width: 6rem;
-$sidebar-padding: 0;
+$sidebar-padding: $header-height 0 0 0;
 $sidebar-gap: 1rem;
 $sidebar-link-gap: 0.15rem;
 $sidebar-link-color: white;
@@ -20,19 +26,77 @@ $sidebar-font: "Saira";
 $sidebar-font-size: 1rem;
 
 //PROFILE
-$user-width: 80%;
-$user-height: 80%;
-$user-background-color: rgba(0, 0, 0, 50%);
-$user-panel-div-bg-color: rgba(0, 0, 0, 100%);
-$user-grid-columns: 20% 50% 30%;
-$user-avatar-width: 100%;
-$user-panel-left-gap: 2rem;
-$user-panel-left-margin: 2rem;
-$user-panel-left-padding: 1rem;
-$user-panel-middle-grid-rows: 20% 40% 40%;
-$user-panel-middle-grid-columns: 50% 50%;
-$user-panel-middle-margin: 2rem 0;
-$user-panel-middle-padding: 1rem;
+$profile-width: 1000px;
+$profile-height: 700px;
+$profile-background-color: rgba(0, 0, 0, 50%);
+$profile-div-bg-color: rgba(0, 0, 0, 80%);
+$profile-avatar-width: 50%;
+$profile-left-gap: 0rem;
+$profile-left-margin: 2rem 0;
+$profile-left-padding: 2rem;
+$profile-left-name-font: "Saira";
+$profile-left-name-size: 4rem;
+$profile-main-margin: 2rem 0;
+$profile-main-padding: 2rem;
+$profile-main-width: 100%;
+$profile-social-width: 50%;
+$profile-social-gap: 5px;
+$profile-social-margin: 1rem 0 0 0;
+
+//STATS
+$stats-width: 100%;
+$stats-height: 100%;
+$stats-grid: 30% 10% 60% / 33% 33% 33%;
+$stats-gap: 1rem;
+$stats-number-size: 2.5rem;
+$stats-win-color: $third-color;
+$stats-rank-color: $second-color;
+$stats-games-color: $prim-color;
+$stats-text-font: "Roboto";
+$stats-text-size: 1rem;
+$stats-bloc-margin: 0rem 0rem;
+$stats-bloc-border-height: 7rem;
+$stats-bloc-border-width: 7rem;
+$stats-bloc-border-border-radius: 50%;
+$stats-bloc-border-bg: linear-gradient($prim-color, $second-color);
+$stats-bloc-height: 6.5rem;
+$stats-bloc-width: 6.5rem;
+$stats-bloc-border-radius: 50%;
+$stats-bloc-bg: black;
+$game-history-height: 80%;
+$game-history-panel-height: 100%;
+$game-history-panel-bg: rgba(0, 0, 0, 50%);
+$game-history-title-bg: rgba(0, 0, 0, 100%);
+$game-history-title-width: 100%;
+$game-history-title-font: "Saira";
+$game-history-title-border: white solid;
+
+
+//PROGRESS BAR
+$progress-bar-width: 100%;
+$progress-bar-height: 2rem;
+$progress-bar-padding: 0.2rem;
+$progress-bar-bg: #313131;
+$progress-bar-border-radius: 16px;
+$progress-bar-box-shadow: inset 0 1px 2px #000;
+$progress-bar-border: 1px solid black;
+$progress-bar-inside-bg: linear-gradient(to right, $second-color, $prim-color, $third-color);
+$progress-bar-label-font: "Saira";
+$progress-bar-inside-height: 80%;
+$progress-bar-inside-border-radius: 12px;
+$progress-bar-label-color: black;
+
+//RAINBOW TITLE
+
+$rainbow-border-bg: linear-gradient($prim-color, $second-color);
+$rainbow-border-border-radius: 25px;
+$rainbow-border-height: 1.8rem;
+$rainbow-border-width: 100%;
+$rainbow-border-padding: 0.1rem;
+$rainbow-title-bg: rgba(0, 0, 0, 100%);
+$rainbow-title-width: 100%;
+$rainbow-border-radius: 25px;
+$rainbow-title-font: "Saira";
 
 
 
@@ -41,8 +105,16 @@ $button-bg-color: rgba(0, 0, 0, 80%);
 $button-width: 100%;
 $button-font: "Saira";
 $button-color: white;
-$button-border-radius: 5px;
-$button-border: 1px solid rgb(255, 255, 255, 70%);
+$button-border-radius: 50px;
+$button-border: none;
 $button-hover-bg-color: black;
-$button-hover-border: 1px solid white;
+$button-hover-border: none;
+$button-msg-bg: darken($prim-color, 15);
+$button-add-bg: darken($second-color, 15);
+$button-invite-bg: darken($third-color, 15);
+$button-block-bg: grey;
 
+//OTHERS
+$status-online-color: rgb(0, 255, 0);
+$status-in-game-color: rgb(255, 0, 0);
+$status-offline-color: rgb(125, 125, 125);

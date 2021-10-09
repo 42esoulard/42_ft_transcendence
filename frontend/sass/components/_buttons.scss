@@ -8,4 +8,20 @@
   &:hover {
     @include button-hover;
   }
+  &--add {
+    background-color: $button-add-bg;
+    @include hover-modifier($button-add-bg);
+  }
+  &--msg {
+    background-color: $button-msg-bg;
+    @include hover-modifier($button-msg-bg);
+  }
+  &--invite {
+    background-color: $button-invite-bg;
+    @include hover-modifier($button-invite-bg);
+  }
+  &--block {
+    background-color: $button-block-bg;
+    @include hover-modifier($button-block-bg);
+  }
 }

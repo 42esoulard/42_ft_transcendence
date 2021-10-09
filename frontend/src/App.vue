@@ -12,9 +12,9 @@ export default {
 
 <template>
   <div class="main-div">
-    <Header />
+    <SideBar />
     <div class="body-div">
-      <SideBar />
+      <Header />
       <div class="router-view">
         <router-view />
       </div>

@@ -2,3 +2,9 @@
   border: $button-hover-border;
   background-color: $button-hover-bg-color;
 }
+
+@mixin hover-modifier ($color) {
+  &:hover {
+    background-color: darken($color, 5);
+  }
+}

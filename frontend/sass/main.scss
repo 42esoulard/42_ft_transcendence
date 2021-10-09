@@ -7,6 +7,7 @@
 @import "./layouts/header";
 @import "./layouts/sidebar";
 @import "./layouts/profile";
+@import "./layouts/stats";
 
 html {
   font-size: 100%;
@@ -14,7 +15,7 @@ html {
   @media (max-width: 720px), (max-height: 700px){
     font-size: 80%;
   }
-  @media (max-width: 500px), (max-height: 600px){
+  @media (max-width: 500px), (max-height: 700px){
     font-size: 70%;
   }
   @media (max-height: 500px){

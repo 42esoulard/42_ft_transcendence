@@ -1,36 +1,104 @@
-.user-panel {
-  width: $user-width;
-  height: $user-height;
-  background-color: $user-background-color;
-  display: grid;
+.profile {
+  width: $profile-width;
+  height: $profile-height;
+  display: flex;
   color: white;
-  grid-template-columns: $user-grid-columns;
+  justify-content: center;
+  background-color: $profile-div-bg-color;
+  margin: auto;
+  margin-top: 2rem;
+  @media (max-width: 1100px){
+    width: 800px;
+  }
+  @media (max-width: 900px){
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    align-self: flex-start;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
 }
 
-.user-panel-left__avatar-div {
+.profile-left {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: $user-panel-left-gap;
-  margin: $user-panel-left-margin;
-  padding: $user-panel-left-padding;
-  background-color: $user-panel-div-bg-color;
+  justify-content: flex-start;
+  gap: $profile-left-gap;
+  margin: $profile-left-margin;
+  padding: $profile-left-padding;
+  @media (max-width: 1100px){
+    margin: 0;
+    padding: 1rem;
+  }
+  @media (max-width: 900px) {
+    margin: 0;
+    padding: 0;
+  }
+
 }
 
-.user-panel-left__avatar-img {
-  width: $user-avatar-width;
+.profile-left__avatar-img {
+  width: $profile-avatar-width;
   height: auto;
   border-radius: 50%;
+  @media (max-width: 900px) {
+    width: 30%;
+  }
+}
+
+.profile-left__name {
+  font-family: $profile-left-name-font;
+  font-size: $profile-left-name-size;
+  @media (max-width: 1100px){
+    font-size: 3rem;
+  }
+}
+
+.profile-left__since {
+  font-family: "Roboto";
+}
+
+.profile-left__social {
+  margin: $profile-social-margin;
+  width: $profile-social-width;
+  display: flex;
+  flex-direction: column;
+  gap: $profile-social-gap;
+}
+
+.profile-main {
+  justify-self: center;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: $profile-main-width;
+  margin: $profile-main-margin;
+  padding: $profile-main-padding;
+  @media (max-width: 1100px){
+    margin: 0;
+  }
+  @media (max-width: 900px) {
+    padding: 0;
+    min-width: 100%;
+    height: 100%;
+  }
+}
+
+.status {
+  &--online {
+    color: $status-online-color;
+  }
+  &--in-game {
+    color: $status-in-game-color;
+  }
+  &--offline {
+    color: $status-offline-color;
+  }
 }
 
 .upload-icon {
   margin-left: 0.5rem;
-}
-
-.user-panel-middle {
-  display: grid;
-  grid-template-rows: $user-panel-middle-grid-rows;
-  grid-template-columns: $user-panel-middle-grid-columns;
-  margin: $user-panel-middle-margin;
-  padding: $user-panel-middle-padding;
 }

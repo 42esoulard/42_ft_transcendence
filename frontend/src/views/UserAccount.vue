@@ -2,7 +2,7 @@
   <h1>User Account</h1>
   <div v-if="user">
     <h2>Your profile from 42</h2>
-    <img :src="user.avatar" alt="[Your avatar]" />
+    <img :src="user.avatar" class="ua-img" alt="[Your avatar]" />
     <p>Your avatar: {{ user.avatar }}</p>
     <p>Your id: {{ user.id }}</p>
     <p>Your username: {{ user.username }}</p>
