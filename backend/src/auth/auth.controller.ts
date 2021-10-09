@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Redirect, Req, Res, Session, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { User } from 'src/users/interfaces/user.interface';
+import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { AuthenticatedGuard, FortyTwoAuthGuard } from './guards/fortytwo.guard';
 import { JwtAuthGuard } from './guards/jwt.guard';
@@ -10,6 +11,7 @@ import { RefreshTokenAuthGuard } from './guards/refresh.guard';
 export class AuthController {
   constructor(
     private authService: AuthService,
+    private userService: UsersService,
   ) { }
 
   // @Get('login')
@@ -29,15 +31,16 @@ export class AuthController {
   @Get('login')
   @UseGuards(FortyTwoAuthGuard)
   async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    
-    const jwt = await this.authService.getAccessToken(req.user);
-    const refresh_token = await this.authService.getRefreshToken(req.user.id);
+
+    const jwt = await this.authService.generateAccessToken(req.user);
+    const refresh_token = await this.authService.generateRefreshToken(req.user.id);
     // console.log(jwt);
     // console.log(refresh_token);
 
-    res.cookie('tokens', {access_token: jwt.access_token, refresh_token}, {
+    res.cookie('tokens', { access_token: jwt.access_token, refresh_token }, {
       httpOnly: true,
       expires: new Date(Date.now() + 1000 * 86400),
+      sameSite: true
     });
     return { message: "Logged in successfully" };
   }
@@ -45,11 +48,12 @@ export class AuthController {
   @Get('refreshtoken')
   @UseGuards(RefreshTokenAuthGuard)
   async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const jwt = await this.authService.getAccessToken(req.user);
-    const refresh_token = await this.authService.getRefreshToken(req.user.id);
+    const jwt = await this.authService.generateAccessToken(req.user);
+    const refresh_token = await this.userService.getRefreshToken(req.user.id);
     res.cookie('tokens', { access_token: jwt.access_token, refresh_token }, {
       httpOnly: true,
       expires: new Date(Date.now() + 1000 * 86400),
+      sameSite: true
     });
     return { message: "Refresh token successfully" };
   }
