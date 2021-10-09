@@ -20,7 +20,10 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    meta: { //should fordid the /login access if logged in
+      disableIfLoggedIn: true
+    }
   },
   {
     path: '/users',
@@ -90,14 +93,23 @@ const getProfile = async () => {
       store.state.user = response.data;
       // console.log(store.state.user);
     })
-    .catch((err: any) => console.log(err.message));
+    .catch((err: Error) => {
+      console.log(err.message);
+      return Promise.reject(err);
+    });
 };
 
 router.beforeEach(async (to, from) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!store.state.user) {
-      await refreshToken();
-      await getProfile();
+      // await refreshToken();
+      await getProfile()
+      .then((res) => console.log(res))
+      .catch( async (err) => {
+        console.log("get profile fails")
+        await refreshToken();
+        await getProfile();
+      })
     }
     console.log('user:', store.state.user)
     if (!store.state.user) {
