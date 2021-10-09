@@ -11,11 +11,7 @@
     <p>Profile created at: {{ formatDate() }}</p>
     <button @click="logOut">LogOut</button>
 
-    <form
-      method="post"
-      @submit.prevent="postAvatar"
-      enctype="multipart/form-data"
-    >
+    <form method="post" @submit.prevent="postAvatar">
       <input @change="handleFile" type="file" ref="avatar" id="avatar" />
       <button>Update avatar</button>
     </form>
@@ -94,6 +90,7 @@ export default defineComponent({
         .post("http://localhost:3000/users/upload", data)
         .then(function (response) {
           console.log(response);
+          window.location.reload();
         })
         .catch(function (err) {
           console.log(err);

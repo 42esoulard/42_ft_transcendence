@@ -39,11 +39,6 @@ export class UsersService {
 	async getUserByUsername(username: string): Promise<User> | undefined {
 		const user = await this.usersRepository
 			.findOne({ where: { username: username } });
-		// .createQueryBuilder("user")
-		// .select()
-		// .where("user.username = :username", { username: username })
-		// .getRawOne();
-		// console.log('getUserByUsername', user);
 		return user;
 	}
 
@@ -59,6 +54,20 @@ export class UsersService {
 		// newUser.password = await bcrypt.hash(newUser.password, newUser.salt);
 
 		return await this.usersRepository.save(newUser);
+	}
+
+	/**
+	 * Returns a refresh_token from user id
+	 * @param id :number
+	 * @returns refresh_token
+	 */
+	async getRefreshToken(id: number) {
+		const refresh_token = await this.usersRepository
+			.createQueryBuilder("user")
+			.select("refresh_token")
+			.where("user.id = :id", { id: id })
+			.getRawOne();
+		return refresh_token.refresh_token;
 	}
 
 	/**

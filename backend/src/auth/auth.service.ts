@@ -29,14 +29,14 @@ export class AuthService implements AuthProvider {
     return user;
   }
 
-  async getAccessToken(user: User) {
+  async generateAccessToken(user: User) {
     const payload: JwtPayload = { username: user.username, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
-  async getRefreshToken(id: number) {
+  async generateRefreshToken(id: number) {
     const oneYearFromNow = new Date();
     oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
     
@@ -50,6 +50,7 @@ export class AuthService implements AuthProvider {
   }
 
   async validRefreshToken(username: string, refresh_token: string): Promise<User> | null {
+    // console.log('validate:', {username, refresh_token} )
     const user: User = await this.usersService.getUserByUsername(username);
     // console.log(user);
     // console.log('RT:', refresh_token);

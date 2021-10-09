@@ -34,6 +34,7 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
     }
     const user = await this.authService.validRefreshToken(payload.username, cookie.refresh_token);
     if (!user) {
+      console.log("oups: token expired")
       throw new BadRequestException('token expired');
     }
     return user;
