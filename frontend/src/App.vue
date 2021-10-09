@@ -11,22 +11,21 @@ export default {
 </script>
 
 <template>
-  <Header />
-  <SideBar />
-  <router-view />
+  <div class="main-div">
+    <SideBar />
+    <div class="body-div">
+      <Header />
+      <div class="router-view">
+        <router-view />
+      </div>
+    </div>
+  </div>
 </template>
 
 <style lang="scss">
   @import "../sass/main.scss";
   body {
-    //background: url("./assets/background.jpg");
-    background-color: white;
-  }
-  .app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: black;
+    background: url("./assets/background.jpg");
+    //background-color: white;
   }
 </style>

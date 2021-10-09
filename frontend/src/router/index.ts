@@ -10,6 +10,7 @@ import PongWatch from '../views/Pong/PongWatch.vue'
 import Login from '../views/Login.vue';
 import store from "@/store";
 import axios from 'axios'
+import UserProfile from '../views/UserProfile.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -47,6 +48,14 @@ const routes: Array<RouteRecordRaw> = [
     path: '/account',
     name: 'UserAccount',
     component: UserAccount,
+    meta: {
+      requiresAuth: true,
+    }
+  },
+  {
+    path: '/profile',
+    name: 'UserProfile',
+    component: UserProfile,
     meta: {
       requiresAuth: true,
     }
