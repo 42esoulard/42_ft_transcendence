@@ -29,8 +29,8 @@ export class MessagesService {
    * Lists all messages in a particular channel
    * nb: find() is a function from the typeORM library
    */
-  async getChannelMessages(chanId: number): Promise<Message[]> {
-    return await this.messagesRepository.find({ channel_id: chanId });
+  async getChannelMessages(chan_id: number): Promise<Message[]> {
+    return await this.messagesRepository.find({ channel_id: chan_id });
   }
 
   /**
@@ -51,8 +51,8 @@ export class MessagesService {
     // console.log(messageDto);
     const newMessage: Message = {
       id: this.index,
-      channel_id: messageDto.channelId,
-      author_id: messageDto.authorId,
+      channel_id: messageDto.channel_id,
+      author_id: messageDto.author_id,
       content: messageDto.content,
       // created_at: Math.floor(Date.now() / 1000),
     };

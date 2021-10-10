@@ -123,13 +123,8 @@ export default defineComponent({
         password: channelPassword.value
       })
       .then((res) => {
-        socket.emit('createRoom', {
-          name: channelName.value,
-          // ownerId: api.getCurrentUserId
-          // ownerId: 1, // API MUST FETCH THE PROPER USER ID
-          type: channelType.value,
-          // password: channelPassword.value
-      })
+        console.log("in createRoom res", res)
+        socket.emit('createRoom', res.data)
         // console.log("AAA", res.data)
         // console.log("BBB", res.data.ownerId)
       //   api.saveChannelMember({

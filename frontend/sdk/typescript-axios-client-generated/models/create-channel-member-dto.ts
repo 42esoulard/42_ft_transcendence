@@ -22,17 +22,17 @@ export interface CreateChannelMemberDto {
      * @type {number}
      * @memberof CreateChannelMemberDto
      */
-    channelId: any;
+    channel_id: any;
     /**
      * 
      * @type {number}
      * @memberof CreateChannelMemberDto
      */
-    userId: any;
+    user_id: any;
     /**
      * 
      * @type {boolean}
      * @memberof CreateChannelMemberDto
      */
-    isAdmin: any;
+    is_admin: any;
 }

@@ -57,7 +57,7 @@ export class MessagesController {
   /**
    * Returns a message found in database by its id.
    */
-  @Get('/in/:channelId')
+  @Get('/in/:channel_id')
   @ApiOkResponse({
     description: "The channel's messages have been found in database",
     type: Message,
@@ -69,10 +69,10 @@ export class MessagesController {
     description: 'Invalid ID supplied',
   })
   async getChannelMessages(
-    @Param('channelId') channelId: number,
+    @Param('channel_id') channel_id: number,
   ): Promise<Message[]> {
     const messages: Message[] = await this.messageService.getChannelMessages(
-      channelId,
+      channel_id,
     );
     if (messages == undefined) {
       throw new NotFoundException('Messages not found');

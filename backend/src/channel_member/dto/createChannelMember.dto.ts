@@ -4,15 +4,15 @@ export class CreateChannelMemberDto {
   /**
    * id of the channel
    */
-  readonly channelId: number;
+  readonly channel_id: number;
 
   /**
    * Id of the user
    */
-  readonly userId: number;
+  readonly user_id: number;
 
   /**
    * Is user admin
    */
-  readonly isAdmin: boolean;
+  readonly is_admin: boolean;
 }

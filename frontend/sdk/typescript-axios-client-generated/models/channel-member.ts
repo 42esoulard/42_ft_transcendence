@@ -22,17 +22,17 @@ export interface ChannelMember {
      * @type {number}
      * @memberof ChannelMember
      */
-    channelId: any;
+    channel_id: any;
     /**
      * 
      * @type {number}
      * @memberof ChannelMember
      */
-    userId: any;
+    user_id: any;
     /**
      * 
      * @type {boolean}
      * @memberof ChannelMember
      */
-    isAdmin: any;
+    is_admin: any;
 }

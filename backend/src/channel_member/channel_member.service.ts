@@ -67,9 +67,9 @@ export class ChannelMembersService {
     channelMemberDto: CreateChannelMemberDto,
   ): Promise<ChannelMember> {
     const newChannel: ChannelMember = {
-      channel_id: channelMemberDto.channelId,
-      user_id: channelMemberDto.userId,
-      is_admin: channelMemberDto.isAdmin,
+      channel_id: channelMemberDto.channel_id,
+      user_id: channelMemberDto.user_id,
+      is_admin: channelMemberDto.is_admin,
     };
     console.log('in save channel member', newChannel);
     return await this.channelMembersRepository.save(newChannel);
