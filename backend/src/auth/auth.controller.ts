@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, Redirect, Req, Res, Session, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Redirect, Req, Res, Session, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { User } from 'src/users/interfaces/user.interface';
+import { UserTwoFACode } from '../users/dto/UserTwoFACode.dto';
+import { User } from '../users/interfaces/user.interface';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { AuthenticatedGuard, FortyTwoAuthGuard } from './guards/fortytwo.guard';
@@ -66,5 +67,70 @@ export class AuthController {
   @Get()
   findAll(@Session() session: Record<string, any>) {
     session.visits = session.visits ? session.visits + 1 : 1;
+  }
+
+  @Post('2fa/generate')
+  // @UseGuards(JwtAuthGuard)
+  async register(@Res() response: Response, @Req() request: Request) {
+    const user: User = { // for debug w/o frontend
+      id: 1,
+      username: 'Mickey',
+      forty_two_login: '',
+      avatar: '',
+      two_fa_secret: '',
+      two_fa_enabled: false,
+      refresh_token: '',
+      expiry_date: undefined
+    }
+    const { otpauthUrl } = await this.authService.generateTwoFASecret(user); // must be request.user
+    return this.authService.pipeQrCodeStream(response, otpauthUrl);
+  }
+  
+  @Post('2fa/turn-on')
+  // @UseGuards(JwtAuthGuard)
+  async turnOnTwoFactorAuthentication(
+    @Req() request: Request,
+    @Body() { twoFACode }: UserTwoFACode
+    ) {
+      
+      const user: User = { // for debug w/o frontend
+        id: 1,
+        username: 'Mickey',
+        forty_two_login: '',
+        avatar: '',
+        two_fa_secret: '',
+        two_fa_enabled: false,
+        refresh_token: '',
+        expiry_date: undefined
+      }
+      const isCodeValid = this.authService.isTwoFACodeValid(
+        twoFACode,
+        user // must be request.user
+        );
+        if (!isCodeValid) {
+          throw new UnauthorizedException('Wrong authentication code');
+        }
+        await this.userService.turnOnTwoFA(1); // must be request.user.id (1 is for dev)
+      }
+      
+      @Post('2fa/authenticate')
+      @HttpCode(200)
+      // @UseGuards(JwtAuthGuard)
+      async authenticate(
+        @Req() request: Request,
+        @Body() { twoFACode }: UserTwoFACode
+        ) {
+    const isCodeValid = this.authService.isTwoFACodeValid(
+      twoFACode, request.user
+    );
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Wrong authentication code');
+    }
+
+    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(request.user.id, true);
+
+    request.res.setHeader('Set-Cookie', [accessTokenCookie]);
+
+    return request.user;
   }
 }

@@ -6,6 +6,9 @@ import { AuthProvider } from './interfaces/auth.interface';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwtPayload.interface';
 import { v4 as uuid } from 'uuid';
+import { authenticator } from 'otplib';
+import { toFileStream } from 'qrcode';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService implements AuthProvider {
@@ -39,7 +42,7 @@ export class AuthService implements AuthProvider {
   async generateRefreshToken(id: number) {
     const oneYearFromNow = new Date();
     oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
-    
+
     const refresh_token = {
       id: id,
       refresh_token: uuid(),
@@ -63,4 +66,34 @@ export class AuthService implements AuthProvider {
     }
     return null;
   }
+
+  //The following functions are for 2FA
+
+  public async generateTwoFASecret(user: User) {
+    const secret = authenticator.generateSecret();
+
+    const otpauthUrl = authenticator.keyuri(user.username, process.env.APP_NAME, secret);
+
+    await this.usersService.saveTwoFASecret(secret, user.id);
+
+    return { secret, otpauthUrl }
+  }
+
+  public async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
+    return toFileStream(stream, otpauthUrl);
+  }
+
+  public isTwoFACodeValid(twoFactorAuthenticationCode: string, user: User) {
+    return authenticator.verify({
+      token: twoFactorAuthenticationCode,
+      secret: user.two_fa_secret
+    })
+  }
+
+  public getCookieWithJwtAccessToken(userId: number, isTwoFAauthenticated = false) {
+    const payload: TokenPayload = { userId, isTwoFAauthenticated };
+    const token = this.jwtService.sign(payload);
+    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`;
+  }
+
 }

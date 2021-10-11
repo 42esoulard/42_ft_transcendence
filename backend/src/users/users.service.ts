@@ -83,4 +83,27 @@ export class UsersService {
 	async updateUserToken(updatedUser: UpdateUserTokenDto): Promise<User> {
 		return await this.usersRepository.save(updatedUser);
 	}
+
+	/**
+	 * Updates the 2FA secret of a particular user
+	 * @param secret string
+	 * @param id number
+	 * @returns Promise<User>
+	 */
+	async saveTwoFASecret(secret: string, id: number) {
+		return await this.usersRepository.update(id, {
+			two_fa_secret: secret
+		});
+	}
+
+	/**
+	 * Sets the 2FA to true in database
+	 * @param id number
+	 * @returns Promise<User>
+	 */
+	async turnOnTwoFA(id: number) {
+		return this.usersRepository.update(id, {
+			two_fa_enabled: true
+		});
+	}
 }

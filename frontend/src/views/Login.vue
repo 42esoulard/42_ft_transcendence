@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, onBeforeMount, onMounted, ref } from "vue";
+import { defineComponent, inject, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 // import { DefaultApi } from "sdk-client";
@@ -20,7 +20,7 @@ export default defineComponent({
     //To exchange cookie or auth header w/o in every req
     axios.defaults.withCredentials = true;
 
-    onBeforeMount(() => { // onBeforeMount ????
+    onMounted(() => { // onBeforeMount ????
       if (route.query.code) {
         const code = route.query.code;
         console.log(code);

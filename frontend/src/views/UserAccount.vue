@@ -7,7 +7,7 @@
     <p>Your id: {{ user.id }}</p>
     <p>Your username: {{ user.username }}</p>
     <p>Your login 42: {{ user.forty_two_login }}</p>
-    <p>Two-Factor Auth activated: {{ user.two_fa }}</p>
+    <p>Two-Factor Auth activated: {{ user.two_fa_enabled }}</p>
     <p>Profile created at: {{ formatDate(user.created_at) }}</p>
     <button @click="logOut">LogOut</button>
 
