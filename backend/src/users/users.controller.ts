@@ -84,7 +84,7 @@ export class UsersController {
 	 * @param file picture
 	 */
 	@Post('upload')
-	@UseGuards(JwtAuthGuard)
+	// @UseGuards(JwtAuthGuard)
 	@UseInterceptors(FileInterceptor('avatar', {
 		storage: diskStorage({
 			destination: './uploads/avatars',
@@ -114,7 +114,7 @@ export class UsersController {
 	 * Returns an avatar from its finename
 	 */
 	@Get('/avatars/:imgpath')
-	@UseGuards(JwtAuthGuard)
+	// @UseGuards(JwtAuthGuard)
 	getAvatar(
 		@Param('imgpath') filename: string,
 		@Res({ passthrough: true }) res: Response
