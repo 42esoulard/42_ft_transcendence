@@ -26,7 +26,6 @@ export default {
 			},
 			socket: null,
 			room: this.$route.params.id,
-			playing: true
 		}
 	},
 	created() {
@@ -39,7 +38,7 @@ export default {
 		this.context = this.$refs.game.getContext("2d");
 		
 		this.socket.on("position", data => {
-			if (this.playing)
+			if (this.room)
 				this.draw(data)
 		})
 
@@ -47,12 +46,9 @@ export default {
 	
 	beforeRouteLeave()
 	{
-		if (this.room)
-		{
-			this.socket.emit('leaveRoom', this.room)
-			this.playing = false
-			console.log('leaving')
-		}
+		this.socket.emit('leaveGame', this.room)
+		this.room = null
+		console.log('leaving')
 	},
 
 	methods: {
@@ -71,7 +67,10 @@ export default {
 		},
 		SendMoveMsg(direction) {
 			if (this.room)
+			{
+				console.log(this.room)
 				this.socket.emit('moveRacquet', {room: this.room, text: direction})
+			}
 		},
 		onKeyDown(event) {
 			const codes = ['ArrowUp', 'ArrowDown'];
