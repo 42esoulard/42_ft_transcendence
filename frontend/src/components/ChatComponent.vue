@@ -156,6 +156,9 @@ export const ChatComponent = defineComponent({
         .then((res) => {
           allMessages[activeChannel.value.id] = [];
           res.data.forEach(item => {
+            console.log(item)
+            console.log(item.channelId)
+            // console.log(item.channel_id)
             allMessages[activeChannel.value.id].push({
               content: item.content,
               author_id: item.authorId,
