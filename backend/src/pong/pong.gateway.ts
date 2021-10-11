@@ -117,6 +117,10 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   handleDisconnect(client: Socket): void {
     this.logger.log('Client disconected ' + client.id);
+    this.games.forEach((value: pongGame, key: string) => {
+      if (value.player1.clientSocket.id === client.id || value.player2.clientSocket.id === client.id)
+        clearInterval(value.interval)
+    })
   }
   
   handleConnection(client: Socket, ...args: any[]): void {
@@ -168,6 +172,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       // client.to(room).emit('opponentLeftRoom')
       // client.leave(room)
   }
+
 
   @SubscribeMessage('moveRacquet')
   handleMessage(client: Socket, message: {room: string, text: string}): void {
