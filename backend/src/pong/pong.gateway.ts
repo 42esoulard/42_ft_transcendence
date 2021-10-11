@@ -41,7 +41,7 @@ class pongGame {
   
   private logger: Logger = new Logger('PongGateway');
   public room: string
-	private position = {
+  public position = {
     player1: 200,
     player2: 200,
     ball: {
@@ -50,12 +50,12 @@ class pongGame {
     },
   }
 
-  private ballDirection = {
+  public ballDirection = {
     x: BALL_INITIAL_DIR_X,
     y: BALL_INITIAL_DIR_Y
   }
 
-  private interval = null
+  public interval = null
 
   async createGame()
   {
@@ -108,29 +108,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   private logger: Logger = new Logger('PongGateway');
 
   private pongGame: pongGame
-  private map = new Map() // pongGame map. key = room id
+  private game = new Map() // pongGame map. key = room id
   private waitingPlayer: player = null
   
-	private position = {
-				player1: 200,
-				player2: 200,
-        ball: {
-          x: CANVAS_WIDTH / 2,
-          y: CANVAS_HEIGHT / 2
-        },
-  }
-
-  private ballDirection = {
-    x: BALL_INITIAL_DIR_X,
-    y: BALL_INITIAL_DIR_Y
-  }
-
-  private clients = {
-        client1: '',
-        client2: ''
-  }
-
-  private interval = null
   
   afterInit(server: Server) {
     this.logger.log('Initialized')
@@ -147,7 +127,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log('Client connected ' + client.id);
-    client.emit('position', this.position)
+    // client.emit('position', this.pongGame.position)
   }
 
   @SubscribeMessage('joinGame')
@@ -168,7 +148,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       await this.pongGame.createGame()
       this.server.to(this.pongGame.room).emit('gameReadyToStart', this.pongGame.room)
 
-      this.interval = setInterval(() => {
+      this.pongGame.interval = setInterval(() => {
         this.moveBall(client, this.pongGame.room)
       }, INTERVAL_IN_MS)
 
@@ -179,20 +159,21 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage('moveRacquet')
   handleMessage(client: Socket, message: {room: string, text: string}): void {
+
     this.logger.log('msg received: ' + message.text)
     if (client.id === this.pongGame.player1.clientSocket.id)
     {
       if (message.text === 'up')
-        this.position.player1 -= RACQUET_SPEED
+        this.pongGame.position.player1 -= RACQUET_SPEED
       if (message.text === 'down')
-        this.position.player1 += RACQUET_SPEED
+        this.pongGame.position.player1 += RACQUET_SPEED
     }
     if (client.id === this.pongGame.player2.clientSocket.id)
     {
       if (message.text === 'up')
-        this.position.player2 -= RACQUET_SPEED
+        this.pongGame.position.player2 -= RACQUET_SPEED
       if (message.text === 'down')
-        this.position.player2 += RACQUET_SPEED
+        this.pongGame.position.player2 += RACQUET_SPEED
     }
     // this.server.to(message.room).emit('position', this.position);
   }
@@ -201,38 +182,38 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   moveBall(client: Socket, room:string) {
 
     this.changeBallDirectionIfWallHit()
-    this.position.ball.x += this.ballDirection.x * BALL_SPEED
-    this.position.ball.y += this.ballDirection.y * BALL_SPEED
-    this.server.to(room).emit('position', this.position)
+    this.pongGame.position.ball.x += this.pongGame.ballDirection.x * BALL_SPEED
+    this.pongGame.position.ball.y += this.pongGame.ballDirection.y * BALL_SPEED
+    this.server.to(room).emit('position', this.pongGame.position)
   }
   
   changeBallDirectionIfWallHit()
   {
     // if hit top or bottom walls
-    if (this.position.ball.y <= BALL_RADIUS || this.position.ball.y >= CANVAS_HEIGHT - BALL_RADIUS)
+    if (this.pongGame.position.ball.y <= BALL_RADIUS || this.pongGame.position.ball.y >= CANVAS_HEIGHT - BALL_RADIUS)
     {
-      this.ballDirection.y = -this.ballDirection.y
+      this.pongGame.ballDirection.y = -this.pongGame.ballDirection.y
     }
     // if hit left left wall
-    if (this.position.ball.x <= BALL_RADIUS)
+    if (this.pongGame.position.ball.x <= BALL_RADIUS)
     {
-      if (this.position.ball.y >= this.position.player1 && this.position.ball.y <= (this.position.player1 + RACQUET_LENGTH))
-        this.ballDirection.x = -this.ballDirection.x
+      if (this.pongGame.position.ball.y >= this.pongGame.position.player1 && this.pongGame.position.ball.y <= (this.pongGame.position.player1 + RACQUET_LENGTH))
+        this.pongGame.ballDirection.x = -this.pongGame.ballDirection.x
       else
       {
-        this.ballDirection.x = 0,
-        this.ballDirection.y = 0
+        this.pongGame.ballDirection.x = 0,
+        this.pongGame.ballDirection.y = 0
       }
     }
     // if hit right wall
-    if (this.position.ball.x >= CANVAS_WIDTH - BALL_RADIUS)
+    if (this.pongGame.position.ball.x >= CANVAS_WIDTH - BALL_RADIUS)
     {
-      if (this.position.ball.y >= this.position.player2 && this.position.ball.y <= (this.position.player2 + RACQUET_LENGTH))
-        this.ballDirection.x = -this.ballDirection.x
+      if (this.pongGame.position.ball.y >= this.pongGame.position.player2 && this.pongGame.position.ball.y <= (this.pongGame.position.player2 + RACQUET_LENGTH))
+        this.pongGame.ballDirection.x = -this.pongGame.ballDirection.x
       else
       {
-        this.ballDirection.x = 0,
-        this.ballDirection.y = 0
+        this.pongGame.ballDirection.x = 0,
+        this.pongGame.ballDirection.y = 0
       }
     }
   }
