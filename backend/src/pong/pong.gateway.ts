@@ -119,12 +119,26 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.logger.log('Client disconected ' + client.id);
     this.games.forEach((value: pongGame, key: string) => {
       if (value.player1.clientSocket.id === client.id || value.player2.clientSocket.id === client.id)
-        clearInterval(value.interval)
+        this.endGame(key)
     })
   }
   
   handleConnection(client: Socket, ...args: any[]): void {
     this.logger.log('Client connected ' + client.id);
+  }
+
+  endGame(room: string)
+  {
+    const game: pongGame = this.games.get(room)
+    if (!game)
+    {
+      this.logger.error('endGame: game doesnt exist')
+      return
+    }
+    clearInterval(game.interval)
+    this.logger.log('interval cleared: ' + room )
+    game.endGame(true)
+    this.games.delete(room)
   }
 
   @SubscribeMessage('joinGame')
@@ -160,15 +174,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('leaveGame')
   handleLeaveRoom(client: Socket, room:string): void
   {
-    const game: pongGame = this.games.get(room)
-    if (!game)
-    {
-      this.logger.error('leaveGame: game doesnt exist')
-      return
-    }
-
-    clearInterval(game.interval)
-    this.logger.log('interval cleared: ' + room )
+    this.endGame(room)
       // client.to(room).emit('opponentLeftRoom')
       // client.leave(room)
   }
