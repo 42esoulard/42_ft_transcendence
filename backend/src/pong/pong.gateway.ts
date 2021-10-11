@@ -7,7 +7,7 @@ import { Game } from './entity/games.entity';
 import { GameUser } from './entity/gameUser.entity';
 
 var BALL_SPEED = 1
-var INTERVAL_IN_MS = 100
+var INTERVAL_IN_MS = 20
 var CANVAS_WIDTH = 640
 var CANVAS_HEIGHT = 480
 var BALL_INITIAL_DIR_X = -2
@@ -107,8 +107,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   private logger: Logger = new Logger('PongGateway');
 
-  private pongGame: pongGame
-  private game = new Map() // pongGame map. key = room id
+  // private pongGame: pongGame
+  private games = new Map() // pongGame map. key = room id
   private waitingPlayer: player = null
   
   
@@ -142,18 +142,21 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     else
     {
       const player2 = new player(message.userId, client)
-      this.pongGame = new pongGame(this.waitingPlayer, player2, this.gameRepo, this.gameUserRepo)
+      const game = new pongGame(this.waitingPlayer, player2, this.gameRepo, this.gameUserRepo)
       delete this.waitingPlayer
       this.waitingPlayer = null
-      await this.pongGame.createGame()
-      this.server.to(this.pongGame.room).emit('gameReadyToStart', this.pongGame.room)
 
-      this.pongGame.interval = setInterval(() => {
-        this.moveBall(client, this.pongGame.room)
+      await game.createGame()
+      this.server.to(game.room).emit('gameReadyToStart', game.room)
+      this.games.set(game.room, game)
+      this.logger.log('new interval: ' + game.room)
+      game.interval = setInterval(() => {
+        this.moveBall(client, game.room)
       }, INTERVAL_IN_MS)
 
+
       // just to test that endGame works correctly
-      this.pongGame.endGame(false)
+      // game.endGame(false)
     }
   }
 
@@ -161,19 +164,23 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleMessage(client: Socket, message: {room: string, text: string}): void {
 
     this.logger.log('msg received: ' + message.text)
-    if (client.id === this.pongGame.player1.clientSocket.id)
+    this.logger.log(message.room)
+    const game: pongGame = this.games.get(message.room)
+
+    if (client.id === game.player1.clientSocket.id)
     {
       if (message.text === 'up')
-        this.pongGame.position.player1 -= RACQUET_SPEED
+        game.position.player1 -= RACQUET_SPEED
       if (message.text === 'down')
-        this.pongGame.position.player1 += RACQUET_SPEED
+        game.position.player1 += RACQUET_SPEED
     }
-    if (client.id === this.pongGame.player2.clientSocket.id)
+    if (client.id === game.player2.clientSocket.id)
     {
+      this.logger.log('there')
       if (message.text === 'up')
-        this.pongGame.position.player2 -= RACQUET_SPEED
+        game.position.player2 -= RACQUET_SPEED
       if (message.text === 'down')
-        this.pongGame.position.player2 += RACQUET_SPEED
+        game.position.player2 += RACQUET_SPEED
     }
     // this.server.to(message.room).emit('position', this.position);
   }
@@ -181,53 +188,53 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   moveBall(client: Socket, room:string) {
 
-    this.changeBallDirectionIfWallHit()
-    this.pongGame.position.ball.x += this.pongGame.ballDirection.x * BALL_SPEED
-    this.pongGame.position.ball.y += this.pongGame.ballDirection.y * BALL_SPEED
-    this.server.to(room).emit('position', this.pongGame.position)
+    this.changeBallDirectionIfWallHit(room)
+    const game = this.games.get(room) // returns a reference to the PongGame object --> any change made to "game" will modify the object inside the map
+    
+    game.position.ball.x += game.ballDirection.x * BALL_SPEED
+    game.position.ball.y += game.ballDirection.y * BALL_SPEED
+    this.server.to(room).emit('position', game.position)
   }
   
-  changeBallDirectionIfWallHit()
+  changeBallDirectionIfWallHit(room: string)
   {
+    const game = this.games.get(room)
     // if hit top or bottom walls
-    if (this.pongGame.position.ball.y <= BALL_RADIUS || this.pongGame.position.ball.y >= CANVAS_HEIGHT - BALL_RADIUS)
+    if (game.position.ball.y <= BALL_RADIUS || game.position.ball.y >= CANVAS_HEIGHT - BALL_RADIUS)
     {
-      this.pongGame.ballDirection.y = -this.pongGame.ballDirection.y
+      game.ballDirection.y = -game.ballDirection.y
     }
     // if hit left left wall
-    if (this.pongGame.position.ball.x <= BALL_RADIUS)
+    if (game.position.ball.x <= BALL_RADIUS)
     {
-      if (this.pongGame.position.ball.y >= this.pongGame.position.player1 && this.pongGame.position.ball.y <= (this.pongGame.position.player1 + RACQUET_LENGTH))
-        this.pongGame.ballDirection.x = -this.pongGame.ballDirection.x
+      if (game.position.ball.y >= game.position.player1 && game.position.ball.y <= (game.position.player1 + RACQUET_LENGTH))
+        game.ballDirection.x = -game.ballDirection.x
       else
       {
-        this.pongGame.ballDirection.x = 0,
-        this.pongGame.ballDirection.y = 0
+        game.ballDirection.x = 0,
+        game.ballDirection.y = 0
       }
     }
     // if hit right wall
-    if (this.pongGame.position.ball.x >= CANVAS_WIDTH - BALL_RADIUS)
+    if (game.position.ball.x >= CANVAS_WIDTH - BALL_RADIUS)
     {
-      if (this.pongGame.position.ball.y >= this.pongGame.position.player2 && this.pongGame.position.ball.y <= (this.pongGame.position.player2 + RACQUET_LENGTH))
-        this.pongGame.ballDirection.x = -this.pongGame.ballDirection.x
+      if (game.position.ball.y >= game.position.player2 && game.position.ball.y <= (game.position.player2 + RACQUET_LENGTH))
+        game.ballDirection.x = -game.ballDirection.x
       else
       {
-        this.pongGame.ballDirection.x = 0,
-        this.pongGame.ballDirection.y = 0
+        game.ballDirection.x = 0,
+        game.ballDirection.y = 0
       }
     }
   }
 
-  // @SubscribeMessage('leaveRoom')
-  // handleLeaveRoom(client: Socket, room:string)
-  // {
-  //   if (client.id === this.clients.client1)
-  //     this.clients.client1 = ''
-  //   if (client.id === this.clients.client2)
-  //     this.clients.client2 = ''
-
-  //   clearInterval(this.interval)
-  //   client.to(room).emit('opponentLeftRoom')
-  //   client.leave(room)
-  // }
+  @SubscribeMessage('leaveGame')
+  handleLeaveRoom(client: Socket, room:string)
+  {
+    const game: pongGame = this.games.get(room)
+    clearInterval(game.interval)
+    this.logger.log('interval cleared: ' + room )
+    // client.to(room).emit('opponentLeftRoom')
+    // client.leave(room)
+  }
 }
