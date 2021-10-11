@@ -2,6 +2,7 @@
 	<h1> Game # {{ id }} </h1>
 	<canvas ref="game" width="640" height="480" style="border: 1px solid black">
 	</canvas>
+	<p> score1 [{{ score.player1 }}]  |  score_2 [{{ score.player2 }}] </p>
 	<p> ball x {{ position.ball.x }} </p>
 	<p> ball y {{ position.ball.y }} </p>
 	<p> Use arrows (keyboard) to move </p>
@@ -24,6 +25,10 @@ export default {
 					y: 0
 				},
 			},
+			score: {
+				player1: 0,
+				player2: 0
+			},
 			socket: null,
 			room: this.$route.params.id,
 		}
@@ -37,10 +42,11 @@ export default {
 		console.log('mounted')
 		this.context = this.$refs.game.getContext("2d");
 		
-		this.socket.on("position", data => {
+		this.socket.on("position", (positions, score) => {
 			console.log('position received')
-			if (this.room)
-				this.draw(data)
+			// if (this.room)
+				this.draw(positions)
+				this.score = score
 		})
 
 	},

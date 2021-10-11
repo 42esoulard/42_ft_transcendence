@@ -49,6 +49,10 @@ class pongGame {
       y: CANVAS_HEIGHT / 2
     },
   }
+  public score = {
+    player1: 0,
+    player2: 0
+  }
 
   public ballDirection = {
     x: BALL_INITIAL_DIR_X,
@@ -77,7 +81,6 @@ class pongGame {
     user2game.gameId = this.player2.gameId
     user2game.userId = this.player2.userId
     await this.gameUserRepo.save(user2game)
-
 
     this.room = game.id.toString()
     await this.player1.clientSocket.join(this.room)
@@ -162,7 +165,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.games.set(game.room, game)
       this.logger.log('new interval: ' + game.room)
       game.interval = setInterval(() => {
-        this.sendPosition(client, game.room)
+        this.sendDatas(client, game.room)
       }, INTERVAL_IN_MS)
 
 
@@ -207,9 +210,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
-  sendPosition(client: Socket, room:string): void {
+  sendDatas(client: Socket, room:string): void {
 
-    const game = this.games.get(room) // returns a reference to the PongGame object --> any change made to "game" will modify the object inside the map
+    const game: pongGame = this.games.get(room) // returns a reference to the PongGame object --> any change made to "game" will modify the object inside the map
     if (!game)
     {
       this.logger.error('sendPosition: game doesnt exist')
@@ -219,7 +222,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     
     game.position.ball.x += game.ballDirection.x * BALL_SPEED
     game.position.ball.y += game.ballDirection.y * BALL_SPEED
-    this.server.to(room).emit('position', game.position)
+    this.server.to(room).emit('position', game.position, game.score)
   }
   
   changeBallDirectionIfWallHit(game: pongGame): void
@@ -236,6 +239,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         game.ballDirection.x = -game.ballDirection.x
       else
       {
+        game.score.player1++
         game.ballDirection.x = 0,
         game.ballDirection.y = 0
       }
@@ -247,6 +251,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         game.ballDirection.x = -game.ballDirection.x
       else
       {
+        game.score.player2++
         game.ballDirection.x = 0,
         game.ballDirection.y = 0
       }
