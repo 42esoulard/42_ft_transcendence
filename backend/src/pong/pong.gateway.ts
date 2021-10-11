@@ -28,18 +28,34 @@ class player {
 }
 
 class pongGame {
+
   constructor(
-    private player1: player, 
-    private player2: player,
-    private readonly gameRepo: Repository<Game>,
-    private readonly gameUserRepo: Repository<GameUser>)
+  public player1: player, 
+  public player2: player,
+  private readonly gameRepo: Repository<Game>,
+  private readonly gameUserRepo: Repository<GameUser>)
   {
     this.player1 = player1,
     this.player2 = player2 
   }
   
   private logger: Logger = new Logger('PongGateway');
-  private room: string
+  public room: string
+	private position = {
+    player1: 200,
+    player2: 200,
+    ball: {
+      x: CANVAS_WIDTH / 2,
+      y: CANVAS_HEIGHT / 2
+    },
+  }
+
+  private ballDirection = {
+    x: BALL_INITIAL_DIR_X,
+    y: BALL_INITIAL_DIR_Y
+  }
+
+  private interval = null
 
   async createGame()
   {
@@ -74,18 +90,6 @@ class pongGame {
     await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.player2.gameId}, { won: !player1Won})
   }
 
-  public getRoom()
-  {
-    return this.room
-  }
-  public getPlayer1Socket()
-  {
-    return this.player1.clientSocket
-  }
-  public getPlayer2Socket()
-  {
-    return this.player2.clientSocket
-  }
 }
 
 @WebSocketGateway( { namespace: '/pong'})
@@ -104,6 +108,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   private logger: Logger = new Logger('PongGateway');
 
   private pongGame: pongGame
+  private map = new Map() // pongGame map. key = room id
   private waitingPlayer: player = null
   
 	private position = {
@@ -132,10 +137,10 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
   
   handleDisconnect(client: Socket) {
-    if (client.id === this.clients.client1)
-      this.clients.client1 = ''
-    if (client.id === this.clients.client2)
-      this.clients.client2 = ''
+    // if (client.id === this.clients.client1)
+    //   this.clients.client1 = ''
+    // if (client.id === this.clients.client2)
+    //   this.clients.client2 = ''
 
     this.logger.log('Client disconected ' + client.id);
   }
@@ -161,10 +166,10 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       delete this.waitingPlayer
       this.waitingPlayer = null
       await this.pongGame.createGame()
-      this.server.to(this.pongGame.getRoom()).emit('gameReadyToStart', this.pongGame.getRoom())
+      this.server.to(this.pongGame.room).emit('gameReadyToStart', this.pongGame.room)
 
       this.interval = setInterval(() => {
-        this.moveBall(client, this.pongGame.getRoom())
+        this.moveBall(client, this.pongGame.room)
       }, INTERVAL_IN_MS)
 
       // just to test that endGame works correctly
@@ -175,14 +180,14 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('moveRacquet')
   handleMessage(client: Socket, message: {room: string, text: string}): void {
     this.logger.log('msg received: ' + message.text)
-    if (client.id === this.pongGame.getPlayer1Socket().id)
+    if (client.id === this.pongGame.player1.clientSocket.id)
     {
       if (message.text === 'up')
         this.position.player1 -= RACQUET_SPEED
       if (message.text === 'down')
         this.position.player1 += RACQUET_SPEED
     }
-    if (client.id === this.pongGame.getPlayer2Socket().id)
+    if (client.id === this.pongGame.player2.clientSocket.id)
     {
       if (message.text === 'up')
         this.position.player2 -= RACQUET_SPEED
@@ -239,8 +244,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   //     this.clients.client1 = ''
   //   if (client.id === this.clients.client2)
   //     this.clients.client2 = ''
-  //   clearInterval(this.interval)
 
+  //   clearInterval(this.interval)
   //   client.to(room).emit('opponentLeftRoom')
   //   client.leave(room)
   // }
