@@ -38,6 +38,7 @@ export default {
 		this.context = this.$refs.game.getContext("2d");
 		
 		this.socket.on("position", data => {
+			console.log('position received')
 			if (this.room)
 				this.draw(data)
 		})
@@ -47,14 +48,14 @@ export default {
 	beforeRouteLeave()
 	{
 		this.socket.emit('leaveGame', this.room)
-		this.room = null
+		this.socket.removeEventListener('position')
+		window.removeEventListener("keydown", this.onKeyDown)
 		console.log('leaving')
 	},
 
 	methods: {
 		draw(data)
 		{
-			console.log('position received')
 			this.position = data
 			this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height)
 
