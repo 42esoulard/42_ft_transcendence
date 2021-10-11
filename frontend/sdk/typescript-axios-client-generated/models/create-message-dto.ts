@@ -22,13 +22,13 @@ export interface CreateMessageDto {
      * @type {number}
      * @memberof CreateMessageDto
      */
-    channel_id: any;
+    channelId: any;
     /**
      * 
      * @type {number}
      * @memberof CreateMessageDto
      */
-    author_id: any;
+    authorId: any;
     /**
      * 
      * @type {string}

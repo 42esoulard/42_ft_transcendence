@@ -51,8 +51,8 @@ export class MessagesService {
     // console.log(messageDto);
     const newMessage: Message = {
       id: this.index,
-      channel_id: messageDto.channel_id,
-      author_id: messageDto.author_id,
+      channel_id: messageDto.channelId,
+      author_id: messageDto.authorId,
       content: messageDto.content,
       // created_at: Math.floor(Date.now() / 1000),
     };

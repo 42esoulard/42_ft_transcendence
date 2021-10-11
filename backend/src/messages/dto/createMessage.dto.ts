@@ -10,11 +10,11 @@ export class CreateMessageDto {
   /**
    * Channel of the id where the message was posted
    */
-  readonly channel_id: number;
+  readonly channelId: number;
   /**
    * Id of the user who posted it
    */
-  readonly author_id: number;
+  readonly authorId: number;
 
   /*
    * Message content

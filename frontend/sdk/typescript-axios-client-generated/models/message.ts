@@ -28,13 +28,13 @@ export interface Message {
      * @type {number}
      * @memberof Message
      */
-    channel_id: any;
+    channelId: any;
     /**
      * 
      * @type {number}
      * @memberof Message
      */
-    author_id: any;
+    authorId: any;
     /**
      * 
      * @type {string}

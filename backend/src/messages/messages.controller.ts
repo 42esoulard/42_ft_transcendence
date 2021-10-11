@@ -58,16 +58,6 @@ export class MessagesController {
    * Returns a message found in database by its id.
    */
   @Get('/in/:channel_id')
-  @ApiOkResponse({
-    description: "The channel's messages have been found in database",
-    type: Message,
-  })
-  @ApiNotFoundResponse({
-    description: 'Message not found',
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid ID supplied',
-  })
   async getChannelMessages(
     @Param('channel_id') channel_id: number,
   ): Promise<Message[]> {
@@ -79,6 +69,16 @@ export class MessagesController {
     }
     return messages;
   }
+  // @ApiOkResponse({
+  //   description: "The channel's messages have been found in database",
+  //   type: Array(Message),
+  // })
+  // @ApiNotFoundResponse({
+  //   description: 'Message not found',
+  // })
+  // @ApiBadRequestResponse({
+  //   description: 'Invalid ID supplied',
+  // })
 
   /**
    * Save a new message to database from the POST body
