@@ -57,7 +57,7 @@ class pongGame {
 
   public interval = null
 
-  async createGame()
+  async createGame(): Promise<void>
   {
     // create a game entity and save it to the database
     this.logger.log('game created')
@@ -84,7 +84,7 @@ class pongGame {
     await this.player2.clientSocket.join(this.room)
   }
   
-  async endGame(player1Won: boolean)
+  async endGame(player1Won: boolean): Promise<void>
   {
     await this.gameUserRepo.update({userId: this.player1.userId, gameId: this.player1.gameId}, { won: player1Won})
     await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.player2.gameId}, { won: !player1Won})
@@ -107,31 +107,24 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   private logger: Logger = new Logger('PongGateway');
 
-  // private pongGame: pongGame
   private games = new Map() // pongGame map. key = room id
   private waitingPlayer: player = null
   
   
-  afterInit(server: Server) {
+  afterInit(server: Server): void {
     this.logger.log('Initialized')
   }
   
-  handleDisconnect(client: Socket) {
-    // if (client.id === this.clients.client1)
-    //   this.clients.client1 = ''
-    // if (client.id === this.clients.client2)
-    //   this.clients.client2 = ''
-
+  handleDisconnect(client: Socket): void {
     this.logger.log('Client disconected ' + client.id);
   }
   
-  handleConnection(client: Socket, ...args: any[]) {
+  handleConnection(client: Socket, ...args: any[]): void {
     this.logger.log('Client connected ' + client.id);
-    // client.emit('position', this.pongGame.position)
   }
 
   @SubscribeMessage('joinGame')
-  async handleJoinGameMessage(client: Socket, message: {userId: number})
+  async handleJoinGameMessage(client: Socket, message: {userId: number}): Promise<void>
   {
     this.logger.log('client joined game. userId: ' + message.userId)
     if (!this.waitingPlayer)
@@ -151,7 +144,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.games.set(game.room, game)
       this.logger.log('new interval: ' + game.room)
       game.interval = setInterval(() => {
-        this.moveBall(client, game.room)
+        this.sendPosition(client, game.room)
       }, INTERVAL_IN_MS)
 
 
@@ -159,13 +152,33 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       // game.endGame(false)
     }
   }
+  
+  @SubscribeMessage('leaveGame')
+  handleLeaveRoom(client: Socket, room:string): void
+  {
+    const game: pongGame = this.games.get(room)
+    if (!game)
+    {
+      this.logger.error('leaveGame: game doesnt exist')
+      return
+    }
+
+    clearInterval(game.interval)
+    this.logger.log('interval cleared: ' + room )
+      // client.to(room).emit('opponentLeftRoom')
+      // client.leave(room)
+  }
 
   @SubscribeMessage('moveRacquet')
   handleMessage(client: Socket, message: {room: string, text: string}): void {
 
-    this.logger.log('msg received: ' + message.text)
-    this.logger.log(message.room)
+    this.logger.log('msg received: ' + message.room)
     const game: pongGame = this.games.get(message.room)
+    if (!game)
+    {
+      this.logger.error('moveRacquet: game doesnt exist')
+      return
+    }
 
     if (client.id === game.player1.clientSocket.id)
     {
@@ -176,29 +189,30 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
     if (client.id === game.player2.clientSocket.id)
     {
-      this.logger.log('there')
       if (message.text === 'up')
         game.position.player2 -= RACQUET_SPEED
       if (message.text === 'down')
         game.position.player2 += RACQUET_SPEED
     }
-    // this.server.to(message.room).emit('position', this.position);
   }
 
+  sendPosition(client: Socket, room:string): void {
 
-  moveBall(client: Socket, room:string) {
-
-    this.changeBallDirectionIfWallHit(room)
     const game = this.games.get(room) // returns a reference to the PongGame object --> any change made to "game" will modify the object inside the map
+    if (!game)
+    {
+      this.logger.error('sendPosition: game doesnt exist')
+      return
+    }
+    this.changeBallDirectionIfWallHit(game)
     
     game.position.ball.x += game.ballDirection.x * BALL_SPEED
     game.position.ball.y += game.ballDirection.y * BALL_SPEED
     this.server.to(room).emit('position', game.position)
   }
   
-  changeBallDirectionIfWallHit(room: string)
+  changeBallDirectionIfWallHit(game: pongGame): void
   {
-    const game = this.games.get(room)
     // if hit top or bottom walls
     if (game.position.ball.y <= BALL_RADIUS || game.position.ball.y >= CANVAS_HEIGHT - BALL_RADIUS)
     {
@@ -228,13 +242,4 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
-  @SubscribeMessage('leaveGame')
-  handleLeaveRoom(client: Socket, room:string)
-  {
-    const game: pongGame = this.games.get(room)
-    clearInterval(game.interval)
-    this.logger.log('interval cleared: ' + room )
-    // client.to(room).emit('opponentLeftRoom')
-    // client.leave(room)
-  }
 }
