@@ -14,20 +14,6 @@ export class AuthController {
     private userService: UsersService,
   ) { }
 
-  // @Get('login')
-  // @UseGuards(FortyTwoAuthGuard)
-  // async login() {
-  //   console.log('LOGIN');
-  //   return;
-  // }
-
-  // @Get('login')
-  // async login(@Res() res: Response) {
-  //   const url = process.env['42_AUTH_URL'];
-  //   res.redirect(307, url);
-  //   return;
-  // }
-
   @Get('login')
   @UseGuards(FortyTwoAuthGuard)
   async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {

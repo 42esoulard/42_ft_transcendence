@@ -11,9 +11,9 @@ export const imageFileFilter = (req: Request, file: Express.Multer.File, callbac
 
 export const editFileName = (req: Request, file: Express.Multer.File, callback) => {
   const fileExtName = extname(file.originalname);
-  const newName = "user"; // default filename 
+  let newName = "user"; // default filename 
   if (req.user?.forty_two_login) {
-    const newName = req.user.forty_two_login;
+    newName = req.user.forty_two_login;
   }
   callback(null, `${newName}${fileExtName}`);
 };
