@@ -68,6 +68,11 @@ class pongGame {
     this.position.ball.x = CANVAS_WIDTH / 2
     this.position.ball.y = CANVAS_HEIGHT / 2
   }
+  initBallDirection()
+  {
+    this.ballDirection.x = BALL_INITIAL_DIR_X,
+    this.ballDirection.y = BALL_INITIAL_DIR_Y
+  }
   
   async createGame(): Promise<void>
   {
@@ -270,6 +275,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     else
       game.score.player2++
     game.initPositions()
+    game.initBallDirection()
   }
 
 }
