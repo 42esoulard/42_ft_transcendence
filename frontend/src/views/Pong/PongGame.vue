@@ -2,7 +2,7 @@
 	<h1> Game # {{ id }} </h1>
 	<canvas ref="game" width="640" height="480" style="border: 1px solid black">
 	</canvas>
-	<p> score1 [{{ score.player1 }}]  |  score_2 [{{ score.player2 }}] </p>
+	<p> user1 [{{ score.player1 }}]  |  user2 [{{ score.player2 }}] </p>
 	<p> ball x {{ position.ball.x }} </p>
 	<p> ball y {{ position.ball.y }} </p>
 	<p> Use arrows (keyboard) to move </p>

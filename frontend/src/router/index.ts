@@ -54,7 +54,10 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/pong',
     name: 'Pong',
-    component: PongPlay
+    component: PongPlay,
+    meta: {
+      requiresAuth: true,
+    }
   },
   {
     path: '/pong/:id',

@@ -14,18 +14,21 @@
 <script>
 import { ref } from 'vue'
 import { clientSocket } from '../../App.vue'
+import { useStore } from 'vuex'
 
 export default {
 	setup() {
 		const socket = ref(clientSocket)
 		const queuing = ref(false)
 
+		const store = useStore()
+
 		const JoinQueue = () => {
 			queuing.value = true
-			socket.value.emit('joinGame', {userId: 2})
+			// socket.value.emit('joinGame', {userId: 2})
+			socket.value.emit('joinGame', {userId: store.state.user.id})
 	// 		// pour l'instant on rentre l'id à la main, pour pouvoir tester plusieurs id differents
 	// 		// a utiliser une fois que la route sera protegee
-	// 		//this.socket.emit('joinGame', {userId: this.$store.state.user.id});
 		}
 		return {socket, queuing, JoinQueue}
 	},
