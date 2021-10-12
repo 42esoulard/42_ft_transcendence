@@ -5,6 +5,7 @@ import { Socket, Server } from 'socket.io';
 import { Repository } from 'typeorm';
 import { Game } from './entity/games.entity';
 import { GameUser } from './entity/gameUser.entity';
+import { player } from './interfaces/player.interface'
 
 var BALL_SPEED = 1
 var INTERVAL_IN_MS = 20
@@ -15,17 +16,6 @@ var BALL_INITIAL_DIR_Y = -1
 var BALL_RADIUS = 10
 var RACQUET_LENGTH = 80
 var RACQUET_SPEED = 2
-
-
-class player {
-  constructor(userId: number, clientSocket: Socket) {
-    this.userId = userId,
-    this.clientSocket = clientSocket
-  }
-  userId: number;
-  clientSocket: Socket
-  gameId: number
-}
 
 class pongGame {
 
@@ -39,6 +29,7 @@ class pongGame {
     this.player2 = player2 
   }
   
+  public gameId: number
   private logger: Logger = new Logger('PongGateway');
   public room: string
   public position = {
@@ -80,18 +71,17 @@ class pongGame {
     this.logger.log('game created')
     const game = this.gameRepo.create()
     await this.gameRepo.save(game)
-    this.player1.gameId = game.id
-    this.player2.gameId = game.id
+    this.gameId = game.id
 
     // create a GameUser entity for player 1 and save it to the database
     const user1game = this.gameUserRepo.create()
-    user1game.gameId = this.player1.gameId
+    user1game.gameId = game.id
     user1game.userId = this.player1.userId
     await this.gameUserRepo.save(user1game)
     
     // create a GameUser entity for player 2 and save it to the database
     const user2game = this.gameUserRepo.create()
-    user2game.gameId = this.player2.gameId
+    user2game.gameId = game.id
     user2game.userId = this.player2.userId
     await this.gameUserRepo.save(user2game)
 
@@ -103,8 +93,8 @@ class pongGame {
   
   async endGame(player1Won: boolean): Promise<void>
   {
-    await this.gameUserRepo.update({userId: this.player1.userId, gameId: this.player1.gameId}, { won: player1Won})
-    await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.player2.gameId}, { won: !player1Won})
+    await this.gameUserRepo.update({userId: this.player1.userId, gameId: this.gameId}, { won: player1Won})
+    await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.gameId}, { won: !player1Won})
   }
 
 }
