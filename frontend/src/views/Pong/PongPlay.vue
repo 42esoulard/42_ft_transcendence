@@ -12,36 +12,29 @@
 
 
 <script>
-// import { io, Socket } from 'socket.io-client'
+import { ref } from 'vue'
 import { clientSocket } from '../../App.vue'
 
 export default {
-	data() {
-		return {
-			socket: null,
-			queuing: false
+	setup() {
+		const socket = ref(clientSocket)
+		const queuing = ref(false)
+
+		const JoinQueue = () => {
+			queuing.value = true
+			socket.value.emit('joinGame', {userId: 2})
+	// 		// pour l'instant on rentre l'id à la main, pour pouvoir tester plusieurs id differents
+	// 		// a utiliser une fois que la route sera protegee
+	// 		//this.socket.emit('joinGame', {userId: this.$store.state.user.id});
 		}
-	},
-	created() {
-		this.socket = clientSocket
-		// this.socket =  io('http://localhost:3000/pong')
+		return {socket, queuing, JoinQueue}
 	},
 	mounted() {
 		this.socket.on('gameReadyToStart', (ids) => {
 			this.$router.push({ name: 'PongGame', params: {id: ids}})
 		})
 	},
-	methods: {
-		JoinQueue() {
-			this.queuing = true,
 
-			// a utiliser une fois que la route sera protegee
-			//this.socket.emit('joinGame', {userId: this.$store.state.user.id});
-			
-			// pour l'instant on rentre l'id à la main, pour pouvoir tester plusieurs id differents
-			this.socket.emit('joinGame', {userId: 3});
-		}
-	}
 }
 </script>
 
