@@ -118,7 +118,7 @@ export default defineComponent({
       const newChannel = api.saveChannel({
         name: channelName.value,
         // ownerId: api.getCurrentUserId
-        ownerId: 1, // API MUST FETCH THE CURRENT USER ID
+        owner_id: 1, // API MUST FETCH THE CURRENT USER ID
         type: channelType.value,
         password: channelPassword.value
       })

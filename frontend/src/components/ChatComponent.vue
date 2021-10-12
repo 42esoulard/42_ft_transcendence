@@ -157,12 +157,11 @@ export const ChatComponent = defineComponent({
           allMessages[activeChannel.value.id] = [];
           res.data.forEach(item => {
             console.log(item)
-            console.log(item.channelId)
-            // console.log(item.channel_id)
+            console.log(item.channel_id)
             allMessages[activeChannel.value.id].push({
               content: item.content,
-              author_id: item.authorId,
-              author: item.authorId.toString(), //TEMPORARY, MUST FETCH USERNAME STORE NAME
+              author_id: item.author_id,
+              author: item.author_id.toString(), //TEMPORARY, MUST FETCH USERNAME STORE NAME
               channel_id: activeChannel.value.id,
               channel: activeChannel.value.name,
               id: item.id,
@@ -311,8 +310,8 @@ export const ChatComponent = defineComponent({
       // }
 
       await api.saveMessage({
-          channelId: newContent.channel_id,
-          authorId: newContent.author_id, // GET LOGGED IN USER ID
+          channel_id: newContent.channel_id,
+          author_id: newContent.author_id, // GET LOGGED IN USER ID
           content: newContent.content,
       })
       .then((res: any) => (responseData.value = res.data))

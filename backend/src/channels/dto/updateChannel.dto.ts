@@ -1,7 +1,6 @@
-
 /*
-*	SHOULD WE MAKE CHANNELS EDITABLE OR DO WE NOT BOTHER?
-*/ 
+ *	SHOULD WE MAKE CHANNELS EDITABLE OR DO WE NOT BOTHER?
+ */
 
 // import { ApiProperty } from "@nestjs/swagger";
 // import { CreateUserDto } from "./createUser.dto";

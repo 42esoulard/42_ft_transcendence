@@ -82,6 +82,20 @@ services:
       - postgres
     # container_name: "${ADMINER_NAME}"
 
+  # Swagger UI (API documentation)
+  swagger:
+    image: swaggerapi/swagger-ui
+    networks:
+      - network
+    ports:
+      - "3030:8080"
+    volumes:
+      - ./backend/api-spec.json:/usr/src/app/api-spec.json
+    environment:
+      SWAGGER_JSON: /usr/src/app/api-spec.json
+      BASE_URL: /swagger
+
+
   # # Pgadmin Service (database management tool)
   # pgadmin:
   #   container_name: pgadmin

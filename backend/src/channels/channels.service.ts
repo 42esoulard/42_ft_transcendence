@@ -51,9 +51,9 @@ export class ChannelsService {
    * nb: save(channel) is a function from the typeORM library
    */
   async saveChannel(channelDto: CreateChannelDto): Promise<Channel> {
-    console.log("IN SAVE CHANNEL", channelDto)
+    console.log('IN SAVE CHANNEL', channelDto);
     const newChannel = this.channelsRepository.create(channelDto);
-    newChannel.owner_id = channelDto.ownerId;
+    newChannel.owner_id = channelDto.owner_id;
 
     if (newChannel.type === 'password-protected') {
       (newChannel.salt = await bcrypt.genSalt()),

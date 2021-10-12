@@ -15,7 +15,7 @@ export class CreateChannelDto {
   /**
    * Id of the user who posted it
    */
-  readonly ownerId: number;
+  readonly owner_id: number;
 
   /**
    * Password for type protected_by_password
