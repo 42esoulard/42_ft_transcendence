@@ -5,7 +5,7 @@ import { User } from '../users/interfaces/user.interface';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { AuthenticatedGuard, FortyTwoAuthGuard } from './guards/fortytwo.guard';
-import { JwtAuthGuard } from './guards/jwt.guard';
+import { JwtTwoFactorGuard } from './guards/jwtTwoFactor.guard';
 import { RefreshTokenAuthGuard } from './guards/refresh.guard';
 
 @Controller('auth')
@@ -15,14 +15,12 @@ export class AuthController {
     private userService: UsersService,
   ) { }
 
-  @Get('login')
+  @Get('42/login')
   @UseGuards(FortyTwoAuthGuard)
   async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
 
     const jwt = await this.authService.generateAccessToken(req.user);
     const refresh_token = await this.authService.generateRefreshToken(req.user.id);
-    // console.log(jwt);
-    // console.log(refresh_token);
 
     res.cookie('tokens', { access_token: jwt.access_token, refresh_token }, {
       httpOnly: true,
@@ -75,12 +73,13 @@ export class AuthController {
   }
 
   @Get('profile')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtTwoFactorGuard)
   async profile(@Req() req: Request) {
     return req.user;
   }
 
   @Get('logout')
+  @UseGuards(JwtTwoFactorGuard)
   logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     req.logOut();
     res.clearCookie('tokens');
@@ -93,47 +92,52 @@ export class AuthController {
   }
 
   @Get('2fa/generate')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtTwoFactorGuard)
   async register(@Res() response: Response, @Req() request: Request) {
 
     // for debug w/o frontend
-    const user: User = await this.userService.getUserbyId(1);
+    // const user: User = await this.userService.getUserbyId(1);
     /////////////////////////////////////
-    const { otpauthUrl } = await this.authService.generateTwoFASecret(user); // must be request.user
+    const { otpauthUrl } = await this.authService.generateTwoFASecret(request.user); // must be request.user
     return this.authService.pipeQrCodeStream(response, otpauthUrl);
   }
 
   @Post('2fa/turn-on')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtTwoFactorGuard)
   async turnOnTwoFactorAuthentication(
     @Req() request: Request,
     @Body() { twoFACode }: UserTwoFACode
   ) {
     console.log('twoFACode', twoFACode);
     // for debug w/o frontend
-    const user: User = await this.userService.getUserbyId(1);
+    // const user: User = await this.userService.getUserbyId(1);
     /////////////////////////////////////
 
-    console.log('USER:', user);
+    console.log('USER:', request.user);
 
     const isCodeValid = this.authService.isTwoFACodeValid(
       twoFACode,
-      user // must be request.user
+      request.user // must be request.user
     );
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
-    await this.userService.turnOnTwoFA(user.id); // must be request.user.id (1 is for dev)
+    await this.userService.turnOnTwoFA(request.user.id); // must be request.user.id (1 is for dev)
     return { message: "2FA Successfully turned-on" };
   }
 
   @Post('2fa/authenticate')
   @HttpCode(200)
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtTwoFactorGuard)
   async authenticate(
     @Req() request: Request,
     @Body() { twoFACode }: UserTwoFACode
   ) {
+
+    // for debug w/o frontend
+    // const user: User = await this.userService.getUserbyId(1);
+    /////////////////////////////////////
+
     const isCodeValid = this.authService.isTwoFACodeValid(
       twoFACode, request.user
     );

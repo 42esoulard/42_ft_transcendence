@@ -9,7 +9,7 @@ import { editFileName, imageFileFilter } from '../utils/files-upload.utils';
 import { createReadStream } from 'fs';
 import { extname, join } from 'path';
 import { Request, Response } from 'express';
-import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { JwtTwoFactorGuard } from 'src/auth/guards/jwtTwoFactor.guard';
 
 @Controller('users')
 export class UsersController {
@@ -84,7 +84,7 @@ export class UsersController {
 	 * @param file picture
 	 */
 	@Post('upload')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtTwoFactorGuard)
 	@UseInterceptors(FileInterceptor('avatar', {
 		storage: diskStorage({
 			destination: './uploads/avatars',
@@ -114,7 +114,7 @@ export class UsersController {
 	 * Returns an avatar from its finename
 	 */
 	@Get('/avatars/:imgpath')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtTwoFactorGuard)
 	getAvatar(
 		@Param('imgpath') filename: string,
 		@Res({ passthrough: true }) res: Response

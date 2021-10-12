@@ -314,7 +314,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         login: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/auth/login`;
+            const localVarPath = `/auth/42/login`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;

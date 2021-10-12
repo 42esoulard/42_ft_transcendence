@@ -25,7 +25,7 @@ export default defineComponent({
         const code = route.query.code;
         console.log(code);
         axios
-          .get("http://localhost:3000/auth/login", {
+          .get("http://localhost:3000/auth/42/login", {
             params: {
               code: code,
             },
