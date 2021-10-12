@@ -49,8 +49,10 @@ export class UsersService {
 	async saveUser(userDto: CreateUserDto): Promise<User> | undefined { // newUser must be of type User or CreateUserDto ??
 		// const newUser: User = userDto as User;
 		const newUser = this.usersRepository.create(userDto);
-		newUser.avatar = 'http://localhost:3000/users/avatars/default.jpg';
-		newUser.forty_two_login = newUser.username;
+		if (!newUser.avatar)
+			newUser.avatar = 'http://localhost:3000/users/avatars/default.jpg';
+		if (!newUser.forty_two_login)
+			newUser.forty_two_login = newUser.username;
 		return await this.usersRepository.save(newUser);
 	}
 

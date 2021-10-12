@@ -1,8 +1,0 @@
-{
-	"users": [
-		{ "id": 1, "name": "bob", "surname": "surname of the first user" },
-        { "id": 2, "name": "joe", "surname": "surname of the 2nd user" },
-		{ "id": 3, "name": "david", "surname": "surname of the 3rd user" },
-		{ "id": 4, "name": "jack", "surname": "surname of the 4th user" }
-	]
-}
