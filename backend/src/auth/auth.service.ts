@@ -6,6 +6,9 @@ import { AuthProvider } from './interfaces/auth.interface';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwtPayload.interface';
 import { v4 as uuid } from 'uuid';
+import { authenticator } from 'otplib';
+import { toFileStream } from 'qrcode';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService implements AuthProvider {
@@ -29,17 +32,17 @@ export class AuthService implements AuthProvider {
     return user;
   }
 
-  async getAccessToken(user: User) {
+  async generateAccessToken(user: User) {
     const payload: JwtPayload = { username: user.username, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
-  async getRefreshToken(id: number) {
+  async generateRefreshToken(id: number) {
     const oneYearFromNow = new Date();
     oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
-    
+
     const refresh_token = {
       id: id,
       refresh_token: uuid(),
@@ -50,16 +53,47 @@ export class AuthService implements AuthProvider {
   }
 
   async validRefreshToken(username: string, refresh_token: string): Promise<User> | null {
+    // console.log('validate:', {username, refresh_token} )
     const user: User = await this.usersService.getUserByUsername(username);
-    console.log(user);
-    console.log('RT:', refresh_token);
+    // console.log(user);
+    // console.log('RT:', refresh_token);
     if (user.refresh_token === refresh_token) {
-      console.log('exp:', user.expiry_date);
-      console.log('date:', new Date(Date.now()));
+      // console.log('exp:', user.expiry_date);
+      // console.log('date:', new Date(Date.now()));
       if (user.expiry_date > new Date(Date.now())) {
         return user;
       }
     }
     return null;
   }
+
+  //The following functions are for 2FA
+
+  public async generateTwoFASecret(user: User) {
+    const secret = authenticator.generateSecret();
+
+    const otpauthUrl = authenticator.keyuri(user.username, process.env.APP_NAME, secret);
+
+    await this.usersService.saveTwoFASecret(secret, user.id);
+
+    return { secret, otpauthUrl }
+  }
+
+  public async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
+    return toFileStream(stream, otpauthUrl);
+  }
+
+  public isTwoFACodeValid(twoFactorAuthenticationCode: string, user: User) {
+    return authenticator.verify({
+      token: twoFactorAuthenticationCode,
+      secret: user.two_fa_secret
+    })
+  }
+
+  public getCookieWithJwtAccessToken(user: User, isTwoFAauthenticated = false) {
+    const payload: JwtPayload = { username: user.username, sub: user.id, isTwoFAauthenticated };
+    const token = this.jwtService.sign(payload);
+    return token;
+  }
+
 }

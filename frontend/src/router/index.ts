@@ -7,9 +7,11 @@ import UserAccount from '../views/UserAccount.vue'
 import PongPlay from '../views/Pong/PongPlay.vue'
 import PongGame from '../views/Pong/PongGame.vue'
 import PongWatch from '../views/Pong/PongWatch.vue'
+import FakeLogin from '../views/FakeLogin.vue'
 import Login from '../views/Login.vue';
 import store from "@/store";
 import axios from 'axios'
+import UserProfile from '../views/UserProfile.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -21,6 +23,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/fake-login',
+    name: 'FakeLogin',
+    component: FakeLogin
   },
   {
     path: '/users',
@@ -47,6 +54,14 @@ const routes: Array<RouteRecordRaw> = [
     path: '/account',
     name: 'UserAccount',
     component: UserAccount,
+    meta: {
+      requiresAuth: true,
+    }
+  },
+  {
+    path: '/profile',
+    name: 'UserProfile',
+    component: UserProfile,
     meta: {
       requiresAuth: true,
     }
@@ -91,15 +106,25 @@ const getProfile = async () => {
     .get("http://localhost:3000/auth/profile")
     .then((response) => {
       store.state.user = response.data;
-      console.log(store.state.user);
+      // console.log(store.state.user);
     })
-    .catch((err: any) => console.log(err.message));
+    .catch((err: Error) => {
+      console.log(err.message);
+    });
 };
 
 router.beforeEach(async (to, from) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    await refreshToken();
-    await getProfile();
+    if (!store.state.user) {
+      await refreshToken();
+      await getProfile();
+      // .then((res) => console.log(res))
+      // .catch( async (err) => {
+      //   console.log("get profile fails")
+      //   await refreshToken();
+      //   await getProfile();
+      // })
+    }
     console.log('user:', store.state.user)
     if (!store.state.user) {
       return '/login'; // redirected to login

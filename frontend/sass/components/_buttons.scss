@@ -1,0 +1,27 @@
+.button {
+  background-color: $button-bg-color;
+  width: $button-width;
+  border-radius: $button-border-radius;
+  border: $button-border;
+  font-family: $button-font;
+  color: $button-color;
+  &:hover {
+    @include button-hover;
+  }
+  &--add {
+    background-color: $button-add-bg;
+    @include hover-modifier($button-add-bg);
+  }
+  &--msg {
+    background-color: $button-msg-bg;
+    @include hover-modifier($button-msg-bg);
+  }
+  &--invite {
+    background-color: $button-invite-bg;
+    @include hover-modifier($button-invite-bg);
+  }
+  &--block {
+    background-color: $button-block-bg;
+    @include hover-modifier($button-block-bg);
+  }
+}

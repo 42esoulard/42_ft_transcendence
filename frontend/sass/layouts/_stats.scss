@@ -1,0 +1,147 @@
+.stats {
+  display: grid;
+  width: $stats-width;
+  grid-template: $stats-grid;
+  height: $stats-height;
+  justify-content: center;
+  align-items: flex-start;
+  gap: $stats-gap;
+  @media (max-width: 900px) {
+    width: 50%;
+    height: 100%;
+    gap: 0;
+  }
+}
+
+.stats-bloc-border {
+  justify-self: center;
+  align-self: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: $stats-bloc-margin;
+  background: $stats-bloc-border-bg;
+  border-radius: $stats-bloc-border-border-radius;
+  height: $stats-bloc-border-height;
+  width: $stats-bloc-border-width;
+  @media (max-width: 1100px) {
+    height: 6rem;
+    width: 6rem;
+  }
+  @media (max-width: 900px) {
+    height: 5rem;
+    width: 5rem;
+  }
+
+}
+.stats-bloc {
+  display: flex;
+  justify-content: center;
+  height: $stats-bloc-height;
+  width: $stats-bloc-width;
+  flex-direction: column;
+  border-radius: $stats-bloc-border-radius;
+  background-color: $stats-bloc-bg;
+  @media (max-width: 1100px) {
+    height: 5.5rem;
+    width: 5.5rem;
+  }
+  @media (max-width: 900px) {
+    height: 4.5rem;
+    width: 4.5rem;
+  }
+}
+
+.stats-bloc__number {
+  font-size: $stats-number-size;
+  &--win {
+    color: $stats-win-color;
+  }
+  &--rank {
+    color: $stats-rank-color;
+  }
+  &--games {
+    color: $stats-games-color;
+  }
+  @media (max-width: 1100px) {
+    font-size: 2rem;
+  }
+  @media (max-width: 900px) {
+    font-size: 1.5rem;
+  }
+}
+
+.stats-bloc__text {
+  font-family: $stats-text-font;
+  font-size: $stats-text-size;
+}
+
+.progress-bar {
+  grid-column: 1/4;
+  width: $progress-bar-width;
+  height: $progress-bar-height;
+  padding: $progress-bar-padding;
+  background-color: $progress-bar-bg;
+  border-radius: $progress-bar-border-radius;
+  box-shadow: $progress-bar-box-shadow;
+  border: $progress-bar-border;
+  position: relative;
+}
+
+.our-progress-bar__inside {
+  width: 100%;
+  height: $progress-bar-inside-height;
+  border-radius: $progress-bar-inside-border-radius;
+  background: $progress-bar-inside-bg;
+  position : absolute;
+}
+
+.our-progress-bar__label {
+  text-align: center;
+  position: absolute;
+  width: 100%;
+  font-family: $progress-bar-label-font;
+  color: $progress-bar-label-color;
+}
+
+.game-history {
+  grid-column: 1/4;
+  height: $game-history-height;
+}
+
+.rainbow-border {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $rainbow-border-bg;
+  border-radius: $rainbow-border-border-radius;
+  height: $rainbow-border-height;
+  width: $rainbow-border-width;
+  padding: $rainbow-border-padding;
+}
+
+.rainbow-title {
+  background-color: $rainbow-title-bg;
+  width: $rainbow-title-width;
+  border-radius: $rainbow-border-radius;
+  align-self: center;
+  font-family: $rainbow-title-font;
+}
+
+.game-history__title {
+  display: inline-block;
+  background-color: $game-history-title-bg;
+  width: $game-history-title-width;
+  border-radius: $rainbow-border-radius;
+  align-self: center;
+  font-family: $game-history-title-font;
+  border: $game-history-title-border;
+}
+
+.game-history-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: $game-history-panel-height;
+  background-color: $game-history-panel-bg;
+}

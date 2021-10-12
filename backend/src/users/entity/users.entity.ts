@@ -18,8 +18,11 @@ export class Users {
   @Column({ type: "varchar", length: 255, nullable: true })
   avatar: string;
  
-  @Column({ type: "boolean", default: false })
-  two_fa: boolean;
+  @Column({ type: "varchar", length: 50, nullable: true })
+  two_fa_secret: string;
+  
+  @Column({ default: false })
+  two_fa_enabled: boolean;
   
   @Column({ type: "varchar", length: 36, nullable: true })
   refresh_token: string;

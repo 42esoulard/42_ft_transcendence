@@ -1,7 +1,7 @@
 <template>
   <h1>Welcome to ft_transcendence</h1>
   <h2>Please Login</h2>
-  <button @click="logWith42">Login with 42</button>
+  <button @click="logInWith42">Login with 42</button>
 </template>
 
 <script lang="ts">
@@ -20,7 +20,7 @@ export default defineComponent({
     //To exchange cookie or auth header w/o in every req
     axios.defaults.withCredentials = true;
 
-    onMounted(() => {
+    onMounted(() => { // onBeforeMount ????
       if (route.query.code) {
         const code = route.query.code;
         console.log(code);
@@ -38,12 +38,11 @@ export default defineComponent({
       }
     });
 
-    const logWith42 = () => {
-      window.location.href =
-        "https://api.intra.42.fr/oauth/authorize?client_id=46e320031831547c491335678b8367e6dbc16e9dbce7359eea37b29a97a2e854&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&response_type=code";
+    const logInWith42 = () => {
+      window.location.href = process.env.VUE_APP_42_AUTH_URL;
     };
 
-    return { logWith42 };
+    return { logInWith42 };
   },
 });
 </script>

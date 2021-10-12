@@ -2,24 +2,28 @@
   <h1>User Account</h1>
   <div v-if="user">
     <h2>Your profile from 42</h2>
-    <img :src="user.avatar" alt="[Your avatar]" />
+    <img :src="user.avatar" class="ua-img" alt="[Your avatar]" />
     <p>Your avatar: {{ user.avatar }}</p>
     <p>Your id: {{ user.id }}</p>
     <p>Your username: {{ user.username }}</p>
     <p>Your login 42: {{ user.forty_two_login }}</p>
-    <p>Two-Factor Auth activated: {{ user.two_fa }}</p>
-    <p>Profile created at: {{ formatDate() }}</p>
+    <p>Two-Factor Auth activated: {{ user.two_fa_enabled }}</p>
+    <p>Profile created at: {{ formatDate(user.created_at) }}</p>
     <button @click="logOut">LogOut</button>
+
+    <form method="post" @submit.prevent="postAvatar">
+      <input @change="handleFile" type="file" ref="avatar" id="avatar" />
+      <button>Update avatar</button>
+    </form>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUpdated, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import axios from "axios";
 import { DefaultApi } from "sdk-client";
 import { useRouter } from "vue-router";
 import moment from "moment";
-import { User } from "../types/User";
 import { useStore } from "vuex";
 
 export default defineComponent({
@@ -29,17 +33,10 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
 
-    const user = ref<User>();
+    const avatar = ref();
+
     //To exchange cookie or auth header w/o in every req
     axios.defaults.withCredentials = true;
-
-    onMounted(async () => {
-      getProfile();
-    });
-
-    const getProfile = () => {
-      user.value = store.state.user;
-    };
 
     const logOut = () => {
       axios
@@ -53,14 +50,51 @@ export default defineComponent({
     };
 
     // Purement utilitaire => should be placed somewhere else
-    const formatDate = () => {
-      if (user.value) {
-        return moment(user.value.created_at).format("YYYY-MM-DD HH:mm:ss");
+    const formatDate = (date: Date) => {
+      if (date) {
+        return moment(date).format("YYYY-MM-DD HH:mm:ss");
       }
       return null;
     };
 
-    return { user, getProfile, logOut, formatDate };
+    const handleFile = (
+      event: Event & {
+        target: HTMLInputElement & {
+          files: FileList;
+        };
+      }
+    ) => {
+      const { target } = event;
+      const { files } = target;
+      if (files.length === 0) {
+        return;
+      }
+      avatar.value = files[0];
+      console.log(avatar.value);
+    };
+
+    const postAvatar = () => {
+      const data = new FormData();
+      data.append("avatar", avatar.value);
+      axios
+        .post("http://localhost:3000/users/upload", data)
+        .then(function (response) {
+          console.log(response);
+          window.location.reload();
+        })
+        .catch(function (err) {
+          console.log(err);
+        });
+    };
+
+    return {
+      user: computed(() => store.state.user),
+      logOut,
+      formatDate,
+      postAvatar,
+      handleFile,
+      avatar,
+    };
   },
 });
 </script>
@@ -81,7 +115,7 @@ export default defineComponent({
 .user a {
   text-decoration: none;
 }
-img {
+.ua-img {
   width: 300px;
   height: 300px;
   border-radius: 300px;
