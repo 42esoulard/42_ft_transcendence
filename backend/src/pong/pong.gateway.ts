@@ -61,6 +61,14 @@ class pongGame {
 
   public interval = null
 
+  initPositions()
+  {
+    this.position.player1 = 200
+    this.position.player2 = 200
+    this.position.ball.x = CANVAS_WIDTH / 2
+    this.position.ball.y = CANVAS_HEIGHT / 2
+  }
+  
   async createGame(): Promise<void>
   {
     // create a game entity and save it to the database
@@ -82,6 +90,7 @@ class pongGame {
     user2game.userId = this.player2.userId
     await this.gameUserRepo.save(user2game)
 
+    // make player 1 and player 2 join room
     this.room = game.id.toString()
     await this.player1.clientSocket.join(this.room)
     await this.player2.clientSocket.join(this.room)
@@ -168,9 +177,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.sendDatas(client, game.room)
       }, INTERVAL_IN_MS)
 
-
-      // just to test that endGame works correctly
-      // game.endGame(false)
     }
   }
   
@@ -239,9 +245,10 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         game.ballDirection.x = -game.ballDirection.x
       else
       {
-        game.score.player1++
-        game.ballDirection.x = 0,
-        game.ballDirection.y = 0
+        // score change
+        // reset positions (ball + racquet)
+        // move ball again
+        this.handleScore(true, game)
       }
     }
     // if hit right wall
@@ -251,11 +258,18 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         game.ballDirection.x = -game.ballDirection.x
       else
       {
-        game.score.player2++
-        game.ballDirection.x = 0,
-        game.ballDirection.y = 0
+        this.handleScore(false, game)
       }
     }
+  }
+
+  handleScore(player1Scored: boolean, game: pongGame)
+  {
+    if (player1Scored)
+      game.score.player1++
+    else
+      game.score.player2++
+    game.initPositions()
   }
 
 }
