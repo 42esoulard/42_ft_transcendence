@@ -10,33 +10,76 @@
 </template>
 
 <script>
-import { io } from 'socket.io-client'
 import { clientSocket } from '../../App.vue'
+import { ref } from 'vue'
+import { useRoute } from 'vue-router'
+
 export default {
 	data() {
 		return {
 			id: this.$route.params.id,
-			context: {},
-			position: {
-				player1: 0,
-				player2: 0,
-				ball: {
-					x: 0,
-					y: 0
-				},
-			},
-			score: {
-				player1: 0,
-				player2: 0
-			},
-			socket: null,
-			room: this.$route.params.id,
+			// context: {},
 		}
 	},
-	created() {
-		this.socket = clientSocket
-		window.addEventListener("keydown", this.onKeyDown)
+	setup() {
+		const position = ref({
+			player1: 0,
+			player2: 0,
+			ball: {
+				x: 0,
+				y: 0
+			},
+		})
+
+		const game = ref(null)
+
+		const context = ref({})
 		
+		const route = useRoute()
+
+		const score = ref({
+			player1: 0,
+			player2: 0
+		})
+
+		const socket = ref(clientSocket)
+		const room =  ref(route.params.id)
+
+		const draw = (data) => {
+			position.value = data
+			context.value.clearRect(0, 0, game.value.width, game.value.height)
+
+			context.value.beginPath()
+			context.value.rect(0, position.value.player1, 20, 80)
+			context.value.rect(620, position.value.player2, 20, 80)
+			context.value.arc(position.value.ball.x, position.value.ball.y, 10, 0, Math.PI*2, false);
+			context.value.fill()
+			context.value.closePath()
+		}
+		
+		const SendMoveMsg = (direction) => {
+			if (room.value)
+			{
+				console.log(room.value)
+				socket.value.emit('moveRacquet', {room: room.value, text: direction})
+			}
+		}
+		
+		const onKeyDown = (event) => {
+			const codes = ['ArrowUp', 'ArrowDown'];
+			if (!codes.includes(event.code))
+				return;
+			if (event.code === 'ArrowUp')
+				SendMoveMsg('up')
+			else if (event.code === 'ArrowDown')
+				SendMoveMsg('down')
+		}
+
+		return { position, score, socket, room, draw, SendMoveMsg, onKeyDown, context, game }
+
+	},
+	created() {
+		window.addEventListener("keydown", this.onKeyDown)
 	},
 	mounted() {
 		console.log('mounted')
@@ -48,9 +91,7 @@ export default {
 				this.draw(positions)
 				this.score = score
 		})
-
 	},
-	
 	beforeRouteLeave()
 	{
 		this.socket.emit('leaveGame', this.room)
@@ -59,35 +100,5 @@ export default {
 		console.log('leaving')
 	},
 
-	methods: {
-		draw(data)
-		{
-			this.position = data
-			this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height)
-
-			this.context.beginPath()
-			this.context.rect(0, this.position.player1, 20, 80)
-			this.context.rect(620, this.position.player2, 20, 80)
-			this.context.arc(this.position.ball.x, this.position.ball.y, 10, 0, Math.PI*2, false);
-			this.context.fill()
-			this.context.closePath()
-		},
-		SendMoveMsg(direction) {
-			if (this.room)
-			{
-				console.log(this.room)
-				this.socket.emit('moveRacquet', {room: this.room, text: direction})
-			}
-		},
-		onKeyDown(event) {
-			const codes = ['ArrowUp', 'ArrowDown'];
-			if (!codes.includes(event.code))
-				return;
-			if (event.code === 'ArrowUp')
-				this.SendMoveMsg('up')
-			else if (event.code === 'ArrowDown')
-				this.SendMoveMsg('down')
-		}
-	}
 }
 </script>
