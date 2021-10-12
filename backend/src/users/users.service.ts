@@ -49,10 +49,8 @@ export class UsersService {
 	async saveUser(userDto: CreateUserDto): Promise<User> | undefined { // newUser must be of type User or CreateUserDto ??
 		// const newUser: User = userDto as User;
 		const newUser = this.usersRepository.create(userDto);
-		// The following is an example to encrypt a pw, not used anymore for users
-		// newUser.salt = await bcrypt.genSalt();
-		// newUser.password = await bcrypt.hash(newUser.password, newUser.salt);
-
+		newUser.avatar = 'http://localhost:3000/users/avatars/default.jpg';
+		newUser.forty_two_login = newUser.username;
 		return await this.usersRepository.save(newUser);
 	}
 

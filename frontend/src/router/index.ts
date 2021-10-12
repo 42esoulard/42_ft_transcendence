@@ -7,6 +7,7 @@ import UserAccount from '../views/UserAccount.vue'
 import PongPlay from '../views/Pong/PongPlay.vue'
 import PongGame from '../views/Pong/PongGame.vue'
 import PongWatch from '../views/Pong/PongWatch.vue'
+import FakeLogin from '../views/FakeLogin.vue'
 import Login from '../views/Login.vue';
 import store from "@/store";
 import axios from 'axios'
@@ -22,6 +23,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/fake-login',
+    name: 'FakeLogin',
+    component: FakeLogin
   },
   {
     path: '/users',

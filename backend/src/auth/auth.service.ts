@@ -90,10 +90,10 @@ export class AuthService implements AuthProvider {
     })
   }
 
-  public getCookieWithJwtAccessToken(userId: number, isTwoFAauthenticated = false) {
-    const payload: TokenPayload = { userId, isTwoFAauthenticated };
+  public getCookieWithJwtAccessToken(user: User, isTwoFAauthenticated = false) {
+    const payload: JwtPayload = { username: user.username, sub: user.id, isTwoFAauthenticated };
     const token = this.jwtService.sign(payload);
-    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`;
+    return token;
   }
 
 }
