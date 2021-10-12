@@ -1,13 +1,15 @@
 import { Body, Controller, Get, HttpCode, NotFoundException, Param, Post, Redirect, Req, Res, Session, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { UserTwoFACode } from '../users/dto/UserTwoFACode.dto';
+import { TwoFactorDto } from './dto/TwoFactor.dto';
 import { User } from '../users/interfaces/user.interface';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { AuthenticatedGuard, FortyTwoAuthGuard } from './guards/fortytwo.guard';
 import { JwtTwoFactorGuard } from './guards/jwtTwoFactor.guard';
 import { RefreshTokenAuthGuard } from './guards/refresh.guard';
+import { ApiCookieAuth, ApiOAuth2, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -15,6 +17,7 @@ export class AuthController {
     private userService: UsersService,
   ) { }
 
+  @ApiOAuth2(['users'])
   @Get('42/login')
   @UseGuards(FortyTwoAuthGuard)
   async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
@@ -53,6 +56,7 @@ export class AuthController {
     return { message: "Logged in successfully" };
   }
 
+  @ApiCookieAuth()
   @Get('refreshtoken')
   @UseGuards(RefreshTokenAuthGuard)
   async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
@@ -66,18 +70,21 @@ export class AuthController {
     return { message: "Refresh token successfully" };
   }
 
+  @ApiCookieAuth()
   @Get('status')
   @UseGuards(AuthenticatedGuard)
   status(@Req() req: Request) {
     return req.user;
   }
 
+  @ApiCookieAuth()
   @Get('profile')
   @UseGuards(JwtTwoFactorGuard)
   async profile(@Req() req: Request) {
     return req.user;
   }
 
+  @ApiCookieAuth()
   @Get('logout')
   @UseGuards(JwtTwoFactorGuard)
   logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
@@ -91,6 +98,7 @@ export class AuthController {
     session.visits = session.visits ? session.visits + 1 : 1;
   }
 
+  @ApiCookieAuth()
   @Get('2fa/generate')
   @UseGuards(JwtTwoFactorGuard)
   async register(@Res() response: Response, @Req() request: Request) {
@@ -102,11 +110,12 @@ export class AuthController {
     return this.authService.pipeQrCodeStream(response, otpauthUrl);
   }
 
+  @ApiCookieAuth()
   @Post('2fa/turn-on')
   @UseGuards(JwtTwoFactorGuard)
   async turnOnTwoFactorAuthentication(
     @Req() request: Request,
-    @Body() { twoFACode }: UserTwoFACode
+    @Body() { code: twoFACode }: TwoFactorDto
   ) {
     console.log('twoFACode', twoFACode);
     // for debug w/o frontend
@@ -126,12 +135,13 @@ export class AuthController {
     return { message: "2FA Successfully turned-on" };
   }
 
+  @ApiCookieAuth()
   @Post('2fa/authenticate')
   @HttpCode(200)
   @UseGuards(JwtTwoFactorGuard)
   async authenticate(
     @Req() request: Request,
-    @Body() { twoFACode }: UserTwoFACode
+    @Body() { code: twoFACode }: TwoFactorDto
   ) {
 
     // for debug w/o frontend

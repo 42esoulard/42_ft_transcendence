@@ -24,6 +24,8 @@ async function bootstrap() {
     .setDescription('Because we will nail it !')
     .setVersion('1.0')
     .addServer('http://localhost:' + process.env.PORT)
+    .addOAuth2()
+    .addCookieAuth('tokens')
     .build();
   const options: SwaggerDocumentOptions = {
     operationIdFactory: (

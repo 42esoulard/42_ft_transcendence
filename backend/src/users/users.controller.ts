@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, NotFoundException, UseInterceptors,
 import { UsersService } from './users.service';
 import { User } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
-import { ApiBadRequestResponse, ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiCookieAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { editFileName, imageFileFilter } from '../utils/files-upload.utils';
@@ -11,6 +11,7 @@ import { extname, join } from 'path';
 import { Request, Response } from 'express';
 import { JwtTwoFactorGuard } from 'src/auth/guards/jwtTwoFactor.guard';
 
+@ApiTags('User')
 @Controller('users')
 export class UsersController {
 	constructor(private readonly userService: UsersService) { }
@@ -83,6 +84,7 @@ export class UsersController {
 	 * Recieve user picture from frontend
 	 * @param file picture
 	 */
+	@ApiCookieAuth()
 	@Post('upload')
 	@UseGuards(JwtTwoFactorGuard)
 	@UseInterceptors(FileInterceptor('avatar', {
@@ -113,6 +115,7 @@ export class UsersController {
 	/**
 	 * Returns an avatar from its finename
 	 */
+	@ApiCookieAuth()
 	@Get('/avatars/:imgpath')
 	@UseGuards(JwtTwoFactorGuard)
 	getAvatar(
