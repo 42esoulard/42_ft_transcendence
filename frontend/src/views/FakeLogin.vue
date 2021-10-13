@@ -19,14 +19,14 @@ import { defineComponent, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { User } from "@/types/User";
-import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
+import { useUserApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
   name: "Login",
   setup() {
     const router = useRouter();
 
-    const api = new DefaultApi();
+    const api = useUserApi();
     const users = ref<User[]>([]);
     const selectedUser = ref<string>();
 

@@ -51,8 +51,6 @@ export class UsersService {
 		const newUser = this.usersRepository.create(userDto);
 		if (!newUser.avatar)
 			newUser.avatar = 'http://localhost:3000/users/avatars/default.jpg';
-		if (!newUser.forty_two_login)
-			newUser.forty_two_login = newUser.username;
 		return await this.usersRepository.save(newUser);
 	}
 

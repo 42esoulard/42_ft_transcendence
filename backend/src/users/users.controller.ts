@@ -11,7 +11,7 @@ import { extname, join } from 'path';
 import { Request, Response } from 'express';
 import { JwtTwoFactorGuard } from 'src/auth/guards/jwtTwoFactor.guard';
 
-// @ApiTags('User')
+@ApiTags('User')
 @Controller('users')
 export class UsersController {
 	constructor(private readonly userService: UsersService) { }

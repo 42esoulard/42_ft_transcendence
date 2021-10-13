@@ -18,7 +18,7 @@
 import { defineComponent, inject, ref } from "vue";
 // import axios from "axios";
 import SubmitSuccess from "@/components/SubmitSuccess.vue";
-import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
+import { useUserApi } from "@/plugins/api.plugin";
 
 
 export default defineComponent({
@@ -26,10 +26,9 @@ export default defineComponent({
     SubmitSuccess,
   },
   setup() {
-    // const api = inject("api") as any;
     const username = ref("");
     const responseData = ref(null);
-    const api = new DefaultApi();
+    const api = useUserApi();
 
     const handleSubmit = async () => {
       await api.saveUser({
@@ -38,14 +37,6 @@ export default defineComponent({
         })
         .then((res: any) => (responseData.value = res.data))
         .catch((err: any) => console.log(err.message));
-
-      // await axios
-      //   .post("http://localhost:3000/users", {
-      //     username: username.value,
-      //     password: password.value,
-      //   })
-      //   .then((response) => (responseData.value = response.data))
-      //   .catch((error) => {});
     };
 
     return { username, responseData, handleSubmit };
