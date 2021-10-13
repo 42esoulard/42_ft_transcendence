@@ -87,6 +87,46 @@ class pongGame {
     await this.gameUserRepo.update({userId: this.player1.userId, gameId: this.gameId}, { won: player1Won})
     await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.gameId}, { won: !player1Won})
   }
+  
+  changeBallDirectionIfWallHit(): void
+  {
+    // if hit top or bottom walls
+    if (this.ballPosition.y <= BALL_RADIUS || this.ballPosition.y >= CANVAS_HEIGHT - BALL_RADIUS)
+      this.ballDirection.y = -this.ballDirection.y
+    
+      // if ball arrives towards player1
+    if (this.ballPosition.x <= RACQUET_WIDTH + BALL_RADIUS) 
+    {
+      // case 1: player1 hits the ball
+      if (this.ballPosition.y >= this.player1.position && 
+      this.ballPosition.y <= (this.player1.position + RACQUET_LENGTH))
+        this.ballDirection.x = -this.ballDirection.x
+      // case2: player2 scores
+      // if (game.ballPosition.x <= 0 - BALL_RADIUS)
+      else  
+        this.handleScore(false)
+    }
+    // if ball arrives towards player2
+    if (this.ballPosition.x >= CANVAS_WIDTH - BALL_RADIUS - RACQUET_WIDTH)
+    {
+      if(this.ballPosition.y >= this.player2.position && 
+      this.ballPosition.y <= (this.player2.position + RACQUET_LENGTH))
+        this.ballDirection.x = -this.ballDirection.x
+      // if (game.ballPosition.x >= CANVAS_WIDTH + BALL_RADIUS)
+      else
+        this.handleScore(true)
+    }
+  }
+
+  handleScore(player1Scored: boolean)
+  {
+    if (player1Scored)
+      this.player1.score++
+    else
+      this.player2.score++
+    this.initPositions()
+    this.initBallDirection()
+  }
 
 }
 
@@ -200,7 +240,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.logger.error('sendPosition: game doesnt exist')
       return
     }
-    this.changeBallDirectionIfWallHit(game)
+    game.changeBallDirectionIfWallHit()
     
     game.ballPosition.x += game.ballDirection.x * BALL_SPEED
     game.ballPosition.y += game.ballDirection.y * BALL_SPEED
@@ -209,45 +249,4 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.server.to(room).emit('position', game.ballPosition, playerPositions, playerScores)
   }
   
-  changeBallDirectionIfWallHit(game: pongGame): void
-  {
-    // if hit top or bottom walls
-    if (game.ballPosition.y <= BALL_RADIUS || game.ballPosition.y >= CANVAS_HEIGHT - BALL_RADIUS)
-      game.ballDirection.y = -game.ballDirection.y
-    
-      // if ball arrives towards player1
-    if (game.ballPosition.x <= RACQUET_WIDTH + BALL_RADIUS) 
-    {
-      // case 1: player1 hits the ball
-      if (game.ballPosition.y >= game.player1.position && 
-      game.ballPosition.y <= (game.player1.position + RACQUET_LENGTH))
-        game.ballDirection.x = -game.ballDirection.x
-      // case2: player2 scores
-      // if (game.ballPosition.x <= 0 - BALL_RADIUS)
-      else  
-        this.handleScore(false, game)
-    }
-    // if ball arrives towards player2
-    if (game.ballPosition.x >= CANVAS_WIDTH - BALL_RADIUS - RACQUET_WIDTH)
-    {
-      if(game.ballPosition.y >= game.player2.position && 
-      game.ballPosition.y <= (game.player2.position + RACQUET_LENGTH))
-        game.ballDirection.x = -game.ballDirection.x
-      // if (game.ballPosition.x >= CANVAS_WIDTH + BALL_RADIUS)
-      else
-        this.handleScore(true, game)
-    }
-    
-  }
-
-  handleScore(player1Scored: boolean, game: pongGame)
-  {
-    if (player1Scored)
-      game.player1.score++
-    else
-      game.player2.score++
-    game.initPositions()
-    game.initBallDirection()
-  }
-
 }
