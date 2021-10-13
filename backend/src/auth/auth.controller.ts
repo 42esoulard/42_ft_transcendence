@@ -9,7 +9,7 @@ import { JwtTwoFactorGuard } from './guards/jwtTwoFactor.guard';
 import { RefreshTokenAuthGuard } from './guards/refresh.guard';
 import { ApiCookieAuth, ApiOAuth2, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Authentication')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(

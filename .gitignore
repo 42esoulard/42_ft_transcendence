@@ -10,5 +10,6 @@ api-spec.json
 */package-lock.json
 backend/uploads/avatars/*
 !backend/uploads/avatars/default.jpg
+# frontend/sdk/typescript-axios-client-generated
 # .env
 # database.env

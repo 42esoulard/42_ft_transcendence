@@ -17,5 +17,5 @@ rm -rf frontend/node_modules
 rm -rf backend/dist
 docker-compose up --build --remove-orphans
 
-# To reset AUto-increment on table "users"
+# To reset Auto-increment on table "users"
 # ALTER SEQUENCE users_id_seq RESTART WITH 1;
