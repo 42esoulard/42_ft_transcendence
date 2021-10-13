@@ -1,11 +1,8 @@
 <template>
-	<h1> Game # {{ id }} </h1>
+	<h1> Game # {{ room }} </h1>
 	<canvas ref="game" width="640" height="480" style="border: 1px solid black">
 	</canvas>
 	<p> user1 [{{ score.player1 }}]  |  user2 [{{ score.player2 }}] </p>
-	<p> ball x {{ ballPosition.x }} </p>
-	<p> ball y {{ ballPosition.y }} </p>
-	<p> Use arrows (keyboard) to move </p>
 	
 </template>
 
@@ -15,21 +12,7 @@ import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 export default {
-	data() {
-		return {
-			id: this.$route.params.id,
-			// context: {},
-		}
-	},
 	setup() {
-		// const position = ref({
-		// 	player1: 0,
-		// 	player2: 0,
-		// 	ball: {
-		// 		x: 0,
-		// 		y: 0
-		// 	},
-		// })
 		const ballPosition = ref({x:0, y:0})
 		const playerPositions = ref({player1:0, player2:0})
 

@@ -60,10 +60,10 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       const game = new pongGame(this.waitingPlayer, player2, this.gameRepo, this.gameUserRepo)
       delete this.waitingPlayer
       this.waitingPlayer = null
-
       await game.createGame()
       this.server.to(game.room).emit('gameReadyToStart', game.room)
       this.games.set(game.room, game)
+      
       this.logger.log('new interval: ' + game.room)
       game.interval = setInterval(() => {
         this.sendDatas(client, game.room)
