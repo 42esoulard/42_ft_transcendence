@@ -17,38 +17,44 @@ var BALL_RADIUS = 10
 var RACQUET_LENGTH = 80
 var RACQUET_SPEED = 2
 
+type coordinates = {
+  x: number,
+  y: number
+}
+
+type ballAndPlayersPosition = {
+  player1: number,
+  player2: number,
+  ball: coordinates
+}
+
+type playerScores = {
+  player1: number,
+  player2: number
+}
+
+
 class pongGame {
 
+  
   constructor(
   public player1: player, 
   public player2: player,
   private readonly gameRepo: Repository<Game>,
   private readonly gameUserRepo: Repository<GameUser>)
   {
-    this.player1 = player1,
-    this.player2 = player2 
+    this.initBallDirection()
+    this.initPositions()
   }
   
-  public gameId: number
   private logger: Logger = new Logger('PongGateway');
+  
   public room: string
-  public position = {
-    player1: 200,
-    player2: 200,
-    ball: {
-      x: CANVAS_WIDTH / 2,
-      y: CANVAS_HEIGHT / 2
-    },
-  }
-  public score = {
-    player1: 0,
-    player2: 0
-  }
-
-  public ballDirection = {
-    x: BALL_INITIAL_DIR_X,
-    y: BALL_INITIAL_DIR_Y
-  }
+  public gameId: number
+  
+  public position: ballAndPlayersPosition = {player1: 0, player2:0, ball: {x: 0, y:0}}
+  public ballDirection: coordinates = {x: 0, y: 0}
+  public score: playerScores = {player1: 0, player2: 0}
 
   public interval = null
 
@@ -64,14 +70,13 @@ class pongGame {
     this.ballDirection.x = BALL_INITIAL_DIR_X,
     this.ballDirection.y = BALL_INITIAL_DIR_Y
   }
-  
+ 
   async createGame(): Promise<void>
   {
     // create a game entity and save it to the database
     this.logger.log('game created')
     const game = this.gameRepo.create()
     await this.gameRepo.save(game)
-    this.gameId = game.id
 
     // create a GameUser entity for player 1 and save it to the database
     const user1game = this.gameUserRepo.create()
@@ -85,6 +90,7 @@ class pongGame {
     user2game.userId = this.player2.userId
     await this.gameUserRepo.save(user2game)
 
+    this.gameId = game.id
     // make player 1 and player 2 join room
     this.room = game.id.toString()
     await this.player1.clientSocket.join(this.room)
