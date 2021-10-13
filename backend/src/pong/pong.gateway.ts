@@ -9,7 +9,6 @@ import { pongGame } from './classes/pong.pongGame';
 import { player } from './classes/pong.player';
 
 var INTERVAL_IN_MS = 20
-var RACQUET_SPEED = 4
 
 @WebSocketGateway( { namespace: '/pong'})
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -44,20 +43,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   handleConnection(client: Socket, ...args: any[]): void {
     this.logger.log('Client connected ' + client.id);
-  }
-
-  endGame(room: string)
-  {
-    const game: pongGame = this.games.get(room)
-    if (!game)
-    {
-      this.logger.error('endGame: game doesnt exist')
-      return
-    }
-    clearInterval(game.interval)
-    this.logger.log('interval cleared: ' + room )
-    game.endGame(true)
-    this.games.delete(room)
   }
 
   @SubscribeMessage('joinGame')
@@ -106,11 +91,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.logger.error('moveRacquet: game doesnt exist')
       return
     }
-    const player = (client.id === game.player1.clientSocket.id) ? game.player1 : game.player2
-    if (message.text === 'up')
-      player.position -= RACQUET_SPEED
-    if (message.text === 'down')
-      player.position += RACQUET_SPEED
+    game.moveRacquet(client.id, message.text)
   }
 
   sendDatas(client: Socket, room:string): void {
@@ -125,6 +106,20 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     game.computeNewBallPosition()
     
     this.server.to(room).emit('position', game.ballPosition, game.getPlayerPositions(), game.getPlayerScores())
+  }
+  
+  endGame(room: string)
+  {
+    const game: pongGame = this.games.get(room)
+    if (!game)
+    {
+      this.logger.error('endGame: game doesnt exist')
+      return
+    }
+    clearInterval(game.interval)
+    this.logger.log('interval cleared: ' + room )
+    game.endGame(true)
+    this.games.delete(room)
   }
   
 }

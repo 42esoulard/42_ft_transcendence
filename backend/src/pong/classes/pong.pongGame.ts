@@ -6,7 +6,6 @@ import { Game } from '../entity/games.entity';
 import { GameUser } from '../entity/gameUser.entity';
 
 var BALL_SPEED = 1
-var INTERVAL_IN_MS = 20
 var CANVAS_WIDTH = 640
 var CANVAS_HEIGHT = 480
 var BALL_INITIAL_DIR_X = -2
@@ -133,5 +132,13 @@ export class pongGame {
   getPlayerScores()
   {
     return {player1: this.player1.score, player2: this.player2.score}
+  }
+  moveRacquet(clientId: string, direction:string)
+  {
+    const player = (clientId === this.player1.clientSocket.id) ? this.player1 : this.player2
+    if (direction === 'up')
+      player.position -= RACQUET_SPEED
+    if (direction === 'down')
+      player.position += RACQUET_SPEED
   }
 }
