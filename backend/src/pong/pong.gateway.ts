@@ -88,7 +88,7 @@ class pongGame {
     await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.gameId}, { won: !player1Won})
   }
   
-  changeBallDirectionIfWallHit(): void
+  changeBallDirectionIfNeeded(): void
   {
     // if hit top or bottom walls
     if (this.ballPosition.y <= BALL_RADIUS || this.ballPosition.y >= CANVAS_HEIGHT - BALL_RADIUS)
@@ -117,7 +117,11 @@ class pongGame {
         this.handleScore(true)
     }
   }
-
+  computeNewBallPosition()
+  {
+    this.ballPosition.x += this.ballDirection.x * BALL_SPEED
+    this.ballPosition.y += this.ballDirection.y * BALL_SPEED
+  }
   handleScore(player1Scored: boolean)
   {
     if (player1Scored)
@@ -126,6 +130,14 @@ class pongGame {
       this.player2.score++
     this.initPositions()
     this.initBallDirection()
+  }
+  getPlayerPositions()
+  {
+    return {player1: this.player1.position, player2: this.player2.position}
+  }
+  getPlayerScores()
+  {
+    return {player1: this.player1.score, player2: this.player2.score}
   }
 
 }
@@ -240,13 +252,10 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.logger.error('sendPosition: game doesnt exist')
       return
     }
-    game.changeBallDirectionIfWallHit()
+    game.changeBallDirectionIfNeeded()
+    game.computeNewBallPosition()
     
-    game.ballPosition.x += game.ballDirection.x * BALL_SPEED
-    game.ballPosition.y += game.ballDirection.y * BALL_SPEED
-    const playerPositions = {player1: game.player1.position, player2: game.player2.position}
-    const playerScores = {player1: game.player1.score, player2: game.player2.score}
-    this.server.to(room).emit('position', game.ballPosition, playerPositions, playerScores)
+    this.server.to(room).emit('position', game.ballPosition, game.getPlayerPositions(), game.getPlayerScores())
   }
   
 }
