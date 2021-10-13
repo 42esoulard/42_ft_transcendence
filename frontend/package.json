@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "api": "rm -rf gen/api && npx @openapitools/openapi-generator-cli generate -i api.yaml --generator-name typescript-axios -o gen/api && cd gen/api && npm install && npm run build"
+    "build": "vue-cli-service build"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
     "@mdi/js": "^6.2.95",
+    "api": "^3.4.2",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "eslint-plugin-vue": "^7.17.0",

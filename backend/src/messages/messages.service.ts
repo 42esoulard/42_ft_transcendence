@@ -12,31 +12,33 @@ import { CreateMessageDto } from './dto/createMessage.dto';
 export class MessagesService {
   constructor(
     @InjectRepository(Messages)
-    private readonly MessagesRepository: Repository<Messages>,
+    private readonly messagesRepository: Repository<Messages>,
   ) {}
+
+  private index: 1;
 
   /**
    * Lists all messages in database
    * nb: find() is a function from the typeORM library
    */
   async getMessages(): Promise<Message[]> {
-    return await this.MessagesRepository.find();
+    return await this.messagesRepository.find();
   }
 
   /**
    * Lists all messages in a particular channel
    * nb: find() is a function from the typeORM library
    */
-  async getChannelMessages(chanId: number): Promise<Message[]> {
-    return await this.MessagesRepository.find({ channel_id: chanId });
+  async getChannelMessages(chan_id: number): Promise<Message[]> {
+    return await this.messagesRepository.find({ channel_id: chan_id });
   }
 
   /**
    * Gets a message in database by its id
    * nb: findOne(id) is a function from the typeORM library
    */
-  async getMessagebyId(id: number): Promise<Message> {
-    const res = await this.MessagesRepository.findOne(id);
+  async getMessageById(id: number): Promise<Message> {
+    const res = await this.messagesRepository.findOne(id);
     console.log('res', res);
     return res;
   }
@@ -48,14 +50,14 @@ export class MessagesService {
   async saveMessage(messageDto: CreateMessageDto): Promise<Message> {
     // console.log(messageDto);
     const newMessage: Message = {
-      id: 1,
-      channel_id: messageDto.channelId,
-      author_id: messageDto.authorId,
+      id: this.index,
+      channel_id: messageDto.channel_id,
+      author_id: messageDto.author_id,
       content: messageDto.content,
-      created_at: Math.floor(Date.now() / 1000),
+      // created_at: Math.floor(Date.now() / 1000),
     };
 
-    return await this.MessagesRepository.save(newMessage);
+    return await this.messagesRepository.save(newMessage);
   }
 
   /**

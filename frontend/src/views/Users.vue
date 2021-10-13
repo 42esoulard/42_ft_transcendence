@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent, inject, onMounted, ref } from "vue";
 import { User } from "@/types/User";
-import { DefaultApi } from "sdk-client";
+import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
 
 export default defineComponent({
   name: "Users",

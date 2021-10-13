@@ -1,6 +1,8 @@
 export interface Message {
-    message: any,
-    type: number,
-    user: string,
-    room: string
+    id: number,
+    content: any,
+    author: string,
+    author_id: number,
+    channel: string,
+    channel_id: number
 }

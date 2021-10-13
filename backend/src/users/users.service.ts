@@ -18,7 +18,7 @@ export class UsersService {
 	 * Lists all users in database
 	 * nb: find() is a function from the typeORM library
 	*/
-	async getUsers(): Promise<User[]> | undefined {
+	async getUsers(): Promise<User[]> | undefined { 
 		return await this.usersRepository.find();
 	}
 

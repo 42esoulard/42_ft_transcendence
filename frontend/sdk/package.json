@@ -1,0 +1,10 @@
+{
+  "name": "sdk",
+  "version": "1.0.0",
+  "description": "",
+  "author": "esoulard <esoulard@student.42.fr>",
+  "license": "ISC",
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.4.12"
+  }
+}

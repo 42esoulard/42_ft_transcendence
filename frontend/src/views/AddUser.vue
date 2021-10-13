@@ -34,6 +34,7 @@ export default defineComponent({
     const handleSubmit = async () => {
       await api.saveUser({
           username: username.value,
+          forty_two_login: "coollogin"
         })
         .then((res: any) => (responseData.value = res.data))
         .catch((err: any) => console.log(err.message));

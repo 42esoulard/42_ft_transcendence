@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 // import * as bcrypt from 'bcrypt';
 
 @Entity('messages')
@@ -15,8 +15,8 @@ export class Messages {
   @Column()
   content: string;
 
-  @Column()
-  created_at: number;
+  @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
+  created_at: Date;
 
   // @BeforeInsert()
   // async hashPassword() {
