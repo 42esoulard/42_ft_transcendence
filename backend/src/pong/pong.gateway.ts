@@ -176,7 +176,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 
   @SubscribeMessage('moveRacquet')
-  handleMessage(client: Socket, message: {room: string, text: string}): void {
+  handleMoveRacquet(client: Socket, message: {room: string, text: string}): void {
 
     this.logger.log('msg received: ' + message.room)
     const game: pongGame = this.games.get(message.room)
@@ -185,21 +185,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.logger.error('moveRacquet: game doesnt exist')
       return
     }
-
-    if (client.id === game.player1.clientSocket.id)
-    {
-      if (message.text === 'up')
-        game.player1.position -= RACQUET_SPEED
-      if (message.text === 'down')
-        game.player1.position += RACQUET_SPEED
-    }
-    if (client.id === game.player2.clientSocket.id)
-    {
-      if (message.text === 'up')
-        game.player2.position -= RACQUET_SPEED
-      if (message.text === 'down')
-        game.player2.position += RACQUET_SPEED
-    }
+    const player = (client.id === game.player1.clientSocket.id) ? game.player1 : game.player2
+    if (message.text === 'up')
+      player.position -= RACQUET_SPEED
+    if (message.text === 'down')
+      player.position += RACQUET_SPEED
   }
 
   sendDatas(client: Socket, room:string): void {
@@ -223,32 +213,27 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   {
     // if hit top or bottom walls
     if (game.ballPosition.y <= BALL_RADIUS || game.ballPosition.y >= CANVAS_HEIGHT - BALL_RADIUS)
-    {
       game.ballDirection.y = -game.ballDirection.y
-    }
-    // if hit left left wall
-    if (game.ballPosition.x <= RACQUET_WIDTH + BALL_RADIUS)
-    {
-      if (game.ballPosition.y >= game.player1.position && game.ballPosition.y <= (game.player1.position + RACQUET_LENGTH))
+    
+      // if player1 hits the ball
+    if (game.ballPosition.x <= RACQUET_WIDTH + BALL_RADIUS &&
+    game.ballPosition.y >= game.player1.position && 
+    game.ballPosition.y <= (game.player1.position + RACQUET_LENGTH))
+      game.ballDirection.x = -game.ballDirection.x
+    
+    // if player2 hits the ball
+    if (game.ballPosition.x >= CANVAS_WIDTH - BALL_RADIUS - RACQUET_WIDTH &&
+    game.ballPosition.y >= game.player2.position && 
+    game.ballPosition.y <= (game.player2.position + RACQUET_LENGTH))
         game.ballDirection.x = -game.ballDirection.x
-      else
-      {
-        // score change
-        // reset positions (ball + racquet)
-        // move ball again
-        this.handleScore(true, game)
-      }
-    }
-    // if hit right wall
-    if (game.ballPosition.x >= CANVAS_WIDTH - BALL_RADIUS - RACQUET_WIDTH)
-    {
-      if (game.ballPosition.y >= game.player2.position && game.ballPosition.y <= (game.player2.position + RACQUET_LENGTH))
-        game.ballDirection.x = -game.ballDirection.x
-      else
-      {
+  
+    // if player 1 scores
+    if (game.ballPosition.x >= CANVAS_WIDTH + BALL_RADIUS)
         this.handleScore(false, game)
-      }
-    }
+    
+        // if player 2 scores
+    if (game.ballPosition.x <= 0 - BALL_RADIUS)
+        this.handleScore(true, game)
   }
 
   handleScore(player1Scored: boolean, game: pongGame)
