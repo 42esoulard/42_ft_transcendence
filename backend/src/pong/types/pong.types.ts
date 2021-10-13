@@ -7,4 +7,11 @@ export class player {
 		this.userId = userId,
 		this.clientSocket = clientSocket
   }
+  position: number = 0
+  score: number = 0
+}
+
+export type coordinates = {
+  x: number,
+  y: number
 }
