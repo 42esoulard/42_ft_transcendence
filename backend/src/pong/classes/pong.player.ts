@@ -10,8 +10,3 @@ export class player {
   position: number = 0
   score: number = 0
 }
-
-export type coordinates = {
-  x: number,
-  y: number
-}
