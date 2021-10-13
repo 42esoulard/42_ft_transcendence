@@ -15,7 +15,8 @@ var BALL_INITIAL_DIR_X = -2
 var BALL_INITIAL_DIR_Y = -1
 var BALL_RADIUS = 10
 var RACQUET_LENGTH = 80
-var RACQUET_SPEED = 2
+var RACQUET_WIDTH = 20
+var RACQUET_SPEED = 4
 
 
 
@@ -226,7 +227,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       game.ballDirection.y = -game.ballDirection.y
     }
     // if hit left left wall
-    if (game.ballPosition.x <= BALL_RADIUS)
+    if (game.ballPosition.x <= RACQUET_WIDTH + BALL_RADIUS)
     {
       if (game.ballPosition.y >= game.player1.position && game.ballPosition.y <= (game.player1.position + RACQUET_LENGTH))
         game.ballDirection.x = -game.ballDirection.x
@@ -239,7 +240,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       }
     }
     // if hit right wall
-    if (game.ballPosition.x >= CANVAS_WIDTH - BALL_RADIUS)
+    if (game.ballPosition.x >= CANVAS_WIDTH - BALL_RADIUS - RACQUET_WIDTH)
     {
       if (game.ballPosition.y >= game.player2.position && game.ballPosition.y <= (game.player2.position + RACQUET_LENGTH))
         game.ballDirection.x = -game.ballDirection.x
