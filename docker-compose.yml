@@ -46,7 +46,7 @@ services:
     command: sh -c "npm install && npm run serve"
     depends_on:
       - postgres
-  
+      - sdk
 
   # PostgreSQL Service
   postgres:
@@ -80,6 +80,7 @@ services:
       ADMINER_DEFAULT_DB_NAME: ${DB_NAME}
     depends_on:
       - postgres
+      
     # container_name: "${ADMINER_NAME}"
 
   # Swagger UI (API documentation)
@@ -94,6 +95,15 @@ services:
     environment:
       SWAGGER_JSON: /usr/src/app/api-spec.json
       BASE_URL: /swagger
+
+  # API watcher and SDK rebuilder
+  sdk:
+    build:
+       context: "./frontend/sdk"
+    volumes:
+      - ./:/usr/src/app/
+    depends_on:
+      - backend
 
 
   # # Pgadmin Service (database management tool)

@@ -18,7 +18,7 @@
 import { defineComponent, onMounted, onUpdated, ref } from "vue";
 // import { User } from "@/types/User";
 import axios from "axios";
-import { DefaultApi } from "sdk-client";
+import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
 import { useRoute } from "vue-router";
 
 export default defineComponent({

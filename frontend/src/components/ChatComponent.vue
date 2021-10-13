@@ -307,7 +307,7 @@ export const ChatComponent = defineComponent({
       socket.emit("chat-message", newContent)
       // } else {
       //   alert('You must join the room to send messages!')
-      // }
+      // } 
 
       await api.saveMessage({
           channel_id: newContent.channel_id,
