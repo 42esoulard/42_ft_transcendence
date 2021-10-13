@@ -215,25 +215,29 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (game.ballPosition.y <= BALL_RADIUS || game.ballPosition.y >= CANVAS_HEIGHT - BALL_RADIUS)
       game.ballDirection.y = -game.ballDirection.y
     
-      // if player1 hits the ball
-    if (game.ballPosition.x <= RACQUET_WIDTH + BALL_RADIUS &&
-    game.ballPosition.y >= game.player1.position && 
-    game.ballPosition.y <= (game.player1.position + RACQUET_LENGTH))
-      game.ballDirection.x = -game.ballDirection.x
-    
-    // if player2 hits the ball
-    if (game.ballPosition.x >= CANVAS_WIDTH - BALL_RADIUS - RACQUET_WIDTH &&
-    game.ballPosition.y >= game.player2.position && 
-    game.ballPosition.y <= (game.player2.position + RACQUET_LENGTH))
+      // if ball arrives towards player1
+    if (game.ballPosition.x <= RACQUET_WIDTH + BALL_RADIUS) 
+    {
+      // case 1: player1 hits the ball
+      if (game.ballPosition.y >= game.player1.position && 
+      game.ballPosition.y <= (game.player1.position + RACQUET_LENGTH))
         game.ballDirection.x = -game.ballDirection.x
-  
-    // if player 1 scores
-    if (game.ballPosition.x >= CANVAS_WIDTH + BALL_RADIUS)
+      // case2: player2 scores
+      // if (game.ballPosition.x <= 0 - BALL_RADIUS)
+      else  
         this.handleScore(false, game)
-    
-        // if player 2 scores
-    if (game.ballPosition.x <= 0 - BALL_RADIUS)
+    }
+    // if ball arrives towards player2
+    if (game.ballPosition.x >= CANVAS_WIDTH - BALL_RADIUS - RACQUET_WIDTH)
+    {
+      if(game.ballPosition.y >= game.player2.position && 
+      game.ballPosition.y <= (game.player2.position + RACQUET_LENGTH))
+        game.ballDirection.x = -game.ballDirection.x
+      // if (game.ballPosition.x >= CANVAS_WIDTH + BALL_RADIUS)
+      else
         this.handleScore(true, game)
+    }
+    
   }
 
   handleScore(player1Scored: boolean, game: pongGame)
