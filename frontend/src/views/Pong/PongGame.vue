@@ -44,11 +44,7 @@ export default {
 		const socket = ref(clientSocket)
 		const room =  ref(route.params.id)
 
-		const draw = (ballPositio, playerPositio) => {
-			ballPosition.value = ballPositio
-			playerPositions.value = playerPositio
-			console.log(playerPositions.value)
-			console.log(ballPosition.value)
+		const draw = () => {
 			context.value.clearRect(0, 0, game.value.width, game.value.height)
 
 			context.value.beginPath()
@@ -88,9 +84,10 @@ export default {
 		this.context = this.$refs.game.getContext("2d");
 		
 		this.socket.on("position", (ballPosition, playerPositions, score) => {
-			console.log('position received')
-			this.draw(ballPosition, playerPositions)
-			this.score = score
+		this.ballPosition = ballPosition
+		this.playerPositions = playerPositions
+		this.draw()
+		this.score = score
 		})
 	},
 	beforeRouteLeave()
