@@ -5,7 +5,7 @@ import { Socket, Server } from 'socket.io';
 import { Repository } from 'typeorm';
 import { Game } from './entity/games.entity';
 import { GameUser } from './entity/gameUser.entity';
-import { player } from './interfaces/player.interface'
+import { coordinates, player } from './types/pong.types'
 
 var BALL_SPEED = 1
 var INTERVAL_IN_MS = 20
@@ -17,21 +17,6 @@ var BALL_RADIUS = 10
 var RACQUET_LENGTH = 80
 var RACQUET_SPEED = 2
 
-type coordinates = {
-  x: number,
-  y: number
-}
-
-type ballAndPlayersPosition = {
-  player1: number,
-  player2: number,
-  ball: coordinates
-}
-
-type playerScores = {
-  player1: number,
-  player2: number
-}
 
 
 class pongGame {
@@ -52,18 +37,17 @@ class pongGame {
   public room: string
   public gameId: number
   
-  public position: ballAndPlayersPosition = {player1: 0, player2:0, ball: {x: 0, y:0}}
+  public ballPosition: coordinates = {x: 0, y:0}
   public ballDirection: coordinates = {x: 0, y: 0}
-  public score: playerScores = {player1: 0, player2: 0}
 
   public interval = null
 
   initPositions()
   {
-    this.position.player1 = 200
-    this.position.player2 = 200
-    this.position.ball.x = CANVAS_WIDTH / 2
-    this.position.ball.y = CANVAS_HEIGHT / 2
+    this.player1.position = 200
+    this.player2.position = 200
+    this.ballPosition.x = CANVAS_WIDTH / 2
+    this.ballPosition.y = CANVAS_HEIGHT / 2
   }
   initBallDirection()
   {
@@ -204,16 +188,16 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (client.id === game.player1.clientSocket.id)
     {
       if (message.text === 'up')
-        game.position.player1 -= RACQUET_SPEED
+        game.player1.position -= RACQUET_SPEED
       if (message.text === 'down')
-        game.position.player1 += RACQUET_SPEED
+        game.player1.position += RACQUET_SPEED
     }
     if (client.id === game.player2.clientSocket.id)
     {
       if (message.text === 'up')
-        game.position.player2 -= RACQUET_SPEED
+        game.player2.position -= RACQUET_SPEED
       if (message.text === 'down')
-        game.position.player2 += RACQUET_SPEED
+        game.player2.position += RACQUET_SPEED
     }
   }
 
@@ -227,22 +211,24 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
     this.changeBallDirectionIfWallHit(game)
     
-    game.position.ball.x += game.ballDirection.x * BALL_SPEED
-    game.position.ball.y += game.ballDirection.y * BALL_SPEED
-    this.server.to(room).emit('position', game.position, game.score)
+    game.ballPosition.x += game.ballDirection.x * BALL_SPEED
+    game.ballPosition.y += game.ballDirection.y * BALL_SPEED
+    const playerPositions = {player1: game.player1.position, player2: game.player2.position}
+    const playerScores = {player1: game.player1.score, player2: game.player2.score}
+    this.server.to(room).emit('position', game.ballPosition, playerPositions, playerScores)
   }
   
   changeBallDirectionIfWallHit(game: pongGame): void
   {
     // if hit top or bottom walls
-    if (game.position.ball.y <= BALL_RADIUS || game.position.ball.y >= CANVAS_HEIGHT - BALL_RADIUS)
+    if (game.ballPosition.y <= BALL_RADIUS || game.ballPosition.y >= CANVAS_HEIGHT - BALL_RADIUS)
     {
       game.ballDirection.y = -game.ballDirection.y
     }
     // if hit left left wall
-    if (game.position.ball.x <= BALL_RADIUS)
+    if (game.ballPosition.x <= BALL_RADIUS)
     {
-      if (game.position.ball.y >= game.position.player1 && game.position.ball.y <= (game.position.player1 + RACQUET_LENGTH))
+      if (game.ballPosition.y >= game.player1.position && game.ballPosition.y <= (game.player1.position + RACQUET_LENGTH))
         game.ballDirection.x = -game.ballDirection.x
       else
       {
@@ -253,9 +239,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       }
     }
     // if hit right wall
-    if (game.position.ball.x >= CANVAS_WIDTH - BALL_RADIUS)
+    if (game.ballPosition.x >= CANVAS_WIDTH - BALL_RADIUS)
     {
-      if (game.position.ball.y >= game.position.player2 && game.position.ball.y <= (game.position.player2 + RACQUET_LENGTH))
+      if (game.ballPosition.y >= game.player2.position && game.ballPosition.y <= (game.player2.position + RACQUET_LENGTH))
         game.ballDirection.x = -game.ballDirection.x
       else
       {
@@ -267,9 +253,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleScore(player1Scored: boolean, game: pongGame)
   {
     if (player1Scored)
-      game.score.player1++
+      game.player1.score++
     else
-      game.score.player2++
+      game.player2.score++
     game.initPositions()
     game.initBallDirection()
   }

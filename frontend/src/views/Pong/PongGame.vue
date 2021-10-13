@@ -3,8 +3,8 @@
 	<canvas ref="game" width="640" height="480" style="border: 1px solid black">
 	</canvas>
 	<p> user1 [{{ score.player1 }}]  |  user2 [{{ score.player2 }}] </p>
-	<p> ball x {{ position.ball.x }} </p>
-	<p> ball y {{ position.ball.y }} </p>
+	<p> ball x {{ ballPosition.x }} </p>
+	<p> ball y {{ ballPosition.y }} </p>
 	<p> Use arrows (keyboard) to move </p>
 	
 </template>
@@ -22,14 +22,16 @@ export default {
 		}
 	},
 	setup() {
-		const position = ref({
-			player1: 0,
-			player2: 0,
-			ball: {
-				x: 0,
-				y: 0
-			},
-		})
+		// const position = ref({
+		// 	player1: 0,
+		// 	player2: 0,
+		// 	ball: {
+		// 		x: 0,
+		// 		y: 0
+		// 	},
+		// })
+		const ballPosition = ref({x:0, y:0})
+		const playerPositions = ref({player1:0, player2:0})
 
 		const game = ref(null)
 
@@ -37,22 +39,22 @@ export default {
 		
 		const route = useRoute()
 
-		const score = ref({
-			player1: 0,
-			player2: 0
-		})
+		const score = ref({player1: 0,player2: 0})
 
 		const socket = ref(clientSocket)
 		const room =  ref(route.params.id)
 
-		const draw = (data) => {
-			position.value = data
+		const draw = (ballPositio, playerPositio) => {
+			ballPosition.value = ballPositio
+			playerPositions.value = playerPositio
+			console.log(playerPositions.value)
+			console.log(ballPosition.value)
 			context.value.clearRect(0, 0, game.value.width, game.value.height)
 
 			context.value.beginPath()
-			context.value.rect(0, position.value.player1, 20, 80)
-			context.value.rect(620, position.value.player2, 20, 80)
-			context.value.arc(position.value.ball.x, position.value.ball.y, 10, 0, Math.PI*2, false);
+			context.value.rect(0, playerPositions.value.player1, 20, 80)
+			context.value.rect(620, playerPositions.value.player2, 20, 80)
+			context.value.arc(ballPosition.value.x, ballPosition.value.y, 10, 0, Math.PI*2, false);
 			context.value.fill()
 			context.value.closePath()
 		}
@@ -75,7 +77,7 @@ export default {
 				SendMoveMsg('down')
 		}
 
-		return { position, score, socket, room, draw, SendMoveMsg, onKeyDown, context, game }
+		return { ballPosition, playerPositions, score, socket, room, draw, SendMoveMsg, onKeyDown, context, game }
 
 	},
 	created() {
@@ -85,11 +87,10 @@ export default {
 		console.log('mounted')
 		this.context = this.$refs.game.getContext("2d");
 		
-		this.socket.on("position", (positions, score) => {
+		this.socket.on("position", (ballPosition, playerPositions, score) => {
 			console.log('position received')
-			// if (this.room)
-				this.draw(positions)
-				this.score = score
+			this.draw(ballPosition, playerPositions)
+			this.score = score
 		})
 	},
 	beforeRouteLeave()
