@@ -1,5 +1,5 @@
 #!/bin/bash
-
+echo "Initializing SDK..."
 rm -rf ./typescript-axios-client-generated/* && npx @openapitools/openapi-generator-cli generate -i ../../backend/api-spec.json -g typescript-axios --additional-properties=modelPropertyNaming=original -o ./typescript-axios-client-generated/
 
 echo "Watching changes on the API..."
