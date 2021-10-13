@@ -5,6 +5,7 @@ import { User } from '../users/interfaces/user.interface';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { AuthenticatedGuard, FortyTwoAuthGuard } from './guards/fortytwo.guard';
+import { JwtAuthGuard } from './guards/jwt.guard';
 import { JwtTwoFactorGuard } from './guards/jwtTwoFactor.guard';
 import { RefreshTokenAuthGuard } from './guards/refresh.guard';
 import { ApiCookieAuth, ApiOAuth2, ApiTags } from '@nestjs/swagger';
@@ -30,6 +31,11 @@ export class AuthController {
       expires: new Date(Date.now() + 1000 * 86400),
       sameSite: true
     });
+
+    if (req.user.two_fa_enabled) {
+      res.status(206);
+      return { message: "Need 2FA to log in" };
+    }
     return { message: "Logged in successfully" };
   }
 
@@ -60,9 +66,15 @@ export class AuthController {
   @Get('refreshtoken')
   @UseGuards(RefreshTokenAuthGuard)
   async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const jwt = await this.authService.generateAccessToken(req.user);
+    console.log('User:', req.user);
+    let jwt: string;
+    if (req.user.two_fa_enabled) {
+      jwt = this.authService.getCookieWithJwtAccessToken(req.user, true);
+    } else {
+      jwt = await (await this.authService.generateAccessToken(req.user)).access_token;
+    }
     const refresh_token = await this.userService.getRefreshToken(req.user.id);
-    res.cookie('tokens', { access_token: jwt.access_token, refresh_token }, {
+    res.cookie('tokens', { access_token: jwt, refresh_token }, {
       httpOnly: true,
       expires: new Date(Date.now() + 1000 * 86400),
       sameSite: true
@@ -100,54 +112,42 @@ export class AuthController {
 
   @ApiCookieAuth()
   @Get('2fa/generate')
-  @UseGuards(JwtTwoFactorGuard)
+  @UseGuards(JwtAuthGuard)
   async register(@Res() response: Response, @Req() request: Request) {
 
-    // for debug w/o frontend
-    // const user: User = await this.userService.getUserbyId(1);
-    /////////////////////////////////////
-    const { otpauthUrl } = await this.authService.generateTwoFASecret(request.user); // must be request.user
+    const { otpauthUrl } = await this.authService.generateTwoFASecret(request.user);
     return this.authService.pipeQrCodeStream(response, otpauthUrl);
   }
 
   @ApiCookieAuth()
   @Post('2fa/turn-on')
-  @UseGuards(JwtTwoFactorGuard)
+  @UseGuards(JwtAuthGuard)
   async turnOnTwoFactorAuthentication(
     @Req() request: Request,
     @Body() { code: twoFACode }: TwoFactorDto
   ) {
     console.log('twoFACode', twoFACode);
-    // for debug w/o frontend
-    // const user: User = await this.userService.getUserbyId(1);
-    /////////////////////////////////////
-
     console.log('USER:', request.user);
 
     const isCodeValid = this.authService.isTwoFACodeValid(
       twoFACode,
-      request.user // must be request.user
+      request.user
     );
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
-    await this.userService.turnOnTwoFA(request.user.id); // must be request.user.id (1 is for dev)
+    await this.userService.turnOnTwoFA(request.user.id);
     return { message: "2FA Successfully turned-on" };
   }
 
   @ApiCookieAuth()
   @Post('2fa/authenticate')
-  @HttpCode(200)
-  @UseGuards(JwtTwoFactorGuard)
+  @UseGuards(JwtAuthGuard)
   async authenticate(
     @Req() request: Request,
     @Body() { code: twoFACode }: TwoFactorDto
   ) {
-
-    // for debug w/o frontend
-    // const user: User = await this.userService.getUserbyId(1);
-    /////////////////////////////////////
-
+    console.log('twoFACode', twoFACode);
     const isCodeValid = this.authService.isTwoFACodeValid(
       twoFACode, request.user
     );
@@ -163,6 +163,7 @@ export class AuthController {
       expires: new Date(Date.now() + 1000 * 86400),
       sameSite: true
     });
+    console.log(access_token);
     return request.user;
   }
 }
