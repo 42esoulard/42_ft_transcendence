@@ -11,5 +11,7 @@ api-spec.json
 backend/uploads/avatars/*
 !backend/uploads/avatars/default.jpg
 frontend/sdk/typescript-axios-client-generated
+npm-errors
+
 # .env
 # database.env

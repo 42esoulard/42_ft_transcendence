@@ -83,7 +83,7 @@ export default defineComponent({
           window.location.reload();
         })
         .catch(function (err) {
-          console.log(err);
+          console.log(err.response.data.message);
         });
     };
 

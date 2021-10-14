@@ -32,11 +32,9 @@ export class AuthService implements AuthProvider {
     return user;
   }
 
-  async generateAccessToken(user: User) {
-    const payload: JwtPayload = { username: user.username, sub: user.id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+  async generateAccessToken(user: User, isTwoFAauthenticated = false) {
+    const payload: JwtPayload = { username: user.username, sub: user.id, isTwoFAauthenticated };
+    return this.jwtService.sign(payload)
   }
 
   async generateRefreshToken(id: number) {
@@ -87,13 +85,7 @@ export class AuthService implements AuthProvider {
     return authenticator.verify({
       token: twoFactorAuthenticationCode,
       secret: user.two_fa_secret
-    })
-  }
-
-  public getCookieWithJwtAccessToken(user: User, isTwoFAauthenticated = false) {
-    const payload: JwtPayload = { username: user.username, sub: user.id, isTwoFAauthenticated };
-    const token = this.jwtService.sign(payload);
-    return token;
+    });
   }
 
 }
