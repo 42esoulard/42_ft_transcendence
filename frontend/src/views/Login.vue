@@ -5,7 +5,7 @@
     <img :src="qrcodeURL" alt="QR code" />
     <form @submit.prevent="sendTwoFactorCode">
       <label for="code">Enter Code:</label>
-      <input v-model="otp" type="text" name="code" />
+      <input v-model="otp" type="text" name="code" autofocus/>
       <div class="otp_submit">
         <button>Validate code</button>
       </div>
@@ -30,7 +30,7 @@ export default defineComponent({
 
     const isTwoFactorEnabled = ref(false);
     const qrcodeURL = ref("");
-    const otp = ref(0);
+    const otp = ref('');
 
     //To exchange cookie or auth header w/o in every req
     axios.defaults.withCredentials = true;

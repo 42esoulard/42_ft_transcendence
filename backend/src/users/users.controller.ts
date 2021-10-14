@@ -98,6 +98,7 @@ export class UsersController {
 	uploadFile(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
 		console.log(file);
 		if (req.fileValidationError) {
+			console.log(req.fileValidationError);
 			throw new BadRequestException(req.fileValidationError);
 		}
 		if (!file) {
