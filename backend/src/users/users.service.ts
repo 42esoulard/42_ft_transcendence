@@ -18,7 +18,7 @@ export class UsersService {
 	 * Lists all users in database
 	 * nb: find() is a function from the typeORM library
 	*/
-	async getUsers(): Promise<User[]> | undefined {
+	async getUsers(): Promise<User[]> | undefined { 
 		return await this.usersRepository.find();
 	}
 
@@ -49,8 +49,8 @@ export class UsersService {
 	async saveUser(userDto: CreateUserDto): Promise<User> | undefined { // newUser must be of type User or CreateUserDto ??
 		// const newUser: User = userDto as User;
 		const newUser = this.usersRepository.create(userDto);
-		newUser.avatar = 'http://localhost:3000/users/avatars/default.jpg';
-		newUser.forty_two_login = newUser.username;
+		if (!newUser.avatar)
+			newUser.avatar = 'http://localhost:3000/users/avatars/default.jpg';
 		return await this.usersRepository.save(newUser);
 	}
 

@@ -46,8 +46,30 @@ export class ChannelsController {
   @ApiBadRequestResponse({
     description: 'Invalid ID supplied',
   })
-  async getChannel(@Param('id') id: number): Promise<Channel> {
-    const channel: Channel = await this.channelService.getChannelbyId(id);
+  async getChannelById(@Param('id') id: number): Promise<Channel> {
+    const channel: Channel = await this.channelService.getChannelById(id);
+    if (channel == undefined) {
+      throw new NotFoundException('Channel not found');
+    }
+    return channel;
+  }
+
+  /**
+   * Returns a channel found in database by its id.
+   */
+  @Get('/name/:name')
+  @ApiOkResponse({
+    description: 'The channel has been found in database',
+    type: Channel,
+  })
+  @ApiNotFoundResponse({
+    description: 'Channel not found',
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid ID supplied',
+  })
+  async getChannelByName(@Param('name') name: string): Promise<Channel> {
+    const channel: Channel = await this.channelService.getChannelByName(name);
     if (channel == undefined) {
       throw new NotFoundException('Channel not found');
     }

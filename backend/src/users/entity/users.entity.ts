@@ -18,7 +18,7 @@ export class Users {
   @Column({ type: "varchar", length: 255, nullable: true })
   avatar: string;
  
-  @Column({ type: "varchar", length: 50, nullable: true })
+  @Column({ type: "varchar", length: 16, nullable: true })
   two_fa_secret: string;
   
   @Column({ default: false })

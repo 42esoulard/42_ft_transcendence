@@ -21,7 +21,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from "vue";
 import axios from "axios";
-import { DefaultApi } from "sdk-client";
+import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
 import { useRouter } from "vue-router";
 import moment from "moment";
 import { useStore } from "vuex";

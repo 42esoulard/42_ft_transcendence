@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { configService } from './config/config.service';
 import { UsersModule } from './users/users.module';
 import { MessagesModule } from './messages/messages.module';
+import { ChannelsModule } from './channels/channels.module';
+import { ChannelMembersModule } from './channel_member/channel_member.module';
 import { ChatModule } from './chat/chat.module';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
@@ -15,10 +17,12 @@ import { PongModule } from './pong/pong.module';
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
     UsersModule,
     ChatModule,
+    MessagesModule,
+    ChannelsModule,
+    ChannelMembersModule,
     AuthModule,
     PassportModule.register({ session: true }),
     PongModule,
-    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

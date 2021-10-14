@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { RefreshStrategy } from './strategies/refresh.strategy';
+import { JwtTwoFactorStrategy } from './strategies/jwtTwoFactor.strategy';
 
 @Module({
   controllers: [AuthController],
@@ -15,6 +16,7 @@ import { RefreshStrategy } from './strategies/refresh.strategy';
     AuthService,
     FortyTwoStrategy,
     JwtStrategy,
+    JwtTwoFactorStrategy,
     RefreshStrategy,
     SessionSerializer,
   ],
