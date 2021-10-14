@@ -1,13 +1,61 @@
 .header {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template: 1fr / 10% 80% 10%;
   align-items: center;
+  justify-content: center;
   height: $header-height;
-  width: 100vw;
+  width: 100%;
   background-color: $header-bg-color;
 }
- .header__title {
+
+.header-link {
+  display: flex;
+  justify-content: center;
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.header__title {
   color: $header-text-color;
   font-size: $header-font-size;
   font-family: $header-font;
+ }
+
+ .header-bloc {
+  margin: $user-bloc-margin;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $user-bloc-gap;
+ }
+
+ .user-bloc {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $user-bloc-gap;
+  &:hover {
+    text-decoration: none;
+    opacity: $user-bloc-hover-opacity;
+  }
+ }
+
+ .user-bloc__username {
+  font-family: $user-bloc-name-font;
+  font-size: $user-bloc-name-size;
+  color: $user-bloc-name-color;
+ }
+
+ .user-bloc__avatar {
+  width: $user-bloc-avatar-width;
+  height: $user-bloc-avatar-width;
+  border-radius: 50%;
+ }
+
+ .user-bloc__icon {
+   &:hover {
+     opacity: $user-bloc-hover-opacity;
+   }
  }
