@@ -5,7 +5,7 @@
     <img :src="qrcodeURL" alt="QR code" />
     <form @submit.prevent="sendTwoFactorCode">
       <label for="code">Enter Code:</label>
-      <input v-model="otp" type="text" name="code" autofocus/>
+      <input v-model="otp" type="text" name="code" v-focus/>
       <div class="otp_submit">
         <button>Validate code</button>
       </div>
@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, onMounted, ref } from "vue";
+import { defineComponent, inject, onBeforeMount, onMounted, ref } from "vue";
 import { routeLocationKey, useRoute, useRouter } from "vue-router";
 import axios from "axios";
 
@@ -35,8 +35,8 @@ export default defineComponent({
     //To exchange cookie or auth header w/o in every req
     axios.defaults.withCredentials = true;
 
-    onMounted(() => {
-      // onBeforeMount ????
+    onBeforeMount(() => {
+      router.replace('/login'); // to remove code from URL: DIRTY ?
       console.log("isTwoFactorEnabled", isTwoFactorEnabled);
       if (route.query.code) {
         const code = route.query.code;
@@ -50,7 +50,6 @@ export default defineComponent({
             console.log("status", res.status);
             if (res.status === 206) {
               isTwoFactorEnabled.value = true;
-              router.push("login"); // to remove code from URL: DIRTY
               getQrCode();
             } else if (res.status === 200) {
               router.push("account"); //find a way to push to requested route, not only account ??
