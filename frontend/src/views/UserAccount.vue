@@ -9,7 +9,15 @@
     <p>Your login 42: {{ user.forty_two_login }}</p>
     <p>Two-Factor Auth activated: {{ user.two_fa_enabled }}</p>
     <p>Profile created at: {{ formatDate(user.created_at) }}</p>
-    <button @click="logOut">LogOut</button>
+
+    <div v-if="!user.two_fa_enabled">
+      <router-link :to="{ name: 'InitTwoFactor' }"
+        >Activate Two-Factor Authentication</router-link
+      >
+    </div>
+    <div v-else>
+      <a @click.prevent="deactivateTwoFactor" href="#">Deactivate Two-Factor Authentication</a>
+    </div>
 
     <form method="post" @submit.prevent="postAvatar">
       <input @change="handleFile" type="file" ref="avatar" id="avatar" />
@@ -25,6 +33,7 @@ import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
 import { useRouter } from "vue-router";
 import moment from "moment";
 import { useStore } from "vuex";
+import { User } from "../types/User";
 
 export default defineComponent({
   name: "UserAccount",
@@ -37,17 +46,6 @@ export default defineComponent({
 
     //To exchange cookie or auth header w/o in every req
     axios.defaults.withCredentials = true;
-
-    const logOut = () => {
-      axios
-        .get("http://localhost:3000/auth/logout", { withCredentials: true })
-        .then((response) => {
-          console.log(response);
-          store.state.user = null;
-          router.push("/login");
-        })
-        .catch((err: any) => console.log(err.message));
-    };
 
     // Purement utilitaire => should be placed somewhere else
     const formatDate = (date: Date) => {
@@ -87,13 +85,23 @@ export default defineComponent({
         });
     };
 
+    const deactivateTwoFactor = async () => {
+      await axios
+        .get("http://localhost:3000/auth/2fa/turn-off")
+        .then((res) => {
+          console.log(res);
+          window.location.reload();
+        })
+        .catch((error) => console.log(error));
+    };
+
     return {
-      user: computed(() => store.state.user),
-      logOut,
+      user: computed<User>(() => store.state.user),
       formatDate,
       postAvatar,
       handleFile,
       avatar,
+      deactivateTwoFactor
     };
   },
 });

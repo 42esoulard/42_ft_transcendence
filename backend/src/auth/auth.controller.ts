@@ -138,7 +138,24 @@ export class AuthController {
       throw new UnauthorizedException('Wrong authentication code');
     }
     await this.userService.turnOnTwoFA(request.user.id);
+    const access_token = await this.authService.generateAccessToken(request.user, true);
+    const refresh_token = await this.userService.getRefreshToken(request.user.id);
+
+    request.res.cookie('tokens', { access_token: access_token, refresh_token }, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 86400),
+      sameSite: true
+    });
+
     return { message: "2FA Successfully turned-on" };
+  }
+
+  @ApiCookieAuth()
+  @Get('2fa/turn-off')
+  @UseGuards(JwtTwoFactorGuard)
+  async turnOffTwoFactorAuthentication(@Req() request: Request) {
+    await this.userService.turnOffTwoFA(request.user.id);
+    return { message: "2FA Successfully turned-off" };
   }
 
   @ApiCookieAuth()
