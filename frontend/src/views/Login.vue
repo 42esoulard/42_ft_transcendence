@@ -5,7 +5,7 @@
   </div>
   <div v-else>
     <h2>Please Login</h2>
-    <button @click="logInWith42">Login with 42</button>
+    <button class="button button--log-in" @click="logInWith42">Login with 42</button>
   </div>
 </template>
 

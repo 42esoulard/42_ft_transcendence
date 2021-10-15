@@ -112,7 +112,7 @@ export class UsersController {
 		};
 		return response;
 	}
-	
+
 	/**
 	 * Returns an avatar from its finename
 	 */

@@ -9,7 +9,7 @@
         <img class="user-bloc__avatar" :src="user.avatar" alt="">
         <span class="user-bloc__username">{{ user.username }}</span>
       </router-link>
-      <button @click="logOut" class="button"><i class="user-bloc__icon fas fa-power-off" /></button>
+      <button @click="logOut" class="button button--log-out"><i class="user-bloc__icon fas fa-power-off" /></button>
     </div>
   </div>
 </template>
