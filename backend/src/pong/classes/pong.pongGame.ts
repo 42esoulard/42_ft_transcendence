@@ -14,6 +14,7 @@ var BALL_RADIUS = 10
 var RACQUET_LENGTH = 80
 var RACQUET_WIDTH = 20
 var RACQUET_SPEED = 4
+var SCORE_NEEDED_TO_WIN = 2
 
 export class pongGame {
 
@@ -78,6 +79,7 @@ export class pongGame {
   
   async endGame(player1Won: boolean): Promise<void>
   {
+    clearInterval(this.interval)
     await this.gameUserRepo.update({userId: this.player1.userId, gameId: this.gameId}, { won: player1Won})
     await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.gameId}, { won: !player1Won})
   }
@@ -122,6 +124,10 @@ export class pongGame {
       this.player1.score++
     else
       this.player2.score++
+    if (this.player1.score >= SCORE_NEEDED_TO_WIN)
+      this.endGame(true)
+    if (this.player2.score >= SCORE_NEEDED_TO_WIN)
+      this.endGame(false)
     this.initPositions()
     this.initBallDirection()
   }
