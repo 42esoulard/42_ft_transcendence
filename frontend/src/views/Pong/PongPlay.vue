@@ -25,16 +25,13 @@ export default {
 
 		const JoinQueue = () => {
 			queuing.value = true
-			// socket.value.emit('joinGame', {userId: 2})
-			socket.value.emit('joinGame', {userId: store.state.user.id})
-	// 		// pour l'instant on rentre l'id à la main, pour pouvoir tester plusieurs id differents
-	// 		// a utiliser une fois que la route sera protegee
+			socket.value.emit('joinGame', {userId: store.state.user.id, userName: store.state.user.username})
 		}
 		return {socket, queuing, JoinQueue}
 	},
 	mounted() {
-		this.socket.on('gameReadyToStart', (ids) => {
-			this.$router.push({ name: 'PongGame', params: {id: ids}})
+		this.socket.on('gameReadyToStart', (id, player1UserName, player2UserName) => {
+			this.$router.push({ name: 'PongGame', params: {id, player1UserName, player2UserName}})
 		})
 	},
 

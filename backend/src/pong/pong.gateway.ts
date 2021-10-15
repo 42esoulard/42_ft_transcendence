@@ -46,22 +46,22 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage('joinGame')
-  async handleJoinGameMessage(client: Socket, message: {userId: number}): Promise<void>
+  async handleJoinGameMessage(client: Socket, message: {userId: number, userName: string}): Promise<void>
   {
-    this.logger.log('client joined game. userId: ' + message.userId)
+    this.logger.log('client joined game. userId: ' + message.userName)
     if (!this.waitingPlayer)
     {
-      this.waitingPlayer = new player(message.userId, client)
+      this.waitingPlayer = new player(message.userId, message.userName, client)
       client.emit('waitingForOpponent')
     }
     else
     {
-      const player2 = new player(message.userId, client)
+      const player2 = new player(message.userId, message.userName, client)
       const game = new pongGame(this.waitingPlayer, player2, this.gameRepo, this.gameUserRepo)
       delete this.waitingPlayer
       this.waitingPlayer = null
       await game.createGame()
-      this.server.to(game.room).emit('gameReadyToStart', game.room)
+      this.server.to(game.room).emit('gameReadyToStart', game.room, game.player1.userName, game.player2.userName)
       this.games.set(game.room, game)
       
       this.logger.log('new interval: ' + game.room)
@@ -116,7 +116,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.logger.error('endGame: game doesnt exist')
       return
     }
-    clearInterval(game.interval)
     this.logger.log('interval cleared: ' + room )
     game.endGame(true)
     this.games.delete(room)

@@ -2,7 +2,7 @@
 	<h1> Game # {{ room }} </h1>
 	<canvas ref="game" width="640" height="480" style="border: 1px solid black">
 	</canvas>
-	<p> user1 [{{ score.player1 }}]  |  user2 [{{ score.player2 }}] </p>
+	<p> {{ player1UserName }} [{{ score.player1 }}]  |  {{ player2UserName }} [{{ score.player2 }}] </p>
 	
 </template>
 
@@ -26,6 +26,8 @@ export default {
 
 		const socket = ref(clientSocket)
 		const room =  ref(route.params.id)
+		const player1UserName = ref(route.params.player1UserName)
+		const player2UserName = ref(route.params.player2UserName)
 
 		const draw = () => {
 			context.value.clearRect(0, 0, game.value.width, game.value.height)
@@ -56,7 +58,8 @@ export default {
 				SendMoveMsg('down')
 		}
 
-		return { ballPosition, playerPositions, score, socket, room, draw, SendMoveMsg, onKeyDown, context, game }
+
+		return { ballPosition, playerPositions, score, socket, room, draw, SendMoveMsg, onKeyDown, context, game, player1UserName, player2UserName }
 
 	},
 	created() {
