@@ -13,5 +13,6 @@ RUN node --version
 
 
 CMD cd /usr/src/app/frontend/sdk \
+    && npm install \
     && sh generateSDK.sh \
     && tail -f /dev/null
