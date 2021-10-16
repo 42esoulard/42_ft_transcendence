@@ -2,13 +2,13 @@
   <h1>Chat Room</h1>
   <div class="container">
     <div class="col-lg-6 offset-lg-3">
-      <div v-if="ready">
+      <div>
         <p v-for="(user, i) in info" :key="i">
           {{ user.username }} {{ user.action }}
         </p>
       </div>
 
-      <div v-if="!ready">
+      <!-- <div v-if="!ready">
         <h4>Enter your username</h4>
         <form @submit.prevent="addUser">
           <div class="form-group row">
@@ -25,10 +25,11 @@
             />
           </div>
         </form>
-      </div>
+      </div> -->
       
-      <h2 v-else>{{ username }}</h2>
-      <div class="card bg-info" v-if="ready">
+      <!-- <h2 v-else>{{ username }}</h2> -->
+      <h2>{{ user.username }}</h2>
+      <div class="card bg-info">
 
         <div class="card-header text-white">
           <h4>
@@ -43,15 +44,18 @@
           </h4>
         </div>
 
-        <ul class="list-group list-group-flush text-right">
+        <div class="messages-wrapper">
+        <div>
+        <ul class="list-group list-group-flush text-left messages" id="messages">
           <small v-if="typing" class="text-white">{{ typing }} is typing</small>
           <li class="list-group-item" v-for="(message) in channelMessages" :key="message.id">
-            <span>
-              {{ message.content }}
-              <small>:{{ message.author }}</small>
+            <span class="message">
+              <div class="message-author">{{ message.author }}</div>: {{ message.content }}
             </span>
           </li>
         </ul>
+        </div>
+        </div>
 
         <div class="card-body">
           <form @submit.prevent="send">
@@ -80,14 +84,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, onUpdated, reactive, ref, watch } from "vue";
+import { defineComponent, reactive, ref, watch, computed } from "vue";
 import { io } from "socket.io-client";
 import { Message } from "@/types/Message";
 import { Channel } from "@/types/Channel"
 import NewChannelForm from "@/components/NewChannelForm.vue"
 import { Info } from "@/types/Info";
 import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
-
+import { useStore } from 'vuex'
 
 export const socket = io("http://localhost:3000/chat");
 
@@ -105,26 +109,28 @@ export const ChatComponent = defineComponent({
   },
 
   setup() {
+
     const api = new DefaultApi();
-    // const socket = ref(io("http://localhost:3000/chat"));
+    const user = computed(() => useStore().state.user);
+
     const newMessage = ref("");
+    const messageId = ref(0);
+
     const allMessages: {
         [key: number]: Array<Message>,
       } = {};
     const channelMessages = ref<Message[]>([]);
-    const typing = ref("");
-    const username = ref("");
-    const ready = ref(false);
-    const info = reactive<Info[]>([]);
-    const connections = ref(1);
     const activeChannel = ref<Channel>({
       name: "General",
       type: "public",
       id: 1
     });
-    const messageId = ref(0);
-    const responseData = ref(null);
     let newChannelForm = ref(false);
+
+    const typing = ref("");
+    const info = reactive<Info[]>([]);
+
+    const connections = ref(1);
 
     /* INITIALIZE FROM DB + UPDATE (on logout? on fixed interval? on fixed nb of messages?):
         - channels:
@@ -150,20 +156,21 @@ export const ChatComponent = defineComponent({
     }
     updateChannelsList();
 
-    const roomMessages = async () => {
-      if (!allMessages[activeChannel.value.id]) {
-        await api.getChannelMessages(activeChannel.value.id)
+    const roomMessages = async (channel: Channel) => {
+
+      if (!allMessages[channel.id]) {
+        await api.getChannelMessages(channel.id)
         .then((res) => {
-          allMessages[activeChannel.value.id] = [];
+          allMessages[channel.id] = [];
           res.data.forEach(item => {
             console.log(item)
             console.log(item.channel_id)
-            allMessages[activeChannel.value.id].push({
+            allMessages[channel.id].push({
               content: item.content,
               author_id: item.author_id,
               author: item.author_id.toString(), //TEMPORARY, MUST FETCH USERNAME STORE NAME
-              channel_id: activeChannel.value.id,
-              channel: activeChannel.value.name,
+              channel_id: channel.id,
+              channel: channel.name,
               id: item.id,
             })
             messageId.value = item.id + 1;
@@ -171,6 +178,9 @@ export const ChatComponent = defineComponent({
         })
       }
       channelMessages.value = allMessages[activeChannel.value.id];
+      // var scroll = document.getElementById('messages')!;
+      // scroll.scrollTop = scroll.scrollHeight;
+      // scroll.animate({scrollTop: scroll.scrollHeight});
     }
 
     const isMemberOfActiveRoom = async () => {
@@ -196,7 +206,7 @@ export const ChatComponent = defineComponent({
     const switchRoom = (info: Channel) => {
       activeChannel.value = info;
       selectActiveChannel();
-      roomMessages();
+      roomMessages(activeChannel.value);
     }
 
     const createRoom = () => {
@@ -208,14 +218,18 @@ export const ChatComponent = defineComponent({
     }
 
     window.onbeforeunload = () => {
-      socket.emit("leave", username.value);
+      socket.emit("leave", user.value.username);
     };
 
     socket.on("chat-message", (data: any) => {
 
-      if (allMessages[data.channel_id])
-        allMessages[data.channel_id].push(data);
-      roomMessages();
+      // console.log("in chat message: data", data)
+      if (!allMessages[data.channel_id])
+        roomMessages({ name: data.channel, id: data.channel_id, type: ''});
+      // if (allMessages[data.channel_id])
+      allMessages[data.channel_id].push(data);
+      // else {}
+      // roomMessages();
     });
 
     socket.on("typing", (user: string) => {
@@ -243,11 +257,12 @@ export const ChatComponent = defineComponent({
       updateChannelsList();
     })
 
-    socket.on("join", (user: string, connectionsNb: number) => {
+    socket.on("join", (username: string, connectionsNb: number) => {
       info.push({
-        username: user,
+        username: username,
         action: "joined",
       });
+      // user.value = useStore().state.user;
 
       //updating connection nb for newcomer
       socket.emit("get-connections")
@@ -275,7 +290,7 @@ export const ChatComponent = defineComponent({
 
     watch(newMessage, (newMessage) => {
       newMessage
-        ? socket.emit("typing", username.value)
+        ? socket.emit("typing", user.value.username)
         : socket.emit("stopTyping");
     });
 
@@ -289,12 +304,14 @@ export const ChatComponent = defineComponent({
 
       const newContent = {
         content: newMessage.value,
-        author: username.value,
-        author_id: 1234,//get user id
+        author: user.value.username,
+        author_id: user.value.id,
         channel: activeChannel.value.name,
         channel_id: activeChannel.value.id,
         id: messageId.value,
       }
+
+      console.log(newContent)
 
       newMessage.value = "";
       messageId.value++;
@@ -302,7 +319,7 @@ export const ChatComponent = defineComponent({
       if (!allMessages[activeChannel.value.id])
         allMessages[activeChannel.value.id] = [];
       allMessages[activeChannel.value.id].push(newContent);
-      roomMessages();
+      roomMessages(activeChannel.value);
 
       socket.emit("chat-message", newContent)
       // } else {
@@ -314,13 +331,11 @@ export const ChatComponent = defineComponent({
           author_id: newContent.author_id, // GET LOGGED IN USER ID
           content: newContent.content,
       })
-      .then((res: any) => (responseData.value = res.data))
       .catch((err: any) => console.log(err.message));
     }
 
     const addUser = () => {
-      ready.value = true;
-      socket.emit("join", username.value);
+      socket.emit("join", user.value.username);
     }
 
     return {
@@ -332,8 +347,7 @@ export const ChatComponent = defineComponent({
       newMessage,
       channelMessages,
       typing,
-      username,
-      ready,
+      user,
       info,
       connections,
 
@@ -354,10 +368,27 @@ export default ChatComponent;
 </script>
 
 <style>
-#messages {
-  height: 300px;
-  overflow-y: scroll;
+
+.message {
+  color: black;
 }
+.message-author {
+  width: 6em;
+  display: inline-block;
+  overflow:scroll;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+.messages-wrapper {
+  height: 300px;
+  overflow-x:auto; 
+  display:flex; 
+  flex-direction:column-reverse;
+}
+/* .messages {
+  overflow-y: scroll;
+} */
 .selectRoom {
   padding-top: 5px;
   border-radius: 10px;
