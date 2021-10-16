@@ -104,7 +104,7 @@ export class UsersController {
 		if (!file) {
 			throw new BadRequestException('Invalid file');
 		}
-		this.userService.updateUser({ id: 1, avatar: `${process.env.BASE_URL}/users/avatars/${file.filename}` })
+		this.userService.updateUser({ id: req.user.id, avatar: `${process.env.BASE_URL}/users/avatars/${file.filename}` })
 		const response = {
 			message: 'File has been uploaded successfully',
 			originalname: file.originalname,

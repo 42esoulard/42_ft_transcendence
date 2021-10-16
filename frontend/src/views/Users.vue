@@ -35,7 +35,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 .user h2 {
   background: #f4f4f4;
   padding: 20px;

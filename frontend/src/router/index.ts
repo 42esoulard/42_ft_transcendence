@@ -133,7 +133,7 @@ router.beforeEach(async (to, from) => {
     }
     console.log('user:', store.state.user)
     if (!store.state.user) {
-      return '/login'; // redirected to login
+      return `/login?from=${to.path}`; // redirected to login
     } else {
       return true; // the route is allowed
     }

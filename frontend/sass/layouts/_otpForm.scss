@@ -1,0 +1,140 @@
+/**
+** Modal version of InitTwoFactor vue
+** See lower in that page for One page version
+*/
+
+.backdrop {
+  top: 0;
+  position: fixed;
+  background: rgba(216, 207, 207, 0.5);
+  width: 100%;
+  height: 100%;
+  padding-left: $sidebar-width;
+  // filter: blur(2px);
+}
+
+.google {
+  width: 120px;
+}
+.twofa-grid {
+  position: relative;
+  margin: 100px auto;
+  display: grid;
+  align-items: center;
+  max-width: 580px;
+  grid-template-columns: 210px auto;
+  // grid-column-gap: 15px;
+  padding: 20px;
+  background-color: rgb(41, 41, 41);
+  color: white;
+  box-shadow: 0 15px 15px rgba(0, 0, 0, 0.6);
+  // filter: none;
+}
+.otp-input {
+  grid-area: 6 / 1 / span 1 / span 2;
+}
+.otp_submit {
+  display: inline-block;
+  margin-left: 20px;
+}
+::placeholder {
+  text-align: center;
+}
+:focus::placeholder {
+  color: #ccc;
+}
+.twofa-hr,
+.twofa-h2 {
+  grid-area: span 1 / span 2;
+  margin-bottom: 0.8em;
+}
+.twofa-hr {
+  width: 100%;
+  border: 1px solid;
+}
+.twofa-h3 {
+  font-size: 1.5em;
+}
+.br15 {
+  border-radius: 15px;
+}
+.tal {
+  text-align: left;
+}
+.tac {
+  text-align: center;
+}
+
+.qr_code {
+  width: 150px;
+}
+
+.close-cross {
+	text-align: center;
+	position: absolute;
+	right: 15px;
+	top: 0;
+  font-size: 2em;
+  color: grey;
+  &:hover {
+    cursor: pointer;
+    color: rgb(177, 177, 177);
+  }
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-active {
+  transition: all 0.2s ease;
+}
+.fade-leave-active {
+  transition: all 0.5s ease;
+}
+
+/**
+** In normal Page
+*/
+
+/* .google {
+  width: 120px;
+}
+.twofa-grid {
+  margin: auto;
+  display: grid;
+  align-items: center;
+  max-width: 700px;
+  grid-template-columns: 230px auto;
+  grid-column-gap: 30px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 50%);
+}
+.otp-input {
+  grid-area: 6 / 1 / span 1 / span 2;
+}
+::placeholder {
+  text-align: center;
+}
+:focus::placeholder {
+  color: #ccc;
+}
+.twofa-hr,
+.twofa-h2 {
+  grid-area: span 1 / span 2;
+}
+.twofa-hr {
+  width: 100%;
+  border: 1px solid;
+}
+.twofa-h3 {
+  font-size: 1.5em;
+}
+.br15 {
+  border-radius: 15px;
+}
+.tal {
+  text-align: left;
+}
+.tac {
+  text-align: center;
+} */

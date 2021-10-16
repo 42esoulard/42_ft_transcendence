@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, NotFoundException, Param, Post, Redirect, Req, Res, Session, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, NotFoundException, Param, Post, Redirect, Req, Res, Session, UnauthorizedException, UseFilters, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { TwoFactorDto } from './dto/TwoFactor.dto';
 import { User } from '../users/interfaces/user.interface';
@@ -10,6 +10,7 @@ import { JwtTwoFactorGuard } from './guards/jwtTwoFactor.guard';
 import { RefreshTokenAuthGuard } from './guards/refresh.guard';
 import { ApiCookieAuth, ApiOAuth2, ApiTags } from '@nestjs/swagger';
 import { RefreshTwoFactorGuard } from './guards/refreshTwoFactor.guard';
+import { HttpExceptionFilter } from '../exceptions/http-exception.filter';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -123,6 +124,7 @@ export class AuthController {
   @ApiCookieAuth()
   @Post('2fa/turn-on')
   @UseGuards(JwtAuthGuard)
+  // @UseFilters(HttpExceptionFilter)
   async turnOnTwoFactorAuthentication(
     @Req() request: Request,
     @Body() { code: twoFACode }: TwoFactorDto
@@ -170,7 +172,10 @@ export class AuthController {
       twoFACode, request.user
     );
     if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong authentication code');
+      throw new UnauthorizedException({
+        error: 'wrong_code',
+        message: 'Wrong authentication code',
+      });
     }
 
     const access_token = await this.authService.generateAccessToken(request.user, true);
