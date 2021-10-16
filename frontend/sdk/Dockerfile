@@ -11,6 +11,7 @@ RUN echo "${ALPINE_MIRROR}/v3.11/main/" >> /etc/apk/repositories
 RUN apk add nodejs --repository="http://dl-cdn.alpinelinux.org/alpine/v3.11/main/"
 RUN node --version
 
-ENTRYPOINT cd /usr/src/app/frontend/sdk \
-    && sh sdkWatcher.sh
 
+CMD cd /usr/src/app/frontend/sdk \
+    && sh generateSDK.sh \
+    && tail -f /dev/null
