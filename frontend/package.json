@@ -18,7 +18,7 @@
     "mdue": "^0.1.4",
     "moment": "^2.29.1",
     "sdk-client": "sdk/typescript-axios-client-generated/",
-    "socket.io-client": "^4.2.0",
+    "socket.io-client": "4.2.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.2"
