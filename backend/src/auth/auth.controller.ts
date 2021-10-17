@@ -122,6 +122,18 @@ export class AuthController {
   }
 
   @ApiCookieAuth()
+  @Get('2fa/key')
+  @UseGuards(JwtAuthGuard)
+  getKey(@Req() request: Request) {
+    let key = 'No available key';
+    // console.log('KEY:', request.user.two_fa_secret);
+    if (request.user.two_fa_secret) {
+      key = request.user.two_fa_secret;
+    }
+    return { message: "Two-factor key", key: key };
+  }
+
+  @ApiCookieAuth()
   @Post('2fa/turn-on')
   @UseGuards(JwtAuthGuard)
   // @UseFilters(HttpExceptionFilter)

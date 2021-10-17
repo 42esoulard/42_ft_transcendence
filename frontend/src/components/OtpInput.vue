@@ -65,7 +65,9 @@ export default defineComponent({
               store.state.user.two_fa_enabled = true;
               store.state.message = res.data.message;
               context.emit("close");
-              setTimeout(() => (store.state.message = ""), 3000);
+              setTimeout(() => {
+                store.state.message = "";
+              }, 3000);
             } else {
               router.push("account");
             }

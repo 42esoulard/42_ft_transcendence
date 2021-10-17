@@ -37,6 +37,8 @@
           Open your Authentication app and scan the following QR code with your
           phone's camera
         </p>
+        <strong>Activation key (manual input)</strong>
+        <p>{{ key }}</p>
       </div>
       <hr class="twofa-hr" />
       <OtpInput :codeSendToUrl="codeSendToUrl" @close="closeModal()" />
@@ -45,8 +47,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, onUpdated, ref } from "vue";
 import OtpInput from "@/components/OtpInput.vue";
+import axios from "axios";
 
 export default defineComponent({
   name: "InitTwoFactor",
@@ -54,14 +57,31 @@ export default defineComponent({
   setup(props, context) {
     const qrcodeURL = ref("http://localhost:3000/auth/2fa/generate");
     const codeSendToUrl = ref("turn-on");
+    const key = ref("No key available");
 
     const closeModal = () => {
       context.emit("close");
     };
+
+    onMounted(() => {
+      getTwoFactorKey();
+    });
+
+    axios.defaults.withCredentials = true;
+    const getTwoFactorKey = async () => {
+      await axios
+        .get("http://localhost:3000/auth/2fa/key")
+        .then(res => {
+          key.value = res.data.key;
+        })
+        .catch(error => console.log(error));
+    };
+
     return {
       qrcodeURL,
       codeSendToUrl,
-      closeModal
+      closeModal,
+      key
     };
   }
 });

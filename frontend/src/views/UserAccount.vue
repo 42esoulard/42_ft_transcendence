@@ -1,8 +1,9 @@
 <template>
+  <transition name="toast">
+    <Toast v-if="message" :message="message" />
+  </transition>
   <h1>User Account</h1>
-  <p class="message" v-if="message">{{ message }}</p>
   <div v-if="user">
-    <h2>Your profile from 42</h2>
     <img :src="user.avatar" class="ua-img" alt="[Your avatar]" />
     <p>Your avatar: {{ user.avatar }}</p>
     <p>Your id: {{ user.id }}</p>
@@ -16,12 +17,12 @@
         >Activate Two-Factor Authentication</router-link
       > -->
       <button class="button button--invite" @click="toggleModal()">
-        Activate Two-Factor Authentication
+        Enable Two-Factor Authentication
       </button>
     </div>
     <div v-else class="ua-twofa">
       <button class="button button--add" @click="deactivateTwoFactor">
-        Deactivate Two-Factor Authentication
+        Disable Two-Factor Authentication
       </button>
     </div>
     <hr />
@@ -52,10 +53,11 @@ import { useStore } from "vuex";
 import axios from "axios";
 import moment from "moment";
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
+import Toast from "@/components/Toast.vue";
 
 export default defineComponent({
   name: "UserAccount",
-  components: { InitTwoFactor },
+  components: { InitTwoFactor, Toast },
   setup() {
     const api = new DefaultApi();
     const store = useStore();
@@ -111,7 +113,9 @@ export default defineComponent({
           console.log(res);
           store.state.user.two_fa_enabled = false;
           store.state.message = res.data.message;
-          setTimeout(() => (store.state.message = ""), 3000);
+          setTimeout(() => {
+            store.state.message = "";
+          }, 3000);
         })
         .catch(error => console.log(error));
     };
@@ -144,9 +148,9 @@ export default defineComponent({
 
 <style scoped>
 .ua-img {
-  width: 150px;
-  height: 150px;
-  border-radius: 150px;
+  width: 200px;
+  height: 200px;
+  border-radius: 200px;
 }
 p {
   margin-bottom: 0.8rem;
