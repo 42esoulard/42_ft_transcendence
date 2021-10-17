@@ -2,15 +2,12 @@ import {
   Entity,
   Column,
   CreateDateColumn,
-  PrimaryGeneratedColumn,
+  // PrimaryGeneratedColumn,
 } from 'typeorm';
 // import * as bcrypt from 'bcrypt';
 
 @Entity('channelMembers')
 export class ChannelMembers {
-  @PrimaryGeneratedColumn()
-  id: number;
-
   @Column()
   channel_id: number;
 

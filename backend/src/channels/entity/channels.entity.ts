@@ -1,8 +1,13 @@
+import { Messages } from 'src/messages/entity/messages.entity';
+import { Users } from 'src/users/entity/users.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  OneToMany,
+  ManyToOne,
+  ManyToMany,
 } from 'typeorm';
 // import * as bcrypt from 'bcrypt';
 
@@ -23,8 +28,14 @@ export class Channels {
   @Column({ nullable: true })
   password: string;
 
-  @Column()
-  owner_id: number;
+  @OneToMany(() => Messages, (message) => message.channel)
+  messages: Messages[];
+
+  @ManyToOne(() => Users, { onDelete: 'SET NULL' })
+  owner: Users;
+
+  @ManyToMany(() => Users, (member) => member.channels)
+  members: Users[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
   created_at: Date;

@@ -14,7 +14,14 @@ export class ChannelsService {
     private readonly channelsRepository: Repository<Channels>,
   ) {}
 
-  private index: 1;
+  async seed() {
+    this.saveChannel({
+      name: 'General',
+      owner_id: null,
+      password: null,
+      type: 'Public',
+    });
+  }
 
   /**
    * Lists all channels in database
@@ -53,7 +60,7 @@ export class ChannelsService {
   async saveChannel(channelDto: CreateChannelDto): Promise<Channel> {
     console.log('IN SAVE CHANNEL', channelDto);
     const newChannel = this.channelsRepository.create(channelDto);
-    newChannel.owner_id = channelDto.owner_id;
+    // newChannel.owner_id = channelDto.owner_id;
 
     if (newChannel.type === 'password-protected') {
       (newChannel.salt = await bcrypt.genSalt()),
@@ -62,7 +69,7 @@ export class ChannelsService {
           newChannel.salt,
         )); //must be crypted
     }
-    this.index++;
+
     const createdChannel = await this.channelsRepository.save(newChannel);
 
     return createdChannel;

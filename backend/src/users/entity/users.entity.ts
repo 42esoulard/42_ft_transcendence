@@ -1,7 +1,10 @@
 import { Game } from 'src/pong/entity/games.entity';
 import { GameStats } from 'src/pong/entity/gameStats.entity';
 import { GameUser } from 'src/pong/entity/gameUser.entity';
+import { ChannelMembers } from 'src/channel_member/entity/channel_member.entity';
+import { Messages } from 'src/messages/entity/messages.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, CreateDateColumn, OneToOne, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import { Channels } from 'src/channels/entity/channels.entity';
 // import * as bcrypt from 'bcrypt';
 
 @Entity('users')
@@ -38,6 +41,16 @@ export class Users {
 
   @OneToMany(() => GameUser, gameuser => gameuser.user)
   games: GameUser[]
+
+  @OneToMany(() => Messages, (message) => message.author)
+  messages: Messages[];
+
+  @ManyToMany(() => Channels, (channel) => channel.members)
+  @JoinTable({ name: 'channel_members' })
+  channels: Channels[];
+
+  // @OneToMany()
+  // channels:
 
   // @ManyToMany(() => Game, game => game.participants )
   // @JoinTable({name: "playsIn"})
