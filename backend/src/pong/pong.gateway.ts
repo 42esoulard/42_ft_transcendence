@@ -42,7 +42,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // }
     this.games.forEach((value: pongGame, key: string) => {
       if (value.player1.clientSocket.id === client.id || value.player2.clientSocket.id === client.id)
-        this.endGame(key)
+        this.leaveGame(client, key)
     })
   }
   
@@ -78,7 +78,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('leaveGame')
   handleLeaveGame(client: Socket, room:string): void
   {
-    this.endGame(room)
+    this.leaveGame(client, room)
       // client.to(room).emit('opponentLeftRoom')
       // client.leave(room)
   }
@@ -97,7 +97,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     game.moveRacquet(client.id, message.text)
   }
 
-  endGame(room: string)
+  async leaveGame(clientWhoLeft: Socket, room: string)
   {
     const game: pongGame = this.games.get(room)
     if (!game)
@@ -105,7 +105,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.logger.error('endGame: game doesnt exist')
       return
     }
-    game.endGame(true)
+
+    const player1Won: boolean = clientWhoLeft === game.player2.clientSocket
+    await game.endGame(player1Won)
     this.games.delete(room)
   }
 
