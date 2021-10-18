@@ -43,7 +43,7 @@ export default {
 		const SendMoveMsg = (direction) => {
 			if (room.value)
 			{
-				console.log(room.value)
+				// console.log(room.value)
 				socket.value.emit('moveRacquet', {room: room.value, text: direction})
 			}
 		}

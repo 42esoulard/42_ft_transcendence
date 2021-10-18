@@ -8,7 +8,6 @@ import { GameUser } from './entity/gameUser.entity';
 import { pongGame } from './classes/pong.pongGame';
 import { player } from './classes/pong.player';
 
-var INTERVAL_IN_MS = 20
 
 @WebSocketGateway( { namespace: '/pong'})
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -64,9 +63,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.games.set(game.room, game)
       
       this.logger.log('new interval: ' + game.room)
-      game.interval = setInterval(() => {
-        game.sendBallPosition()
-      }, INTERVAL_IN_MS)
 
     }
   }
@@ -83,7 +79,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('moveRacquet')
   handleMoveRacquet(client: Socket, message: {room: string, text: string}): void {
 
-    this.logger.log('msg received: ' + message.room)
+    // this.logger.log('msg received: ' + message.room)
     const game: pongGame = this.games.get(message.room)
     if (!game)
     {
@@ -93,17 +89,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     game.moveRacquet(client.id, message.text)
   }
 
-  // sendDatas(client: Socket, room:string): void {
-
-  //   const game: pongGame = this.games.get(room) // returns a reference to the PongGame object --> any change made to "game" will modify the object inside the map
-  //   if (!game)
-  //   {
-  //     this.logger.error('sendPosition: game doesnt exist')
-  //     return
-  //   }
-  //   game.sendBallPosition()
-  // }
-  
   endGame(room: string)
   {
     const game: pongGame = this.games.get(room)

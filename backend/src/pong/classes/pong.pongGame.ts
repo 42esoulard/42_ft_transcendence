@@ -16,6 +16,7 @@ var RACQUET_LENGTH = 80
 var RACQUET_WIDTH = 20
 var RACQUET_SPEED = 4
 var SCORE_NEEDED_TO_WIN = 2
+var INTERVAL_IN_MS = 20
 
 export class pongGame {
 
@@ -89,6 +90,9 @@ export class pongGame {
     await this.player2.clientSocket.join(this.room)
     
     this.server.to(this.room).emit('gameReadyToStart', this.room, this.player1.userName, this.player2.userName)
+    this.interval = setInterval(() => {
+      this.sendBallPosition()
+    }, INTERVAL_IN_MS)
   }
   
   async endGame(player1Won: boolean): Promise<void>
