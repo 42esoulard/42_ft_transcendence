@@ -96,7 +96,7 @@ export class pongGame {
   startGame()
   {
     this.interval = setInterval(() => {
-      this.sendBallPosition()
+      this.sendPositions()
     }, INTERVAL_IN_MS)
   }
   
@@ -109,13 +109,13 @@ export class pongGame {
     this.server.to(this.room).emit('gameOver')
   }
  
-  sendBallPosition(): void
+  sendPositions(): void
   {
 
     this.changeBallDirectionIfNeeded()
     this.computeNewBallPosition()
     
-    this.server.to(this.room).emit('position', this.ballPosition, this.getPlayerPositions(), this.getPlayerScores())
+    this.server.to(this.room).emit('position', this.ballPosition, this.getPlayerPositions())
   }
 
   changeBallDirectionIfNeeded(): void
@@ -158,6 +158,9 @@ export class pongGame {
       this.player1.score++
     else
       this.player2.score++
+    
+    this.server.to(this.room).emit('score', this.getPlayerScores())
+    
     if (this.player1.score >= SCORE_NEEDED_TO_WIN)
       this.endGame(true)
     if (this.player2.score >= SCORE_NEEDED_TO_WIN)

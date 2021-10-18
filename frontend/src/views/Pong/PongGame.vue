@@ -67,15 +67,20 @@ export default {
 	},
 	mounted() {
 		console.log('mounted')
-		this.context = this.$refs.game.getContext("2d");
+		this.context = this.$refs.game.getContext("2d")
 		
-		this.socket.on("position", (ballPosition, playerPositions, score) => {
-		this.ballPosition = ballPosition
-		this.playerPositions = playerPositions
-		this.draw()
-		this.score = score
+		this.socket.on("position", (ballPosition, playerPositions) => {
+			this.ballPosition = ballPosition
+			this.playerPositions = playerPositions
+			this.draw()
 		})
+		
+		this.socket.on("score", score => {
+			this.score = score
+		})
+
 	},
+
 	beforeRouteLeave()
 	{
 		this.socket.emit('leaveGame', this.room)
