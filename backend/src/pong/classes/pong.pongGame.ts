@@ -102,6 +102,7 @@ export class pongGame {
   
   async endGame(player1Won: boolean): Promise<void>
   {
+    this.logger.log('interval cleared: ' + this.room )
     clearInterval(this.interval)
     await this.gameUserRepo.update({userId: this.player1.userId, gameId: this.gameId}, { won: player1Won})
     await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.gameId}, { won: !player1Won})

@@ -57,12 +57,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     {
       const player2 = new player(message.userId, message.userName, client)
       const game = new pongGame(this.waitingPlayer, player2, this.gameRepo, this.gameUserRepo, this.server)
-      delete this.waitingPlayer
-      this.waitingPlayer = null
       await game.createGame()
       this.games.set(game.room, game)
       
-      this.logger.log('new interval: ' + game.room)
+      delete this.waitingPlayer
+      this.waitingPlayer = null
 
     }
   }
@@ -97,7 +96,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.logger.error('endGame: game doesnt exist')
       return
     }
-    this.logger.log('interval cleared: ' + room )
     game.endGame(true)
     this.games.delete(room)
   }
