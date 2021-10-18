@@ -57,7 +57,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     else
     {
       const player2 = new player(message.userId, message.userName, client)
-      const game = new pongGame(this.waitingPlayer, player2, this.gameRepo, this.gameUserRepo)
+      const game = new pongGame(this.waitingPlayer, player2, this.gameRepo, this.gameUserRepo, this.server)
       delete this.waitingPlayer
       this.waitingPlayer = null
       await game.createGame()
@@ -102,10 +102,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.logger.error('sendPosition: game doesnt exist')
       return
     }
-    game.changeBallDirectionIfNeeded()
-    game.computeNewBallPosition()
-    
-    this.server.to(room).emit('position', game.ballPosition, game.getPlayerPositions(), game.getPlayerScores())
+    game.sendBallPosition()
   }
   
   endGame(room: string)

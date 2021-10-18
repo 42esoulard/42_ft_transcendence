@@ -4,6 +4,7 @@ import { Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Game } from '../entity/games.entity';
 import { GameUser } from '../entity/gameUser.entity';
+import { Server } from 'socket.io';
 
 var BALL_SPEED = 1
 var CANVAS_WIDTH = 640
@@ -22,7 +23,8 @@ export class pongGame {
   public player1: player, 
   public player2: player,
   private readonly gameRepo: Repository<Game>,
-  private readonly gameUserRepo: Repository<GameUser>)
+  private readonly gameUserRepo: Repository<GameUser>,
+  public server: Server)
   {
     this.initBallDirection()
     this.initPositions()
@@ -82,8 +84,18 @@ export class pongGame {
     clearInterval(this.interval)
     await this.gameUserRepo.update({userId: this.player1.userId, gameId: this.gameId}, { won: player1Won})
     await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.gameId}, { won: !player1Won})
+    this.server.to(this.room).emit('gameOver')
   }
-  
+ 
+  sendBallPosition(): void
+  {
+
+    this.changeBallDirectionIfNeeded()
+    this.computeNewBallPosition()
+    
+    this.server.to(this.room).emit('position', this.ballPosition, this.getPlayerPositions(), this.getPlayerScores())
+  }
+
   changeBallDirectionIfNeeded(): void
   {
     // if hit top or bottom walls
