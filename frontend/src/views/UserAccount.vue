@@ -36,6 +36,9 @@
     </form>
     <teleport to="#modals">
       <transition name="fade">
+        <div v-if="showModal" class="backdrop"></div>
+      </transition>
+      <transition name="zoomin">
         <InitTwoFactor
           v-if="showModal"
           @close="toggleModal()"

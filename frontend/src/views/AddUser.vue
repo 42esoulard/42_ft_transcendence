@@ -32,7 +32,7 @@ export default defineComponent({
       await api
         .saveUser({
           username: username.value,
-          forty_two_login: "coollogin",
+          forty_two_login: username.value,
         })
         .then((res: any) => (responseData.value = res.data))
         .catch((err: any) => console.log(err.response.data.message));

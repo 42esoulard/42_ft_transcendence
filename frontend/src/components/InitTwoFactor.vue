@@ -1,5 +1,5 @@
 <template>
-  <div class="backdrop" @click.self="closeModal">
+  <div class="twofa-grid-container" @click.self="closeModal">
     <div class="twofa-grid tac br15">
       <div @click="closeModal()" class="close-cross">
         &times;
