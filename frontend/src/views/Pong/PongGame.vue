@@ -7,6 +7,10 @@
 	<div v-if="!gameHasStarted">
 		<h1> Get ready, game is about to start ! </h1>
 	</div>
+
+	<div v-if="gameIsOver">
+		<h1> {{ winningPlayer }} won ! </h1>
+	</div>
 	
 </template>
 
@@ -34,6 +38,8 @@ export default {
 		const player2UserName = ref(route.params.player2UserName)
 
 		const gameHasStarted = ref(false)
+		const gameIsOver = ref(false)
+		const winningPlayer = ref(null)
 
 		const draw = () => {
 			context.value.clearRect(0, 0, game.value.width, game.value.height)
@@ -65,7 +71,7 @@ export default {
 		}
 
 
-		return { ballPosition, playerPositions, score, socket, room, draw, SendMoveMsg, onKeyDown, context, game, player1UserName, player2UserName, gameHasStarted }
+		return { ballPosition, playerPositions, score, socket, room, draw, SendMoveMsg, onKeyDown, context, game, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer }
 
 	},
 	created() {
@@ -87,6 +93,14 @@ export default {
 
 		this.socket.on("gameStarting", () => {
 			this.gameHasStarted = true
+		})
+
+		this.socket.on("gameOver", (player1Won) => {
+			this.gameIsOver = true
+			if (player1Won)
+				this.winningPlayer = this.player1UserName
+			else
+				this.winningPlayer = this.player2UserName
 		})
 
 	},

@@ -111,7 +111,7 @@ export class pongGame {
     clearInterval(this.interval)
     await this.gameUserRepo.update({userId: this.player1.userId, gameId: this.gameId}, { won: player1Won})
     await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.gameId}, { won: !player1Won})
-    this.server.to(this.room).emit('gameOver')
+    this.server.to(this.room).emit('gameOver', player1Won)
   }
  
   sendPositions(): void
@@ -157,7 +157,7 @@ export class pongGame {
     this.ballPosition.x += this.ballDirection.x * BALL_SPEED
     this.ballPosition.y += this.ballDirection.y * BALL_SPEED
   }
-  
+
   handleScore(player1Scored: boolean)
   {
     if (player1Scored)
