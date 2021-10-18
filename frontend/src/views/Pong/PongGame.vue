@@ -1,8 +1,12 @@
 <template>
-	<h1> Game # {{ room }} </h1>
+	<p> Game # {{ room }} </p>
+	<h1> {{ player1UserName }} [{{ score.player1 }}]  |  {{ player2UserName }} [{{ score.player2 }}] </h1>
 	<canvas ref="game" width="640" height="480" style="border: 1px solid black">
 	</canvas>
-	<p> {{ player1UserName }} [{{ score.player1 }}]  |  {{ player2UserName }} [{{ score.player2 }}] </p>
+
+	<div v-if="!gameHasStarted">
+		<h1> Get ready, game is about to start ! </h1>
+	</div>
 	
 </template>
 
@@ -28,6 +32,8 @@ export default {
 		const room =  ref(route.params.id)
 		const player1UserName = ref(route.params.player1UserName)
 		const player2UserName = ref(route.params.player2UserName)
+
+		const gameHasStarted = ref(false)
 
 		const draw = () => {
 			context.value.clearRect(0, 0, game.value.width, game.value.height)
@@ -59,7 +65,7 @@ export default {
 		}
 
 
-		return { ballPosition, playerPositions, score, socket, room, draw, SendMoveMsg, onKeyDown, context, game, player1UserName, player2UserName }
+		return { ballPosition, playerPositions, score, socket, room, draw, SendMoveMsg, onKeyDown, context, game, player1UserName, player2UserName, gameHasStarted }
 
 	},
 	created() {
@@ -77,6 +83,10 @@ export default {
 		
 		this.socket.on("score", score => {
 			this.score = score
+		})
+
+		this.socket.on("gameStarting", () => {
+			this.gameHasStarted = true
 		})
 
 	},

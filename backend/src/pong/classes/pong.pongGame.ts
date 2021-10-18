@@ -17,6 +17,7 @@ var RACQUET_WIDTH = 20
 var RACQUET_SPEED = 4
 var SCORE_NEEDED_TO_WIN = 2
 var INTERVAL_IN_MS = 20
+var INITAL_DELAY_IN_MS = 3000
 
 export class pongGame {
 
@@ -90,7 +91,10 @@ export class pongGame {
     await this.player2.clientSocket.join(this.room)
     
     this.server.to(this.room).emit('gameReadyToStart', this.room, this.player1.userName, this.player2.userName)
-    this.startGame()
+    setTimeout(() => {
+      this.server.to(this.room).emit('gameStarting')
+      this.startGame()
+    }, INITAL_DELAY_IN_MS)
   }
 
   startGame()
