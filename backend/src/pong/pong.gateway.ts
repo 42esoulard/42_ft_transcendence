@@ -65,7 +65,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       
       this.logger.log('new interval: ' + game.room)
       game.interval = setInterval(() => {
-        this.sendDatas(client, game.room)
+        game.sendBallPosition()
       }, INTERVAL_IN_MS)
 
     }
@@ -93,16 +93,16 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     game.moveRacquet(client.id, message.text)
   }
 
-  sendDatas(client: Socket, room:string): void {
+  // sendDatas(client: Socket, room:string): void {
 
-    const game: pongGame = this.games.get(room) // returns a reference to the PongGame object --> any change made to "game" will modify the object inside the map
-    if (!game)
-    {
-      this.logger.error('sendPosition: game doesnt exist')
-      return
-    }
-    game.sendBallPosition()
-  }
+  //   const game: pongGame = this.games.get(room) // returns a reference to the PongGame object --> any change made to "game" will modify the object inside the map
+  //   if (!game)
+  //   {
+  //     this.logger.error('sendPosition: game doesnt exist')
+  //     return
+  //   }
+  //   game.sendBallPosition()
+  // }
   
   endGame(room: string)
   {
