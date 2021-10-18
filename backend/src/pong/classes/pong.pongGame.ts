@@ -17,7 +17,8 @@ var RACQUET_WIDTH = 20
 var RACQUET_SPEED = 4
 var SCORE_NEEDED_TO_WIN = 2
 var INTERVAL_IN_MS = 20
-var INITAL_DELAY_IN_MS = 3000
+var INITAL_DELAY_IN_MS = 2000
+var DELAY_AFTER_SCORE_IN_MS = 500
 
 export class pongGame {
 
@@ -156,6 +157,7 @@ export class pongGame {
     this.ballPosition.x += this.ballDirection.x * BALL_SPEED
     this.ballPosition.y += this.ballDirection.y * BALL_SPEED
   }
+  
   handleScore(player1Scored: boolean)
   {
     if (player1Scored)
@@ -166,12 +168,30 @@ export class pongGame {
     this.server.to(this.room).emit('score', this.getPlayerScores())
     
     if (this.player1.score >= SCORE_NEEDED_TO_WIN)
+    {
       this.endGame(true)
+      return
+    }
     if (this.player2.score >= SCORE_NEEDED_TO_WIN)
+    {
       this.endGame(false)
+      return
+    }
+    this.restartGame()
+  }
+
+  restartGame()
+  {
+    clearInterval(this.interval)
+    setTimeout(() => {
+      this.startGame()
+    }, DELAY_AFTER_SCORE_IN_MS)
+
     this.initPositions()
     this.initBallDirection()
+
   }
+
   getPlayerPositions()
   {
     return {player1: this.player1.position, player2: this.player2.position}
