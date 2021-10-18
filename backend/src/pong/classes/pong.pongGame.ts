@@ -52,29 +52,39 @@ export class pongGame {
     this.ballDirection.x = BALL_INITIAL_DIR_X,
     this.ballDirection.y = BALL_INITIAL_DIR_Y
   }
- 
-  async createGame(): Promise<void>
+
+  async pushGameintoDB()
   {
-    // create a game entity and save it to the database
-    this.logger.log('game created')
     const game = this.gameRepo.create()
     await this.gameRepo.save(game)
+    this.gameId = game.id
+  }
 
-    // create a GameUser entity for player 1 and save it to the database
+  async pushGameUsersintoDB()
+  {
+    // push a GameUser entity for player 1
     const user1game = this.gameUserRepo.create()
-    user1game.gameId = game.id
+    user1game.gameId = this.gameId
     user1game.userId = this.player1.userId
     await this.gameUserRepo.save(user1game)
     
-    // create a GameUser entity for player 2 and save it to the database
+    // push a GameUser entity for player 2
     const user2game = this.gameUserRepo.create()
-    user2game.gameId = game.id
+    user2game.gameId = this.gameId
     user2game.userId = this.player2.userId
     await this.gameUserRepo.save(user2game)
 
-    this.gameId = game.id
+  }
+
+  async createGame(): Promise<void>
+  {
+    this.logger.log('game created')
+
+    await this.pushGameintoDB()
+    await this.pushGameUsersintoDB()
+
     // make player 1 and player 2 join room
-    this.room = game.id.toString()
+    this.room = this.gameId.toString()
     await this.player1.clientSocket.join(this.room)
     await this.player2.clientSocket.join(this.room)
     
