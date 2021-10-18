@@ -61,7 +61,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       delete this.waitingPlayer
       this.waitingPlayer = null
       await game.createGame()
-      this.server.to(game.room).emit('gameReadyToStart', game.room, game.player1.userName, game.player2.userName)
       this.games.set(game.room, game)
       
       this.logger.log('new interval: ' + game.room)

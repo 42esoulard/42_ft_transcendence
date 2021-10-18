@@ -77,6 +77,8 @@ export class pongGame {
     this.room = game.id.toString()
     await this.player1.clientSocket.join(this.room)
     await this.player2.clientSocket.join(this.room)
+    
+    this.server.to(this.room).emit('gameReadyToStart', this.room, this.player1.userName, this.player2.userName)
   }
   
   async endGame(player1Won: boolean): Promise<void>
