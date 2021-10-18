@@ -15,7 +15,7 @@ export class Messages {
   id: number;
 
   // if a channel or a user is deleted, the channel's or user's messages are deleted
-  // seems like the ethical thing to do (looking at u, google)
+  // seems like the ethical thing to do (lookin' atcha, gafams)
 
   @ManyToOne(() => Channels, (channel) => channel.messages, {
     onDelete: 'CASCADE',

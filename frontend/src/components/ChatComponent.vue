@@ -120,11 +120,15 @@ export const ChatComponent = defineComponent({
         [key: number]: Array<Message>,
       } = {};
     const channelMessages = ref<Message[]>([]);
-    const activeChannel = ref<Channel>({
-      name: "General",
-      type: "public",
-      id: 1
-    });
+    
+    const getChannel = async (id: number) => {
+      await api.getChannelById(0)
+      .then((res) => { return res; })
+    }
+
+    const activeChannel = ref(getChannel(0));
+
+
     let newChannelForm = ref(false);
 
     const typing = ref("");
@@ -158,26 +162,26 @@ export const ChatComponent = defineComponent({
 
     const roomMessages = async (channel: Channel) => {
 
-      if (!allMessages[channel.id]) {
-        await api.getChannelMessages(channel.id)
-        .then((res) => {
-          allMessages[channel.id] = [];
-          res.data.forEach(item => {
-            console.log(item)
-            console.log(item.channel_id)
-            allMessages[channel.id].push({
-              content: item.content,
-              author_id: item.author_id,
-              author: item.author_id.toString(), //TEMPORARY, MUST FETCH USERNAME STORE NAME
-              channel_id: channel.id,
-              channel: channel.name,
-              id: item.id,
-            })
-            messageId.value = item.id + 1;
-          })
-        })
-      }
-      channelMessages.value = allMessages[activeChannel.value.id];
+      // if (!allMessages[channel.id]) {
+      //   await api.getChannelMessages(channel.id)
+      //   .then((res) => {
+      //     allMessages[channel.id] = [];
+      //     res.data.forEach(item => {
+      //       console.log(item)
+      //       console.log(item.channel_id)
+      //       allMessages[channel.id].push({
+      //         content: item.content,
+      //         author_id: item.author_id,
+      //         author: item.author_id.toString(), //TEMPORARY, MUST FETCH USERNAME STORE NAME
+      //         channel_id: channel.id,
+      //         channel: channel.name,
+      //         id: item.id,
+      //       })
+      //       messageId.value = item.id + 1;
+      //     })
+      //   })
+      // }
+      // channelMessages.value = allMessages[activeChannel.value.id];
       // var scroll = document.getElementById('messages')!;
       // scroll.scrollTop = scroll.scrollHeight;
       // scroll.animate({scrollTop: scroll.scrollHeight});
@@ -326,12 +330,12 @@ export const ChatComponent = defineComponent({
       //   alert('You must join the room to send messages!')
       // } 
 
-      await api.saveMessage({
-          channel_id: newContent.channel_id,
-          author_id: newContent.author_id, // GET LOGGED IN USER ID
-          content: newContent.content,
-      })
-      .catch((err: any) => console.log(err.message));
+      // await api.saveMessage({
+      //     channel_id: newContent.channel_id,
+      //     author_id: newContent.author_id, // GET LOGGED IN USER ID
+      //     content: newContent.content,
+      // })
+      // .catch((err: any) => console.log(err.message));
     }
 
     const addUser = () => {

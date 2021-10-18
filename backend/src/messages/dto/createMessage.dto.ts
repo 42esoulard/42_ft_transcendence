@@ -1,24 +1,10 @@
 // import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+import { Channel } from 'src/channels/interfaces/channel.interface';
+import { User } from 'src/users/interfaces/user.interface';
+
 export class CreateMessageDto {
-  /**
-   * Message id
-   */
-  // @ApiPropertyOptional()
-  // readonly id: number;
-
-  /**
-   * Channel of the id where the message was posted
-   */
-  readonly channel_id: number;
-  /**
-   * Id of the user who posted it
-   */
-  readonly author_id: number;
-
-  /*
-   * Message content
-   */
-
+  readonly channel: Channel;
+  readonly author: User;
   readonly content: string;
 }

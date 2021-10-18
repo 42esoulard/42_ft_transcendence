@@ -1,7 +1,6 @@
 import { Game } from 'src/pong/entity/games.entity';
 import { GameStats } from 'src/pong/entity/gameStats.entity';
 import { GameUser } from 'src/pong/entity/gameUser.entity';
-import { ChannelMembers } from 'src/channel_member/entity/channel_member.entity';
 import { Messages } from 'src/messages/entity/messages.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, CreateDateColumn, OneToOne, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { Channels } from 'src/channels/entity/channels.entity';

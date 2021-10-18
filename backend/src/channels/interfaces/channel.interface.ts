@@ -1,8 +1,13 @@
+import { User } from 'src/users/interfaces/user.interface';
+import { Message } from 'src/messages/interfaces/message.interface';
+
 export class Channel {
   id: number;
   name: string;
   type: string;
   salt: string | null;
   password: string | null;
-  owner_id: number;
+  owner: User | null;
+  messages: Message[] | null;
+  members: User[] | null;
 }

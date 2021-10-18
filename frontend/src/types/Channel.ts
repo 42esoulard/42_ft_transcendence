@@ -1,6 +1,11 @@
+import { User } from "./User";
+import { Message } from "./Message"
+
 export interface Channel {
-    name: string,
-    id: number,
-    type: string,
-    // joined: boolean,
+  id: number;
+  name: string;
+  type: string;
+  owner: User | null;
+  messages: Message[] | null;
+  members: User[] | null;
 }

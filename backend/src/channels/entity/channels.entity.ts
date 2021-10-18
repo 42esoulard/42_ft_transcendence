@@ -28,14 +28,14 @@ export class Channels {
   @Column({ nullable: true })
   password: string;
 
-  @OneToMany(() => Messages, (message) => message.channel)
-  messages: Messages[];
-
   @ManyToOne(() => Users, { onDelete: 'SET NULL' })
   owner: Users;
 
   @ManyToMany(() => Users, (member) => member.channels)
   members: Users[];
+
+  @OneToMany(() => Messages, (message) => message.channel)
+  messages: Messages[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
   created_at: Date;

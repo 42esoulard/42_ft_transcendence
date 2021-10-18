@@ -49,7 +49,7 @@ export class ChannelsService {
    */
   async getChannelById(id: number): Promise<Channel> {
     const res = await this.channelsRepository.findOne(id);
-    console.log('res', res);
+    console.log('getChannelById', id, res);
     return res;
   }
 

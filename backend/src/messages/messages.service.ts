@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Messages } from './entity/messages.entity';
 import { CreateMessageDto } from './dto/createMessage.dto';
+import { Channel } from 'src/channels/interfaces/channel.interface';
+import { User } from 'src/users/interfaces/user.interface';
 // import { timestamp } from 'rxjs';
 // import { UpdateMessageDto } from './dto/updateMessage.dto';
 // import * as bcrypt from 'bcrypt';
@@ -14,8 +16,6 @@ export class MessagesService {
     @InjectRepository(Messages)
     private readonly messagesRepository: Repository<Messages>,
   ) {}
-
-  private index: 1;
 
   /**
    * Lists all messages in database
@@ -29,8 +29,8 @@ export class MessagesService {
    * Lists all messages in a particular channel
    * nb: find() is a function from the typeORM library
    */
-  async getChannelMessages(chan_id: number): Promise<Message[]> {
-    return await this.messagesRepository.find({ channel_id: chan_id });
+  async getChannelMessages(channel: Channel): Promise<Message[]> {
+    return await this.messagesRepository.find({ channel: channel });
   }
 
   /**
@@ -49,13 +49,7 @@ export class MessagesService {
    */
   async saveMessage(messageDto: CreateMessageDto): Promise<Message> {
     // console.log(messageDto);
-    const newMessage: Message = {
-      id: this.index,
-      channel_id: messageDto.channel_id,
-      author_id: messageDto.author_id,
-      content: messageDto.content,
-      // created_at: Math.floor(Date.now() / 1000),
-    };
+    const newMessage: Message = this.messagesRepository.create(messageDto);
 
     return await this.messagesRepository.save(newMessage);
   }
