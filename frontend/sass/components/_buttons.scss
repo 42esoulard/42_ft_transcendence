@@ -35,14 +35,14 @@
   }
 }
 
-<<<<<<< HEAD
 .otp_submit > .button,
 .ua-twofa > .button {
   padding: 10px 20px;
   // margin-top: 20px;
   width: auto;
   font-weight: bold;
-=======
+}
+
 .button-log-in__logo {
   width: $button-log-in-logo-width;
   height: auto;
@@ -54,5 +54,4 @@
   width: 350px;
   gap: 10px;
   margin: auto;
->>>>>>> buttons + hiding sidebar & header
 }
