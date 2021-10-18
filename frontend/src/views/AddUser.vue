@@ -15,11 +15,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, ref } from "vue";
-// import axios from "axios";
+import { defineComponent, ref } from "vue";
 import SubmitSuccess from "@/components/SubmitSuccess.vue";
 import { useUserApi } from "@/plugins/api.plugin";
-
 
 export default defineComponent({
   components: {
@@ -31,12 +29,13 @@ export default defineComponent({
     const api = useUserApi();
 
     const handleSubmit = async () => {
-      await api.saveUser({
+      await api
+        .saveUser({
           username: username.value,
-          forty_two_login: "coollogin"
+          forty_two_login: "coollogin",
         })
         .then((res: any) => (responseData.value = res.data))
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) => console.log(err.response.data.message));
     };
 
     return { username, responseData, handleSubmit };
@@ -79,11 +78,5 @@ button {
 }
 .submit {
   text-align: center;
-}
-.error {
-  color: #ff0062;
-  margin-top: 10px;
-  font-size: 0.8em;
-  font-weight: bold;
 }
 </style>

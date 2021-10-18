@@ -104,4 +104,10 @@ export class UsersService {
 			two_fa_enabled: true
 		});
 	}
+	async turnOffTwoFA(id: number) {
+		return this.usersRepository.update(id, {
+			two_fa_enabled: false
+		});
+	}
+
 }

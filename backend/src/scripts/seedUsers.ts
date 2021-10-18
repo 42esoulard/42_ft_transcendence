@@ -9,10 +9,10 @@ async function run() {
         .insert()
         .into(Users)
         .values([
-          { username: "Harry", avatar: "path/to/avatar.img" },
-          { username: "Ron", avatar: "path/to/avatar.img" },
-          { username: "Hermione", avatar: "path/to/avatar.img" },
-          { username: "Severus", avatar: "path/to/avatar.img" }
+          { username: "Harry", avatar: "http://localhost:3000/users/avatars/default.jpg" },
+          { username: "Ron", avatar: "http://localhost:3000/users/avatars/default.jpg" },
+          { username: "Hermione", avatar: "http://localhost:3000/users/avatars/default.jpg" },
+          { username: "Severus", avatar: "http://localhost:3000/users/avatars/default.jpg" }
         ])
         .execute();
     })

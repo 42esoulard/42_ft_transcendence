@@ -98,12 +98,13 @@ export class UsersController {
 	uploadFile(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
 		console.log(file);
 		if (req.fileValidationError) {
+			console.log(req.fileValidationError);
 			throw new BadRequestException(req.fileValidationError);
 		}
 		if (!file) {
 			throw new BadRequestException('Invalid file');
 		}
-		this.userService.updateUser({ id: 1, avatar: `${process.env.BASE_URL}/users/avatars/${file.filename}` })
+		this.userService.updateUser({ id: req.user.id, avatar: `${process.env.BASE_URL}/users/avatars/${file.filename}` })
 		const response = {
 			message: 'File has been uploaded successfully',
 			originalname: file.originalname,

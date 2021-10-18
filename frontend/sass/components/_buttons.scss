@@ -25,3 +25,11 @@
     @include hover-modifier($button-block-bg);
   }
 }
+
+.otp_submit > .button,
+.ua-twofa > .button {
+  padding: 10px 20px;
+  // margin-top: 20px;
+  width: auto;
+  font-weight: bold;
+}

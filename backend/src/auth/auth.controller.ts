@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, NotFoundException, Param, Post, Redirect, Req, Res, Session, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, NotFoundException, Param, Post, Redirect, Req, Res, Session, UnauthorizedException, UseFilters, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { TwoFactorDto } from './dto/TwoFactor.dto';
 import { User } from '../users/interfaces/user.interface';
@@ -9,6 +9,8 @@ import { JwtAuthGuard } from './guards/jwt.guard';
 import { JwtTwoFactorGuard } from './guards/jwtTwoFactor.guard';
 import { RefreshTokenAuthGuard } from './guards/refresh.guard';
 import { ApiCookieAuth, ApiOAuth2, ApiTags } from '@nestjs/swagger';
+import { RefreshTwoFactorGuard } from './guards/refreshTwoFactor.guard';
+import { HttpExceptionFilter } from '../exceptions/http-exception.filter';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -23,10 +25,10 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
 
-    const jwt = await this.authService.generateAccessToken(req.user);
+    const access_token = await this.authService.generateAccessToken(req.user);
     const refresh_token = await this.authService.generateRefreshToken(req.user.id);
 
-    res.cookie('tokens', { access_token: jwt.access_token, refresh_token }, {
+    res.cookie('tokens', { access_token: access_token, refresh_token }, {
       httpOnly: true,
       expires: new Date(Date.now() + 1000 * 86400),
       sameSite: true
@@ -51,10 +53,10 @@ export class AuthController {
     if (user == undefined) {
       throw new NotFoundException('User not found');
     }
-    const jwt = await this.authService.generateAccessToken(user);
+    const access_token = await this.authService.generateAccessToken(user);
     const refresh_token = await this.authService.generateRefreshToken(user.id);
 
-    res.cookie('tokens', { access_token: jwt.access_token, refresh_token }, {
+    res.cookie('tokens', { access_token: access_token, refresh_token }, {
       httpOnly: true,
       expires: new Date(Date.now() + 1000 * 86400),
       sameSite: true
@@ -64,22 +66,22 @@ export class AuthController {
 
   @ApiCookieAuth()
   @Get('refreshtoken')
-  @UseGuards(RefreshTokenAuthGuard)
+  @UseGuards(RefreshTwoFactorGuard)
   async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     console.log('User:', req.user);
-    let jwt: string;
+    let access_token: string;
     if (req.user.two_fa_enabled) {
-      jwt = this.authService.getCookieWithJwtAccessToken(req.user, true);
+      access_token = await this.authService.generateAccessToken(req.user, true);
     } else {
-      jwt = await (await this.authService.generateAccessToken(req.user)).access_token;
+      access_token = await this.authService.generateAccessToken(req.user);
     }
     const refresh_token = await this.userService.getRefreshToken(req.user.id);
-    res.cookie('tokens', { access_token: jwt, refresh_token }, {
+    res.cookie('tokens', { access_token, refresh_token }, {
       httpOnly: true,
       expires: new Date(Date.now() + 1000 * 86400),
       sameSite: true
     });
-    return { message: "Refresh token successfully" };
+    return { message: "Token refreshed successfully" };
   }
 
   @ApiCookieAuth()
@@ -120,8 +122,21 @@ export class AuthController {
   }
 
   @ApiCookieAuth()
+  @Get('2fa/key')
+  @UseGuards(JwtAuthGuard)
+  getKey(@Req() request: Request) {
+    let key = 'No available key';
+    // console.log('KEY:', request.user.two_fa_secret);
+    if (request.user.two_fa_secret) {
+      key = request.user.two_fa_secret;
+    }
+    return { message: "Two-factor key", key: key };
+  }
+
+  @ApiCookieAuth()
   @Post('2fa/turn-on')
   @UseGuards(JwtAuthGuard)
+  // @UseFilters(HttpExceptionFilter)
   async turnOnTwoFactorAuthentication(
     @Req() request: Request,
     @Body() { code: twoFACode }: TwoFactorDto
@@ -137,7 +152,24 @@ export class AuthController {
       throw new UnauthorizedException('Wrong authentication code');
     }
     await this.userService.turnOnTwoFA(request.user.id);
+    const access_token = await this.authService.generateAccessToken(request.user, true);
+    const refresh_token = await this.userService.getRefreshToken(request.user.id);
+
+    request.res.cookie('tokens', { access_token: access_token, refresh_token }, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 86400),
+      sameSite: true
+    });
+
     return { message: "2FA Successfully turned-on" };
+  }
+
+  @ApiCookieAuth()
+  @Get('2fa/turn-off')
+  @UseGuards(JwtTwoFactorGuard)
+  async turnOffTwoFactorAuthentication(@Req() request: Request) {
+    await this.userService.turnOffTwoFA(request.user.id);
+    return { message: "2FA Successfully turned-off" };
   }
 
   @ApiCookieAuth()
@@ -152,10 +184,13 @@ export class AuthController {
       twoFACode, request.user
     );
     if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong authentication code');
+      throw new UnauthorizedException({
+        error: 'wrong_code',
+        message: 'Wrong authentication code',
+      });
     }
 
-    const access_token = this.authService.getCookieWithJwtAccessToken(request.user, true);
+    const access_token = await this.authService.generateAccessToken(request.user, true);
     const refresh_token = await this.userService.getRefreshToken(request.user.id);
 
     request.res.cookie('tokens', { access_token: access_token, refresh_token }, {
@@ -163,7 +198,7 @@ export class AuthController {
       expires: new Date(Date.now() + 1000 * 86400),
       sameSite: true
     });
-    console.log(access_token);
+    console.log('authenticate', access_token);
     return request.user;
   }
 }

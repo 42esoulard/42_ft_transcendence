@@ -102,10 +102,4 @@ button {
 .submit:hover {
   opacity: .8;
 }
-.error {
-  color: #ff0062;
-  margin-top: 10px;
-  font-size: 0.8em;
-  font-weight: bold;
-}
 </style>

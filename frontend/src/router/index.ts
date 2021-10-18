@@ -12,6 +12,7 @@ import Login from '../views/Login.vue';
 import store from "@/store";
 import axios from 'axios'
 import UserProfile from '../views/UserProfile.vue'
+import InitTwoFactor from '../views/InitTwoFactor.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -30,6 +31,14 @@ const routes: Array<RouteRecordRaw> = [
     component: FakeLogin
   },
   {
+    path: '/init-otp',
+    name: 'InitTwoFactor',
+    component: InitTwoFactor,
+    meta: {
+      requiresAuth: true,
+    }
+  },
+  {
     path: '/users',
     name: 'Users',
     component: Users,
@@ -40,10 +49,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/adduser',
     name: 'AddUser',
-    component: AddUser,
-    meta: {
-      requiresAuth: true,
-    }
+    component: AddUser
   },
   {
     path: '/chat',
@@ -127,7 +133,7 @@ router.beforeEach(async (to, from) => {
     }
     console.log('user:', store.state.user)
     if (!store.state.user) {
-      return '/login'; // redirected to login
+      return `/login?from=${to.path}`; // redirected to login
     } else {
       return true; // the route is allowed
     }
