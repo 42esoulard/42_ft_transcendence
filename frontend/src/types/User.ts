@@ -6,5 +6,5 @@ export interface User {
   two_fa_enabled: string;
   refresh_token: string;
   expiry_date: Date;
-  created_at: Date;
+  // created_at: Date;
 }

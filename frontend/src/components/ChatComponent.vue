@@ -121,13 +121,14 @@ export const ChatComponent = defineComponent({
       } = {};
     const channelMessages = ref<Message[]>([]);
     
-    const getChannel = async (id: number) => {
+    const getDefaultChannel = async (id: number) => {
       await api.getChannelById(0)
-      .then((res) => { return res; })
+      .then((res) => {
+        api.joinChannel(0, user.value.id);
+        return res;
+      })
     }
-
-    const activeChannel = ref(getChannel(0));
-
+    const activeChannel = ref(getDefaultChannel(0));
 
     let newChannelForm = ref(false);
 
@@ -156,6 +157,7 @@ export const ChatComponent = defineComponent({
       .then((res) => {
         console.log(res.data)
         allChannels.value = res.data;
+        console.log("allchans", allChannels.value)
       })
     }
     updateChannelsList();
@@ -202,20 +204,20 @@ export const ChatComponent = defineComponent({
   
 
     const selectActiveChannel = () => {
-      setTimeout(() => { const selectedRoom = document.getElementById(activeChannel.value.name)!;
-      selectedRoom.setAttribute("selected", "true");}, 1000);
+      // setTimeout(() => { const selectedRoom = document.getElementById(activeChannel.value.name)!;
+      // selectedRoom.setAttribute("selected", "true");}, 1000);
       // FIND A CLEANER SOLUTION TO WAIT FOR DOM ELEM TO BE CREATED
     }
 
     const switchRoom = (info: Channel) => {
-      activeChannel.value = info;
-      selectActiveChannel();
-      roomMessages(activeChannel.value);
+      // activeChannel.value = info;
+      // selectActiveChannel();
+      // roomMessages(activeChannel.value);
     }
 
     const createRoom = () => {
       // activates form component: 
-      newChannelForm.value = true;
+      // newChannelForm.value = true;
       // once form component is validated, it shuts and calls api to 
       // save the new channel and the new channel_member (with current user
       // as admin)
@@ -228,8 +230,8 @@ export const ChatComponent = defineComponent({
     socket.on("chat-message", (data: any) => {
 
       // console.log("in chat message: data", data)
-      if (!allMessages[data.channel_id])
-        roomMessages({ name: data.channel, id: data.channel_id, type: ''});
+      // if (!allMessages[data.channel_id])
+      //   roomMessages({ name: data.channel, id: data.channel_id, type: ''});
       // if (allMessages[data.channel_id])
       allMessages[data.channel_id].push(data);
       // else {}
@@ -246,13 +248,13 @@ export const ChatComponent = defineComponent({
 
     socket.on('createdRoom', async (info: Channel) => {
       newChannelForm.value = false;
-      await api.getChannels()
-      .then((res) => {
-        allChannels.value = res.data;
-        switchRoom(info);
-        // newMessage.value = `${username.value} has created the [${info.name}] channel`;
-        // send();
-      })
+      // await api.getChannels()
+      // .then((res) => {
+      //   allChannels.value = res.data;
+      //   switchRoom(info);
+      //   // newMessage.value = `${username.value} has created the [${info.name}] channel`;
+      //   // send();
+      // })
    
       // MUST ADD MESSAGE TO DB
     })
@@ -310,8 +312,8 @@ export const ChatComponent = defineComponent({
         content: newMessage.value,
         author: user.value.username,
         author_id: user.value.id,
-        channel: activeChannel.value.name,
-        channel_id: activeChannel.value.id,
+        channel: activeChannel.value,
+        // channel_id: activeChannel.value.id,
         id: messageId.value,
       }
 
@@ -320,10 +322,10 @@ export const ChatComponent = defineComponent({
       newMessage.value = "";
       messageId.value++;
 
-      if (!allMessages[activeChannel.value.id])
-        allMessages[activeChannel.value.id] = [];
-      allMessages[activeChannel.value.id].push(newContent);
-      roomMessages(activeChannel.value);
+      // if (!allMessages[activeChannel.value.id])
+      //   allMessages[activeChannel.value.id] = [];
+      // allMessages[activeChannel.value.id].push(newContent);
+      // roomMessages(activeChannel.value);
 
       socket.emit("chat-message", newContent)
       // } else {

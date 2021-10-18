@@ -29,9 +29,9 @@ export class MessagesService {
    * Lists all messages in a particular channel
    * nb: find() is a function from the typeORM library
    */
-  async getChannelMessages(channel: Channel): Promise<Message[]> {
-    return await this.messagesRepository.find({ channel: channel });
-  }
+  // async getChannelMessages(channel: Channel): Promise<Message[]> {
+  //   return await this.messagesRepository.find({ channel: channel });
+  // }
 
   /**
    * Gets a message in database by its id

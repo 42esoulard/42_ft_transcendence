@@ -1,10 +1,10 @@
 import { Channel } from "./Channel";
-import { User } from "./User";
+import { ChatUser } from "./ChatUser";
 
 export interface Message {
   id: number;
   channel: Channel;
-  author: User;
+  author: ChatUser;
   content: string;
-  created_at: Date;
+  created_at: string;
 }

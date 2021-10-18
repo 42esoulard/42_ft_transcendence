@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Channel } from './interfaces/channel.interface';
+import { User } from '../users/interfaces/user.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Channels } from './entity/channels.entity';
 import { CreateChannelDto } from './dto/createChannel.dto';
 // import { UpdateChannelDto } from './dto/updateChannel.dto';
+import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -14,13 +16,20 @@ export class ChannelsService {
     private readonly channelsRepository: Repository<Channels>,
   ) {}
 
+  private readonly userService: UsersService;
+
   async seed() {
-    this.saveChannel({
-      name: 'General',
-      owner_id: null,
-      password: null,
-      type: 'Public',
-    });
+    console.log('Initializing default channel...');
+    await this.channelsRepository
+      .save({
+        id: 0,
+        name: 'General',
+        owner: null,
+        password: null,
+        type: 'Public',
+      })
+      .then(() => console.log('Channels seed complete!'))
+      .catch(() => console.log('Channels seed failed :('));
   }
 
   /**
@@ -28,7 +37,9 @@ export class ChannelsService {
    * nb: find() is a function from the typeORM library
    */
   async getChannels(): Promise<Channel[]> {
-    return await this.channelsRepository.find();
+    return await this.channelsRepository.find({
+      relations: ['owner', 'messages', 'members'],
+    });
   }
 
   /**
@@ -39,7 +50,7 @@ export class ChannelsService {
     const channel = await this.channelsRepository.findOne({
       where: { name: name },
     });
-    console.log('getChannelByName', name, channel);
+    // console.log('getChannelByName', name, channel);
     return channel;
   }
 
@@ -48,9 +59,30 @@ export class ChannelsService {
    * nb: findOne(id) is a function from the typeORM library
    */
   async getChannelById(id: number): Promise<Channel> {
-    const res = await this.channelsRepository.findOne(id);
-    console.log('getChannelById', id, res);
+    const res = await this.channelsRepository.findOne(id).catch(() => {
+      if (id === 0) {
+        this.seed();
+        return this.getChannelById(id);
+      }
+    });
+    // console.log('getChannelById', id, res);
     return res;
+  }
+
+  async joinChannel(channel_id: number, user_id: number) {
+    console.log('entering joinchan serv', channel_id, user_id);
+    const channel = await this.getChannelById(channel_id);
+    console.log(channel);
+    const user = await this.userService.getUserbyId(user_id);
+    console.log(user);
+    console.log('in join chan serv');
+    channel.members.push(user);
+    console.log(channel);
+  }
+
+  async leaveChannel(channel: Channel, user: User) {
+    if (channel.members.includes(user))
+      channel.members.splice(channel.members.indexOf(user), 1);
   }
 
   /**

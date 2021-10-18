@@ -1,11 +1,11 @@
-import { User } from "./User";
+import { ChatUser } from "./ChatUser";
 import { Message } from "./Message"
 
 export interface Channel {
   id: number;
   name: string;
   type: string;
-  owner: User | null;
+  owner: ChatUser | null;
   messages: Message[] | null;
-  members: User[] | null;
+  members: ChatUser[] | null;
 }
