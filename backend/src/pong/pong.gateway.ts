@@ -34,6 +34,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   handleDisconnect(client: Socket): void {
     this.logger.log('Client disconected ' + client.id);
+    if (this.waitingPlayer && this.waitingPlayer.clientSocket == client)
+    {
+      delete this.waitingPlayer
+      this.waitingPlayer = null
+    }
     this.games.forEach((value: pongGame, key: string) => {
       if (value.player1.clientSocket.id === client.id || value.player2.clientSocket.id === client.id)
         this.endGame(key)
@@ -60,14 +65,26 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       await game.createGame()
       this.games.set(game.room, game)
       
-      delete this.waitingPlayer
-      this.waitingPlayer = null
+      // delete this.waitingPlayer
+      // this.waitingPlayer = null
 
     }
   }
+
+  @SubscribeMessage('leaveQueue')
+  handleLeaveQueue(client: Socket, room:string): void
+  {
+    if (this.waitingPlayer && this.waitingPlayer.clientSocket == client)
+    {
+      this.logger.log('deleting queue')
+      delete this.waitingPlayer
+      this.waitingPlayer = null
+    }
+  }
+
   
   @SubscribeMessage('leaveGame')
-  handleLeaveRoom(client: Socket, room:string): void
+  handleLeaveGame(client: Socket, room:string): void
   {
     this.endGame(room)
       // client.to(room).emit('opponentLeftRoom')

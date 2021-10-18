@@ -15,6 +15,7 @@
 import { ref } from 'vue'
 import { clientSocket } from '../../App.vue'
 import { useStore } from 'vuex'
+import { onBeforeRouteLeave } from 'vue-router'
 
 export default {
 	setup() {
@@ -27,12 +28,19 @@ export default {
 			queuing.value = true
 			socket.value.emit('joinGame', {userId: store.state.user.id, userName: store.state.user.username})
 		}
+
 		return {socket, queuing, JoinQueue}
 	},
 	mounted() {
 		this.socket.on('gameReadyToStart', (id, player1UserName, player2UserName) => {
 			this.$router.push({ name: 'PongGame', params: {id, player1UserName, player2UserName}})
 		})
+	},
+	
+	beforeRouteLeave()
+	{
+		if (this.queuing)
+			this.socket.emit('leaveQueue', this.room)
 	},
 
 }
