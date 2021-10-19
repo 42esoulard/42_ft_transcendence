@@ -40,7 +40,9 @@ export default {
 	beforeRouteLeave()
 	{
 		if (this.queuing)
-			this.socket.emit('leaveQueue', this.room)
+		{
+			this.socket.emit('leaveQueue')
+		}
 	},
 
 }

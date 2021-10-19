@@ -69,7 +69,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage('leaveQueue')
-  handleLeaveQueue(client: Socket, room:string): void
+  handleLeaveQueue(client: Socket): void
   {
     this.clearQueue(client)
   }
