@@ -96,6 +96,7 @@ export default {
 		})
 
 		this.socket.on("gameOver", (player1Won) => {
+			this.gameHasStarted = true
 			this.gameIsOver = true
 			if (player1Won)
 				this.winningPlayer = this.player1UserName

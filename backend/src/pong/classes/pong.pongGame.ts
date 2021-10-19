@@ -42,6 +42,7 @@ export class pongGame {
   public ballDirection: coordinates = {x: 0, y: 0}
 
   public interval = null
+  public timeout = null
 
   initPositions()
   {
@@ -92,7 +93,7 @@ export class pongGame {
     await this.player2.clientSocket.join(this.room)
     
     this.server.to(this.room).emit('gameReadyToStart', this.room, this.player1.userName, this.player2.userName)
-    setTimeout(() => {
+    this.timeout = setTimeout(() => {
       this.server.to(this.room).emit('gameStarting')
       this.startGame()
     }, INITAL_DELAY_IN_MS)
@@ -108,6 +109,7 @@ export class pongGame {
   async endGame(player1Won: boolean): Promise<void>
   {
     this.logger.log('interval cleared: ' + this.room )
+    clearTimeout(this.timeout)
     clearInterval(this.interval)
     await this.gameUserRepo.update({userId: this.player1.userId, gameId: this.gameId}, { won: player1Won})
     await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.gameId}, { won: !player1Won})
@@ -183,7 +185,7 @@ export class pongGame {
   restartGame()
   {
     clearInterval(this.interval)
-    setTimeout(() => {
+    this.timeout = setTimeout(() => {
       this.startGame()
     }, DELAY_AFTER_SCORE_IN_MS)
 
