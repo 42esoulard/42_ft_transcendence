@@ -62,7 +62,7 @@ export default defineComponent({
           .then(res => {
             // console.log(res);
             if (props.codeSendToUrl === "turn-on") {
-              store.state.user.two_fa_enabled = true;
+              store.commit('toggleTwoFactor',true);
               store.state.message = res.data.message;
               context.emit("close");
               setTimeout(() => {

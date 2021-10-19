@@ -113,8 +113,7 @@ export default defineComponent({
       await axios
         .get("http://localhost:3000/auth/2fa/turn-off")
         .then(res => {
-          console.log(res);
-          store.state.user.two_fa_enabled = false;
+          store.commit("toggleTwoFactor", false);
           store.state.message = res.data.message;
           setTimeout(() => {
             store.state.message = "";

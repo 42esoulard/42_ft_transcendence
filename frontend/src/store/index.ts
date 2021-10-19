@@ -1,12 +1,37 @@
 import { User } from '@/types/User'
-import { createStore } from 'vuex'
+import { InjectionKey } from 'vue'
+import { createStore, useStore as baseUseStore, Store } from 'vuex'
 
-export default createStore({
+// define your typings for the store state
+export interface State {
+  user: User | null,
+  message: string,
+}
+
+// define injection key
+export const key: InjectionKey<Store<State>> = Symbol()
+
+/**
+ * Following is the actual store
+ */
+export const store = createStore<State>({
   state: {
-    user: null as User | null,
+    user: null,
     message: '',
   },
   getters: {},
-  mutations: {},
+  mutations: {
+
+    toggleTwoFactor(state: State, payload: boolean) {
+      if (state.user) {
+        state.user.two_fa_enabled = payload;
+      }
+    }
+  },
   actions: {}
 })
+
+// define your own `useStore` composition function
+export function useStore() {
+  return baseUseStore(key)
+}

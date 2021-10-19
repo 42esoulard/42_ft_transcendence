@@ -9,7 +9,7 @@ import PongGame from '../views/Pong/PongGame.vue'
 import PongWatch from '../views/Pong/PongWatch.vue'
 import FakeLogin from '../views/FakeLogin.vue'
 import Login from '../views/Login.vue';
-import store from "@/store";
+import { store } from "@/store";
 import axios from 'axios'
 import UserProfile from '../views/UserProfile.vue'
 import InitTwoFactor from '../views/InitTwoFactor.vue'
