@@ -10,6 +10,6 @@ export class User {
   two_fa_enabled: boolean;
   refresh_token: string;
   expiry_date: Date;
-  messages: Message[] | null;
-  channels: Channel[] | null;
+  messages: Message[];
+  channels: Channel[];
 }

@@ -6,6 +6,8 @@ import { Messages } from './entity/messages.entity';
 import { CreateMessageDto } from './dto/createMessage.dto';
 import { Channel } from 'src/channels/interfaces/channel.interface';
 import { User } from 'src/users/interfaces/user.interface';
+import { ChannelsService } from 'src/channels/channels.service';
+import { UsersService } from 'src/users/users.service';
 // import { timestamp } from 'rxjs';
 // import { UpdateMessageDto } from './dto/updateMessage.dto';
 // import * as bcrypt from 'bcrypt';
@@ -15,6 +17,8 @@ export class MessagesService {
   constructor(
     @InjectRepository(Messages)
     private readonly messagesRepository: Repository<Messages>,
+    private readonly channelService: ChannelsService,
+    private readonly userService: UsersService,
   ) {}
 
   /**
@@ -50,6 +54,12 @@ export class MessagesService {
   async saveMessage(messageDto: CreateMessageDto): Promise<Message> {
     // console.log(messageDto);
     const newMessage: Message = this.messagesRepository.create(messageDto);
+    newMessage.channel = await this.channelService.getChannelById(
+      messageDto.channel_id,
+    );
+    newMessage.author = await this.userService.getUserbyId(
+      messageDto.author_id,
+    );
 
     return await this.messagesRepository.save(newMessage);
   }

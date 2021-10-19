@@ -8,6 +8,7 @@ export class Channel {
   salt: string | null;
   password: string | null;
   owner: User | null;
-  messages: Message[] | null;
+  messages: Message[];
   members: User[] | null;
+  created_at: Date;
 }

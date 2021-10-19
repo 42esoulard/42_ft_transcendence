@@ -6,6 +6,6 @@ export interface Channel {
   name: string;
   type: string;
   owner: ChatUser | null;
-  messages: Message[] | null;
+  messages: Message[];
   members: ChatUser[] | null;
 }

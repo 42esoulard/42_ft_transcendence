@@ -34,7 +34,9 @@ export class Channels {
   @ManyToMany(() => Users, (member) => member.channels)
   members: Users[];
 
-  @OneToMany(() => Messages, (message) => message.channel)
+  @OneToMany(() => Messages, (message) => message.channel, {
+    eager: true,
+  })
   messages: Messages[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })

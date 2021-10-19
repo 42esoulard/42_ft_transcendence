@@ -16,13 +16,12 @@ import {
 } from '@nestjs/swagger';
 import { User } from 'src/users/interfaces/user.interface';
 import { UsersModule } from 'src/users/users.module';
-import { UsersService } from 'src/users/users.service';
 // import { UpdateChannelDto } from './dto/updateChannel.dto';
 
 @Controller('channels')
 export class ChannelsController {
   constructor(private readonly channelService: ChannelsService) {}
-  private readonly userService: UsersService;
+  // private readonly userService: UsersService;
   /**
    * Lists all channels in database.
    */
@@ -87,7 +86,7 @@ export class ChannelsController {
     return await this.channelService.saveChannel(newChannel);
   }
 
-  @Get('/user/:user/join/:channel')
+  @Get('/channel/:channel/user/:user')
   async joinChannel(
     @Param('channel') channel_id: number,
     @Param('user') user_id: number,
@@ -95,14 +94,25 @@ export class ChannelsController {
     await this.channelService.joinChannel(channel_id, user_id);
   }
 
-  @Post('/user/:user_id/leave_channel/:channel_id')
+  // @Get('/user/:user')
+  // async getJoinedChannels(@Param('user') user_id: number): Promise<Channel[]> {
+  //   console.log('heree', await this.channelService.getJoinedChannels(user_id));
+  //   await this.channelService.getJoinedChannels(user_id).then((res) => {
+  //     console.log("res.channels", res.channels)
+  //     return res.channels;
+  //   });
+  //   return [];
+  //   // return await this.channelService.getJoinedChannels(user_id);
+  // }
+
+  @Post('/channel/:channel/user/:user')
   async leaveChannel(
-    @Param('channel_id') channel_id: number,
-    @Param('user_id') user_id: number,
+    @Param('channel') channel_id: number,
+    @Param('user') user_id: number,
   ) {
-    const channel = await this.getChannelById(channel_id);
-    const user = await this.userService.getUserbyId(user_id);
-    await this.channelService.leaveChannel(channel, user);
+    // const channel = await this.getChannelById(channel_id);
+    // const user = await this.userService.getUserbyId(user_id);
+    // await this.channelService.leaveChannel(channel, user);
   }
 
   // @Post()

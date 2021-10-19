@@ -6,5 +6,7 @@ export interface User {
   two_fa_enabled: string;
   refresh_token: string;
   expiry_date: Date;
+  messages: Message[] | null;
+  channels: Channel[] | null;
   // created_at: Date;
 }

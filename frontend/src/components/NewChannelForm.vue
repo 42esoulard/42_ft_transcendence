@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, computed } from "vue";
+import { ref, defineComponent, computed, onMounted } from "vue";
 // import { Socket, io } from "socket.io-client"
 import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
 import { socket } from "./ChatComponent.vue"
@@ -55,7 +55,7 @@ export default defineComponent({
     const channelType = ref('public');
     const channelPassword = ref('');
     const channelPasswordConf = ref('');
-    const user = computed(() => useStore().state.user);
+    const user = useStore().state.user;
 
     let validName = true;
     let validPassword = true;
@@ -119,7 +119,7 @@ export default defineComponent({
       const newChannel = api.saveChannel({
         name: channelName.value,
         // ownerId: api.getCurrentUserId
-        owner: user.value, // API MUST FETCH THE CURRENT USER ID
+        owner_id: user.id, 
         type: channelType.value,
         password: channelPassword.value
       })

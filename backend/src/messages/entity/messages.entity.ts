@@ -24,6 +24,7 @@ export class Messages {
 
   @ManyToOne(() => Users, (author) => author.messages, {
     onDelete: 'CASCADE',
+    eager: true,
   })
   author: Users;
 

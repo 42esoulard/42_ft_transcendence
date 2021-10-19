@@ -6,17 +6,17 @@ import { Repository } from 'typeorm';
 import { Channels } from './entity/channels.entity';
 import { CreateChannelDto } from './dto/createChannel.dto';
 // import { UpdateChannelDto } from './dto/updateChannel.dto';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.module';
 import * as bcrypt from 'bcrypt';
+import { Users } from 'src/users/entity/users.entity';
 
 @Injectable()
 export class ChannelsService {
   constructor(
     @InjectRepository(Channels)
     private readonly channelsRepository: Repository<Channels>,
+    private readonly userService: UsersService,
   ) {}
-
-  private readonly userService: UsersService;
 
   async seed() {
     console.log('Initializing default channel...');
@@ -58,7 +58,7 @@ export class ChannelsService {
    * Gets a channel in database by its id
    * nb: findOne(id) is a function from the typeORM library
    */
-  async getChannelById(id: number): Promise<Channel> {
+  async getChannelById(id: number): Promise<Channels> {
     const res = await this.channelsRepository.findOne(id).catch(() => {
       if (id === 0) {
         this.seed();
@@ -69,21 +69,38 @@ export class ChannelsService {
     return res;
   }
 
-  async joinChannel(channel_id: number, user_id: number) {
-    console.log('entering joinchan serv', channel_id, user_id);
-    const channel = await this.getChannelById(channel_id);
-    console.log(channel);
-    const user = await this.userService.getUserbyId(user_id);
-    console.log(user);
-    console.log('in join chan serv');
-    channel.members.push(user);
-    console.log(channel);
+  async joinChannel(channel_id: number, user_id: number): Promise<Channel> {
+    const channelEntry: Channels = await this.getChannelById(channel_id);
+    const userEntry: Users = await this.userService.getUserbyId(user_id);
+
+    if (!channelEntry.members) {
+      channelEntry.members = [];
+    }
+    channelEntry.members.push(userEntry);
+    return await this.channelsRepository.save(channelEntry);
   }
 
-  async leaveChannel(channel: Channel, user: User) {
-    if (channel.members.includes(user))
-      channel.members.splice(channel.members.indexOf(user), 1);
+  async leaveChannel(channel: Channel, user: User): Promise<Channel> {
+    const channelEntry: Channels = await this.getChannelById(channel.id);
+    const userEntry: Users = await this.userService.getUserbyId(user.id);
+
+    if (
+      channelEntry &&
+      userEntry &&
+      channelEntry.members &&
+      channelEntry.members.includes(userEntry)
+    )
+      channelEntry.members.splice(channelEntry.members.indexOf(userEntry), 1);
+    return await this.channelsRepository.save(channelEntry);
   }
+
+  // async getJoinedChannels(user_id: number): Promise<User> {
+  //   // await this.userService.getUserChannels(user_id).then((res) => {
+  //   //   console.log("in service", res.channels)
+  //   //   return res.channels;
+  //   // });
+  //   return await this.userService.getUserChannels(user_id);
+  // }
 
   /**
    * Saves a new channel into db
@@ -93,6 +110,7 @@ export class ChannelsService {
     console.log('IN SAVE CHANNEL', channelDto);
     const newChannel = this.channelsRepository.create(channelDto);
     // newChannel.owner_id = channelDto.owner_id;
+    newChannel.owner = await this.userService.getUserbyId(channelDto.owner_id);
 
     if (newChannel.type === 'password-protected') {
       (newChannel.salt = await bcrypt.genSalt()),
@@ -102,9 +120,13 @@ export class ChannelsService {
         )); //must be crypted
     }
 
-    const createdChannel = await this.channelsRepository.save(newChannel);
-
-    return createdChannel;
+    newChannel.members = [];
+    newChannel.members.push(newChannel.owner);
+    // await this.channelsRepository.save(newChannel).then(async (res) => {
+    //   await this.joinChannel(res.id, res.owner.id);
+    // });
+    // console.log("in chan service newchan", newChannel)
+    return await this.channelsRepository.save(newChannel);
   }
 
   /**

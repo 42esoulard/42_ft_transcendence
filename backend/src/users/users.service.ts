@@ -22,11 +22,19 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
+  async getUserChannels(id: number): Promise<Users> {
+    const res = await this.usersRepository.findOne(id, {
+      relations: ['channels'],
+    });
+    // console.log('in getuserchannels res', res);
+    return res;
+  }
+
   /**
    * Gets a user in database by its id
    * nb: findOne(id) is a function from the typeORM library
    */
-  async getUserbyId(id: number): Promise<User> {
+  async getUserbyId(id: number): Promise<Users> {
     console.log('in getuser byid', id);
     const res = await this.usersRepository.findOne(id);
     console.log('res', res);
