@@ -16,8 +16,8 @@
 
 <script>
 import { clientSocket } from '../../App.vue'
-import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import getDraw from '../../composables/draw'
 
 export default {
@@ -56,16 +56,25 @@ export default {
 				SendMoveMsg('down')
 		}
 
+		onMounted(() => {
+			console.log('mounted')
+			context.value = game.value.getContext("2d")
+			window.addEventListener("keydown", onKeyDown)
+		})
+
+		onBeforeRouteLeave(() => {
+			socket.value.emit('leaveGame', room.value)
+			socket.value.removeEventListener('position')
+			window.removeEventListener("keydown", onKeyDown)
+			console.log('leaving')
+		})
+
 
 		return { ballPosition, playerPositions, score, socket, room, draw, SendMoveMsg, onKeyDown, context, game, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer }
 
 	},
-	created() {
-		window.addEventListener("keydown", this.onKeyDown)
-	},
+	
 	mounted() {
-		console.log('mounted')
-		this.context = this.$refs.game.getContext("2d")
 		
 		this.socket.on("position", (ballPosition, playerPositions) => {
 			this.ballPosition = ballPosition
@@ -92,13 +101,6 @@ export default {
 
 	},
 
-	beforeRouteLeave()
-	{
-		this.socket.emit('leaveGame', this.room)
-		this.socket.removeEventListener('position')
-		window.removeEventListener("keydown", this.onKeyDown)
-		console.log('leaving')
-	},
 
 }
 </script>
