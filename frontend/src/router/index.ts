@@ -13,6 +13,7 @@ import store from "@/store";
 import axios from 'axios'
 import UserProfile from '../views/UserProfile.vue'
 import InitTwoFactor from '../views/InitTwoFactor.vue'
+import NotFound from '../views/NotFound.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -92,6 +93,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/pong/watch',
     name: 'PongWatch',
     component: PongWatch
+  },
+  {
+    path: '/:catchAll(.*)',
+    name: 'NotFound',
+    component: NotFound
   },
 ]
 
