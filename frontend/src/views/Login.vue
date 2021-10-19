@@ -27,26 +27,28 @@ export default defineComponent({
     const codeSendToUrl = ref("authenticate");
 
     //To exchange cookie or auth header w/o in every req
-    axios.defaults.withCredentials = true;
+    // axios.defaults.withCredentials = true;
 
     onBeforeMount(() => {
-      console.log("FROM", route.query.from);
-      router.replace("/login"); // to remove code from URL: DIRTY ?
-      console.log("isTwoFactorEnabled", isTwoFactorEnabled);
+      let redirectUrl = "account";
+      if (route.query.state != "undefined") {
+        redirectUrl = route.query.state as string;
+      }
       if (route.query.code) {
         const code = route.query.code;
+        // router.replace("/login"); // to remove code from URL: DIRTY ?
         axios
           .get("http://localhost:3000/auth/42/login", {
             params: {
-              code: code,
-            },
+              code: code
+            }
           })
-          .then((res) => {
-            console.log("status", res.status);
+          .then(res => {
             if (res.status === 206) {
               isTwoFactorEnabled.value = true;
             } else if (res.status === 200) {
-              router.push("account"); //find a way to push to requested route, not only account ??
+              // console.log('REDIRECT', redirectUrl);
+              router.push(redirectUrl);
             }
           })
           .catch((err: any) => console.log(err.message));
@@ -54,16 +56,19 @@ export default defineComponent({
     });
 
     const logInWith42 = () => {
-      window.location.href = process.env.VUE_APP_42_AUTH_URL;
+      if (route.query.from === "undefined") {
+        route.query.from = "account";
+      }
+      window.location.href = `${process.env.VUE_APP_42_AUTH_URL}&state=${route.query.from}`;
     };
 
     return {
       logInWith42,
       isTwoFactorEnabled,
       qrcodeURL,
-      codeSendToUrl,
+      codeSendToUrl
     };
-  },
+  }
 });
 </script>
 

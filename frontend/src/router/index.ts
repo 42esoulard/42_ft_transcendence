@@ -23,7 +23,10 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    meta: {
+      requiresVisitor: true,
+    }
   },
   {
     path: '/fake-login',
@@ -98,12 +101,14 @@ const router = createRouter({
 })
 
 //To exchange cookie or auth header w/o in every req
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 
 const refreshToken = async () => {
   await axios
     .get("http://localhost:3000/auth/refreshtoken")
-    .then((response) => console.log(response))
+    .then(async (response) => {
+      await getProfile();
+    })
     .catch((err: any) => console.log(err.message));
 };
 
@@ -112,30 +117,28 @@ const getProfile = async () => {
     .get("http://localhost:3000/auth/profile")
     .then((response) => {
       store.state.user = response.data;
-      // console.log(store.state.user);
     })
-    .catch((err: Error) => {
-      console.log(err.message);
+    .catch(async (err: Error) => {
+      await refreshToken();
     });
 };
 
 router.beforeEach(async (to, from) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
+    console.log('beforeEach');
     if (!store.state.user) {
-      await refreshToken();
       await getProfile();
-      // .then((res) => console.log(res))
-      // .catch( async (err) => {
-      //   console.log("get profile fails")
-      //   await refreshToken();
-      //   await getProfile();
-      // })
     }
-    console.log('user:', store.state.user)
     if (!store.state.user) {
       return `/login?from=${to.path}`; // redirected to login
     } else {
       return true; // the route is allowed
+    }
+  } else if (to.matched.some(record => record.meta.requiresVisitor)) {
+    if (store.state.user) {
+      return '/';
+    } else {
+      return true;
     }
   }
 });

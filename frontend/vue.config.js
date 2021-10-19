@@ -1,5 +1,5 @@
-// module.exports = {
-//     devServer: {
-//       proxy: 'http://localhost:3000'
-//     }
-//   }
+module.exports = {
+  configureWebpack: {
+    devtool: 'cheap-module-eval-source-map',
+  },
+}

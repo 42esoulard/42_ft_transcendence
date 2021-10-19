@@ -12,6 +12,7 @@ backend/uploads/avatars/*
 !backend/uploads/avatars/default.jpg
 frontend/sdk/typescript-axios-client-generated
 npm-errors
+.vscode
 
 # .env
 # database.env

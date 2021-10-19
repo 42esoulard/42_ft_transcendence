@@ -4,7 +4,9 @@ import router from './router'
 import '@fortawesome/fontawesome-free/js/all'
 import store from '@/store'
 import api from "@/plugins/api.plugin";
+import axios from "axios";
 
+// axios.defaults.withCredentials = true;
 
 const app = createApp(App);
 app.use(store);
