@@ -91,7 +91,7 @@ export default {
 		
 
 
-		return { ballPosition, playerPositions, score, socket, room, draw, context, game, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer }
+		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, game }
 
 	},
 
