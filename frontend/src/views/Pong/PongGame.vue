@@ -59,7 +59,6 @@ export default {
 		onMounted(() => {
 			console.log('mounted')
 			context.value = game.value.getContext("2d")
-			window.addEventListener("keydown", onKeyDown)
 		})
 
 		onBeforeRouteLeave(() => {
@@ -81,9 +80,11 @@ export default {
 		
 		socket.value.on("gameStarting", () => {
 			gameHasStarted.value = true
+			window.addEventListener("keydown", onKeyDown)
 		})
 		
 		socket.value.on("gameOver", (player1Won) => {
+			window.removeEventListener("keydown", onKeyDown)
 			gameHasStarted.value = true
 			gameIsOver.value = true
 			if (player1Won)
