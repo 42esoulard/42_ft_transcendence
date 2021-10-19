@@ -1,8 +1,7 @@
 <template>
 	<p> Game # {{ room }} </p>
 	<h1> {{ player1UserName }} [{{ score.player1 }}]  |  {{ player2UserName }} [{{ score.player2 }}] </h1>
-	<canvas ref="game" width="640" height="480" style="border: 1px solid black">
-	</canvas>
+	<canvas ref="game" width="640" height="480" style="border: 1px solid black"> </canvas>
 
 	<div v-if="!gameHasStarted">
 		<h1> Get ready, game is about to start ! </h1>
@@ -11,7 +10,6 @@
 	<div v-if="gameIsOver">
 		<h1> {{ winningPlayer }} won ! </h1>
 	</div>
-	
 </template>
 
 <script>
