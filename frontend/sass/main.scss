@@ -3,6 +3,7 @@
 @import "./utils/mixins";
 @import "./utils/functions";
 @import "./components/buttons";
+@import "./base/transitions";
 @import "./base/app";
 @import "./layouts/header";
 @import "./layouts/sidebar";
@@ -10,32 +11,17 @@
 @import "./layouts/stats";
 @import "./layouts/otpForm";
 @import "./layouts/errors";
+@import "./layouts/account";
 @import "./components/toasts";
 
 html {
   font-size: 100%;
 
-  @media (max-width: 720px), (max-height: 700px){
+  @media (max-width: 720px){
     font-size: 80%;
   }
-  @media (max-width: 500px), (max-height: 700px){
+  @media (max-width: 500px){
     font-size: 70%;
   }
-  @media (max-height: 500px){
-    font-size: 60%;
-  }
-  @media (max-height: 400px){
-    font-size: 50%;
-  }
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 1s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 

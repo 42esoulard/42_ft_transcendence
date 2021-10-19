@@ -1,5 +1,6 @@
 <template>
-  <div class="header">
+  <transition name="fade--log">
+  <div class="header" v-if="user">
     <div></div>
     <router-link to="/" class="header-link">
       <h1 class="header__title">Space Pong</h1>
@@ -12,6 +13,8 @@
       <button @click="logOut" class="button button--log-out"><i class="user-bloc__icon fas fa-power-off" /></button>
     </div>
   </div>
+  </transition>
+  <div class="header header--invisible" v-if="!user"></div>
 </template>
 
 <script lang="ts">
@@ -37,7 +40,7 @@ export default defineComponent({
         .then((response) => {
           console.log(response);
           store.state.user = null;
-          router.push("/login");
+          router.push('/login');
         })
         .catch((err: any) => console.log(err.message));
     };

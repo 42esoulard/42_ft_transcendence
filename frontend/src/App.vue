@@ -17,18 +17,13 @@ export default {
   }
 
 }
-
 </script>
 
 <template>
   <div class="main-div">
-    <transition name="fade">
-      <SideBar v-show="user" />
-    </transition>
+    <SideBar />
     <div class="body-div">
-      <transition name="fade">
-        <Header v-show="user" />
-      </transition>
+      <Header />
       <div class="router-view">
         <router-view />
       </div>

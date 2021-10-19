@@ -2,8 +2,8 @@
   <transition name="toast">
     <Toast v-if="message" :message="message" />
   </transition>
-  <h1>User Account</h1>
-  <div v-if="user">
+  <div class="user-account" v-if="user">
+    <h1 class="profile-left__name">User Account</h1>
     <img :src="user.avatar" class="ua-img" alt="[Your avatar]" />
     <p>Your avatar: {{ user.avatar }}</p>
     <p>Your id: {{ user.id }}</p>
@@ -28,14 +28,14 @@
     <hr />
 
     <form method="post" @submit.prevent="postAvatar">
-      <transition name="fade">
+      <transition name="fade--error">
         <p v-if="error" class="error">{{ error }}</p>
       </transition>
       <input @change="handleFile" type="file" ref="avatar" id="avatar" />
-      <button>Update avatar</button>
+      <button class="button button--msg">Update avatar</button>
     </form>
     <teleport to="#modals">
-      <transition name="fade">
+      <transition name="fade-error">
         <div v-if="showModal" class="backdrop"></div>
       </transition>
       <transition name="zoomin">

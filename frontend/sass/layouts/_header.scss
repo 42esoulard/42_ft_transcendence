@@ -6,6 +6,9 @@
   height: $header-height;
   width: 100%;
   background-color: $header-bg-color;
+  &--invisible {
+    background-color: transparent;
+  }
 }
 
 .header-link {
@@ -31,7 +34,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: $user-bloc-gap;
+  gap: $header-bloc-gap;
  }
 
  .user-bloc {
