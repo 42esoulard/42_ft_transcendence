@@ -18,15 +18,10 @@
 import { clientSocket } from '../../App.vue'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+import getDraw from '../../composables/draw'
 
 export default {
 	setup() {
-		const ballPosition = ref({x:0, y:0})
-		const playerPositions = ref({player1:0, player2:0})
-
-		const game = ref(null)
-
-		const context = ref({})
 		
 		const route = useRoute()
 
@@ -41,17 +36,8 @@ export default {
 		const gameIsOver = ref(false)
 		const winningPlayer = ref(null)
 
-		const draw = () => {
-			context.value.clearRect(0, 0, game.value.width, game.value.height)
+		const { context, game, ballPosition, playerPositions, draw } = getDraw()
 
-			context.value.beginPath()
-			context.value.rect(0, playerPositions.value.player1, 20, 80)
-			context.value.rect(620, playerPositions.value.player2, 20, 80)
-			context.value.arc(ballPosition.value.x, ballPosition.value.y, 10, 0, Math.PI*2, false);
-			context.value.fill()
-			context.value.closePath()
-		}
-		
 		const SendMoveMsg = (direction) => {
 			if (room.value)
 			{
