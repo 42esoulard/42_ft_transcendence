@@ -39,11 +39,7 @@ export default {
 		const { context, game, ballPosition, playerPositions, draw } = getDraw()
 
 		const SendMoveMsg = (direction) => {
-			if (room.value)
-			{
-				// console.log(room.value)
-				socket.value.emit('moveRacquet', {room: room.value, text: direction})
-			}
+			socket.value.emit('moveRacquet', {room: room.value, text: direction})
 		}
 		
 		const onKeyDown = (event) => {
