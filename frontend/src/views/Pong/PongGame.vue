@@ -68,39 +68,35 @@ export default {
 			window.removeEventListener("keydown", onKeyDown)
 			console.log('leaving')
 		})
-
-
-		return { ballPosition, playerPositions, score, socket, room, draw, SendMoveMsg, onKeyDown, context, game, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer }
-
-	},
+		
+		socket.value.on("position", (NewballPosition, NewplayerPositions) => {
+			ballPosition.value = NewballPosition
+			playerPositions.value = NewplayerPositions
+			draw()
+		})
 	
-	mounted() {
-		
-		this.socket.on("position", (ballPosition, playerPositions) => {
-			this.ballPosition = ballPosition
-			this.playerPositions = playerPositions
-			this.draw()
+		socket.value.on("score", new_score => {
+			score.value = new_score
 		})
 		
-		this.socket.on("score", score => {
-			this.score = score
+		socket.value.on("gameStarting", () => {
+			gameHasStarted.value = true
 		})
-
-		this.socket.on("gameStarting", () => {
-			this.gameHasStarted = true
-		})
-
-		this.socket.on("gameOver", (player1Won) => {
-			this.gameHasStarted = true
-			this.gameIsOver = true
+		
+		socket.value.on("gameOver", (player1Won) => {
+			gameHasStarted.value = true
+			gameIsOver.value = true
 			if (player1Won)
-				this.winningPlayer = this.player1UserName
+				winningPlayer.value = player1UserName
 			else
-				this.winningPlayer = this.player2UserName
+				winningPlayer.value = player2UserName
 		})
+		
+
+
+		return { ballPosition, playerPositions, score, socket, room, draw, context, game, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer }
 
 	},
-
 
 }
 </script>
