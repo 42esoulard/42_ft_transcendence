@@ -26,9 +26,20 @@ export const store = createStore<State>({
       if (state.user) {
         state.user.two_fa_enabled = payload;
       }
+    },
+
+    setMessage(state: State, payload: string) {
+      state.message = payload;
     }
   },
-  actions: {}
+  actions: {
+    setMessage(context, payload: string) {
+      context.commit('setMessage', payload);
+      setTimeout(() => {
+        context.commit('setMessage', '');
+      }, 3000);
+    }
+  },
 })
 
 // define your own `useStore` composition function

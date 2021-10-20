@@ -131,7 +131,6 @@ const getProfile = async () => {
 
 router.beforeEach(async (to, from) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    console.log('beforeEach');
     if (!store.state.user) {
       await getProfile();
     }
@@ -141,6 +140,8 @@ router.beforeEach(async (to, from) => {
       return true; // the route is allowed
     }
   } else if (to.matched.some(record => record.meta.requiresVisitor)) {
+    // Use local storage to store isLoggedIn boolean to block access to login page while user is logged in ?
+    // localStorage.setItem('isLoggedIn', 'true');
     if (store.state.user) {
       return '/';
     } else {

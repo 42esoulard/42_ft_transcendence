@@ -88,7 +88,7 @@ services:
   # API watcher and SDK rebuilder
   sdk:
     build:
-       context: "./frontend/sdk"
+      context: "./frontend/sdk"
     volumes:
       - ./:/usr/src/app/
     depends_on:

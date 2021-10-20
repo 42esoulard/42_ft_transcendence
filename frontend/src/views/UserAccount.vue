@@ -113,11 +113,8 @@ export default defineComponent({
       await axios
         .get("http://localhost:3000/auth/2fa/turn-off")
         .then(res => {
-          store.commit("toggleTwoFactor", false);
-          store.state.message = res.data.message;
-          setTimeout(() => {
-            store.state.message = "";
-          }, 3000);
+          store.commit('toggleTwoFactor', false);
+          store.dispatch('setMessage', res.data.message);
         })
         .catch(error => console.log(error));
     };
@@ -128,7 +125,7 @@ export default defineComponent({
 
     const handleSuccess = (message: string) => {
       console.log(message);
-      store.state.message = message;
+      store.dispatch('setMessage', message);
     };
 
     return {

@@ -62,12 +62,9 @@ export default defineComponent({
           .then(res => {
             // console.log(res);
             if (props.codeSendToUrl === "turn-on") {
-              store.commit('toggleTwoFactor',true);
-              store.state.message = res.data.message;
+              store.commit("toggleTwoFactor", true);
+              store.dispatch("setMessage", res.data.message);
               context.emit("close");
-              setTimeout(() => {
-                store.state.message = "";
-              }, 3000);
             } else {
               router.push("account");
             }
