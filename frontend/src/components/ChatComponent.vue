@@ -247,8 +247,8 @@ export const ChatComponent = defineComponent({
     };
 
     socket.on("chat-message", (data: any) => {
-      console.log("RECEIVED CHAT MESSAGE")
-      roomMessages(data);
+      console.log("RECEIVED CHAT MESSAGE, data:", data)
+      roomMessages(data.channel);
       // console.log("in chat message: data", data)
       // if (!allMessages[data.channel_id])
       //   roomMessages({ name: data.channel, id: data.channel_id, type: ''});
@@ -355,7 +355,6 @@ export const ChatComponent = defineComponent({
       // console.log("IN VUE ALLMESSAGES ", allMessages);
       // roomMessages(activeChannel.value!);
 
-      socket.emit("chat-message", newContent)
       // } else {
       //   alert('You must join the room to send messages!')
       // } 
@@ -365,7 +364,10 @@ export const ChatComponent = defineComponent({
           author_id: newContent.author_id, 
           content: newContent.content,
       })
-      .then(() => roomMessages(newContent.channel))
+      .then(() => { 
+        roomMessages(newContent.channel); 
+        socket.emit("chat-message", newContent); 
+      })
       .catch((err: any) => console.log(err.message));
     }
 
