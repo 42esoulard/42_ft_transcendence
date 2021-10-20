@@ -131,7 +131,7 @@ export const ChatComponent = defineComponent({
         .then(()=> {
           updateChannelsList();
           activeChannel.value = res.data;
-          roomMessages(res.data);
+          getMessagesUpdate(res.data);
           return res;
         })
         
@@ -172,13 +172,14 @@ export const ChatComponent = defineComponent({
     }
     updateChannelsList();
 
-    
 
-    const roomMessages = async (channel: Channel) => {
+    const getMessagesUpdate = async (channel: Channel) => {
       await api.getChannelById(channel.id)
       .then((res) => {
-        activeChannel.value = res.data
-        channelMessages.value = res.data.messages
+        if (activeChannel.value!.id === channel.id) {
+          activeChannel.value = res.data
+          channelMessages.value = res.data.messages
+        }
         console.log("in room messages", channelMessages.value)
         return res;
       })
@@ -231,7 +232,7 @@ export const ChatComponent = defineComponent({
     const switchRoom = (info: Channel) => {
       activeChannel.value = info;
       selectActiveChannel();
-      roomMessages(activeChannel.value);
+      getMessagesUpdate(activeChannel.value);
     }
 
     // const createRoom = () => {
@@ -248,14 +249,14 @@ export const ChatComponent = defineComponent({
 
     socket.on("chat-message", (data: any) => {
       console.log("RECEIVED CHAT MESSAGE, data:", data)
-      roomMessages(data.channel);
+      getMessagesUpdate(data.channel);
       // console.log("in chat message: data", data)
       // if (!allMessages[data.channel_id])
-      //   roomMessages({ name: data.channel, id: data.channel_id, type: ''});
+      //   getMessagesUpdate({ name: data.channel, id: data.channel_id, type: ''});
       // // if (allMessages[data.channel_id])
       // allMessages[data.channel_id].push(data);
       // else {}
-      // roomMessages();
+      // getMessagesUpdate();
     });
 
     socket.on("typing", (user: string) => {
@@ -353,7 +354,7 @@ export const ChatComponent = defineComponent({
       //   allMessages[activeChannel.value!.id] = [];
       // allMessages[activeChannel.value!.id].push(newContent);
       // console.log("IN VUE ALLMESSAGES ", allMessages);
-      // roomMessages(activeChannel.value!);
+      // getMessagesUpdate(activeChannel.value!);
 
       // } else {
       //   alert('You must join the room to send messages!')
@@ -365,7 +366,7 @@ export const ChatComponent = defineComponent({
           content: newContent.content,
       })
       .then(() => { 
-        roomMessages(newContent.channel); 
+        getMessagesUpdate(newContent.channel); 
         socket.emit("chat-message", newContent); 
       })
       .catch((err: any) => console.log(err.message));
@@ -388,7 +389,7 @@ export const ChatComponent = defineComponent({
       info,
       connections,
 
-      roomMessages,
+      getMessagesUpdate,
       joinedChannels,
       allChannels,
       activeChannel,

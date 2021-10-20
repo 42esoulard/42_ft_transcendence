@@ -25,7 +25,7 @@ export class ChannelsService {
       name: 'General',
       owner: null,
       password: null,
-      type: 'Public',
+      type: 'public',
     });
     // .then(() => console.log('Channels seed complete!'))
     // .catch(() => console.log('Channels seed failed :('));
@@ -99,12 +99,12 @@ export class ChannelsService {
     const channelEntry: Channels = await this.getChannelById(channel_id);
     const userEntry: Users = await this.userService.getUserbyId(user_id);
 
-    console.log('in joinchannel BEFORE', channelEntry.members);
+    // console.log('in joinchannel BEFORE', channelEntry.members);
     if (!channelEntry.members) {
       channelEntry.members = [];
     }
     channelEntry.members.push(userEntry);
-    console.log('in joinchannel', channelEntry.members);
+    // console.log('in joinchannel', channelEntry.members);
     return await this.channelsRepository.save(channelEntry);
   }
 
@@ -149,7 +149,16 @@ export class ChannelsService {
     }
 
     newChannel.members = [];
-    newChannel.members.push(newChannel.owner);
+    if (newChannel.type === 'public') {
+      await this.userService.getUsers().then((res) => {
+        res.forEach((user) => {
+          newChannel.members.push(user);
+        });
+      });
+    } else {
+      newChannel.members.push(newChannel.owner);
+    }
+
     // await this.channelsRepository.save(newChannel).then(async (res) => {
     //   await this.joinChannel(res.id, res.owner.id);
     // });

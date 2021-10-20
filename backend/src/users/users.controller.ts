@@ -62,7 +62,6 @@ export class UsersController {
 		if (user == undefined) {
 			throw new NotFoundException('User not found');
 		}
-		console.log("in userconstroller", user)
 		return user;
 	}
 
