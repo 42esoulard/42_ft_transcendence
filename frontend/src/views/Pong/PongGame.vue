@@ -1,7 +1,7 @@
 <template>
 	<p> Game # {{ room }} </p>
 	<h1> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
-	<canvas ref="game" :width="canvasWidth" :height="canvasHeight" style="border: 1px solid black"> </canvas>
+	<canvas ref="game" :width="canvasWidth" :height="canvasHeight" style="border: 3px solid black"> </canvas>
 
 	<div v-if="!gameHasStarted">
 		<h1> Get ready, game is about to start ! </h1>
