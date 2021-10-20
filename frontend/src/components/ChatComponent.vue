@@ -2,13 +2,13 @@
   <h1>Chat Room</h1>
   <div class="container">
     <div class="col-lg-6 offset-lg-3">
-      <div v-if="ready">
+      <div>
         <p v-for="(user, i) in info" :key="i">
           {{ user.username }} {{ user.action }}
         </p>
       </div>
 
-      <div v-if="!ready">
+      <!-- <div v-if="!ready">
         <h4>Enter your username</h4>
         <form @submit.prevent="addUser">
           <div class="form-group row">
@@ -25,15 +25,16 @@
             />
           </div>
         </form>
-      </div>
+      </div> -->
       
-      <h2 v-else>{{ username }}</h2>
-      <div class="card bg-info" v-if="ready">
+      <!-- <h2 v-else>{{ username }}</h2> -->
+      <h2>{{ user.username }}</h2>
+      <div class="card bg-info">
 
         <div class="card-header text-white">
           <h4>
             <select class="selectRoom">
-              <option v-for="(chan) in allChannels" :key="chan.name" class="optionRoom" @click="switchRoom(chan)" :id="chan.name" >{{ chan.name }}</option>
+              <option v-for="(chan) in joinedChannels" :key="chan.name" class="optionRoom" @click="switchRoom(chan)" :id="chan.name" >{{ chan.name }}</option>
             </select>
             <button class="createBtn" @click="newChannelForm = true">Create Channel</button>
 
@@ -43,15 +44,18 @@
           </h4>
         </div>
 
-        <ul class="list-group list-group-flush text-right">
+        <div class="messages-wrapper">
+        <div>
+        <ul class="list-group list-group-flush text-left messages" id="messages">
           <small v-if="typing" class="text-white">{{ typing }} is typing</small>
           <li class="list-group-item" v-for="(message) in channelMessages" :key="message.id">
-            <span>
-              {{ message.content }}
-              <small>:{{ message.author }}</small>
+            <span class="message">
+              <div class="message-author">{{ message.author.username }}</div>: {{ message.content }}
             </span>
           </li>
         </ul>
+        </div>
+        </div>
 
         <div class="card-body">
           <form @submit.prevent="send">
@@ -80,14 +84,15 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, onUpdated, reactive, ref, watch } from "vue";
+import { defineComponent, reactive, ref, watch, computed } from "vue";
 import { io } from "socket.io-client";
 import { Message } from "@/types/Message";
 import { Channel } from "@/types/Channel"
 import NewChannelForm from "@/components/NewChannelForm.vue"
 import { Info } from "@/types/Info";
 import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
-
+import { useStore } from 'vuex';
+import { useUserApi } from "@/plugins/api.plugin";
 
 export const socket = io("http://localhost:3000/chat");
 
@@ -105,26 +110,42 @@ export const ChatComponent = defineComponent({
   },
 
   setup() {
+
     const api = new DefaultApi();
-    // const socket = ref(io("http://localhost:3000/chat"));
+    const userApi = useUserApi();
+    const user = computed(() => useStore().state.user);
+
     const newMessage = ref("");
+    const messageId = ref(0);
+
     const allMessages: {
         [key: number]: Array<Message>,
       } = {};
     const channelMessages = ref<Message[]>([]);
-    const typing = ref("");
-    const username = ref("");
-    const ready = ref(false);
-    const info = reactive<Info[]>([]);
-    const connections = ref(1);
-    const activeChannel = ref<Channel>({
-      name: "General",
-      type: "public",
-      id: 1
-    });
-    const messageId = ref(0);
-    const responseData = ref(null);
+    
+    const activeChannel = ref<Channel>();
+    const getDefaultChannel = async (id: number) => {
+      await api.getChannelById(1)
+      .then((res) => {
+        api.joinChannel(1, user.value.id)
+        .then(()=> {
+          updateChannelsList();
+          activeChannel.value = res.data;
+          getMessagesUpdate(res.data);
+          return res;
+        })
+        
+      })
+    }
+    getDefaultChannel(0);
+    
+
     let newChannelForm = ref(false);
+
+    const typing = ref("");
+    const info = reactive<Info[]>([]);
+
+    const connections = ref(1);
 
     /* INITIALIZE FROM DB + UPDATE (on logout? on fixed interval? on fixed nb of messages?):
         - channels:
@@ -135,42 +156,57 @@ export const ChatComponent = defineComponent({
     */
 
     // let channels = api.getChannelsByMember(1) //API GET CURRENT USER ID
-    let joinedChannels = reactive<Channel[]>([]);
-    let availableChannels = reactive<Channel[]>([]);
+    let joinedChannels = ref<Channel[]>([]);
+    let availableChannels = ref<Channel[]>([]);
     const allChannels = ref<Channel[]>([]);
 
     //This gets all channels (temporary before adding channel-members db table and fetching
     // joined + joinable (public) channels)
     const updateChannelsList = async () => {
-      await api.getChannels()
+      await userApi.getUserChannels(user.value.id)
       .then((res) => {
-        console.log(res.data)
-        allChannels.value = res.data;
+        joinedChannels.value = res.data.channels;
+        console.log("in  channels list", joinedChannels.value)
       })
+      .catch((err) => { console.log("not found")})
     }
     updateChannelsList();
 
-    const roomMessages = async () => {
-      if (!allMessages[activeChannel.value.id]) {
-        await api.getChannelMessages(activeChannel.value.id)
-        .then((res) => {
-          allMessages[activeChannel.value.id] = [];
-          res.data.forEach(item => {
-            console.log(item)
-            console.log(item.channel_id)
-            allMessages[activeChannel.value.id].push({
-              content: item.content,
-              author_id: item.author_id,
-              author: item.author_id.toString(), //TEMPORARY, MUST FETCH USERNAME STORE NAME
-              channel_id: activeChannel.value.id,
-              channel: activeChannel.value.name,
-              id: item.id,
-            })
-            messageId.value = item.id + 1;
-          })
-        })
-      }
-      channelMessages.value = allMessages[activeChannel.value.id];
+
+    const getMessagesUpdate = async (channel: Channel) => {
+      await api.getChannelById(channel.id)
+      .then((res) => {
+        if (activeChannel.value!.id === channel.id) {
+          activeChannel.value = res.data
+          channelMessages.value = res.data.messages
+        }
+        console.log("in room messages", channelMessages.value)
+        return res;
+      })
+      
+      // if (!allMessages[channel.id]) {
+      //   await api.getChannelMessages(channel.id)
+      //   .then((res) => {
+      //     allMessages[channel.id] = [];
+      //     res.data.forEach(item => {
+      //       console.log(item)
+      //       console.log(item.channel_id)
+      //       allMessages[channel.id].push({
+      //         content: item.content,
+      //         author_id: item.author_id,
+      //         author: item.author_id.toString(), //TEMPORARY, MUST FETCH USERNAME STORE NAME
+      //         channel_id: channel.id,
+      //         channel: channel.name,
+      //         id: item.id,
+      //       })
+      //       messageId.value = item.id + 1;
+      //     })
+      //   })
+      // }
+      // channelMessages.value = allMessages[activeChannel.value!.id];
+      // var scroll = document.getElementById('messages')!;
+      // scroll.scrollTop = scroll.scrollHeight;
+      // scroll.animate({scrollTop: scroll.scrollHeight});
     }
 
     const isMemberOfActiveRoom = async () => {
@@ -188,7 +224,7 @@ export const ChatComponent = defineComponent({
   
 
     const selectActiveChannel = () => {
-      setTimeout(() => { const selectedRoom = document.getElementById(activeChannel.value.name)!;
+      setTimeout(() => { const selectedRoom = document.getElementById(activeChannel.value!.name)!;
       selectedRoom.setAttribute("selected", "true");}, 1000);
       // FIND A CLEANER SOLUTION TO WAIT FOR DOM ELEM TO BE CREATED
     }
@@ -196,26 +232,31 @@ export const ChatComponent = defineComponent({
     const switchRoom = (info: Channel) => {
       activeChannel.value = info;
       selectActiveChannel();
-      roomMessages();
+      getMessagesUpdate(activeChannel.value);
     }
 
-    const createRoom = () => {
-      // activates form component: 
-      newChannelForm.value = true;
-      // once form component is validated, it shuts and calls api to 
-      // save the new channel and the new channel_member (with current user
-      // as admin)
-    }
+    // const createRoom = () => {
+    //   // activates form component: 
+    //   // newChannelForm.value = true;
+    //   // once form component is validated, it shuts and calls api to 
+    //   // save the new channel and the new channel_member (with current user
+    //   // as admin)
+    // }
 
     window.onbeforeunload = () => {
-      socket.emit("leave", username.value);
+      socket.emit("leave", user.value.username);
     };
 
     socket.on("chat-message", (data: any) => {
-
-      if (allMessages[data.channel_id])
-        allMessages[data.channel_id].push(data);
-      roomMessages();
+      console.log("RECEIVED CHAT MESSAGE, data:", data)
+      getMessagesUpdate(data.channel);
+      // console.log("in chat message: data", data)
+      // if (!allMessages[data.channel_id])
+      //   getMessagesUpdate({ name: data.channel, id: data.channel_id, type: ''});
+      // // if (allMessages[data.channel_id])
+      // allMessages[data.channel_id].push(data);
+      // else {}
+      // getMessagesUpdate();
     });
 
     socket.on("typing", (user: string) => {
@@ -228,13 +269,17 @@ export const ChatComponent = defineComponent({
 
     socket.on('createdRoom', async (info: Channel) => {
       newChannelForm.value = false;
-      await api.getChannels()
-      .then((res) => {
-        allChannels.value = res.data;
+      // await api.getChannels()
+      // .then((res) => {
+      //   allChannels.value = res.data;
+      await updateChannelsList()
+      .then(() => {
         switchRoom(info);
+      })
+        
         // newMessage.value = `${username.value} has created the [${info.name}] channel`;
         // send();
-      })
+      // })
    
       // MUST ADD MESSAGE TO DB
     })
@@ -243,11 +288,12 @@ export const ChatComponent = defineComponent({
       updateChannelsList();
     })
 
-    socket.on("join", (user: string, connectionsNb: number) => {
+    socket.on("join", (username: string, connectionsNb: number) => {
       info.push({
-        username: user,
+        username: username,
         action: "joined",
       });
+      // user.value = useStore().state.user;
 
       //updating connection nb for newcomer
       socket.emit("get-connections")
@@ -275,7 +321,7 @@ export const ChatComponent = defineComponent({
 
     watch(newMessage, (newMessage) => {
       newMessage
-        ? socket.emit("typing", username.value)
+        ? socket.emit("typing", user.value.username)
         : socket.emit("stopTyping");
     });
 
@@ -289,38 +335,45 @@ export const ChatComponent = defineComponent({
 
       const newContent = {
         content: newMessage.value,
-        author: username.value,
-        author_id: 1234,//get user id
-        channel: activeChannel.value.name,
-        channel_id: activeChannel.value.id,
+        author: user.value.username,
+        author_id: user.value.id,
+        channel: activeChannel.value!,
+        channel_id: activeChannel.value!.id,
         id: messageId.value,
+        created_at: Date.now().toString(),
       }
+
+      // console.log(newContent)
 
       newMessage.value = "";
       messageId.value++;
+      // console.log(activeChannel)
+      
 
-      if (!allMessages[activeChannel.value.id])
-        allMessages[activeChannel.value.id] = [];
-      allMessages[activeChannel.value.id].push(newContent);
-      roomMessages();
+      // if (!allMessages[activeChannel.value!.id])
+      //   allMessages[activeChannel.value!.id] = [];
+      // allMessages[activeChannel.value!.id].push(newContent);
+      // console.log("IN VUE ALLMESSAGES ", allMessages);
+      // getMessagesUpdate(activeChannel.value!);
 
-      socket.emit("chat-message", newContent)
       // } else {
       //   alert('You must join the room to send messages!')
       // } 
 
       await api.saveMessage({
           channel_id: newContent.channel_id,
-          author_id: newContent.author_id, // GET LOGGED IN USER ID
+          author_id: newContent.author_id, 
           content: newContent.content,
       })
-      .then((res: any) => (responseData.value = res.data))
+      .then(() => { 
+        getMessagesUpdate(newContent.channel); 
+        socket.emit("chat-message", newContent); 
+      })
       .catch((err: any) => console.log(err.message));
     }
 
     const addUser = () => {
-      ready.value = true;
-      socket.emit("join", username.value);
+      socket.emit("join", user.value.username);
     }
 
     return {
@@ -332,12 +385,11 @@ export const ChatComponent = defineComponent({
       newMessage,
       channelMessages,
       typing,
-      username,
-      ready,
+      user,
       info,
       connections,
 
-      roomMessages,
+      getMessagesUpdate,
       joinedChannels,
       allChannels,
       activeChannel,
@@ -345,7 +397,6 @@ export const ChatComponent = defineComponent({
       newChannelForm,
       toggleRoomMembership,
       isMemberOfActiveRoom,
-      createRoom
     };
   },
 });
@@ -354,10 +405,27 @@ export default ChatComponent;
 </script>
 
 <style>
-#messages {
-  height: 300px;
-  overflow-y: scroll;
+
+.message {
+  color: black;
 }
+.message-author {
+  width: 6em;
+  display: inline-block;
+  overflow:scroll;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+.messages-wrapper {
+  height: 300px;
+  overflow-x:auto; 
+  display:flex; 
+  flex-direction:column-reverse;
+}
+/* .messages {
+  overflow-y: scroll;
+} */
 .selectRoom {
   padding-top: 5px;
   border-radius: 10px;

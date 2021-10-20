@@ -28,6 +28,9 @@ export class UsersController {
 		return users;
 	}
 
+
+
+	
 	/**
 	* Returns a user found in database by its id.
 	*/
@@ -44,6 +47,18 @@ export class UsersController {
 	})
 	async getUser(@Param('id') id: number): Promise<User> {
 		const user: User = await this.userService.getUserbyId(id)
+		if (user == undefined) {
+			throw new NotFoundException('User not found');
+		}
+		return user;
+	}
+
+	/*
+	* Returns a user and its 'channels' (joined channels) property
+	*/
+	@Get('/channels/:id')
+	async getUserChannels(@Param('id') id: number): Promise<User> {
+		const user: User = await this.userService.getUserChannels(id)
 		if (user == undefined) {
 			throw new NotFoundException('User not found');
 		}

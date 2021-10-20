@@ -4,6 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Messages } from './entity/messages.entity';
 import { CreateMessageDto } from './dto/createMessage.dto';
+import { Channel } from 'src/channels/interfaces/channel.interface';
+import { User } from 'src/users/interfaces/user.interface';
+import { ChannelsService } from 'src/channels/channels.service';
+import { UsersService } from 'src/users/users.service';
 // import { timestamp } from 'rxjs';
 // import { UpdateMessageDto } from './dto/updateMessage.dto';
 // import * as bcrypt from 'bcrypt';
@@ -13,9 +17,9 @@ export class MessagesService {
   constructor(
     @InjectRepository(Messages)
     private readonly messagesRepository: Repository<Messages>,
+    private readonly channelService: ChannelsService,
+    private readonly userService: UsersService,
   ) {}
-
-  private index: 1;
 
   /**
    * Lists all messages in database
@@ -29,9 +33,9 @@ export class MessagesService {
    * Lists all messages in a particular channel
    * nb: find() is a function from the typeORM library
    */
-  async getChannelMessages(chan_id: number): Promise<Message[]> {
-    return await this.messagesRepository.find({ channel_id: chan_id });
-  }
+  // async getChannelMessages(channel: Channel): Promise<Message[]> {
+  //   return await this.messagesRepository.find({ channel: channel });
+  // }
 
   /**
    * Gets a message in database by its id
@@ -49,13 +53,13 @@ export class MessagesService {
    */
   async saveMessage(messageDto: CreateMessageDto): Promise<Message> {
     // console.log(messageDto);
-    const newMessage: Message = {
-      id: this.index,
-      channel_id: messageDto.channel_id,
-      author_id: messageDto.author_id,
-      content: messageDto.content,
-      // created_at: Math.floor(Date.now() / 1000),
-    };
+    const newMessage: Message = this.messagesRepository.create(messageDto);
+    newMessage.channel = await this.channelService.getChannelById(
+      messageDto.channel_id,
+    );
+    newMessage.author = await this.userService.getUserbyId(
+      messageDto.author_id,
+    );
 
     return await this.messagesRepository.save(newMessage);
   }

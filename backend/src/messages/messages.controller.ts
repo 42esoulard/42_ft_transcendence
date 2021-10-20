@@ -14,6 +14,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
+import { Channel } from 'src/channels/interfaces/channel.interface';
 // import { UpdateMessageDto } from './dto/updateMessage.dto';
 
 @Controller('messages')
@@ -57,18 +58,18 @@ export class MessagesController {
   /**
    * Returns a message found in database by its id.
    */
-  @Get('/in/:channel_id')
-  async getChannelMessages(
-    @Param('channel_id') channel_id: number,
-  ): Promise<Message[]> {
-    const messages: Message[] = await this.messageService.getChannelMessages(
-      channel_id,
-    );
-    if (messages == undefined) {
-      throw new NotFoundException('Messages not found');
-    }
-    return messages;
-  }
+  // @Get('/in/:channel_id')
+  // async getChannelMessages(
+  //   @Param('channel_id') channel: Channel,
+  // ): Promise<Message[]> {
+  //   const messages: Message[] = await this.messageService.getChannelMessages(
+  //     channel,
+  //   );
+  //   if (messages == undefined) {
+  //     throw new NotFoundException('Messages not found');
+  //   }
+  //   return messages;
+  // }
   // @ApiOkResponse({
   //   description: "The channel's messages have been found in database",
   //   type: Array(Message),
