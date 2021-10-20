@@ -6,7 +6,8 @@ import { Game } from '../entity/games.entity';
 import { GameUser } from '../entity/gameUser.entity';
 import { Server } from 'socket.io';
 
-var BALL_SPEED = 1
+var BALL_INITIAL_SPEED = 1
+var BALL_ACCELERATION = 0.5
 var CANVAS_WIDTH = 640
 var CANVAS_HEIGHT = 480
 var BALL_RADIUS = 10
@@ -38,6 +39,7 @@ export class pongGame {
   
   public ballPosition: coordinates = {x: 0, y:0}
   public ballDirection: coordinates = {x: 0, y: 0}
+  public ballSpeed = BALL_INITIAL_SPEED
 
   public interval = null
   public timeout = null
@@ -144,9 +146,11 @@ export class pongGame {
       // case 1: player1 hits the ball
       if (this.ballPosition.y >= this.player1.position && 
       this.ballPosition.y <= (this.player1.position + RACQUET_LENGTH))
+      {
         this.ballDirection.x = -this.ballDirection.x
+        this.ballSpeed += BALL_ACCELERATION
+      }
       // case2: player2 scores
-      // if (game.ballPosition.x <= 0 - BALL_RADIUS)
       else  
         this.handleScore(false)
     }
@@ -155,16 +159,18 @@ export class pongGame {
     {
       if(this.ballPosition.y >= this.player2.position && 
       this.ballPosition.y <= (this.player2.position + RACQUET_LENGTH))
+      {
         this.ballDirection.x = -this.ballDirection.x
-      // if (game.ballPosition.x >= CANVAS_WIDTH + BALL_RADIUS)
+        this.ballSpeed += BALL_ACCELERATION
+      }
       else
         this.handleScore(true)
     }
   }
   computeNewBallPosition()
   {
-    this.ballPosition.x += this.ballDirection.x * BALL_SPEED
-    this.ballPosition.y += this.ballDirection.y * BALL_SPEED
+    this.ballPosition.x += this.ballDirection.x * this.ballSpeed
+    this.ballPosition.y += this.ballDirection.y * this.ballSpeed
   }
 
   handleScore(player1Scored: boolean)
