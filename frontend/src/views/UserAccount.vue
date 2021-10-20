@@ -13,10 +13,7 @@
     <p>Profile created at: {{ formatedDate }}</p>
 
     <div v-if="!user.two_fa_enabled" class="ua-twofa">
-      <!-- <router-link :to="{ name: 'InitTwoFactor' }"
-        >Activate Two-Factor Authentication</router-link
-      > -->
-      <button class="button button--invite" @click="toggleModal()">
+      <button class="button button--invite" @click="toggleModal(1)">
         Enable Two-Factor Authentication
       </button>
     </div>
@@ -35,16 +32,21 @@
       <button class="button button--msg">Update avatar</button>
     </form>
     <teleport to="#modals">
-      <transition name="fade-error">
-        <div v-if="showModal" class="backdrop"></div>
+      <transition name="fade--error">
+        <div v-if="showBackdrop" class="backdrop"></div>
       </transition>
-      <transition name="zoomin">
-        <InitTwoFactor
-          v-if="showModal"
-          @close="toggleModal()"
-          @success="handleSuccess"
-        />
-      </transition>
+      <transition-group name="zoomin">
+        <Modal v-if="showModal" @close="toggleModal(1)">
+          <template v-slot:twofa>
+            <InitTwoFactor @close="toggleModal(1)" @success="handleSuccess" />
+          </template>
+        </Modal>
+        <Modal v-if="firstTimeConnect" @close="toggleModal(2)">
+          <template v-slot:update-user>
+            <UpdateUser @close="toggleModal(2)" />
+          </template>
+        </Modal>
+      </transition-group>
     </teleport>
   </div>
 </template>
@@ -57,10 +59,12 @@ import axios from "axios";
 import moment from "moment";
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import Toast from "@/components/Toast.vue";
+import UpdateUser from "@/components/UpdateUser.vue";
+import Modal from "@/components/Modal.vue";
 
 export default defineComponent({
   name: "UserAccount",
-  components: { InitTwoFactor, Toast },
+  components: { Modal, InitTwoFactor, Toast, UpdateUser },
   setup() {
     const api = new DefaultApi();
     const store = useStore();
@@ -68,6 +72,7 @@ export default defineComponent({
     const avatar = ref();
     const showModal = ref(false);
     const error = ref("");
+    const date = ref(1);
 
     const formatedDate = computed(() => {
       return moment(store.state.user.created_at as Date).format(
@@ -94,14 +99,16 @@ export default defineComponent({
       console.log(avatar.value);
     };
 
-    const postAvatar = () => {
+    const postAvatar = async () => {
       const data = new FormData();
       data.append("avatar", avatar.value);
-      axios
+      await axios
         .post("http://localhost:3000/users/upload", data)
-        .then(function(response) {
+        .then(response => {
           console.log(response);
-          window.location.reload();
+          store.commit("updateAvatar", response.data.filename);
+          // store.commit("tagAvatar", Date.now());
+          // window.location.reload();
         })
         .catch(err => {
           error.value = err.response.data.message;
@@ -114,26 +121,32 @@ export default defineComponent({
         .get("http://localhost:3000/auth/2fa/turn-off")
         .then(res => {
           store.commit("toggleTwoFactor", false);
-          store.state.message = res.data.message;
-          setTimeout(() => {
-            store.state.message = "";
-          }, 3000);
+          store.dispatch("setMessage", res.data.message);
         })
         .catch(error => console.log(error));
     };
 
-    const toggleModal = () => {
-      showModal.value = !showModal.value;
+    const toggleModal = (nbr: number) => {
+      if (nbr === 1) {
+        showModal.value = !showModal.value;
+      } else {
+        store.commit("setFirstTimeConnect", false);
+      }
     };
 
     const handleSuccess = (message: string) => {
       console.log(message);
-      store.state.message = message;
+      store.dispatch("setMessage", message);
     };
+
+    const showBackdrop = computed(() => {
+      return showModal.value || store.state.firstTimeConnect;
+    });
 
     return {
       user: computed(() => store.state.user),
       message: computed(() => store.state.message),
+      firstTimeConnect: computed(() => store.state.firstTimeConnect),
       formatedDate,
       postAvatar,
       handleFile,
@@ -142,7 +155,8 @@ export default defineComponent({
       showModal,
       toggleModal,
       error,
-      handleSuccess
+      handleSuccess,
+      showBackdrop
     };
   }
 });
@@ -157,12 +171,4 @@ export default defineComponent({
 p {
   margin-bottom: 0.8rem;
 }
-/* .fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 2s ease;
-} */
 </style>
