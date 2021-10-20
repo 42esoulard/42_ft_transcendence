@@ -1,7 +1,7 @@
 <template>
 	<p> Game # {{ room }} </p>
 	<h1> {{ player1UserName }} [{{ score.player1 }}]  |  {{ player2UserName }} [{{ score.player2 }}] </h1>
-	<canvas ref="game" width="640" height="480" style="border: 1px solid black"> </canvas>
+	<canvas ref="game" :width="canvasWidth" :height="canvasHeight" style="border: 1px solid black"> </canvas>
 
 	<div v-if="!gameHasStarted">
 		<h1> Get ready, game is about to start ! </h1>
@@ -18,6 +18,9 @@ import { onMounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import getDraw from '../../composables/draw'
 
+var CANVAS_HEIGHT = 480
+var CANVAS_WIDTH = 640
+
 export default {
 	setup() {
 		
@@ -25,6 +28,8 @@ export default {
 		const room =  ref(route.params.id)
 		const player1UserName = ref(route.params.player1UserName)
 		const player2UserName = ref(route.params.player2UserName)
+		const canvasWidth = CANVAS_WIDTH
+		const canvasHeight = CANVAS_HEIGHT
 
 		const { context, game, ballPosition, playerPositions, draw } = getDraw()
 
@@ -90,7 +95,7 @@ export default {
 		}
 		
 
-		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, game }
+		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, game, canvasWidth, canvasHeight }
 
 	},
 

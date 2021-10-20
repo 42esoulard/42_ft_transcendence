@@ -1,6 +1,10 @@
 
 import { ref } from 'vue'
 
+var BALL_RADIUS = 10
+var RACQUET_LENGTH = 80
+var RACQUET_WIDTH = 20
+
 const getDraw = () => {
 
 	const context = ref({})
@@ -12,9 +16,11 @@ const getDraw = () => {
 		context.value.clearRect(0, 0, game.value.width, game.value.height)
 
 		context.value.beginPath()
-		context.value.rect(0, playerPositions.value.player1, 20, 80)
-		context.value.rect(620, playerPositions.value.player2, 20, 80)
-		context.value.arc(ballPosition.value.x, ballPosition.value.y, 10, 0, Math.PI*2, false);
+
+		context.value.rect(0, playerPositions.value.player1, RACQUET_WIDTH, RACQUET_LENGTH)
+		context.value.rect(game.value.width - RACQUET_WIDTH, playerPositions.value.player2, RACQUET_WIDTH, RACQUET_LENGTH)
+		context.value.arc(ballPosition.value.x, ballPosition.value.y, BALL_RADIUS, 0, Math.PI*2, false);
+		
 		context.value.fill()
 		context.value.closePath()
 	}
