@@ -19,7 +19,10 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: Home,
+    meta: {
+      requiresAuth: true,
+    }
   },
   {
     path: '/login',
@@ -135,7 +138,7 @@ router.beforeEach(async (to, from) => {
       await getProfile();
     }
     if (!store.state.user) {
-      return `/login?from=${to.path}`; // redirected to login
+      return `/login`; // redirected to login
     } else {
       return true; // the route is allowed
     }

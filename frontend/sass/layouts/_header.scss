@@ -6,6 +6,9 @@
   height: $header-height;
   width: 100%;
   background-color: $header-bg-color;
+  &--invisible {
+    background-color: transparent;
+  }
 }
 
 .header-link {
@@ -23,12 +26,15 @@
  }
 
  .header-bloc {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 5px 10px;
+  border-radius: 25px;
   margin: $user-bloc-margin;
   justify-self: end;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: $user-bloc-gap;
+  gap: $header-bloc-gap;
  }
 
  .user-bloc {
@@ -54,8 +60,3 @@
   border-radius: 50%;
  }
 
- .user-bloc__icon {
-   &:hover {
-     opacity: $user-bloc-hover-opacity;
-   }
- }

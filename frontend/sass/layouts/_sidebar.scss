@@ -6,6 +6,9 @@
   padding: $sidebar-padding;
   color: $sidebar-text-color;
   background-color: $sidebar-bg-color;
+  &--invisible {
+    background-color: transparent;
+  }
 }
 
 .sidebar-link {

@@ -1,0 +1,34 @@
+
+.fade {
+  &-enter-active, &-leave-active {
+    transition: opacity 0.2s ease;
+  }
+  &-enter-from, &-leave-to {
+    opacity: 0;
+  }
+
+  &--log {
+    &-enter-active {
+      transition: opacity 1s ease;
+    }
+    &-leave-active {
+      transition: opacity 0s ease;
+    }
+    &-enter-from, &-leave-to {
+      opacity: 0;
+    }
+  }
+
+  &--error {
+    &-fade-enter-active {
+      transition: all 0.2s ease;
+    }
+    &-fade-leave-active {
+      transition: all 0.5s ease;
+    }
+    &-enter-from, &-leave-to {
+      opacity: 0;
+    }
+  }
+
+}

@@ -3,9 +3,12 @@
   <div v-if="isTwoFactorEnabled">
     <OtpInput :codeSendToUrl="codeSendToUrl" />
   </div>
-  <div v-else>
-    <h2>Please Login</h2>
-    <button @click="logInWith42">Login with 42</button>
+  <div v-else class="log-in-div">
+    <button class="button button--log-in" @click="logInWith42">
+      <span>Login with  </span>
+      <img class="button-log-in__logo" src="../assets/42_logo_white.png" alt="">
+    </button>
+    <button class="button button--log-in" @click="$router.push('fake-login')">Login with fake user</button>
   </div>
 </template>
 
