@@ -9,8 +9,6 @@ import { Server } from 'socket.io';
 var BALL_SPEED = 1
 var CANVAS_WIDTH = 640
 var CANVAS_HEIGHT = 480
-var BALL_INITIAL_DIR_X = -2
-var BALL_INITIAL_DIR_Y = -1
 var BALL_RADIUS = 10
 var RACQUET_LENGTH = 80
 var RACQUET_WIDTH = 20
@@ -53,8 +51,17 @@ export class pongGame {
   }
   initBallDirection()
   {
-    this.ballDirection.x = BALL_INITIAL_DIR_X,
-    this.ballDirection.y = BALL_INITIAL_DIR_Y
+    var sign1:boolean = (Math.random() > 0.5)
+    var sign2:boolean = (Math.random() > 0.5)
+    var rand = Math.random() * 3
+    var dir_x = sign1 ? rand : -rand
+    var abs_dir_y = Math.sqrt(9 - dir_x*dir_x)
+    var dir_y = sign2 ? abs_dir_y : -abs_dir_y
+    // this.logger.log(dir_x)
+    // this.logger.log(dir_y)
+    // this.logger.log(dir_y*dir_y + dir_x*dir_x)
+    this.ballDirection.x = dir_x,
+    this.ballDirection.y = dir_y
   }
 
   async pushGameintoDB()
