@@ -1,6 +1,7 @@
 @mixin button-hover () {
   border: $button-hover-border;
   background-color: $button-hover-bg-color;
+  text-decoration: none;
 }
 
 @mixin hover-modifier ($color) {

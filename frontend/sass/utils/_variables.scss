@@ -10,7 +10,8 @@ $header-text-color: white;
 $header-height: 4rem;
 $header-font: "Saira";
 $header-font-size: 3rem;
-$user-bloc-gap: 5px;
+$header-bloc-gap: 7px;
+$user-bloc-gap: 14px;
 $user-bloc-name-font: "Saira";
 $user-bloc-name-size: 1.5rem;
 $user-bloc-name-color: white;
@@ -46,7 +47,8 @@ $profile-left-name-size: 4rem;
 $profile-main-margin: 2rem 0;
 $profile-main-padding: 2rem;
 $profile-main-width: 100%;
-$profile-social-width: 50%;
+$profile-social-width: 80%;
+$profile-social-width-column: 50%;
 $profile-social-gap: 5px;
 $profile-social-margin: 1rem 0 0 0;
 
@@ -114,12 +116,16 @@ $button-font: "Saira";
 $button-color: white;
 $button-border-radius: 50px;
 $button-border: none;
+$button-padding: 5px 10px;
 $button-hover-bg-color: black;
 $button-hover-border: none;
 $button-msg-bg: darken($prim-color, 15);
 $button-add-bg: darken($second-color, 15);
 $button-invite-bg: darken($third-color, 15);
 $button-block-bg: grey;
+$button-log-in-size: 1.5rem;
+$button-log-in-padding: 10px 50px;
+$button-log-in-logo-width: 3rem;
 
 //OTHERS
 $status-online-color: rgb(0, 255, 0);

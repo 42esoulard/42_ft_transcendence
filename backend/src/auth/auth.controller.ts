@@ -7,10 +7,8 @@ import { AuthService } from './auth.service';
 import { AuthenticatedGuard, FortyTwoAuthGuard } from './guards/fortytwo.guard';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { JwtTwoFactorGuard } from './guards/jwtTwoFactor.guard';
-import { RefreshTokenAuthGuard } from './guards/refresh.guard';
-import { ApiCookieAuth, ApiOAuth2, ApiTags } from '@nestjs/swagger';
 import { RefreshTwoFactorGuard } from './guards/refreshTwoFactor.guard';
-import { HttpExceptionFilter } from '../exceptions/http-exception.filter';
+import { ApiCookieAuth, ApiOAuth2, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -114,7 +112,7 @@ export class AuthController {
 
   @ApiCookieAuth()
   @Get('2fa/generate')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtTwoFactorGuard)
   async register(@Res() response: Response, @Req() request: Request) {
 
     const { otpauthUrl } = await this.authService.generateTwoFASecret(request.user);
@@ -123,7 +121,7 @@ export class AuthController {
 
   @ApiCookieAuth()
   @Get('2fa/key')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtTwoFactorGuard)
   getKey(@Req() request: Request) {
     let key = 'No available key';
     // console.log('KEY:', request.user.two_fa_secret);
@@ -135,7 +133,7 @@ export class AuthController {
 
   @ApiCookieAuth()
   @Post('2fa/turn-on')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtTwoFactorGuard)
   // @UseFilters(HttpExceptionFilter)
   async turnOnTwoFactorAuthentication(
     @Req() request: Request,

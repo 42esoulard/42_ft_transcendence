@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Channels } from 'src/channels/entity/channels.entity';
+import { Users } from 'src/users/entity/users.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+} from 'typeorm';
 // import * as bcrypt from 'bcrypt';
 
 @Entity('messages')
@@ -6,11 +14,19 @@ export class Messages {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  channel_id: number;
+  // if a channel or a user is deleted, the channel's or user's messages are deleted
+  // seems like the ethical thing to do (lookin' atcha, gafams)
 
-  @Column()
-  author_id: number;
+  @ManyToOne(() => Channels, (channel) => channel.messages, {
+    onDelete: 'CASCADE',
+  })
+  channel: Channels;
+
+  @ManyToOne(() => Users, (author) => author.messages, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  author: Users;
 
   @Column()
   content: string;

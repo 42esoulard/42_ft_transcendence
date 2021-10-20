@@ -9,21 +9,28 @@ import PongGame from '../views/Pong/PongGame.vue'
 import PongWatch from '../views/Pong/PongWatch.vue'
 import FakeLogin from '../views/FakeLogin.vue'
 import Login from '../views/Login.vue';
-import store from "@/store";
+import { store } from "@/store";
 import axios from 'axios'
 import UserProfile from '../views/UserProfile.vue'
 import InitTwoFactor from '../views/InitTwoFactor.vue'
+import NotFound from '../views/NotFound.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: Home,
+    meta: {
+      requiresAuth: true,
+    }
   },
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    meta: {
+      requiresVisitor: true,
+    }
   },
   {
     path: '/fake-login',
@@ -54,7 +61,10 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/chat',
     name: 'Chat',
-    component: Chat
+    component: Chat,
+    meta: {
+      requiresAuth: true,
+    }
   },
   {
     path: '/account',
@@ -90,6 +100,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'PongWatch',
     component: PongWatch
   },
+  {
+    path: '/:catchAll(.*)',
+    name: 'NotFound',
+    component: NotFound
+  },
 ]
 
 const router = createRouter({
@@ -98,12 +113,14 @@ const router = createRouter({
 })
 
 //To exchange cookie or auth header w/o in every req
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 
 const refreshToken = async () => {
   await axios
     .get("http://localhost:3000/auth/refreshtoken")
-    .then((response) => console.log(response))
+    .then(async (response) => {
+      await getProfile();
+    })
     .catch((err: any) => console.log(err.message));
 };
 
@@ -112,30 +129,28 @@ const getProfile = async () => {
     .get("http://localhost:3000/auth/profile")
     .then((response) => {
       store.state.user = response.data;
-      // console.log(store.state.user);
     })
-    .catch((err: Error) => {
-      console.log(err.message);
+    .catch(async (err: Error) => {
+      await refreshToken();
     });
 };
 
 router.beforeEach(async (to, from) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
+    console.log('beforeEach');
     if (!store.state.user) {
-      await refreshToken();
       await getProfile();
-      // .then((res) => console.log(res))
-      // .catch( async (err) => {
-      //   console.log("get profile fails")
-      //   await refreshToken();
-      //   await getProfile();
-      // })
     }
-    console.log('user:', store.state.user)
     if (!store.state.user) {
-      return `/login?from=${to.path}`; // redirected to login
+      return `/login`; // redirected to login
     } else {
       return true; // the route is allowed
+    }
+  } else if (to.matched.some(record => record.meta.requiresVisitor)) {
+    if (store.state.user) {
+      return '/';
+    } else {
+      return true;
     }
   }
 });

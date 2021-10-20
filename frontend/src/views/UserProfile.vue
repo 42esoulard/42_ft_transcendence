@@ -1,5 +1,5 @@
 <template>
-  <div class="profile">
+  <div class="profile" v-if="user">
     <div class="profile-left">
         <img :src="user.avatar" class="profile-left__avatar-img" alt= "">
         <span class="profile-left__name">{{ user.username }}</span>

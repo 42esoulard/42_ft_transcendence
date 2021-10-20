@@ -1,10 +1,11 @@
 .button {
   background-color: $button-bg-color;
-  width: $button-width;
+  padding: $button-padding;
   border-radius: $button-border-radius;
   border: $button-border;
   font-family: $button-font;
   color: $button-color;
+  text-decoration: none;
   &:hover {
     @include button-hover;
   }
@@ -24,6 +25,14 @@
     background-color: $button-block-bg;
     @include hover-modifier($button-block-bg);
   }
+  &--log-out {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  &--log-in {
+    font-size: $button-log-in-size;
+    padding: $button-log-in-padding;
+    height: 4rem;
+  }
 }
 
 .otp_submit > .button,
@@ -32,4 +41,17 @@
   // margin-top: 20px;
   width: auto;
   font-weight: bold;
+}
+
+.button-log-in__logo {
+  width: $button-log-in-logo-width;
+  height: auto;
+}
+
+.log-in-div {
+  display: flex;
+  flex-direction: column;
+  width: 350px;
+  gap: 10px;
+  margin: auto;
 }
