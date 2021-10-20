@@ -62,8 +62,8 @@ export class pongGame {
     // this.logger.log(dir_x)
     // this.logger.log(dir_y)
     // this.logger.log(dir_y*dir_y + dir_x*dir_x)
-    this.ballDirection.x = dir_x,
-    this.ballDirection.y = dir_y
+    this.ballDirection.x = 2,
+    this.ballDirection.y = 1
   }
 
   async pushGameintoDB()
@@ -204,6 +204,7 @@ export class pongGame {
 
     this.initPositions()
     this.initBallDirection()
+    this.ballSpeed = BALL_INITIAL_SPEED
 
   }
 
