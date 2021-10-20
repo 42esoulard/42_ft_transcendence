@@ -35,6 +35,7 @@ export default {
 
 		// lifecycle hooks
 		onMounted(() => {
+			window.addEventListener("keydown", onKeyDown)
 			console.log('mounted')
 			context.value = game.value.getContext("2d")
 		})
@@ -62,7 +63,6 @@ export default {
 		const gameHasStarted = ref(false)
 		socket.value.on("gameStarting", () => {
 			gameHasStarted.value = true
-			window.addEventListener("keydown", onKeyDown)
 		})
 		
 		const winningPlayer = ref(null)
@@ -80,7 +80,8 @@ export default {
 
 		// socket emit
 		const SendMoveMsg = (direction) => {
-			socket.value.emit('moveRacquet', {room: room.value, text: direction})
+			if (gameHasStarted.value)
+				socket.value.emit('moveRacquet', {room: room.value, text: direction})
 		}
 		
 		const onKeyDown = (event) => {
