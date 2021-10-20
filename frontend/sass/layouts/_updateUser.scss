@@ -1,0 +1,14 @@
+.update-user-grid {
+  position: relative;
+  margin: 300px auto;
+  display: grid;
+  align-items: center;
+  max-width: 580px;
+  // grid-template-columns: 210px auto;
+  // grid-column-gap: 15px;
+  padding: 20px;
+  background-color: rgb(41, 41, 41);
+  color: white;
+  box-shadow: 0 15px 15px rgba(0, 0, 0, 0.6);
+  // filter: none;
+}

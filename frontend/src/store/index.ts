@@ -6,6 +6,7 @@ import { createStore, useStore as baseUseStore, Store } from 'vuex'
 export interface State {
   user: User | null,
   message: string,
+  firstTimeConnect: boolean,
 }
 
 // define injection key
@@ -18,6 +19,7 @@ export const store = createStore<State>({
   state: {
     user: null,
     message: '',
+    firstTimeConnect: false,
   },
   getters: {},
   mutations: {
@@ -27,9 +29,21 @@ export const store = createStore<State>({
         state.user.two_fa_enabled = payload;
       }
     },
+    updateAvatar(state: State, payload: string) {
+      if (state.user) {
+        const tag = `?tag=${Date.now().toString()}`;
+        // This is dirty, better to save avatar with ONLY ONE extension in backend
+        const avatar = `http://localhost:3000/users/avatars/${payload}${tag}`;
+        state.user.avatar = avatar;
+      }
+    },
 
     setMessage(state: State, payload: string) {
       state.message = payload;
+    },
+
+    setFirstTimeConnect(state: State, payload: boolean) {
+      state.firstTimeConnect = payload;
     }
   },
   actions: {
@@ -38,7 +52,13 @@ export const store = createStore<State>({
       setTimeout(() => {
         context.commit('setMessage', '');
       }, 3000);
-    }
+    },
+    tagAvatar(context, payload: number) {
+      setTimeout(() => {
+        context.commit('tagAvatar', payload);
+      }, 2000);
+    },
+    
   },
 })
 

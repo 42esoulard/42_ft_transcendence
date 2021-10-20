@@ -20,10 +20,10 @@
   }
 
   &--error {
-    &-fade-enter-active {
+    &-enter-active {
       transition: all 0.2s ease;
     }
-    &-fade-leave-active {
+    &-leave-active {
       transition: all 0.5s ease;
     }
     &-enter-from, &-leave-to {

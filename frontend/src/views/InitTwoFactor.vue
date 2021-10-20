@@ -1,9 +1,13 @@
 <template>
+<!-- THIS FILE IS NOT USES ANYMORE. IT IS THE PAGE VERSION OF THE 2FA INPUT
+    KEPT HERE IN CASE WE WOULD LIKE TO NOT USE THE MODAL VERSION.
+    COULD BE DELETED IF NOT
+ -->
   <div class="twofa-grid tac br15">
     <h2 class="twofa-h2">Activate Two-Factor Authentication</h2>
     <div>
       <img
-        class="google"
+        class="google-img"
         src="../assets/google_auth.png"
         alt="Google Authenticator"
       />

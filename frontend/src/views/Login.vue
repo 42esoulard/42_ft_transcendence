@@ -16,6 +16,7 @@
 import { defineComponent, onBeforeMount, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import OtpInput from "@/components/OtpInput.vue";
+import { useStore } from "vuex";
 import axios from "axios";
 
 export default defineComponent({
@@ -24,6 +25,7 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const router = useRouter();
+    const store = useStore();
 
     const isTwoFactorEnabled = ref(false);
     const qrcodeURL = ref("");
@@ -50,7 +52,8 @@ export default defineComponent({
             if (res.status === 206) {
               isTwoFactorEnabled.value = true;
             } else if (res.status === 200) {
-              // console.log('REDIRECT', redirectUrl);
+              // Put this commit under if block, condition from backend: first connect == true
+              store.commit('setFirstTimeConnect', true);
               router.push(redirectUrl);
             }
           })
