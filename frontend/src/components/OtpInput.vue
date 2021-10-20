@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { defineComponent, ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -34,9 +34,9 @@ export default defineComponent({
   props: ["codeSendToUrl", "isTwoFactorEnabled"],
   setup(props, context) {
     const router = useRouter();
+    const store = useStore();
     const otp = ref("");
     const error = ref("");
-    const store = useStore();
 
     //To exchange cookie or auth header w/o in every req
     axios.defaults.withCredentials = true;
@@ -79,7 +79,6 @@ export default defineComponent({
       sendTwoFactorCode,
       otp,
       error,
-      user: computed(() => store.state.user)
     };
   }
 });
