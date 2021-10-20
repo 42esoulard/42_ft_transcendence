@@ -1,6 +1,6 @@
 <template>
 	<p> Game # {{ room }} </p>
-	<h1> {{ player1UserName }} [{{ score.player1 }}]  |  {{ player2UserName }} [{{ score.player2 }}] </h1>
+	<h1> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
 	<canvas ref="game" :width="canvasWidth" :height="canvasHeight" style="border: 1px solid black"> </canvas>
 
 	<div v-if="!gameHasStarted">
@@ -31,7 +31,7 @@ export default {
 		const canvasWidth = CANVAS_WIDTH
 		const canvasHeight = CANVAS_HEIGHT
 
-		const { context, game, ballPosition, playerPositions, draw } = getDraw()
+		const { context, game, ballPosition, playerPositions, draw, score } = getDraw()
 
 		// lifecycle hooks
 		onMounted(() => {
@@ -55,7 +55,6 @@ export default {
 			draw()
 		})
 	
-		const score = ref({player1: 0,player2: 0})
 		socket.value.on("score", new_score => {
 			score.value = new_score
 		})
