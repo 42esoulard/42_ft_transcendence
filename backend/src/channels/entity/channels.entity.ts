@@ -31,7 +31,9 @@ export class Channels {
   @ManyToOne(() => Users, { onDelete: 'SET NULL' })
   owner: Users;
 
-  @ManyToMany(() => Users, (member) => member.channels)
+  @ManyToMany(() => Users, (member) => member.channels, {
+    cascade: true,
+  })
   members: Users[];
 
   @OneToMany(() => Messages, (message) => message.channel, {

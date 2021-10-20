@@ -51,6 +51,11 @@ export class ChannelsController {
   async getChannelById(@Param('id') id: number): Promise<Channel> {
     const channel: Channel = await this.channelService.getChannelById(id);
     if (channel == undefined) {
+      if (id == 1) {
+        return await this.channelService.seed()
+        //   return await this.channelService.getChannelById(id);
+        // });
+      }
       throw new NotFoundException('Channel not found');
     }
     return channel;

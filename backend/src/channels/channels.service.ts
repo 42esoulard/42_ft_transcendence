@@ -18,18 +18,17 @@ export class ChannelsService {
     private readonly userService: UsersService,
   ) {}
 
-  async seed() {
+  async seed(): Promise<Channel> {
     console.log('Initializing default channel...');
-    await this.channelsRepository
-      .save({
-        id: 0,
-        name: 'General',
-        owner: null,
-        password: null,
-        type: 'Public',
-      })
-      .then(() => console.log('Channels seed complete!'))
-      .catch(() => console.log('Channels seed failed :('));
+    return await this.channelsRepository.save({
+      id: 1,
+      name: 'General',
+      owner: null,
+      password: null,
+      type: 'Public',
+    });
+    // .then(() => console.log('Channels seed complete!'))
+    // .catch(() => console.log('Channels seed failed :('));
   }
 
   /**
@@ -59,24 +58,53 @@ export class ChannelsService {
    * nb: findOne(id) is a function from the typeORM library
    */
   async getChannelById(id: number): Promise<Channels> {
-    const res = await this.channelsRepository.findOne(id).catch(() => {
-      if (id === 0) {
-        this.seed();
-        return this.getChannelById(id);
-      }
+    console.log('in get channel by id', id);
+    return await this.channelsRepository.findOne(id, {
+      relations: ['members'],
     });
+    // const ret = await this.channelsRepository
+    //   .findOne(id)
+    //   .then((res) => {
+    //     console.log(ret);
+    //     if (ret == undefined && id === 0) {
+    //       this.seed().then(() => {
+    //         console.log('seeded');
+    //         return this.getChannelById(0);
+    //       });
+    //       // return this.getChannelById(id);
+    //     }
+    //     console.log(
+    //       'not seeded res:',
+    //       res,
+    //       typeof res,
+    //       id,
+    //       res == undefined,
+    //       res === undefined,
+    //     );
+    //     return res;
+    //   })
+    //   .catch(() => {
+    //     if (id === 0) {
+    //       this.seed();
+    //       console.log('seeded');
+    //       return this.getChannelById(id);
+    //     }
+    //   });
+    // return ret;
     // console.log('getChannelById', id, res);
-    return res;
+    // return res;
   }
 
   async joinChannel(channel_id: number, user_id: number): Promise<Channel> {
     const channelEntry: Channels = await this.getChannelById(channel_id);
     const userEntry: Users = await this.userService.getUserbyId(user_id);
 
+    console.log('in joinchannel BEFORE', channelEntry.members);
     if (!channelEntry.members) {
       channelEntry.members = [];
     }
     channelEntry.members.push(userEntry);
+    console.log('in joinchannel', channelEntry.members);
     return await this.channelsRepository.save(channelEntry);
   }
 

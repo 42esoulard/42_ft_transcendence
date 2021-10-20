@@ -125,13 +125,16 @@ export const ChatComponent = defineComponent({
     
     const activeChannel = ref<Channel>();
     const getDefaultChannel = async (id: number) => {
-      await api.getChannelById(0)
+      await api.getChannelById(1)
       .then((res) => {
-        api.joinChannel(0, user.value.id);
-        updateChannelsList();
-        activeChannel.value = res.data;
-        roomMessages(res.data);
-        return res;
+        api.joinChannel(1, user.value.id)
+        .then(()=> {
+          updateChannelsList();
+          activeChannel.value = res.data;
+          roomMessages(res.data);
+          return res;
+        })
+        
       })
     }
     getDefaultChannel(0);
@@ -244,6 +247,7 @@ export const ChatComponent = defineComponent({
     };
 
     socket.on("chat-message", (data: any) => {
+      console.log("RECEIVED CHAT MESSAGE")
       roomMessages(data);
       // console.log("in chat message: data", data)
       // if (!allMessages[data.channel_id])
