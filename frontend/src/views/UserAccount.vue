@@ -8,6 +8,15 @@
     <p>Your avatar: {{ user.avatar }}</p>
     <p>Your id: {{ user.id }}</p>
     <p>Your username: {{ user.username }}</p>
+    <form @submit.prevent="updateUsername">
+      <transition name="fade--error">
+        <p v-if="error_username" class="error">{{ error_username }}</p>
+      </transition>
+      <input type="text" v-model="username" maxlength="10"/>
+      <div>
+        <button class="button button--msg">Update username</button>
+      </div>
+    </form>
     <p>Your login 42: {{ user.forty_two_login }}</p>
     <p>Two-Factor Auth activated: {{ user.two_fa_enabled }}</p>
     <p>Profile created at: {{ formatedDate }}</p>
@@ -52,8 +61,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
-import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
+import { computed, defineComponent, ref, onMounted } from "vue";
+import { useUserApi } from "@/plugins/api.plugin";
+import { User } from "@/types/User";
 import { useStore } from "vuex";
 import axios from "axios";
 import moment from "moment";
@@ -66,13 +76,23 @@ export default defineComponent({
   name: "UserAccount",
   components: { Modal, InitTwoFactor, Toast, UpdateUser },
   setup() {
-    const api = new DefaultApi();
+    const api = useUserApi();
     const store = useStore();
 
     const avatar = ref();
     const showModal = ref(false);
     const error = ref("");
     const date = ref(1);
+    const error_username = ref("");
+    const username = ref("");
+    const users = ref<User[]>([]);
+
+    onMounted(() => {
+      api
+        .getUsers()
+        .then((res: any) => (users.value = res.data))
+        .catch((err: any) => console.log(err.message));
+    });
 
     const formatedDate = computed(() => {
       return moment(store.state.user.created_at as Date).format(
@@ -97,6 +117,24 @@ export default defineComponent({
       }
       avatar.value = files[0];
       console.log(avatar.value);
+    };
+
+    const updateUsername = async () => {
+      if (!/^[a-zA-Z]+$/.test(username.value))
+        error_username.value = "Username should only contains letters";
+      else if (users.value.find(user => user.username == username.value))
+        error_username.value = "Username already taken";
+      else
+        await axios
+          .post(`http://localhost:3000/users/update-user`, {
+            id: store.state.user.id,
+            username: username.value,
+          })
+          .then((res) => {
+            console.log(res);
+            location.reload();
+          })
+          .catch(error_username => console.log(error_username));
     };
 
     const postAvatar = async () => {
@@ -156,7 +194,10 @@ export default defineComponent({
       toggleModal,
       error,
       handleSuccess,
-      showBackdrop
+      showBackdrop,
+      updateUsername,
+      username,
+      error_username,
     };
   }
 });

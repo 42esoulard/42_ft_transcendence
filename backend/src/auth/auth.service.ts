@@ -18,22 +18,22 @@ export class AuthService implements AuthProvider {
   ) { }
 
   async validateUser(userProfile: FortyTwoUser): Promise<User> {
-    const user: User = await this.usersService.getUserByUsername(userProfile.username);
+    const user: User = await this.usersService.getUserByLogin(userProfile.username);
     if (user) {
       return user;
     } else {
       const { username, photo } = userProfile;
-      return this.usersService.saveUser({ username: username, forty_two_login: username, avatar: photo });
+      return this.usersService.saveUser({ username: username, forty_two_login: username, two_fa_enabled: false, avatar: photo });
     }
   }
 
-  async validateJwtUser(username: string): Promise<User> {
-    const user: User = await this.usersService.getUserByUsername(username);
+  async validateJwtUser(login: string): Promise<User> {
+    const user: User = await this.usersService.getUserByLogin(login);
     return user;
   }
 
   async generateAccessToken(user: User, isTwoFAauthenticated = false) {
-    const payload: JwtPayload = { username: user.username, sub: user.id, isTwoFAauthenticated };
+    const payload: JwtPayload = { username: user.forty_two_login, sub: user.id, isTwoFAauthenticated };
     return this.jwtService.sign(payload)
   }
 
@@ -50,9 +50,9 @@ export class AuthService implements AuthProvider {
     return refresh_token.refresh_token;
   }
 
-  async validRefreshToken(username: string, refresh_token: string): Promise<User> | null {
+  async validRefreshToken(login: string, refresh_token: string): Promise<User> | null {
     // console.log('validate:', {username, refresh_token} )
-    const user: User = await this.usersService.getUserByUsername(username);
+    const user: User = await this.usersService.getUserByLogin(login);
     // console.log(user);
     // console.log('RT:', refresh_token);
     if (user.refresh_token === refresh_token) {

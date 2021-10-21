@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param, NotFoundException, UseInterceptors, UploadedFile, Res, StreamableFile, UseGuards, BadRequestException, Req, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, NotFoundException, UseInterceptors, UploadedFile, Res, StreamableFile, UseGuards, BadRequestException, Req, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
+import { UpdateUserDto } from './dto/updateUser.dto';
 import { ApiBadRequestResponse, ApiCookieAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -87,12 +88,42 @@ export class UsersController {
 		return user;
 	}
 
+  /**
+	* Returns a user found in database by its login.
+	*/
+	@Get('/login/:login')
+	@ApiOkResponse({
+		description: 'The user has been found in database',
+		type: User,
+	})
+	@ApiNotFoundResponse({
+		description: 'User not found',
+	})
+	@ApiBadRequestResponse({
+		description: 'Invalid login supplied',
+	})
+	async getUserByLogin(@Param('login') login: string): Promise<User> {
+		const user: User = await this.userService.getUserByLogin(login)
+		if (user == undefined) {
+			throw new NotFoundException('User not found');
+		}
+		return user;
+	}
+
 	/**
 	* Save a new user to database from the POST body
 	*/
 	@Post()
 	async saveUser(@Body() newUser: CreateUserDto): Promise<User> {
 		return await this.userService.saveUser(newUser);
+	}
+
+	/**
+	* Update user from the POST body
+	*/
+	@Post('update-user')
+	async updateUser(@Body() updatedUser: UpdateUserDto): Promise<User> {
+		return await this.userService.updateUser(updatedUser);
 	}
 
 	/**
@@ -119,7 +150,11 @@ export class UsersController {
 		if (!file) {
 			throw new BadRequestException('Invalid file');
 		}
-		this.userService.updateUser({ id: req.user.id, avatar: `${process.env.BASE_URL}/users/avatars/${file.filename}` })
+		this.userService.updateUser({
+      id: req.user.id,
+      username: req.user.username,
+      two_fa_enabled: req.user.two_fa_enabled,
+      avatar: `${process.env.BASE_URL}/users/avatars/${file.filename}` })
 		const response = {
 			message: 'File has been uploaded successfully',
 			originalname: file.originalname,
