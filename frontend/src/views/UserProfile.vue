@@ -63,6 +63,10 @@ export default defineComponent({
       );
     });
 
+    console.log("COUCOU");
+    console.log("GAMES", store.state.user.games);
+    console.log("GAMESTATS", store.state.user.gameStats);
+
     return { formatedDate, user: computed(() => store.state.user) };
   },
 });
