@@ -24,7 +24,7 @@
     </div>
     <hr />
 
-    <form method="post" @submit.prevent="postAvatar">
+    <form @submit.prevent="postAvatar">
       <transition name="fade--error">
         <p v-if="error" class="error">{{ error }}</p>
       </transition>
@@ -43,7 +43,7 @@
         </Modal>
         <Modal v-if="firstTimeConnect" @close="toggleModal(2)">
           <template v-slot:update-user>
-            <UpdateUser @close="toggleModal(2)" />
+            <UpdateUser :handleFile="handleFile" :avatar="avatar" @close="toggleModal(2)" />
           </template>
         </Modal>
       </transition-group>
@@ -72,7 +72,6 @@ export default defineComponent({
     const avatar = ref();
     const showModal = ref(false);
     const error = ref("");
-    const date = ref(1);
 
     const formatedDate = computed(() => {
       return moment(store.state.user.created_at as Date).format(
@@ -96,7 +95,7 @@ export default defineComponent({
         return;
       }
       avatar.value = files[0];
-      console.log(avatar.value);
+      console.log('avatar value', avatar.value);
     };
 
     const postAvatar = async () => {
