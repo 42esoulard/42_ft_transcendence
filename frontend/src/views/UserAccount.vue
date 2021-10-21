@@ -132,7 +132,7 @@ export default defineComponent({
           })
           .then((res) => {
             console.log(res);
-            location.reload();
+            store.commit('updateUsername', username.value);
           })
           .catch(error_username => console.log(error_username));
     };

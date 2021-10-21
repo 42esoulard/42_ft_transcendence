@@ -38,6 +38,12 @@ export const store = createStore<State>({
       }
     },
 
+    updateUsername(state: State, payload: string) {
+      if (state.user) {
+        state.user.username = payload;
+      }
+    },
+
     setMessage(state: State, payload: string) {
       state.message = payload;
     },
@@ -58,7 +64,7 @@ export const store = createStore<State>({
         context.commit('tagAvatar', payload);
       }, 2000);
     },
-    
+
   },
 })
 
