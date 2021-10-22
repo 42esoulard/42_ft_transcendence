@@ -1,7 +1,8 @@
 
 import { ref } from 'vue'
 
-
+var CANVAS_WIDTH_RATIO = 2
+var CANVAS_HEIGHT_RATIO = 3
 var BALL_RATIO = 150
 var RACQUET_LENGTH_RATIO = 16
 var RACQUET_WIDTH_RATIO = 100
@@ -20,8 +21,8 @@ const getDraw = () => {
 	
 	const draw = () => {
 
-		const canvasWidth = windowWidth.value / 2
-		const canvasHeight = windowWidth.value / 3
+		const canvasWidth = windowWidth.value / CANVAS_WIDTH_RATIO
+		const canvasHeight = windowWidth.value / CANVAS_HEIGHT_RATIO
 		context.value.clearRect(0, 0, canvasWidth, canvasHeight)
 
 		context.value.beginPath()
@@ -53,8 +54,12 @@ const getDraw = () => {
 		context.value.lineTo(canvasWidth /2, canvasHeight);
 		context.value.stroke()
 	}
+	
+	const onResize = () => {
+		windowWidth.value = window.innerWidth
+	}
 
-	return { context, ballPosition, playerPositions, score, windowWidth, draw}
+	return { context, ballPosition, playerPositions, score, windowWidth, draw, onResize}
 }
 
 export default getDraw

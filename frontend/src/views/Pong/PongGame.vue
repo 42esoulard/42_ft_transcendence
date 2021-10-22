@@ -18,9 +18,6 @@ import { onMounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import getDraw from '../../composables/draw'
 
-var HEIGHT_WIDTH_RATIO = 1.5
-
-
 export default {
 	setup() {
 		
@@ -30,7 +27,7 @@ export default {
 		const player2UserName = ref(route.params.player2UserName)
 		const game = ref(null)
 
-		const { context, ballPosition, playerPositions, draw, score, windowWidth } = getDraw()
+		const { context, ballPosition, playerPositions, draw, score, windowWidth, onResize } = getDraw()
 
 		// lifecycle hooks
 		onMounted(() => {
@@ -95,9 +92,6 @@ export default {
 				SendMoveMsg('down')
 		}
 
-		const onResize = () => {
-			windowWidth.value = window.innerWidth
-		}
 		
 
 		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, game, windowWidth }
