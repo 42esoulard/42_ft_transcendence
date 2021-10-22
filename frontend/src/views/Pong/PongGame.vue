@@ -18,8 +18,7 @@ import { onMounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import getDraw from '../../composables/draw'
 
-var CANVAS_HEIGHT = 480
-var CANVAS_WIDTH = 640
+var HEIGHT_WIDTH_RATIO = 1.5
 
 export default {
 	setup() {
@@ -28,14 +27,15 @@ export default {
 		const room =  ref(route.params.id)
 		const player1UserName = ref(route.params.player1UserName)
 		const player2UserName = ref(route.params.player2UserName)
-		const canvasWidth = CANVAS_WIDTH
-		const canvasHeight = CANVAS_HEIGHT
+		const canvasWidth = ref(window.innerWidth / 2)
+		const canvasHeight = ref(canvasWidth.value / HEIGHT_WIDTH_RATIO)
 
 		const { context, game, ballPosition, playerPositions, draw, score } = getDraw()
 
 		// lifecycle hooks
 		onMounted(() => {
 			window.addEventListener("keydown", onKeyDown)
+			window.addEventListener("resize", onResize)
 			console.log('mounted')
 			context.value = game.value.getContext("2d")
 		})
@@ -43,6 +43,7 @@ export default {
 		onBeforeRouteLeave(() => {
 			socket.value.emit('leaveGame', room.value)
 			socket.value.removeEventListener('position')
+			window.removeEventListener("resize", onResize)
 			window.removeEventListener("keydown", onKeyDown)
 			console.log('leaving')
 		})
@@ -92,6 +93,11 @@ export default {
 				SendMoveMsg('up')
 			else if (event.code === 'ArrowDown')
 				SendMoveMsg('down')
+		}
+
+		const onResize = () => {
+			canvasWidth.value = window.innerWidth / 2
+			canvasHeight.value = canvasWidth.value / HEIGHT_WIDTH_RATIO
 		}
 		
 
