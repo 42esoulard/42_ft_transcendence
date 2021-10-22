@@ -36,16 +36,32 @@ import { useStore } from "vuex";
 
 export default defineComponent({
   name: "UpdateUser",
-  props: ["handleFile", "avatar"],
+  props: ["avatar"],
   setup(props, context) {
     const store = useStore();
     const username = ref(store.state.user.username);
     const error = ref("");
     const avatar = ref(props.avatar); // use the store ???
-    const handleFile = ref(props.handleFile); // use a composable ??
 
     const closeModal = () => {
       context.emit("close");
+    };
+
+    //this function is redundant, export it in a composable ??
+    const handleFile = (
+      event: Event & {
+        target: HTMLInputElement & {
+          files: FileList;
+        };
+      }
+    ) => {
+      const { target } = event;
+      const { files } = target;
+      if (files.length === 0) {
+        return;
+      }
+      avatar.value = files[0];
+      console.log("avatar value", avatar.value);
     };
 
     const updateUser = () => {

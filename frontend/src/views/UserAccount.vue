@@ -31,6 +31,9 @@
       <input @change="handleFile" type="file" ref="avatar" id="avatar" />
       <button class="button button--msg">Update avatar</button>
     </form>
+    <button @click="toggleModal(2)" class="button button--invite">
+      Edit profile
+    </button>
     <teleport to="#modals">
       <transition name="fade--error">
         <div v-if="showBackdrop" class="backdrop"></div>
@@ -41,9 +44,9 @@
             <InitTwoFactor @close="toggleModal(1)" @success="handleSuccess" />
           </template>
         </Modal>
-        <Modal v-if="firstTimeConnect" @close="toggleModal(2)">
+        <Modal v-if="showModal2" @close="toggleModal(2)">
           <template v-slot:update-user>
-            <UpdateUser :handleFile="handleFile" :avatar="avatar" @close="toggleModal(2)" />
+            <UpdateUser :avatar="avatar" @close="toggleModal(2)" />
           </template>
         </Modal>
       </transition-group>
@@ -71,6 +74,7 @@ export default defineComponent({
 
     const avatar = ref();
     const showModal = ref(false);
+    const showModal2 = ref(store.state.firstTimeConnect);
     const error = ref("");
 
     const formatedDate = computed(() => {
@@ -95,7 +99,7 @@ export default defineComponent({
         return;
       }
       avatar.value = files[0];
-      console.log('avatar value', avatar.value);
+      console.log("avatar value", avatar.value);
     };
 
     const postAvatar = async () => {
@@ -129,7 +133,9 @@ export default defineComponent({
       if (nbr === 1) {
         showModal.value = !showModal.value;
       } else {
-        store.commit("setFirstTimeConnect", false);
+        showModal2.value = !showModal2.value;
+        if (store.state.firstTimeConnect === true)
+          store.commit("setFirstTimeConnect", false);
       }
     };
 
@@ -139,7 +145,7 @@ export default defineComponent({
     };
 
     const showBackdrop = computed(() => {
-      return showModal.value || store.state.firstTimeConnect;
+      return showModal.value || showModal2.value;
     });
 
     return {
@@ -152,6 +158,7 @@ export default defineComponent({
       avatar,
       deactivateTwoFactor,
       showModal,
+      showModal2,
       toggleModal,
       error,
       handleSuccess,

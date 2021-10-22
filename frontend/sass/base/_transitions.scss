@@ -1,9 +1,10 @@
-
 .fade {
-  &-enter-active, &-leave-active {
+  &-enter-active,
+  &-leave-active {
     transition: opacity 0.2s ease;
   }
-  &-enter-from, &-leave-to {
+  &-enter-from,
+  &-leave-to {
     opacity: 0;
   }
 
@@ -14,7 +15,8 @@
     &-leave-active {
       transition: opacity 0s ease;
     }
-    &-enter-from, &-leave-to {
+    &-enter-from,
+    &-leave-to {
       opacity: 0;
     }
   }
@@ -26,9 +28,42 @@
     &-leave-active {
       transition: all 0.5s ease;
     }
-    &-enter-from, &-leave-to {
+    &-enter-from,
+    &-leave-to {
       opacity: 0;
     }
   }
+}
 
+.zoomin {
+  &-enter-from,
+  &-leave-to {
+    opacity: 0;
+    transform: scale(0);
+  }
+  &-enter-active {
+    transition: all 0.4s ease;
+  }
+  &-leave-active {
+    transition: all 0.4s ease;
+  }
+}
+
+.toast {
+  &-enter-from,
+  &-leave-to {
+    opacity: 0;
+    transform: translateY(-60px);
+  }
+  &-enter-to,
+  &-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  &-enter-active {
+    transition: all 0.4s ease;
+  }
+  &-leave-active {
+    transition: all 0.5s ease;
+  }
 }
