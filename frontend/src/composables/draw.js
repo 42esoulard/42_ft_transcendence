@@ -7,6 +7,7 @@ var RACQUET_WIDTH = 20
 var NET_ELEM_LENGHT = 40
 var NET_ELEM_GAP = 10
 var NET_WIDTH = 5
+var HEIGHT_WIDTH_RATIO = 1.5
 
 const getDraw = () => {
 
@@ -15,9 +16,12 @@ const getDraw = () => {
 	const ballPosition = ref({x:0, y:0})
 	const playerPositions = ref({player1:0, player2:0})
 	const score = ref({player1: 0,player2: 0})
+	const windowWidth = ref(window.innerWidth)
+	const canvasWidth = ref(windowWidth.value / 2)
+	const canvasHeight = ref(canvasWidth.value / HEIGHT_WIDTH_RATIO)
 	
 	const draw = () => {
-		context.value.clearRect(0, 0, game.value.width, game.value.height)
+		context.value.clearRect(0, 0, canvasWidth.value, canvasHeight.value)
 
 		context.value.beginPath()
 
@@ -45,7 +49,7 @@ const getDraw = () => {
 		context.value.stroke()
 	}
 
-	return { context, game, ballPosition, playerPositions, score, draw}
+	return { context, game, ballPosition, playerPositions, score, canvasHeight, canvasWidth, draw}
 }
 
 export default getDraw

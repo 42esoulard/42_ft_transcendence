@@ -20,6 +20,7 @@ import getDraw from '../../composables/draw'
 
 var HEIGHT_WIDTH_RATIO = 1.5
 
+
 export default {
 	setup() {
 		
@@ -27,10 +28,8 @@ export default {
 		const room =  ref(route.params.id)
 		const player1UserName = ref(route.params.player1UserName)
 		const player2UserName = ref(route.params.player2UserName)
-		const canvasWidth = ref(window.innerWidth / 2)
-		const canvasHeight = ref(canvasWidth.value / HEIGHT_WIDTH_RATIO)
 
-		const { context, game, ballPosition, playerPositions, draw, score } = getDraw()
+		const { context, game, ballPosition, playerPositions, draw, score, canvasHeight, canvasWidth } = getDraw()
 
 		// lifecycle hooks
 		onMounted(() => {
