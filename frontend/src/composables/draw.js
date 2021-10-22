@@ -12,7 +12,6 @@ var HEIGHT_WIDTH_RATIO = 1.5
 const getDraw = () => {
 
 	const context = ref({})
-	const game = ref(null)
 	const ballPosition = ref({x:0, y:0})
 	const playerPositions = ref({player1:0, player2:0})
 	const score = ref({player1: 0,player2: 0})
@@ -27,7 +26,7 @@ const getDraw = () => {
 
 		// racquets
 		context.value.rect(0, playerPositions.value.player1, RACQUET_WIDTH, RACQUET_LENGTH)
-		context.value.rect(game.value.width - RACQUET_WIDTH, playerPositions.value.player2, RACQUET_WIDTH, RACQUET_LENGTH)
+		context.value.rect(canvasWidth.value - RACQUET_WIDTH, playerPositions.value.player2, RACQUET_WIDTH, RACQUET_LENGTH)
 		// ball
 		context.value.arc(ballPosition.value.x, ballPosition.value.y, BALL_RADIUS, 0, Math.PI*2, false);
 		
@@ -37,19 +36,19 @@ const getDraw = () => {
 		
 		//scores
 		context.value.font = "80px Arial";
-		context.value.fillText(score.value.player1, game.value.width / 4, game.value.height / 5)
-		context.value.fillText(score.value.player2, game.value.width * 3 / 4, game.value.height / 5)
+		context.value.fillText(score.value.player1, canvasWidth.value / 4, canvasHeight.value / 5)
+		context.value.fillText(score.value.player2, canvasWidth.value * 3 / 4, canvasHeight.value / 5)
 		
 		// net
 		context.value.beginPath()
 		context.value.lineWidth = NET_WIDTH
 		context.value.setLineDash([NET_ELEM_LENGHT, NET_ELEM_GAP])
-		context.value.moveTo(game.value.width / 2, 0);
-		context.value.lineTo(game.value.width /2, game.value.height);
+		context.value.moveTo(canvasWidth.value / 2, 0);
+		context.value.lineTo(canvasWidth.value /2, canvasHeight.value);
 		context.value.stroke()
 	}
 
-	return { context, game, ballPosition, playerPositions, score, canvasHeight, canvasWidth, draw}
+	return { context, ballPosition, playerPositions, score, canvasHeight, canvasWidth, draw}
 }
 
 export default getDraw
