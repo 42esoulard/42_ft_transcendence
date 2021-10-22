@@ -1,7 +1,7 @@
 <template>
 	<p> Game # {{ room }} </p>
 	<h1> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
-	<canvas ref="game" :width="canvasWidth" :height="canvasHeight" style="border: 3px solid black"> </canvas>
+	<canvas ref="game" :width="windowWidth / 2" :height="windowWidth / 3" style="border: 3px solid black"> </canvas>
 
 	<div v-if="!gameHasStarted">
 		<h1> Get ready, game is about to start ! </h1>
@@ -30,7 +30,7 @@ export default {
 		const player2UserName = ref(route.params.player2UserName)
 		const game = ref(null)
 
-		const { context, ballPosition, playerPositions, draw, score, canvasHeight, canvasWidth } = getDraw()
+		const { context, ballPosition, playerPositions, draw, score, windowWidth } = getDraw()
 
 		// lifecycle hooks
 		onMounted(() => {
@@ -96,12 +96,11 @@ export default {
 		}
 
 		const onResize = () => {
-			canvasWidth.value = window.innerWidth / 2
-			canvasHeight.value = canvasWidth.value / HEIGHT_WIDTH_RATIO
+			windowWidth.value = window.innerWidth
 		}
 		
 
-		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, game, canvasWidth, canvasHeight }
+		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, game, windowWidth }
 
 	},
 
