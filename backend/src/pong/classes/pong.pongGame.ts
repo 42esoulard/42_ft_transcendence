@@ -6,16 +6,19 @@ import { Game } from '../entity/games.entity';
 import { GameUser } from '../entity/gameUser.entity';
 import { Server } from 'socket.io';
 
-var BALL_INITIAL_SPEED = 1
-var BALL_ACCELERATION = 0.5
-var CANVAS_WIDTH = 640
-var CANVAS_HEIGHT = 480
-var BALL_RADIUS = 10
-var RACQUET_LENGTH = 80
-var RACQUET_WIDTH = 20
-var RACQUET_SPEED = 4
-var SCORE_NEEDED_TO_WIN = 2
-var INTERVAL_IN_MS = 20
+var BALL_INITIAL_SPEED = 1 / 500
+var BALL_ACCELERATION = 1 / 2000
+var RACQUET_SPEED = 1 / 100
+
+// same ratios as in frontend
+var CANVAS_WIDTH = 1 / 2
+var CANVAS_HEIGHT = 1 / 3
+var BALL_RADIUS = 1 / 150
+var RACQUET_LENGTH = 1 / 16
+var RACQUET_WIDTH = 1 / 100
+
+var SCORE_NEEDED_TO_WIN = 5
+var INTERVAL_IN_MS = 50
 var INITAL_DELAY_IN_MS = 2000
 var DELAY_AFTER_SCORE_IN_MS = 500
 
@@ -46,9 +49,10 @@ export class pongGame {
 
   initPositions()
   {
-    this.player1.position = 200
-    this.player2.position = 200
+    this.player1.position = CANVAS_HEIGHT / 2 - RACQUET_LENGTH / 2
+    this.player2.position = CANVAS_HEIGHT / 2 - RACQUET_LENGTH / 2
     this.ballPosition.x = CANVAS_WIDTH / 2
+    this.logger.log(this.ballPosition.x)
     this.ballPosition.y = CANVAS_HEIGHT / 2
   }
   initBallDirection()

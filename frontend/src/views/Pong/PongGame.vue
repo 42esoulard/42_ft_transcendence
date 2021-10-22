@@ -57,8 +57,12 @@ export default {
 		// socket event listeners
 		const socket = ref(clientSocket)
 		socket.value.on("position", (NewballPosition, NewplayerPositions) => {
-			ballPosition.value = NewballPosition
-			playerPositions.value = NewplayerPositions
+			ballPosition.value.x = NewballPosition.x * windowWidth.value
+			ballPosition.value.y = NewballPosition.y * windowWidth.value
+			// console.log(NewballPosition.x)
+			// console.log(ballPosition.value.x)
+			playerPositions.value.player1 = NewplayerPositions.player1 * windowWidth.value
+			playerPositions.value.player2 = NewplayerPositions.player2 * windowWidth.value
 			draw()
 		})
 	

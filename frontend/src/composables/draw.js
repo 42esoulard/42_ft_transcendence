@@ -58,7 +58,7 @@ const getDraw = () => {
 	
 	const onResize = () => {
 		windowWidth.value = window.innerWidth
-
+		// console.log(windowWidth.value)
 		game.value.width = windowWidth.value / CANVAS_WIDTH_RATIO
 		game.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
 	}
