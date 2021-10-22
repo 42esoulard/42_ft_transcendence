@@ -29,7 +29,11 @@ export default {
 		const player1UserName = ref(route.params.player1UserName)
 		const player2UserName = ref(route.params.player2UserName)
 
-		const { context, ballPosition, playerPositions, draw, score, windowWidth, onResize, game } = getDraw()
+		const { 
+			context, game, 
+			ballPosition, playerPositions, score, 
+			windowWidth, onResize, 
+			draw } = getDraw()
 
 		// lifecycle hooks
 		onMounted(() => {
@@ -98,7 +102,7 @@ export default {
 
 		
 
-		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, game, windowWidth }
+		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, game }
 
 	},
 
