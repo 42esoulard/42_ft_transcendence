@@ -31,7 +31,7 @@ export class UsersController {
 
 
 
-	
+
 	/**
 	* Returns a user found in database by its id.
 	*/
@@ -60,6 +60,15 @@ export class UsersController {
 	@Get('/channels/:id')
 	async getUserChannels(@Param('id') id: number): Promise<User> {
 		const user: User = await this.userService.getUserChannels(id)
+		if (user == undefined) {
+			throw new NotFoundException('User not found');
+		}
+		return user;
+	}
+
+	@Get('/user-games/:id')
+	async getUserGames(@Param('id') id: number): Promise<User> {
+		const user: User = await this.userService.getUserGames(id)
 		if (user == undefined) {
 			throw new NotFoundException('User not found');
 		}

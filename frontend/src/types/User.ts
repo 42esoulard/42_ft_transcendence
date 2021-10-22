@@ -8,5 +8,5 @@ export interface User {
   expiry_date: Date;
   messages: Message[] | null;
   channels: Channel[] | null;
-  // created_at: Date;
+  games: GameUser[] | null;
 }

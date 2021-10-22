@@ -140,8 +140,12 @@
 
 .game-history-panel {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow-y: scroll;
   height: $game-history-panel-height;
   background-color: $game-history-panel-bg;
+}
+
+.game-history-panel__list {
+  text-align: left;
+  font-family: 'Roboto';
 }

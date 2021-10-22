@@ -22,6 +22,13 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
+  async getUserGames(id: number): Promise<Users> {
+    const res = await this.usersRepository.findOne(id, {
+      relations: ['games'],
+    });
+    return res;
+  }
+
   async getUserChannels(id: number): Promise<Users> {
     const res = await this.usersRepository.findOne(id, {
       relations: ['channels'],

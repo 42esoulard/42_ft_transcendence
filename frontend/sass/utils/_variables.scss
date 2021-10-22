@@ -90,11 +90,11 @@ $progress-bar-bg: #313131;
 $progress-bar-border-radius: 16px;
 $progress-bar-box-shadow: inset 0 1px 2px #000;
 $progress-bar-border: 1px solid black;
-$progress-bar-inside-bg: linear-gradient(to right, $second-color, $prim-color, $third-color);
+$progress-bar-inside-bg: linear-gradient(to right, $prim-color, $second-color);
 $progress-bar-label-font: "Saira";
 $progress-bar-inside-height: 80%;
 $progress-bar-inside-border-radius: 12px;
-$progress-bar-label-color: black;
+$progress-bar-label-color: white;
 
 //RAINBOW TITLE
 

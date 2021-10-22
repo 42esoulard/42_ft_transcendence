@@ -1,5 +1,6 @@
 import { Message } from 'src/messages/interfaces/message.interface';
 import { Channel } from 'src/channels/interfaces/channel.interface';
+import { GameUser } from 'src/pong/entity/gameUser.entity';
 
 export class User {
   id: number;
@@ -12,4 +13,5 @@ export class User {
   expiry_date: Date;
   messages: Message[];
   channels: Channel[];
+  games: GameUser[];
 }
