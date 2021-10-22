@@ -18,6 +18,7 @@ const getDraw = () => {
 	const playerPositions = ref({player1:0, player2:0})
 	const score = ref({player1: 0,player2: 0})
 	const windowWidth = ref(window.innerWidth)
+	const game = ref(null)
 	
 	const draw = () => {
 
@@ -57,9 +58,12 @@ const getDraw = () => {
 	
 	const onResize = () => {
 		windowWidth.value = window.innerWidth
+
+		game.value.width = windowWidth.value / CANVAS_WIDTH_RATIO
+		game.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
 	}
 
-	return { context, ballPosition, playerPositions, score, windowWidth, draw, onResize}
+	return { context, ballPosition, playerPositions, score, windowWidth, game, draw, onResize}
 }
 
 export default getDraw

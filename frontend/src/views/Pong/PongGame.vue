@@ -1,7 +1,7 @@
 <template>
 	<p> Game # {{ room }} </p>
 	<h1> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
-	<canvas ref="game" :width="windowWidth / 2" :height="windowWidth / 3" style="border: 3px solid black"> </canvas>
+	<canvas ref="game" style="border: 3px solid black"> </canvas>
 
 	<div v-if="!gameHasStarted">
 		<h1> Get ready, game is about to start ! </h1>
@@ -18,6 +18,9 @@ import { onMounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import getDraw from '../../composables/draw'
 
+var CANVAS_WIDTH_RATIO = 2
+var CANVAS_HEIGHT_RATIO = 3
+
 export default {
 	setup() {
 		
@@ -25,9 +28,8 @@ export default {
 		const room =  ref(route.params.id)
 		const player1UserName = ref(route.params.player1UserName)
 		const player2UserName = ref(route.params.player2UserName)
-		const game = ref(null)
 
-		const { context, ballPosition, playerPositions, draw, score, windowWidth, onResize } = getDraw()
+		const { context, ballPosition, playerPositions, draw, score, windowWidth, onResize, game } = getDraw()
 
 		// lifecycle hooks
 		onMounted(() => {
@@ -35,6 +37,8 @@ export default {
 			window.addEventListener("resize", onResize)
 			console.log('mounted')
 			context.value = game.value.getContext("2d")
+			game.value.width = windowWidth.value / CANVAS_WIDTH_RATIO
+			game.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
 		})
 
 		onBeforeRouteLeave(() => {
