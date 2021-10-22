@@ -16,17 +16,17 @@ const getDraw = () => {
 	const playerPositions = ref({player1:0, player2:0})
 	const score = ref({player1: 0,player2: 0})
 	const windowWidth = ref(window.innerWidth)
-	const canvasWidth = ref(windowWidth.value / 2)
-	const canvasHeight = ref(canvasWidth.value / HEIGHT_WIDTH_RATIO)
 	
 	const draw = () => {
-		context.value.clearRect(0, 0, canvasWidth.value, canvasHeight.value)
+		const canvasWidth = windowWidth.value / 2
+		const canvasHeight = windowWidth.value / 3
+		context.value.clearRect(0, 0, canvasWidth, canvasHeight)
 
 		context.value.beginPath()
 
 		// racquets
-		context.value.rect(0, playerPositions.value.player1, RACQUET_WIDTH, RACQUET_LENGTH)
-		context.value.rect(canvasWidth.value - RACQUET_WIDTH, playerPositions.value.player2, RACQUET_WIDTH, RACQUET_LENGTH)
+		context.value.rect(0, playerPositions.value.player1, RACQUET_WIDTH, windowWidth.value / 16)
+		context.value.rect(canvasWidth - RACQUET_WIDTH, playerPositions.value.player2, RACQUET_WIDTH, windowWidth.value / 16)
 		// ball
 		context.value.arc(ballPosition.value.x, ballPosition.value.y, BALL_RADIUS, 0, Math.PI*2, false);
 		
@@ -36,19 +36,19 @@ const getDraw = () => {
 		
 		//scores
 		context.value.font = "80px Arial";
-		context.value.fillText(score.value.player1, canvasWidth.value / 4, canvasHeight.value / 5)
-		context.value.fillText(score.value.player2, canvasWidth.value * 3 / 4, canvasHeight.value / 5)
+		context.value.fillText(score.value.player1, canvasWidth / 4, canvasHeight / 5)
+		context.value.fillText(score.value.player2, canvasWidth * 3 / 4, canvasHeight / 5)
 		
 		// net
 		context.value.beginPath()
 		context.value.lineWidth = NET_WIDTH
 		context.value.setLineDash([NET_ELEM_LENGHT, NET_ELEM_GAP])
-		context.value.moveTo(canvasWidth.value / 2, 0);
-		context.value.lineTo(canvasWidth.value /2, canvasHeight.value);
+		context.value.moveTo(canvasWidth / 2, 0);
+		context.value.lineTo(canvasWidth /2, canvasHeight);
 		context.value.stroke()
 	}
 
-	return { context, ballPosition, playerPositions, score, canvasHeight, canvasWidth, draw}
+	return { context, ballPosition, playerPositions, score, windowWidth, draw}
 }
 
 export default getDraw
