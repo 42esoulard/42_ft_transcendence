@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
 import { useStore } from "vuex";
 import axios from "axios";
@@ -74,8 +74,12 @@ export default defineComponent({
 
     const avatar = ref();
     const showModal = ref(false);
-    const showModal2 = ref(store.state.firstTimeConnect);
+    const showModal2 = ref(false);
     const error = ref("");
+
+    onMounted(() => {
+      showModal2.value = store.state.firstTimeConnect;
+    });
 
     const formatedDate = computed(() => {
       return moment(store.state.user.created_at as Date).format(
