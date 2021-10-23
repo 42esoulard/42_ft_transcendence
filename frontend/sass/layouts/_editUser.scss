@@ -1,0 +1,12 @@
+.edit-user-grid {
+  // z-index: 2;
+  position: relative;
+  margin: 15% auto;
+  display: grid;
+  align-items: center;
+  max-width: 580px;
+  padding: 20px;
+  color: white;
+  background-color: rgb(41, 41, 41);
+  box-shadow: 0 15px 15px rgba(0, 0, 0, 0.6);
+}

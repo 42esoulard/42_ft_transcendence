@@ -72,7 +72,7 @@ import axios from "axios";
 import moment from "moment";
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import Toast from "@/components/Toast.vue";
-import UpdateUser from "@/components/UpdateUser.vue";
+import UpdateUser from "@/components/EditUser.vue";
 import Modal from "@/components/Modal.vue";
 
 export default defineComponent({
@@ -86,7 +86,6 @@ export default defineComponent({
     const showModal = ref(false);
     const showModal2 = ref(false);
     const error = ref("");
-    const date = ref(1);
     const error_username = ref("");
     const username = ref("");
     const users = ref<User[]>([]);

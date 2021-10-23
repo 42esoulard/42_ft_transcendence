@@ -1,5 +1,5 @@
 <template>
-  <div class="update-user-grid tac br15">
+  <div class="edit-user-grid tac br15">
     <div @click="closeModal()" class="close-cross">
       &times;
     </div>
