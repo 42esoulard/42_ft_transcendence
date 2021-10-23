@@ -36,6 +36,7 @@ export class AuthController {
       res.status(206);
       return { message: "Need 2FA to log in" };
     }
+    // Should return a message mentionning if newly created user
     return { message: "Logged in successfully" };
   }
 

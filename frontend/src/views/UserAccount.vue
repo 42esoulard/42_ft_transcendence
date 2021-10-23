@@ -33,13 +33,16 @@
     </div>
     <hr />
 
-    <form method="post" @submit.prevent="postAvatar">
+    <form @submit.prevent="postAvatar">
       <transition name="fade--error">
         <p v-if="error" class="error">{{ error }}</p>
       </transition>
       <input @change="handleFile" type="file" ref="avatar" id="avatar" />
       <button class="button button--msg">Update avatar</button>
     </form>
+    <button @click="toggleModal(2)" class="button button--invite">
+      Edit profile
+    </button>
     <teleport to="#modals">
       <transition name="fade--error">
         <div v-if="showBackdrop" class="backdrop"></div>
@@ -50,9 +53,9 @@
             <InitTwoFactor @close="toggleModal(1)" @success="handleSuccess" />
           </template>
         </Modal>
-        <Modal v-if="firstTimeConnect" @close="toggleModal(2)">
+        <Modal v-if="showModal2" @close="toggleModal(2)">
           <template v-slot:update-user>
-            <UpdateUser @close="toggleModal(2)" />
+            <UpdateUser :avatar="avatar" @close="toggleModal(2)" />
           </template>
         </Modal>
       </transition-group>
@@ -61,7 +64,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, onMounted } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useUserApi } from "@/plugins/api.plugin";
 import { User } from "@/types/User";
 import { useStore } from "vuex";
@@ -81,6 +84,7 @@ export default defineComponent({
 
     const avatar = ref();
     const showModal = ref(false);
+    const showModal2 = ref(false);
     const error = ref("");
     const date = ref(1);
     const error_username = ref("");
@@ -92,6 +96,8 @@ export default defineComponent({
         .getUsers()
         .then((res: any) => (users.value = res.data))
         .catch((err: any) => console.log(err.message));
+
+      showModal2.value = store.state.firstTimeConnect;
     });
 
     const formatedDate = computed(() => {
@@ -116,7 +122,7 @@ export default defineComponent({
         return;
       }
       avatar.value = files[0];
-      console.log(avatar.value);
+      console.log("avatar value", avatar.value);
     };
 
     const updateUsername = async () => {
@@ -168,7 +174,9 @@ export default defineComponent({
       if (nbr === 1) {
         showModal.value = !showModal.value;
       } else {
-        store.commit("setFirstTimeConnect", false);
+        showModal2.value = !showModal2.value;
+        if (store.state.firstTimeConnect === true)
+          store.commit("setFirstTimeConnect", false);
       }
     };
 
@@ -178,7 +186,7 @@ export default defineComponent({
     };
 
     const showBackdrop = computed(() => {
-      return showModal.value || store.state.firstTimeConnect;
+      return showModal.value || showModal2.value;
     });
 
     return {
@@ -191,6 +199,7 @@ export default defineComponent({
       avatar,
       deactivateTwoFactor,
       showModal,
+      showModal2,
       toggleModal,
       error,
       handleSuccess,
