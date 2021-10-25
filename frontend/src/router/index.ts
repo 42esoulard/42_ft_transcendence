@@ -117,7 +117,7 @@ const router = createRouter({
 // const authApi = useAuthApi(); // Doesnt work !!????
 
 //To exchange cookie or auth header w/o in every req
-// axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true;
 
 const refreshToken = async () => {
   // await authApi.refreshToken({ withCredentials: true })

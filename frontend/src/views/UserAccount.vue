@@ -12,7 +12,7 @@
       <transition name="fade--error">
         <p v-if="error_username" class="error">{{ error_username }}</p>
       </transition>
-      <input type="text" v-model="username" maxlength="10"/>
+      <input type="text" v-model="username" maxlength="10" />
       <div>
         <button class="button button--msg">Update username</button>
       </div>
@@ -67,10 +67,9 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from "vue";
-import { useUserApi } from "@/plugins/api.plugin";
+import { useAuthApi, useUserApi } from "@/plugins/api.plugin";
 import { User } from "@/types/User";
 import { useStore } from "vuex";
-import axios from "axios";
 import moment from "moment";
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import Toast from "@/components/Toast.vue";
@@ -81,7 +80,8 @@ export default defineComponent({
   name: "UserAccount",
   components: { Modal, InitTwoFactor, Toast, UpdateUser },
   setup() {
-    const api = useUserApi();
+    const userApi = useUserApi();
+    const authApi = useAuthApi();
     const store = useStore();
 
     const avatar = ref();
@@ -93,7 +93,7 @@ export default defineComponent({
     const users = ref<User[]>([]);
 
     onMounted(() => {
-      api
+      userApi
         .getUsers()
         .then((res: any) => (users.value = res.data))
         .catch((err: any) => console.log(err.message));
@@ -106,9 +106,6 @@ export default defineComponent({
         "YYYY-MM-DD HH:mm:ss"
       );
     });
-
-    //To exchange cookie or auth header w/o in every req
-    axios.defaults.withCredentials = true;
 
     const handleFile = (
       event: Event & {
@@ -132,14 +129,19 @@ export default defineComponent({
       else if (users.value.find(user => user.username == username.value))
         error_username.value = "Username already taken";
       else
-        await axios
-          .post(`http://localhost:3000/users/update-user`, {
-            id: store.state.user.id,
-            username: username.value,
-          })
-          .then((res) => {
+        userApi
+          .updateUser(
+            {
+              id: store.state.user.id,
+              username: username.value
+            },
+            {
+              withCredentials: true
+            }
+          )
+          .then(res => {
             console.log(res);
-            store.commit('updateUsername', username.value);
+            store.commit("updateUsername", username.value);
           })
           .catch(error_username => console.log(error_username));
     };
@@ -147,9 +149,9 @@ export default defineComponent({
     const postAvatar = async () => {
       const data = new FormData();
       data.append("avatar", avatar.value);
-      await axios
-        .post("http://localhost:3000/users/upload", data)
-        .then(response => {
+      userApi
+        .uploadFile({ data, withCredentials: true })
+        .then((response: any) => {
           console.log(response);
           store.commit("updateAvatar", response.data.filename);
           // store.commit("tagAvatar", Date.now());
@@ -162,9 +164,9 @@ export default defineComponent({
     };
 
     const deactivateTwoFactor = async () => {
-      await axios
-        .get("http://localhost:3000/auth/2fa/turn-off")
-        .then(res => {
+      authApi
+        .turnOffTwoFactorAuthentication({ withCredentials: true })
+        .then((res: any) => {
           store.commit("toggleTwoFactor", false);
           store.dispatch("setMessage", res.data.message);
         })
@@ -207,7 +209,7 @@ export default defineComponent({
       showBackdrop,
       updateUsername,
       username,
-      error_username,
+      error_username
     };
   }
 });
