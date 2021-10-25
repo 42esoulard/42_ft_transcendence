@@ -1,14 +1,15 @@
 .sidebar {
+  z-index: 1;
+  position: fixed;
+  height: 100%;
+  justify-self: flex-start;
   display: flex;
   flex-direction: column;
   width: $sidebar-width;
   gap: $sidebar-gap;
-  padding: $sidebar-padding;
+  padding-top: $header-height;
   color: $sidebar-text-color;
   background-color: $sidebar-bg-color;
-  &--invisible {
-    background-color: transparent;
-  }
 }
 
 .sidebar-link {
@@ -36,5 +37,15 @@
 .sidebar-link__icon {
   min-width: 2.5rem;
   height: auto;
+
+  @media (max-height: 800px){
+    min-width: 2rem;
+  }
+  @media (max-height: 700px){
+    min-width: 1.5rem;
+  }
+  @media (max-height: 600px){
+    min-width: 1rem;
+  }
 }
 

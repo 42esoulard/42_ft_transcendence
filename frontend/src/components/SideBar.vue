@@ -12,8 +12,6 @@
       <SideBarLink to="/account" icon="fas fa-toolbox">account</SidebarLink>
     </div>
   </transition>
-  <div class="sidebar sidebar--invisible" v-if="!user"></div>
-
 </template>
 
 <script lang="ts">

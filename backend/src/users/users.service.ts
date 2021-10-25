@@ -53,6 +53,16 @@ export class UsersService {
   }
 
   /**
+	* Gets a user in database by its forty_two_login
+	*
+	*/
+	async getUserByLogin(login: string): Promise<User> | undefined {
+		const user = await this.usersRepository
+			.findOne({ where: { forty_two_login: login } });
+		return user;
+	}
+
+  /**
    * Saves a new user into db after generating pw hash and salt
    * nb: save(user) is a function from the typeORM library
    */

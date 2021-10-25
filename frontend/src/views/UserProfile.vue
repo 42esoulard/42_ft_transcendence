@@ -3,7 +3,7 @@
     <div class="profile-left">
         <img :src="user.avatar" class="profile-left__avatar-img" alt= "">
         <span class="profile-left__name">{{ user.username }}</span>
-        <span class="profile-left__since">member since 07/10/2021</span>
+        <span class="profile-left__since">member since {{ formatedDate }}</span>
         <span class="profile-left__status"><i class="status status--online fas fa-circle" /> online</span>
         <div class="profile-left__social">
           <button class="button button--add"><i class="upload-icon fas fa-user-plus" /> add friend</button>
@@ -50,12 +50,24 @@
 <script lang="ts">
 import { defineComponent, inject, ref, computed } from "vue";
 import { useStore } from "vuex";
+import moment from "moment";
 
 export default defineComponent({
   name: "UserProfile",
   setup() {
     const store = useStore();
-    return { user: computed(() => store.state.user) };
+
+    const formatedDate = computed(() => {
+      return moment(store.state.user.created_at as Date).format(
+        "MM-DD-YYYY"
+      );
+    });
+
+    console.log("COUCOU");
+    console.log("GAMES", store.state.user.games);
+    console.log("GAMESTATS", store.state.user.gameStats);
+
+    return { formatedDate, user: computed(() => store.state.user) };
   },
 });
 

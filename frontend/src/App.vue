@@ -20,13 +20,11 @@ export default {
 </script>
 
 <template>
+  <SideBar />
   <div class="main-div">
-    <SideBar />
-    <div class="body-div">
-      <Header />
-      <div class="router-view">
-        <router-view />
-      </div>
+    <Header />
+    <div class="router-view">
+      <router-view />
     </div>
   </div>
 </template>

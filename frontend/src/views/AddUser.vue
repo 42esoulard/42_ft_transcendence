@@ -32,6 +32,7 @@ export default defineComponent({
       await api
         .saveUser({
           username: username.value,
+          two_fa_enabled: false,
           forty_two_login: username.value,
         })
         .then((res: any) => (responseData.value = res.data))

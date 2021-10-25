@@ -1,32 +1,16 @@
 .toast-wrapper {
-    position: fixed;
-    width: auto;
-    right: 20px;
-    top: 20px;
+  position: fixed;
+  width: auto;
+  right: 20px;
+  top: 20px;
 }
 
 .toast-content {
-    padding: 20px;
-    color: white;
-    background: rgb(7, 173, 7);
-    border-radius: 10px;
-    box-shadow: 1px 3px 5px rgba($color: #000000, $alpha: 0.2);
-    min-width: 400px;
-    margin: 0 auto;
+  padding: 20px;
+  color: white;
+  background: rgb(7, 173, 7);
+  border-radius: 10px;
+  box-shadow: 1px 3px 5px rgba($color: #000000, $alpha: 0.2);
+  min-width: 400px;
+  margin: 0 auto;
 }
-
-.toast-enter-from, .toast-leave-to {
-    opacity: 0;
-    transform: translateY(-60px);
-  }
-.toast-enter-to, .toast-leave-from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .toast-enter-active {
-    transition: all 0.4s ease;
-  }
-  .toast-leave-active {
-    transition: all 0.5s ease;
-  }
-  

@@ -3,20 +3,7 @@
 ** See lower in that page for One page version
 */
 
-.backdrop, .twofa-grid-container {
-  top: 0;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  padding-left: $sidebar-width;
-}
-
-.backdrop {
-  background: rgba(216, 207, 207, 0.5);
-  // backdrop-filter: blur(5px);
-}
-
-.google {
+.google-img {
   width: 120px;
 }
 .twofa-grid {
@@ -83,18 +70,6 @@
     cursor: pointer;
     color: rgb(177, 177, 177);
   }
-}
-
-.zoomin-enter-from, .zoomin-leave-to {
-  opacity: 0;
-  transform: scale(0);
-}
-.zoomin-enter-active {
-  // animation: animatezoom 0.4s;
-  transition: all 0.4s ease;
-}
-.zoomin-leave-active {
-  transition: all 0.4s ease;
 }
 
 /* @keyframes animatezoom {
