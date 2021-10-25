@@ -13,7 +13,6 @@ var RACQUET_LENGTH = 1 / Number(process.env['RACQUET_LENGTH'])
 var RACQUET_WIDTH = 1 / Number(process.env['RACQUET_WIDTH'])
 
 var BALL_INITIAL_SPEED = 1 / Number([process.env['BALL_INITIAL_SPEED']])
-// var BALL_INITIAL_SPEED = 1 / 2000
 var BALL_ACCELERATION = 1 / Number([process.env['BALL_ACCELERATION']])
 var RACQUET_SPEED = 1 / Number([process.env['RACQUET_SPEED']])
 var SCORE_NEEDED_TO_WIN = Number(process.env['SCORE_NEEDED_TO_WIN'])
@@ -130,7 +129,7 @@ export class pongGame {
 
   changeBallDirectionIfNeeded(): void
   {
-    // balls hits top or bottom walls
+    // hits top or bottom walls
     if (this.ballPosition.y <= BALL_RADIUS || this.ballPosition.y >= CANVAS_HEIGHT - BALL_RADIUS)
       this.ballDirection.y = -this.ballDirection.y
     
@@ -140,22 +139,48 @@ export class pongGame {
     if (this.ballPosition.x - BALL_RADIUS > CANVAS_WIDTH)
       this.handleScore(true)
     
-    // collision with player1
-    if (this.ballDirection.x < 0 &&
-      this.ballPosition.x <= RACQUET_WIDTH + BALL_RADIUS && this.ballPosition.x >= BALL_RADIUS &&
-      this.ballPosition.y >= this.player1.position && this.ballPosition.y <= (this.player1.position + RACQUET_LENGTH))
+    // collision with player
+    if (this.ballCollisionWithPlayer1() || this.ballCollisionWithPlayer2())
     {
       this.ballDirection.x = -this.ballDirection.x
       this.ballSpeed += BALL_ACCELERATION
     }
-    // collision with player2
-    if (this.ballDirection.x > 0 &&
-      this.ballPosition.x >= CANVAS_WIDTH - BALL_RADIUS - RACQUET_WIDTH && this.ballPosition.x <= CANVAS_WIDTH - BALL_RADIUS &&
-      this.ballPosition.y >= this.player2.position && this.ballPosition.y <= (this.player2.position + RACQUET_LENGTH))
-      {
-        this.ballDirection.x = -this.ballDirection.x
-        this.ballSpeed += BALL_ACCELERATION
-      }
+  }
+
+  ballCollisionWithPlayer1(): boolean
+  {
+    if (
+    // ball is going towards player1
+    this.ballDirection.x < 0 &&
+
+    // ball position x is "inside" racquet (ballPosition.x - BALL_RADIUS = left edge of the ball)
+    this.ballPosition.x - BALL_RADIUS <= RACQUET_WIDTH && 
+    this.ballPosition.x - BALL_RADIUS >= 0 &&
+
+    // ball position y is "inside" racquet
+    this.ballPosition.y <= this.player1.position + RACQUET_LENGTH && 
+    this.ballPosition.y >= this.player1.position
+    )
+      return true
+    return false
+  }
+  
+  ballCollisionWithPlayer2(): boolean
+  {
+    if (
+    // ball is going towards player2
+    this.ballDirection.x > 0 &&
+
+    // ball position x is "inside" racquet (ballPosition.x + BALL_RADIUS = right edge of the ball)
+    this.ballPosition.x + BALL_RADIUS <= CANVAS_WIDTH && 
+    this.ballPosition.x + BALL_RADIUS >= CANVAS_WIDTH - RACQUET_WIDTH &&
+
+    // ball position y is "inside" racquet
+    this.ballPosition.y <= this.player2.position + RACQUET_LENGTH && 
+    this.ballPosition.y >= this.player2.position
+    )
+      return true
+    return false
   }
 
   computeNewBallPosition()
