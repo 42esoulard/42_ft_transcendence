@@ -30,10 +30,7 @@ export class pongGame {
   private readonly gameRepo: Repository<Game>,
   private readonly gameUserRepo: Repository<GameUser>,
   public server: Server)
-  {
-    this.initBallDirection()
-    this.initPositions()
-  }
+  {}
   
   private logger: Logger = new Logger('PongGateway');
   
@@ -42,7 +39,7 @@ export class pongGame {
   
   public ballPosition: coordinates = {x: 0, y:0}
   public ballDirection: coordinates = {x: 0, y: 0}
-  public ballSpeed = BALL_INITIAL_SPEED
+  public ballSpeed = 0
 
   public interval = null
   public timeout = null
@@ -106,6 +103,9 @@ export class pongGame {
 
   startGame()
   {
+    this.initPositions()
+    this.initBallDirection()
+    this.ballSpeed = BALL_INITIAL_SPEED
     this.interval = setInterval(() => {
       this.sendPositions()
     }, INTERVAL_IN_MS)
@@ -193,9 +193,6 @@ export class pongGame {
   {
     clearInterval(this.interval)
     this.timeout = setTimeout(() => {
-      this.initPositions()
-      this.initBallDirection()
-      this.ballSpeed = BALL_INITIAL_SPEED
       this.startGame()
     }, DELAY_AFTER_SCORE_IN_MS)
 
