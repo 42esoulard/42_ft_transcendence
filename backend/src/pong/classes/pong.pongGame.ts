@@ -56,17 +56,11 @@ export class pongGame {
   }
   initBallDirection()
   {
-    var sign1:boolean = (Math.random() > 0.5)
-    var sign2:boolean = (Math.random() > 0.5)
-    var rand = Math.random() * 3
-    var dir_x = sign1 ? rand : -rand
-    var abs_dir_y = Math.sqrt(9 - dir_x*dir_x)
-    var dir_y = sign2 ? abs_dir_y : -abs_dir_y
-    // this.logger.log(dir_x)
-    // this.logger.log(dir_y)
-    // this.logger.log(dir_y*dir_y + dir_x*dir_x)
-    this.ballDirection.x = 2,
-    this.ballDirection.y = 1
+    var rand1:boolean = (Math.random() > 0.5)
+    rand1 ? this.ballDirection.x = 2 : this.ballDirection.x = -2
+    var rand2:boolean = (Math.random() > 0.5)
+    rand2 ? this.ballDirection.y = 1 : this.ballDirection.y = -1
+    this.logger.log(this.ballDirection.x, this.ballDirection.y)
   }
 
   async pushGameintoDB()
@@ -134,7 +128,6 @@ export class pongGame {
     this.server.to(this.room).emit('position', this.ballPosition, this.getPlayerPositions())
     this.changeBallDirectionIfNeeded()
     this.computeNewBallPosition()
-    this.logger.log(this.ballPosition.x)
   }
 
   changeBallDirectionIfNeeded(): void
