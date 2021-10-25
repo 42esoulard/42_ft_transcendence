@@ -25,21 +25,17 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import axios from "axios";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 
 export default defineComponent({
   name: "OtpInput",
-  props: ["codeSendToUrl", "isTwoFactorEnabled"],
-  setup(props, context) {
+  props: ["codeSendToUrl", "authApi"],
+  setup({ codeSendToUrl, authApi }, { emit }) {
     const router = useRouter();
     const store = useStore();
     const otp = ref("");
     const error = ref("");
-
-    //To exchange cookie or auth header w/o in every req
-    axios.defaults.withCredentials = true;
 
     function isDigit(str: string): boolean {
       return !isNaN(Number(str));
@@ -52,33 +48,65 @@ export default defineComponent({
     };
 
     const sendTwoFactorCode = async () => {
-      // console.log(otp.value);
       checkOtp(); // some checks over the code
       if (!error.value) {
-        await axios
-          .post(`http://localhost:3000/auth/2fa/${props.codeSendToUrl}`, {
-            code: otp.value
-          })
-          .then(res => {
-            // console.log(res);
-            if (props.codeSendToUrl === "turn-on") {
+        if (codeSendToUrl === "turn-on") {
+          await authApi
+            .turnOnTwoFactorAuthentication(
+              { code: otp.value },
+              { withCredentials: true }
+            )
+            .then((res: any) => {
               store.commit("toggleTwoFactor", true);
               store.dispatch("setMessage", res.data.message);
-              context.emit("close");
-            } else {
+              emit("close");
+            })
+            .catch((err: any) => {
+              error.value = err.response.data.message;
+            });
+        } else if (codeSendToUrl === "authenticate") {
+          await authApi
+            .authenticate({ code: otp.value }, { withCredentials: true })
+            .then((res: any) => {
               router.push("account");
-            }
-          })
-          .catch(err => (error.value = err.response.data.message));
+            })
+            .catch((err: any) => (error.value = err.response.data.message));
+        }
       }
       if (error.value) {
         setTimeout(() => (error.value = ""), 2000);
       }
     };
+
+    // const sendTwoFactorCode = async () => {
+    //   // console.log(otp.value);
+    //   checkOtp(); // some checks over the code
+    //   if (!error.value) {
+    //     await axios
+    //       .post(`http://localhost:3000/auth/2fa/${codeSendToUrl}`, {
+    //         code: otp.value
+    //       })
+    //       .then(res => {
+    //         // console.log(res);
+    //         if (codeSendToUrl === "turn-on") {
+    //           store.commit("toggleTwoFactor", true);
+    //           store.dispatch("setMessage", res.data.message);
+    //           emit("close");
+    //         } else {
+    //           router.push("account");
+    //         }
+    //       })
+    //       .catch(err => (error.value = err.response.data.message));
+    //   }
+    //   if (error.value) {
+    //     setTimeout(() => (error.value = ""), 2000);
+    //   }
+    // };
+
     return {
       sendTwoFactorCode,
       otp,
-      error,
+      error
     };
   }
 });

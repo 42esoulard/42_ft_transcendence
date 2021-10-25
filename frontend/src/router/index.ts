@@ -14,6 +14,8 @@ import axios from 'axios'
 import UserProfile from '../views/UserProfile.vue'
 import InitTwoFactor from '../views/InitTwoFactor.vue'
 import NotFound from '../views/NotFound.vue'
+import { User } from '@/types/User'
+import { useAuthApi } from "@/plugins/api.plugin";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -112,10 +114,13 @@ const router = createRouter({
   routes
 })
 
+// const authApi = useAuthApi(); // Doesnt work !!????
+
 //To exchange cookie or auth header w/o in every req
-// axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true;
 
 const refreshToken = async () => {
+  // await authApi.refreshToken({ withCredentials: true })
   await axios
     .get("http://localhost:3000/auth/refreshtoken")
     .then(async (response) => {
@@ -125,8 +130,9 @@ const refreshToken = async () => {
 };
 
 const getProfile = async () => {
+  // await authApi.profile()
   await axios
-    .get("http://localhost:3000/auth/profile")
+    .get<User>("http://localhost:3000/auth/profile")
     .then((response) => {
       store.state.user = response.data;
     })

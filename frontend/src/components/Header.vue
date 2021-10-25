@@ -19,24 +19,19 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
-import axios from "axios";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { useAuthApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
   name: "UserAccount",
   setup() {
     const store = useStore();
     const router = useRouter();
-
-    const avatar = ref();
-
-    //To exchange cookie or auth header w/o in every req
-    axios.defaults.withCredentials = true;
+    const authApi = useAuthApi();
 
     const logOut = () => {
-      axios
-        .get("http://localhost:3000/auth/logout", { withCredentials: true })
+        authApi.logout({ withCredentials: true })
         .then((response) => {
           console.log(response);
           store.state.user = null;
@@ -48,7 +43,6 @@ export default defineComponent({
     return {
       user: computed(() => store.state.user),
       logOut,
-      avatar,
     };
   },
 });
