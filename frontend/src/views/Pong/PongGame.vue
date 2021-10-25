@@ -18,9 +18,6 @@ import { onMounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import getDraw from '../../composables/draw'
 
-var CANVAS_WIDTH_RATIO = 2
-var CANVAS_HEIGHT_RATIO = 3
-
 export default {
 	setup() {
 		
@@ -32,7 +29,7 @@ export default {
 		const { 
 			context, game, 
 			ballPosition, playerPositions, score, 
-			windowWidth, onResize, 
+			windowWidth, onResize, setInitalCanvasSize, 
 			draw } = getDraw()
 
 		// lifecycle hooks
@@ -41,8 +38,7 @@ export default {
 			window.addEventListener("resize", onResize)
 			console.log('mounted')
 			context.value = game.value.getContext("2d")
-			game.value.width = windowWidth.value / CANVAS_WIDTH_RATIO
-			game.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
+			setInitalCanvasSize()
 		})
 
 		onBeforeRouteLeave(() => {

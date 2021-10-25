@@ -63,7 +63,11 @@ const getDraw = () => {
 		game.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
 	}
 
-	return { context, ballPosition, playerPositions, score, windowWidth, game, draw, onResize}
+	const setInitalCanvasSize = () => {
+			game.value.width = windowWidth.value / CANVAS_WIDTH_RATIO
+			game.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
+	}
+	return { context, ballPosition, playerPositions, score, windowWidth, game, draw, onResize, setInitalCanvasSize}
 }
 
 export default getDraw
