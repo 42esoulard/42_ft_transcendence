@@ -47,18 +47,20 @@
       <transition name="fade--error">
         <div v-if="showBackdrop" class="backdrop"></div>
       </transition>
-      <transition-group name="zoomin">
+      <transition name="zoomin">
         <Modal v-if="showModal" @close="toggleModal(1)">
           <template v-slot:twofa>
             <InitTwoFactor @close="toggleModal(1)" @success="handleSuccess" />
           </template>
         </Modal>
-        <Modal v-if="showModal2" @close="toggleModal(2)">
+      </transition>
+      <transition name="zoomin">
+        <Modal v-show="showModal2" @close="toggleModal(2)">
           <template v-slot:update-user>
             <UpdateUser :avatar="avatar" @close="toggleModal(2)" />
           </template>
         </Modal>
-      </transition-group>
+      </transition>
     </teleport>
   </div>
 </template>

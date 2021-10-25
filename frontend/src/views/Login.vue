@@ -1,7 +1,7 @@
 <template>
   <h1>Welcome to ft_transcendence</h1>
   <div v-if="isTwoFactorEnabled">
-    <OtpInput :codeSendToUrl="codeSendToUrl" />
+    <OtpInput :authApi="authApi" :codeSendToUrl="codeSendToUrl" />
   </div>
   <div v-else class="log-in-div">
     <button class="button button--log-in" @click="logInWith42">
@@ -18,6 +18,7 @@ import { useRoute, useRouter } from "vue-router";
 import OtpInput from "@/components/OtpInput.vue";
 import { useStore } from "vuex";
 import axios from "axios";
+import { useAuthApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
   name: "Login",
@@ -26,6 +27,7 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
     const store = useStore();
+    const authApi = useAuthApi();
 
     const isTwoFactorEnabled = ref(false);
     const qrcodeURL = ref("");
@@ -42,6 +44,8 @@ export default defineComponent({
       if (route.query.code) {
         const code = route.query.code;
         // router.replace("/login"); // to remove code from URL: DIRTY ?
+        
+        // authApi.login({code: code})
         axios
           .get("http://localhost:3000/auth/42/login", {
             params: {
@@ -72,7 +76,8 @@ export default defineComponent({
       logInWith42,
       isTwoFactorEnabled,
       qrcodeURL,
-      codeSendToUrl
+      codeSendToUrl,
+      authApi
     };
   }
 });
