@@ -68,6 +68,7 @@ export default {
 	
 		socket.value.on("score", new_score => {
 			score.value = new_score
+			draw()
 		})
 		
 		const gameHasStarted = ref(false)
