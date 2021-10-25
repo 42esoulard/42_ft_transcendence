@@ -46,6 +46,8 @@ services:
       NODE_ENV: development
       VUE_APP_API_URL: ${API_URL}
       VUE_APP_42_AUTH_URL: ${AUTH_URL}
+    env_file:
+    - game.env
     command: sh -c "npm install && npm run serve"
     depends_on:
       - postgres
