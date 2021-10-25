@@ -52,7 +52,6 @@ export class pongGame {
     this.player1.position = CANVAS_HEIGHT / 2 - RACQUET_LENGTH / 2
     this.player2.position = CANVAS_HEIGHT / 2 - RACQUET_LENGTH / 2
     this.ballPosition.x = CANVAS_WIDTH / 2
-    this.logger.log(this.ballPosition.x)
     this.ballPosition.y = CANVAS_HEIGHT / 2
   }
   initBallDirection()
@@ -131,11 +130,11 @@ export class pongGame {
  
   sendPositions(): void
   {
-
-    this.changeBallDirectionIfNeeded()
-    this.computeNewBallPosition()
     
     this.server.to(this.room).emit('position', this.ballPosition, this.getPlayerPositions())
+    this.changeBallDirectionIfNeeded()
+    this.computeNewBallPosition()
+    this.logger.log(this.ballPosition.x)
   }
 
   changeBallDirectionIfNeeded(): void
