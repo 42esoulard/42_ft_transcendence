@@ -13,6 +13,7 @@ var RACQUET_LENGTH = 1 / Number(process.env['RACQUET_LENGTH'])
 var RACQUET_WIDTH = 1 / Number(process.env['RACQUET_WIDTH'])
 
 var BALL_INITIAL_SPEED = 1 / Number([process.env['BALL_INITIAL_SPEED']])
+// var BALL_INITIAL_SPEED = 1 / 2000
 var BALL_ACCELERATION = 1 / Number([process.env['BALL_ACCELERATION']])
 var RACQUET_SPEED = 1 / Number([process.env['RACQUET_SPEED']])
 var SCORE_NEEDED_TO_WIN = Number(process.env['SCORE_NEEDED_TO_WIN'])
@@ -129,37 +130,34 @@ export class pongGame {
 
   changeBallDirectionIfNeeded(): void
   {
-    // if hit top or bottom walls
+    // balls hits top or bottom walls
     if (this.ballPosition.y <= BALL_RADIUS || this.ballPosition.y >= CANVAS_HEIGHT - BALL_RADIUS)
       this.ballDirection.y = -this.ballDirection.y
     
-      // if ball arrives towards player1
-    if (this.ballPosition.x <= RACQUET_WIDTH + BALL_RADIUS) 
+    // score
+    if (this.ballPosition.x + BALL_RADIUS < 0)
+      this.handleScore(false)
+    if (this.ballPosition.x - BALL_RADIUS > CANVAS_WIDTH)
+      this.handleScore(true)
+    
+    // collision with player1
+    if (this.ballDirection.x < 0 &&
+      this.ballPosition.x <= RACQUET_WIDTH + BALL_RADIUS && this.ballPosition.x >= BALL_RADIUS &&
+      this.ballPosition.y >= this.player1.position && this.ballPosition.y <= (this.player1.position + RACQUET_LENGTH))
     {
-      // case 1: player1 hits the ball
-      if (this.ballPosition.y >= this.player1.position && 
-      this.ballPosition.y <= (this.player1.position + RACQUET_LENGTH))
+      this.ballDirection.x = -this.ballDirection.x
+      this.ballSpeed += BALL_ACCELERATION
+    }
+    // collision with player2
+    if (this.ballDirection.x > 0 &&
+      this.ballPosition.x >= CANVAS_WIDTH - BALL_RADIUS - RACQUET_WIDTH && this.ballPosition.x <= CANVAS_WIDTH - BALL_RADIUS &&
+      this.ballPosition.y >= this.player2.position && this.ballPosition.y <= (this.player2.position + RACQUET_LENGTH))
       {
         this.ballDirection.x = -this.ballDirection.x
         this.ballSpeed += BALL_ACCELERATION
       }
-      // case2: player2 scores
-      else  
-        this.handleScore(false)
-    }
-    // if ball arrives towards player2
-    if (this.ballPosition.x >= CANVAS_WIDTH - BALL_RADIUS - RACQUET_WIDTH)
-    {
-      if(this.ballPosition.y >= this.player2.position && 
-      this.ballPosition.y <= (this.player2.position + RACQUET_LENGTH))
-      {
-        this.ballDirection.x = -this.ballDirection.x
-        this.ballSpeed += BALL_ACCELERATION
-      }
-      else
-        this.handleScore(true)
-    }
   }
+
   computeNewBallPosition()
   {
     this.ballPosition.x += this.ballDirection.x * this.ballSpeed
