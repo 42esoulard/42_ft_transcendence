@@ -1,5 +1,6 @@
 import { Message } from 'src/messages/interfaces/message.interface';
 import { Channel } from 'src/channels/interfaces/channel.interface';
+import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
 
 export class User {
   id: number;
@@ -11,5 +12,5 @@ export class User {
   refresh_token: string;
   expiry_date: Date;
   messages: Message[];
-  channels: Channel[];
+  channel_members: ChannelMember[];
 }

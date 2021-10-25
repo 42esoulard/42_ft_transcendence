@@ -52,7 +52,7 @@ export class ChannelsController {
     const channel: Channel = await this.channelService.getChannelById(id);
     if (channel == undefined) {
       if (id == 1) {
-        return await this.channelService.seed()
+        return await this.channelService.seed();
         //   return await this.channelService.getChannelById(id);
         // });
       }
@@ -97,6 +97,11 @@ export class ChannelsController {
     @Param('user') user_id: number,
   ) {
     await this.channelService.joinChannel(channel_id, user_id);
+  }
+
+  @Get('/channels/:id')
+  async getUserChannels(@Param('id') id: number){
+    return await this.channelService.getUserChannels(id);
   }
 
   // @Get('/user/:user')

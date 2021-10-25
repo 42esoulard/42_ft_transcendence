@@ -9,6 +9,8 @@ import { CreateChannelDto } from './dto/createChannel.dto';
 import { UsersService } from '../users/users.module';
 import * as bcrypt from 'bcrypt';
 import { Users } from 'src/users/entity/users.entity';
+import { ChannelMembersService } from 'src/channel_members/channel_members.service';
+import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
 
 @Injectable()
 export class ChannelsService {
@@ -16,6 +18,7 @@ export class ChannelsService {
     @InjectRepository(Channels)
     private readonly channelsRepository: Repository<Channels>,
     private readonly userService: UsersService,
+    private readonly channelMemberService: ChannelMembersService,
   ) {}
 
   async seed(): Promise<Channel> {
@@ -37,7 +40,7 @@ export class ChannelsService {
    */
   async getChannels(): Promise<Channel[]> {
     return await this.channelsRepository.find({
-      relations: ['owner', 'messages', 'members'],
+      relations: ['messages', 'channel_members'],
     });
   }
 
@@ -53,6 +56,25 @@ export class ChannelsService {
     return channel;
   }
 
+  async getUserChannels(user_id: number){
+    
+    // const res = await this.usersRepository
+    //   .findOne(id, {
+    //     relations: ['channel_members', 'channel_members.member'],
+    //   })
+    // const res = await this.usersRepository
+    //   .createQueryBuilder('user')
+    //   .leftJoinAndSelect('user.channel_members', 'channel_members')
+    //   .leftJoinAndSelect('channel_members.channel', 'channel')
+    //   .select('channel')
+    //   .getOne();
+    // // .then((res) => console.log('in getuserchannels res', res));
+    // console.log('in getuserchannels res', res);
+    // return res;
+    const user: Users = await this.userService.getUserbyId(user_id);
+    return await this.channelMemberService.getUserChannels(user);
+  }
+
   /**
    * Gets a channel in database by its id
    * nb: findOne(id) is a function from the typeORM library
@@ -60,7 +82,7 @@ export class ChannelsService {
   async getChannelById(id: number): Promise<Channels> {
     console.log('in get channel by id', id);
     return await this.channelsRepository.findOne(id, {
-      relations: ['members'],
+      relations: ['messages', 'channel_members'],
     });
     // const ret = await this.channelsRepository
     //   .findOne(id)
@@ -95,31 +117,27 @@ export class ChannelsService {
     // return res;
   }
 
-  async joinChannel(channel_id: number, user_id: number): Promise<Channel> {
-    const channelEntry: Channels = await this.getChannelById(channel_id);
-    const userEntry: Users = await this.userService.getUserbyId(user_id);
+  async joinChannel(
+    channel_id: number,
+    user_id: number,
+  ): Promise<ChannelMember> {
+    const channel: Channels = await this.getChannelById(channel_id);
+    const user: Users = await this.userService.getUserbyId(user_id);
 
     // console.log('in joinchannel BEFORE', channelEntry.members);
-    if (!channelEntry.members) {
-      channelEntry.members = [];
-    }
-    channelEntry.members.push(userEntry);
+    // if (!channelEntry.members) {
+    //   channelEntry.members = [];
+    // }
+    // channelEntry.members.push(userEntry);
     // console.log('in joinchannel', channelEntry.members);
-    return await this.channelsRepository.save(channelEntry);
+    return await this.channelMemberService.createChannelMember(channel, user);
   }
 
-  async leaveChannel(channel: Channel, user: User): Promise<Channel> {
-    const channelEntry: Channels = await this.getChannelById(channel.id);
-    const userEntry: Users = await this.userService.getUserbyId(user.id);
+  async leaveChannel(channel_id: number, user_id: number) {
+    const channel: Channels = await this.getChannelById(channel_id);
+    const user: Users = await this.userService.getUserbyId(user_id);
 
-    if (
-      channelEntry &&
-      userEntry &&
-      channelEntry.members &&
-      channelEntry.members.includes(userEntry)
-    )
-      channelEntry.members.splice(channelEntry.members.indexOf(userEntry), 1);
-    return await this.channelsRepository.save(channelEntry);
+    await this.channelMemberService.deleteChannelMember(channel, user);
   }
 
   // async getJoinedChannels(user_id: number): Promise<User> {
@@ -148,15 +166,28 @@ export class ChannelsService {
         )); //must be crypted
     }
 
-    newChannel.members = [];
     if (newChannel.type === 'public') {
       await this.userService.getUsers().then((res) => {
         res.forEach((user) => {
-          newChannel.members.push(user);
+          if (user.id === newChannel.owner.id) {
+            this.channelMemberService.createChannelMember(
+              newChannel,
+              user,
+              true,
+              true,
+            );
+          } else {
+            this.channelMemberService.createChannelMember(newChannel, user);
+          }
         });
       });
     } else {
-      newChannel.members.push(newChannel.owner);
+      this.channelMemberService.createChannelMember(
+        newChannel,
+        newChannel.owner,
+        true,
+        true,
+      );
     }
 
     // await this.channelsRepository.save(newChannel).then(async (res) => {

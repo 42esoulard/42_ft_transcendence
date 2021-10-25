@@ -28,6 +28,8 @@
       </div> -->
       
       <!-- <h2 v-else>{{ username }}</h2> -->
+      <!-- <ChannelsList :joinedChannels="joinedChannels" :availableChannels="availableChannels" /> -->
+
       <h2>{{ user.username }}</h2>
       <div class="card bg-info">
 
@@ -88,7 +90,8 @@ import { defineComponent, reactive, ref, watch, computed } from "vue";
 import { io } from "socket.io-client";
 import { Message } from "@/types/Message";
 import { Channel } from "@/types/Channel"
-import NewChannelForm from "@/components/NewChannelForm.vue"
+import NewChannelForm from "@/components/chat/NewChannelForm.vue"
+import ChannelsList from "@/components/chat/ChannelsList.vue"
 import { Info } from "@/types/Info";
 import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
 import { useStore } from 'vuex';
@@ -130,8 +133,8 @@ export const ChatComponent = defineComponent({
         api.joinChannel(1, user.value.id)
         .then(()=> {
           updateChannelsList();
-          activeChannel.value = res.data;
-          getMessagesUpdate(res.data);
+          // activeChannel.value = res.data;
+          // getMessagesUpdate(res.data);
           return res;
         })
         
@@ -163,10 +166,10 @@ export const ChatComponent = defineComponent({
     //This gets all channels (temporary before adding channel-members db table and fetching
     // joined + joinable (public) channels)
     const updateChannelsList = async () => {
-      await userApi.getUserChannels(user.value.id)
+      await api.getUserChannels(user.value.id)
       .then((res) => {
-        joinedChannels.value = res.data.channels;
-        console.log("in  channels list", joinedChannels.value)
+        // joinedChannels.value = res.data.channels;
+        console.log("in  channels list", res.data)
       })
       .catch((err) => { console.log("not found")})
     }
@@ -177,10 +180,10 @@ export const ChatComponent = defineComponent({
       await api.getChannelById(channel.id)
       .then((res) => {
         if (activeChannel.value!.id === channel.id) {
-          activeChannel.value = res.data
-          channelMessages.value = res.data.messages
+          // activeChannel.value = res.data
+          // channelMessages.value = res.data.messages
         }
-        console.log("in room messages", channelMessages.value)
+        // console.log("in room messages", channelMessages.value)
         return res;
       })
       
@@ -391,6 +394,7 @@ export const ChatComponent = defineComponent({
 
       getMessagesUpdate,
       joinedChannels,
+      availableChannels,
       allChannels,
       activeChannel,
       switchRoom,

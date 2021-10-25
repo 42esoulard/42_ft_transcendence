@@ -22,13 +22,21 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
-  async getUserChannels(id: number): Promise<Users> {
-    const res = await this.usersRepository.findOne(id, {
-      relations: ['channels'],
-    });
-    // console.log('in getuserchannels res', res);
-    return res;
-  }
+  // async getUserChannels(id: number): Promise<Users> {
+  //   // const res = await this.usersRepository
+  //   //   .findOne(id, {
+  //   //     relations: ['channel_members', 'channel_members.member'],
+  //   //   })
+  //   const res = await this.usersRepository
+  //     .createQueryBuilder('user')
+  //     .leftJoinAndSelect('user.channel_members', 'channel_members')
+  //     .leftJoinAndSelect('channel_members.channel', 'channel')
+  //     .select('channel')
+  //     .getOne();
+  //   // .then((res) => console.log('in getuserchannels res', res));
+  //   console.log('in getuserchannels res', res);
+  //   return res;
+  // }
 
   /**
    * Gets a user in database by its id
@@ -53,14 +61,15 @@ export class UsersService {
   }
 
   /**
-	* Gets a user in database by its forty_two_login
-	*
-	*/
-	async getUserByLogin(login: string): Promise<User> | undefined {
-		const user = await this.usersRepository
-			.findOne({ where: { forty_two_login: login } });
-		return user;
-	}
+   * Gets a user in database by its forty_two_login
+   *
+   */
+  async getUserByLogin(login: string): Promise<User> | undefined {
+    const user = await this.usersRepository.findOne({
+      where: { forty_two_login: login },
+    });
+    return user;
+  }
 
   /**
    * Saves a new user into db after generating pw hash and salt

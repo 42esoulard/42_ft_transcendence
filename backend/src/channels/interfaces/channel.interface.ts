@@ -1,5 +1,6 @@
 import { User } from 'src/users/interfaces/user.interface';
 import { Message } from 'src/messages/interfaces/message.interface';
+import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
 
 export class Channel {
   id: number;
@@ -7,8 +8,8 @@ export class Channel {
   type: string;
   salt: string | null;
   password: string | null;
-  owner: User | null;
+  // owner: User | null;
   messages: Message[];
-  members: User[] | null;
+  channel_members: ChannelMember[];
   created_at: Date;
 }

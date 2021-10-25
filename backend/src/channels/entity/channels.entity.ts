@@ -1,3 +1,4 @@
+import { ChannelMembers } from 'src/channel_members/entity/channel_members.entity';
 import { Messages } from 'src/messages/entity/messages.entity';
 import { Users } from 'src/users/entity/users.entity';
 import {
@@ -31,10 +32,11 @@ export class Channels {
   @ManyToOne(() => Users, { onDelete: 'SET NULL' })
   owner: Users;
 
-  @ManyToMany(() => Users, (member) => member.channels, {
+  @OneToMany(() => ChannelMembers, (cm) => cm.channel, {
     cascade: true,
+    nullable: true,
   })
-  members: Users[];
+  channel_members: ChannelMembers[];
 
   @OneToMany(() => Messages, (message) => message.channel, {
     eager: true,
