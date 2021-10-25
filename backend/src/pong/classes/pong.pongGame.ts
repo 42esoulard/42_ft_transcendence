@@ -207,9 +207,13 @@ export class pongGame {
   moveRacquet(clientId: string, direction:string)
   {
     const player = (clientId === this.player1.clientSocket.id) ? this.player1 : this.player2
-    if (direction === 'up')
-      player.position -= RACQUET_SPEED
-    if (direction === 'down')
-      player.position += RACQUET_SPEED
+  
+    var topOfTheRacquet = player.position
+    if (direction === 'up' && topOfTheRacquet > 0)
+      player.position -= Math.min(RACQUET_SPEED, topOfTheRacquet)
+    
+    var bottomOfTheRacquet = player.position + RACQUET_LENGTH
+    if (direction === 'down' && bottomOfTheRacquet < CANVAS_HEIGHT)
+      player.position += Math.min(RACQUET_SPEED, bottomOfTheRacquet - player.position)
   }
 }
