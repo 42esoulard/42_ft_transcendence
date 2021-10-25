@@ -17,7 +17,7 @@ var BALL_RADIUS = 1 / 150
 var RACQUET_LENGTH = 1 / 16
 var RACQUET_WIDTH = 1 / 100
 
-var SCORE_NEEDED_TO_WIN = 5
+var SCORE_NEEDED_TO_WIN = 3
 var INTERVAL_IN_MS = 50
 var INITAL_DELAY_IN_MS = 2000
 var DELAY_AFTER_SCORE_IN_MS = 500
@@ -97,11 +97,11 @@ export class pongGame {
     this.server.to(this.room).emit('gameReadyToStart', this.room, this.player1.userName, this.player2.userName)
     this.timeout = setTimeout(() => {
       this.server.to(this.room).emit('gameStarting')
-      this.startGame()
+      this.startMoving()
     }, INITAL_DELAY_IN_MS)
   }
 
-  startGame()
+  startMoving()
   {
     this.initPositions()
     this.initBallDirection()
@@ -186,17 +186,15 @@ export class pongGame {
       this.endGame(false)
       return
     }
-    this.restartGame()
+    this.restartMoving()
   }
 
-  restartGame()
+  restartMoving()
   {
     clearInterval(this.interval)
     this.timeout = setTimeout(() => {
-      this.startGame()
+      this.startMoving()
     }, DELAY_AFTER_SCORE_IN_MS)
-
-
   }
 
   getPlayerPositions()
