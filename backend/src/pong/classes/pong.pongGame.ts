@@ -60,7 +60,6 @@ export class pongGame {
     rand1 ? this.ballDirection.x = 2 : this.ballDirection.x = -2
     var rand2:boolean = (Math.random() > 0.5)
     rand2 ? this.ballDirection.y = 1 : this.ballDirection.y = -1
-    this.logger.log(this.ballDirection.x, this.ballDirection.y)
   }
 
   async pushGameintoDB()
@@ -124,7 +123,6 @@ export class pongGame {
  
   sendPositions(): void
   {
-    
     this.server.to(this.room).emit('position', this.ballPosition, this.getPlayerPositions())
     this.changeBallDirectionIfNeeded()
     this.computeNewBallPosition()
@@ -195,12 +193,12 @@ export class pongGame {
   {
     clearInterval(this.interval)
     this.timeout = setTimeout(() => {
+      this.initPositions()
+      this.initBallDirection()
+      this.ballSpeed = BALL_INITIAL_SPEED
       this.startGame()
     }, DELAY_AFTER_SCORE_IN_MS)
 
-    this.initPositions()
-    this.initBallDirection()
-    this.ballSpeed = BALL_INITIAL_SPEED
 
   }
 
