@@ -23,6 +23,7 @@ services:
       BASE_URL: ${API_URL}
     env_file:
     - credentials.env
+    - game.env
     command: sh -c "rm -rf ./dist && npm install && npm run start:dev"
     # command: "tail -f"
     depends_on:

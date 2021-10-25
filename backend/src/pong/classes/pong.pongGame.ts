@@ -6,21 +6,20 @@ import { Game } from '../entity/games.entity';
 import { GameUser } from '../entity/gameUser.entity';
 import { Server } from 'socket.io';
 
-var BALL_INITIAL_SPEED = 1 / 500
-var BALL_ACCELERATION = 1 / 2000
-var RACQUET_SPEED = 1 / 100
+var CANVAS_WIDTH = 1 / Number(process.env['CANVAS_WIDTH'])
+var CANVAS_HEIGHT = 1 / Number(process.env['CANVAS_HEIGHT'])
+var BALL_RADIUS = 1 / Number(process.env['BALL_RADIUS'])
+var RACQUET_LENGTH = 1 / Number(process.env['RACQUET_LENGTH'])
+var RACQUET_WIDTH = 1 / Number(process.env['RACQUET_WIDTH'])
 
-// same ratios as in frontend
-var CANVAS_WIDTH = 1 / 2
-var CANVAS_HEIGHT = 1 / 3
-var BALL_RADIUS = 1 / 150
-var RACQUET_LENGTH = 1 / 16
-var RACQUET_WIDTH = 1 / 100
+var BALL_INITIAL_SPEED = 1 / Number([process.env['BALL_INITIAL_SPEED']])
+var BALL_ACCELERATION = 1 / Number([process.env['BALL_ACCELERATION']])
+var RACQUET_SPEED = 1 / Number([process.env['RACQUET_SPEED']])
+var SCORE_NEEDED_TO_WIN = Number(process.env['SCORE_NEEDED_TO_WIN'])
 
-var SCORE_NEEDED_TO_WIN = 3
-var INTERVAL_IN_MS = 50
-var INITAL_DELAY_IN_MS = 2000
-var DELAY_AFTER_SCORE_IN_MS = 500
+var INTERVAL_IN_MS = Number(process.env['INTERVAL_IN_MS'])
+var INITAL_DELAY_IN_MS = Number(process.env['INITIAL_DELAY_IN_MS'])
+var DELAY_AFTER_SCORE_IN_MS = Number(process.env['DELAY_AFTER_SCORE_IN_MS'])
 
 export class pongGame {
 
