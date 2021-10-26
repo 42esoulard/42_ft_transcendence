@@ -1,20 +1,42 @@
 <template>
 	<h1> Select the game you want to watch </h1>
 	<div v-for="game in games" :key="game.id">
-    <router-link :to="{ name: 'PongGame', params: {id: game.id} }" > {{game.p1}} vs {{game.p2}} </router-link>
+		<button v-on:click="WatchGame(game.id)"> {{ game.id }} </button>
 	</div>
 </template>
 
 <script>
+
+import { ref } from 'vue'
+import { clientSocket } from '../../App.vue'
+import { useRouter } from 'vue-router'
+
 export default {
-	data() {
-		return {
-			games: [
-				{id: 1, p1: "loup", p2: "pie"},
-				{id: 2, p1: "chat", p2: "lotte"},
-				{id: 3, p1: "merlu", p2: "merle"}
-			]
+	setup()
+	{
+		const games = ref([])
+		const socket = ref(clientSocket)
+		
+		const WatchGame = (id) => {
+			console.log('WatchGame emited, id: ' + id)
+			socket.value.emit('watchGame', id.toString())
 		}
+		
+		const router = useRouter()
+		socket.value.on('GoToGame', (id, player1UserName, player2UserName) => {
+			console.log('goToGame')
+			router.push({ name: 'PongGameWatch', params: {id, player1UserName, player2UserName}})
+		})
+
+		return { games, WatchGame }
+	},
+	
+	async mounted()
+	{
+			const res = await fetch('http://localhost:3000/pong')
+			const json = await res.json()
+			this.games = json
+
 	}
 }
 </script>
