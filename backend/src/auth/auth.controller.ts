@@ -9,6 +9,7 @@ import { JwtAuthGuard } from './guards/jwt.guard';
 import { JwtTwoFactorGuard } from './guards/jwtTwoFactor.guard';
 import { RefreshTwoFactorGuard } from './guards/refreshTwoFactor.guard';
 import { ApiCookieAuth, ApiOAuth2, ApiTags } from '@nestjs/swagger';
+import { timingSafeEqual } from 'crypto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -22,6 +23,8 @@ export class AuthController {
   @Get('42/login')
   @UseGuards(FortyTwoAuthGuard)
   async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+
+    const userAlreadyExists = await this.userService.getRefreshToken(req.user.id);
 
     const access_token = await this.authService.generateAccessToken(req.user);
     const refresh_token = await this.authService.generateRefreshToken(req.user.id);
@@ -37,7 +40,17 @@ export class AuthController {
       return { message: "Need 2FA to log in" };
     }
     // Should return a message mentionning if newly created user
-    return { message: "Logged in successfully" };
+    if (userAlreadyExists) {
+      return {
+        message: "Logged in successfully",
+        newlyCreated: false
+      };
+    } else {
+      return {
+        message: "Logged in successfully",
+        newlyCreated: true
+      };
+    }
   }
 
   @Post('fake-login')

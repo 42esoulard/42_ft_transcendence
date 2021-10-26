@@ -39,36 +39,38 @@
       <p>{{ key }}</p>
     </div>
     <hr class="twofa-hr" />
-    <OtpInput :codeSendToUrl="codeSendToUrl" @close="closeModal()" />
+    <OtpInput :authApi="authApi" :codeSendToUrl="codeSendToUrl" @close="closeModal()" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, onUpdated, ref } from "vue";
 import OtpInput from "@/components/OtpInput.vue";
-import axios from "axios";
+import { useAuthApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
   name: "InitTwoFactor",
   components: { OtpInput },
-  setup(props, context) {
+  setup(props, { emit }) {
     const qrcodeURL = ref("http://localhost:3000/auth/2fa/generate");
     const codeSendToUrl = ref("turn-on");
     const key = ref("No key available");
+    const authApi = useAuthApi();
 
     const closeModal = () => {
-      context.emit("close");
+      emit("close");
     };
 
     onMounted(() => {
-      getTwoFactorKey();
+      if (key.value == "No key available") {
+        getTwoFactorKey();
+      }
     });
 
-    axios.defaults.withCredentials = true;
     const getTwoFactorKey = async () => {
-      await axios
-        .get("http://localhost:3000/auth/2fa/key")
-        .then(res => {
+      authApi
+        .getKey({ withCredentials: true })
+        .then((res: any) => {
           key.value = res.data.key;
         })
         .catch(error => console.log(error));
@@ -78,7 +80,8 @@ export default defineComponent({
       qrcodeURL,
       codeSendToUrl,
       closeModal,
-      key
+      key,
+      authApi
     };
   }
 });
