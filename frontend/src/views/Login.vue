@@ -49,14 +49,13 @@ export default defineComponent({
 
         authApi
           .login({ params: { code: code }, withCredentials: true })
-          .then(res => {
-            console.log("RES", res);
+          .then((res: any) => {
             if (res.status === 206) {
               isTwoFactorEnabled.value = true;
             } else if (res.status === 200) {
-              // Put this commit under if block, condition from backend: first connect == true
-              console.log("STATUS 200");
-              store.commit("setFirstTimeConnect", true);
+              if (res.data.newlyCreated == true) {
+                store.commit("setFirstTimeConnect", true);
+              }
               router.push(redirectUrl);
             }
           })
