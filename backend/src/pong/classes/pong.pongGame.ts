@@ -104,8 +104,8 @@ export class pongGame {
   async addSpectator(client: Socket)
   {
     client.join(this.room)
-    this.server.emit('GoToGame', this.room, this.player1.userName, this.player2.userName)
-    this.server.emit('score', this.getPlayerScores())
+    client.emit('GoToGame', this.room, this.player1.userName, this.player2.userName)
+    client.emit('score', this.getPlayerScores())
   }
 
   startMoving()

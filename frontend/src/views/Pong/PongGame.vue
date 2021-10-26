@@ -61,7 +61,6 @@ export default {
 		})
 	
 		socket.value.on("score", newScore => {
-			console.log('score received')
 			score.value = newScore
 			draw()
 		})
