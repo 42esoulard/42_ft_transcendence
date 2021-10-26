@@ -156,7 +156,7 @@ export class UsersController {
       two_fa_enabled: req.user.two_fa_enabled,
       avatar: `${process.env.BASE_URL}/users/avatars/${file.filename}` })
 		const response = {
-			message: 'File has been uploaded successfully',
+			message: 'Avatar has been uploaded successfully',
 			originalname: file.originalname,
 			filename: file.filename,
 		};
