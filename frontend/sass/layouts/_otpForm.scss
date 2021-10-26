@@ -27,9 +27,9 @@
   display: inline-block;
   margin-left: 20px;
 }
-::placeholder {
-  text-align: center;
-}
+// ::placeholder {
+//   text-align: center;
+// }
 :focus::placeholder {
   color: #ccc;
 }

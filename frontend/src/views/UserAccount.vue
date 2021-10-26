@@ -1,22 +1,10 @@
 <template>
-  <transition name="toast">
-    <Toast v-if="message" :message="message" />
-  </transition>
   <div class="user-account" v-if="user">
     <h1 class="profile-left__name">User Account</h1>
     <img :src="user.avatar" class="ua-img" alt="[Your avatar]" />
     <p>Your avatar: {{ user.avatar }}</p>
     <p>Your id: {{ user.id }}</p>
     <p>Your username: {{ user.username }}</p>
-    <form @submit.prevent="updateUsername">
-      <transition name="fade--error">
-        <p v-if="error_username" class="error">{{ error_username }}</p>
-      </transition>
-      <input type="text" v-model="username" maxlength="10" />
-      <div>
-        <button class="button button--msg">Update username</button>
-      </div>
-    </form>
     <p>Your login 42: {{ user.forty_two_login }}</p>
     <p>Two-Factor Auth activated: {{ user.two_fa_enabled }}</p>
     <p>Profile created at: {{ formatedDate }}</p>
@@ -32,15 +20,7 @@
       </button>
     </div>
     <hr />
-
-    <form @submit.prevent="postAvatar">
-      <transition name="fade--error">
-        <p v-if="error" class="error">{{ error }}</p>
-      </transition>
-      <input @change="handleFile" type="file" ref="avatar" id="avatar" />
-      <button class="button button--msg">Update avatar</button>
-    </form>
-    <button @click="toggleModal(2)" class="button button--invite">
+    <button @click="toggleModal(2)" class="button button--msg">
       Edit profile
     </button>
     <teleport to="#modals">
@@ -56,8 +36,8 @@
       </transition>
       <transition name="zoomin">
         <Modal v-show="showModal2" @close="toggleModal(2)">
-          <template v-slot:update-user>
-            <UpdateUser :avatar="avatar" @close="toggleModal(2)" />
+          <template v-slot:edit-user>
+            <UpdateUser @close="toggleModal(2)" />
           </template>
         </Modal>
       </transition>
@@ -67,20 +47,18 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from "vue";
-import { useAuthApi, useUserApi } from "@/plugins/api.plugin";
+import { useAuthApi} from "@/plugins/api.plugin";
 import { User } from "@/types/User";
 import { useStore } from "vuex";
-import moment from "moment";
+import moment from "moment"; // Should not be in this component
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
-import Toast from "@/components/Toast.vue";
 import UpdateUser from "@/components/EditUser.vue";
 import Modal from "@/components/Modal.vue";
 
 export default defineComponent({
   name: "UserAccount",
-  components: { Modal, InitTwoFactor, Toast, UpdateUser },
+  components: { Modal, InitTwoFactor, UpdateUser },
   setup() {
-    const userApi = useUserApi();
     const authApi = useAuthApi();
     const store = useStore();
 
@@ -88,16 +66,10 @@ export default defineComponent({
     const showModal = ref(false);
     const showModal2 = ref(false);
     const error = ref("");
-    const error_username = ref("");
     const username = ref("");
     const users = ref<User[]>([]);
 
     onMounted(() => {
-      userApi
-        .getUsers()
-        .then((res: any) => (users.value = res.data))
-        .catch((err: any) => console.log(err.message));
-
       showModal2.value = store.state.firstTimeConnect;
     });
 
@@ -106,62 +78,6 @@ export default defineComponent({
         "YYYY-MM-DD HH:mm:ss"
       );
     });
-
-    const handleFile = (
-      event: Event & {
-        target: HTMLInputElement & {
-          files: FileList;
-        };
-      }
-    ) => {
-      const { target } = event;
-      const { files } = target;
-      if (files.length === 0) {
-        return;
-      }
-      avatar.value = files[0];
-      console.log("avatar value", avatar.value);
-    };
-
-    const updateUsername = async () => {
-      if (!/^[a-zA-Z]+$/.test(username.value))
-        error_username.value = "Username should only contains letters";
-      else if (users.value.find(user => user.username == username.value))
-        error_username.value = "Username already taken";
-      else
-        userApi
-          .updateUser(
-            {
-              id: store.state.user.id,
-              username: username.value
-            },
-            {
-              withCredentials: true
-            }
-          )
-          .then(res => {
-            console.log(res);
-            store.commit("updateUsername", username.value);
-          })
-          .catch(error_username => console.log(error_username));
-    };
-
-    const postAvatar = async () => {
-      const data = new FormData();
-      data.append("avatar", avatar.value);
-      userApi
-        .uploadFile({ data, withCredentials: true })
-        .then((response: any) => {
-          console.log(response);
-          store.commit("updateAvatar", response.data.filename);
-          // store.commit("tagAvatar", Date.now());
-          // window.location.reload();
-        })
-        .catch(err => {
-          error.value = err.response.data.message;
-        });
-      setTimeout(() => (error.value = ""), 2000);
-    };
 
     const deactivateTwoFactor = async () => {
       authApi
@@ -194,11 +110,8 @@ export default defineComponent({
 
     return {
       user: computed(() => store.state.user),
-      message: computed(() => store.state.message),
       firstTimeConnect: computed(() => store.state.firstTimeConnect),
       formatedDate,
-      postAvatar,
-      handleFile,
       avatar,
       deactivateTwoFactor,
       showModal,
@@ -207,9 +120,7 @@ export default defineComponent({
       error,
       handleSuccess,
       showBackdrop,
-      updateUsername,
       username,
-      error_username
     };
   }
 });
