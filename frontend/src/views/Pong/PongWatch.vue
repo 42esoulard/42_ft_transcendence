@@ -1,7 +1,7 @@
 <template>
 	<h1> Select the game you want to watch </h1>
 	<div v-for="game in games" :key="game.id">
-		<button v-on:click="WatchGame(game.id)"> game #{{ game.id }} : user {{ game.users[0].userId }} vs user {{ game.users[1].userId }} </button>
+		<button v-on:click="WatchGame(game.id)"> game #{{ game.id }} : {{ game.users[0].user.username }} vs {{ game.users[1].user.username }} </button>
 	</div>
 </template>
 
