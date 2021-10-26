@@ -22,22 +22,6 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
-  // async getUserChannels(id: number): Promise<Users> {
-  //   // const res = await this.usersRepository
-  //   //   .findOne(id, {
-  //   //     relations: ['channel_members', 'channel_members.member'],
-  //   //   })
-  //   const res = await this.usersRepository
-  //     .createQueryBuilder('user')
-  //     .leftJoinAndSelect('user.channel_members', 'channel_members')
-  //     .leftJoinAndSelect('channel_members.channel', 'channel')
-  //     .select('channel')
-  //     .getOne();
-  //   // .then((res) => console.log('in getuserchannels res', res));
-  //   console.log('in getuserchannels res', res);
-  //   return res;
-  // }
-
   /**
    * Gets a user in database by its id
    * nb: findOne(id) is a function from the typeORM library

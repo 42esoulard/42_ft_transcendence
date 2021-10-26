@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { Users } from 'src/users/entity/users.entity';
 import { ChannelMembersService } from 'src/channel_members/channel_members.service';
 import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
+import { AsyncSubject } from 'rxjs';
 
 @Injectable()
 export class ChannelsService {
@@ -38,10 +39,8 @@ export class ChannelsService {
    * Lists all channels in database
    * nb: find() is a function from the typeORM library
    */
-  async getChannels(): Promise<Channel[]> {
-    return await this.channelsRepository.find({
-      relations: ['messages', 'channel_members'],
-    });
+  async getChannels(): Promise<Channels[]> {
+    return await this.channelsRepository.find();
   }
 
   /**
@@ -52,25 +51,20 @@ export class ChannelsService {
     const channel = await this.channelsRepository.findOne({
       where: { name: name },
     });
-    // console.log('getChannelByName', name, channel);
     return channel;
   }
 
-  async getUserChannels(user_id: number){
-    
-    // const res = await this.usersRepository
-    //   .findOne(id, {
-    //     relations: ['channel_members', 'channel_members.member'],
-    //   })
-    // const res = await this.usersRepository
-    //   .createQueryBuilder('user')
-    //   .leftJoinAndSelect('user.channel_members', 'channel_members')
-    //   .leftJoinAndSelect('channel_members.channel', 'channel')
-    //   .select('channel')
-    //   .getOne();
-    // // .then((res) => console.log('in getuserchannels res', res));
-    // console.log('in getuserchannels res', res);
-    // return res;
+  async getChannelMember(
+    channel_id: number,
+    user_id: number,
+  ): Promise<ChannelMember> {
+    const channel: Channels = await this.getChannelById(channel_id);
+    const user: Users = await this.userService.getUserbyId(user_id);
+
+    return await this.channelMemberService.getChannelMember(channel, user);
+  }
+
+  async getUserChannels(user_id: number): Promise<ChannelMember[]> {
     const user: Users = await this.userService.getUserbyId(user_id);
     return await this.channelMemberService.getUserChannels(user);
   }
@@ -84,37 +78,6 @@ export class ChannelsService {
     return await this.channelsRepository.findOne(id, {
       relations: ['messages', 'channel_members'],
     });
-    // const ret = await this.channelsRepository
-    //   .findOne(id)
-    //   .then((res) => {
-    //     console.log(ret);
-    //     if (ret == undefined && id === 0) {
-    //       this.seed().then(() => {
-    //         console.log('seeded');
-    //         return this.getChannelById(0);
-    //       });
-    //       // return this.getChannelById(id);
-    //     }
-    //     console.log(
-    //       'not seeded res:',
-    //       res,
-    //       typeof res,
-    //       id,
-    //       res == undefined,
-    //       res === undefined,
-    //     );
-    //     return res;
-    //   })
-    //   .catch(() => {
-    //     if (id === 0) {
-    //       this.seed();
-    //       console.log('seeded');
-    //       return this.getChannelById(id);
-    //     }
-    //   });
-    // return ret;
-    // console.log('getChannelById', id, res);
-    // return res;
   }
 
   async joinChannel(
@@ -124,14 +87,35 @@ export class ChannelsService {
     const channel: Channels = await this.getChannelById(channel_id);
     const user: Users = await this.userService.getUserbyId(user_id);
 
-    // console.log('in joinchannel BEFORE', channelEntry.members);
-    // if (!channelEntry.members) {
-    //   channelEntry.members = [];
-    // }
-    // channelEntry.members.push(userEntry);
-    // console.log('in joinchannel', channelEntry.members);
+    const cm = await this.channelMemberService.getChannelMember(channel, user);
+    if (cm) {
+      console.log('in joinchannel', cm);
+      return await cm;
+    }
     return await this.channelMemberService.createChannelMember(channel, user);
   }
+
+  // async joinAllChannels(user_id: number): Promise<ChannelMember> {
+  //   const user: Users = await this.userService.getUserbyId(user_id);
+  //   const allChannels = await this.getChannels();
+  //   let ret;
+
+  //   allChannels.forEach(async (chan) => {
+  //     await this.channelMemberService
+  //       .getChannelMember(chan, user)
+  //       .then(async (res) => {
+  //         console.log(res);
+  //         if (!res) {
+  //           if (chan.id === 1) {
+  //             ret = await this.channelMemberService.createChannelMember(chan, user);
+  //           } else {
+  //             await this.channelMemberService.createChannelMember(chan, user);
+  //           }
+  //         }
+  //       });
+  //   });
+  //   return await ret;
+  // }
 
   async leaveChannel(channel_id: number, user_id: number) {
     const channel: Channels = await this.getChannelById(channel_id);
@@ -140,22 +124,14 @@ export class ChannelsService {
     await this.channelMemberService.deleteChannelMember(channel, user);
   }
 
-  // async getJoinedChannels(user_id: number): Promise<User> {
-  //   // await this.userService.getUserChannels(user_id).then((res) => {
-  //   //   console.log("in service", res.channels)
-  //   //   return res.channels;
-  //   // });
-  //   return await this.userService.getUserChannels(user_id);
-  // }
-
   /**
    * Saves a new channel into db
    * nb: save(channel) is a function from the typeORM library
    */
-  async saveChannel(channelDto: CreateChannelDto): Promise<Channel> {
+  async saveChannel(channelDto: CreateChannelDto): Promise<ChannelMember> {
     console.log('IN SAVE CHANNEL', channelDto);
     const newChannel = this.channelsRepository.create(channelDto);
-    // newChannel.owner_id = channelDto.owner_id;
+    let newChannelOwner;
     newChannel.owner = await this.userService.getUserbyId(channelDto.owner_id);
 
     if (newChannel.type === 'password-protected') {
@@ -166,11 +142,13 @@ export class ChannelsService {
         )); //must be crypted
     }
 
+    await this.channelsRepository.save(newChannel);
+
     if (newChannel.type === 'public') {
       await this.userService.getUsers().then((res) => {
-        res.forEach((user) => {
+        res.forEach(async (user) => {
           if (user.id === newChannel.owner.id) {
-            this.channelMemberService.createChannelMember(
+            newChannelOwner = this.channelMemberService.createChannelMember(
               newChannel,
               user,
               true,
@@ -182,19 +160,14 @@ export class ChannelsService {
         });
       });
     } else {
-      this.channelMemberService.createChannelMember(
+      newChannelOwner = this.channelMemberService.createChannelMember(
         newChannel,
         newChannel.owner,
         true,
         true,
       );
     }
-
-    // await this.channelsRepository.save(newChannel).then(async (res) => {
-    //   await this.joinChannel(res.id, res.owner.id);
-    // });
-    // console.log("in chan service newchan", newChannel)
-    return await this.channelsRepository.save(newChannel);
+    return await newChannelOwner;
   }
 
   /**

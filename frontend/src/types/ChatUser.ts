@@ -6,5 +6,5 @@ export interface ChatUser {
   username: string;
   messages: Message[];
   // channels: Channel[] | null;
-  channel_members: ChannelMember;
+  channel_members: ChannelMember[];
 }
