@@ -91,9 +91,20 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
-    path: '/pong/:id',
+    path: '/pong/play',
     name: 'PongGame',
-    component: PongGame
+    component: PongGame,
+    beforeEnter(to, from, next) {
+      if (to.params.id)
+      {
+        next()
+      }
+      else
+      {
+        console.log('redirected to Pong')
+        next({name: 'Pong'})
+      }
+    }
   },
   {
     path: '/pong/watch',
