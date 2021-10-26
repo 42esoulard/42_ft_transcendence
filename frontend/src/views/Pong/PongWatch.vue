@@ -1,7 +1,7 @@
 <template>
 	<h1> Select the game you want to watch </h1>
 	<div v-for="game in games" :key="game.id">
-		<button v-on:click="WatchGame(game.id)"> {{ game.id }} : {{ game.users[0].userId }} vs {{ game.users[0].userId }} </button>
+		<button v-on:click="WatchGame(game.id)"> game #{{ game.id }} : user {{ game.users[0].userId }} vs user {{ game.users[1].userId }} </button>
 	</div>
 </template>
 
@@ -36,8 +36,9 @@ export default {
 			const res = await fetch('http://localhost:3000/pong/onGoingGames')
 			const json = await res.json()
 			this.games = json
-			console.log(this.games)
 
+			// filtering games where user is playing againt itself (which should not happen in production): causes problem as game.users[1] doesnt exist
+			this.games = this.games.filter((game) => game.users.length > 1)
 	}
 }
 </script>
