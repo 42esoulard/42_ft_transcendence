@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Game } from '../entity/games.entity';
 import { GameUser } from '../entity/gameUser.entity';
 import { Server } from 'socket.io';
+import { Socket } from 'socket.io';
 
 var CANVAS_WIDTH = 1 / Number(process.env['CANVAS_WIDTH'])
 var CANVAS_HEIGHT = 1 / Number(process.env['CANVAS_HEIGHT'])
@@ -98,6 +99,12 @@ export class pongGame {
       this.server.to(this.room).emit('gameStarting')
       this.startMoving()
     }, INITAL_DELAY_IN_MS)
+  }
+
+  async addSpectator(client: Socket)
+  {
+    client.join(this.room)
+    this.server.emit('GoToGame', this.room, this.player1.userName, this.player2.userName)
   }
 
   startMoving()

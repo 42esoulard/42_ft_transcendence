@@ -68,6 +68,19 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
+  @SubscribeMessage('watchGame')
+  async handleWatchGame(client: Socket, gameId: string)
+  {
+    this.logger.log("watchGame received")
+    const game: pongGame = this.games.get(gameId)
+    if (!game)
+    {
+      this.logger.error('watchGame: game doesnt exist')
+      return
+    }
+    game.addSpectator(client)
+  }
+
   @SubscribeMessage('leaveQueue')
   handleLeaveQueue(client: Socket): void
   {

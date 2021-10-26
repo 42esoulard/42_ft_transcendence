@@ -6,7 +6,8 @@ import Chat from '../views/Chat.vue'
 import UserAccount from '../views/UserAccount.vue'
 import Pong from '../views/Pong/Pong.vue'
 import PongGame from '../views/Pong/PongGame.vue'
-import PongWatch from '../views/Pong/PongWatch.vue'
+import PongWatchTest from '../views/Pong/PongWatchTest.vue'
+import PongGameWatch from '../views/Pong/PongGameWatch.vue'
 import FakeLogin from '../views/FakeLogin.vue'
 import Login from '../views/Login.vue';
 import { store } from "@/store";
@@ -109,7 +110,12 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/pong/watch',
     name: 'PongWatch',
-    component: PongWatch
+    component: PongWatchTest
+  },
+  {
+    path: '/pong/watch/:id',
+    name: 'PongGameWatch',
+    component: PongGameWatch
   },
   {
     path: '/:catchAll(.*)',
