@@ -18,13 +18,13 @@ export default {
 		const socket = ref(clientSocket)
 		
 		const WatchGame = (id) => {
-			console.log('WatchGame emited, id: ' + id)
+			// console.log('WatchGame emited, id: ' + id)
 			socket.value.emit('watchGame', id.toString())
 		}
 		
 		const router = useRouter()
 		socket.value.on('GoToGame', (id, player1UserName, player2UserName) => {
-			console.log('goToGame')
+			// console.log('goToGame')
 			router.push({ name: 'PongGameWatch', params: {id, player1UserName, player2UserName, authorized:true}})
 		})
 

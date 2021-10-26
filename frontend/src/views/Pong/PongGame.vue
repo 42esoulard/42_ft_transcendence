@@ -60,8 +60,9 @@ export default {
 			draw()
 		})
 	
-		socket.value.on("score", new_score => {
-			score.value = new_score
+		socket.value.on("score", newScore => {
+			console.log('score received')
+			score.value = newScore
 			draw()
 		})
 		
