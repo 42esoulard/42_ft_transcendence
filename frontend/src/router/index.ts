@@ -96,7 +96,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'PongGame',
     component: PongGame,
     beforeEnter(to, from, next) {
-      if (to.params.id)
+      if (to.params.authorized)
       {
         next()
       }
