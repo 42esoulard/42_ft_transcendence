@@ -20,7 +20,9 @@ export class Game {
   @CreateDateColumn({ type: "timestamp", default: () => "now()" })
   startedAt: Date;
 
-  @OneToMany(() => GameUser, gameuser => gameuser.game)
+  @OneToMany(() => GameUser, gameuser => gameuser.game, {
+    eager: true,
+  })
   users: GameUser[]
 
   // @ManyToMany(() => Users, user => user.games)

@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Put, Body, Param, NotFoundException, UseInterceptors, UploadedFile, Res, StreamableFile, UseGuards, BadRequestException, Req, HttpStatus } from '@nestjs/common';
 import { Game } from './entity/games.entity';
-import { GameUser } from './entity/gameUser.entity';
 import { PongService } from './pong.service';
 import { ApiBadRequestResponse, ApiCookieAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 

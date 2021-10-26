@@ -75,6 +75,15 @@ export class UsersController {
 		return user;
 	}
 
+  @Get('/friendships/:id')
+	async getUserFriendships(@Param('id') id: number): Promise<User> {
+		const user: User = await this.userService.getUserFriendships(id)
+		if (user == undefined) {
+			throw new NotFoundException('User not found');
+		}
+		return user;
+	}
+
 	/**
 	* Returns a user found in database by its username.
 	*/

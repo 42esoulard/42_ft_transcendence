@@ -16,6 +16,8 @@ export class CreateUserDto {
 
   readonly two_fa_enabled: boolean;
 
+  readonly expiry_date?: Date;
+
 	/**
 	 * The avatar of the created user
 	 */

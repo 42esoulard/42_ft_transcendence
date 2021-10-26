@@ -24,7 +24,14 @@ export class UsersService {
 
   async getUserGames(id: number): Promise<Users> {
     const res = await this.usersRepository.findOne(id, {
-      relations: ['games'],
+      relations: ['games', 'games.game'],
+    });
+    return res;
+  }
+
+  async getUserFriendships(id: number): Promise<Users> {
+    const res = await this.usersRepository.findOne(id, {
+      relations: ['friendships_requested', 'friendships_adressed'],
     });
     return res;
   }
