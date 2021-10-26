@@ -63,15 +63,9 @@ export default {
 			draw()
 		})
 		
-		const gameHasStarted = ref(false)
-		socket.value.on("gameStarting", () => {
-			gameHasStarted.value = true
-		})
-		
 		const winningPlayer = ref(null)
 		const gameIsOver = ref(false)
 		socket.value.on("gameOver", (player1Won) => {
-			gameHasStarted.value = true
 			gameIsOver.value = true
 			if (player1Won)
 				winningPlayer.value = player1UserName
@@ -81,7 +75,7 @@ export default {
 		
 
 
-		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, game }
+		return { score, room, player1UserName, player2UserName, gameIsOver, winningPlayer, game }
 
 	},
 
