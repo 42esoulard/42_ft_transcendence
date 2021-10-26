@@ -4,7 +4,7 @@ import AddUser from '../views/AddUser.vue'
 import Users from '../views/Users.vue'
 import Chat from '../views/Chat.vue'
 import UserAccount from '../views/UserAccount.vue'
-import PongPlay from '../views/Pong/PongPlay.vue'
+import Pong from '../views/Pong/Pong.vue'
 import PongGame from '../views/Pong/PongGame.vue'
 import PongWatch from '../views/Pong/PongWatch.vue'
 import FakeLogin from '../views/FakeLogin.vue'
@@ -85,7 +85,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/pong',
     name: 'Pong',
-    component: PongPlay,
+    component: Pong,
     meta: {
       requiresAuth: true,
     }
