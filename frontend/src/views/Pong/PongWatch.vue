@@ -25,7 +25,7 @@ export default {
 		const router = useRouter()
 		socket.value.on('GoToGame', (id, player1UserName, player2UserName) => {
 			console.log('goToGame')
-			router.push({ name: 'PongGameWatch', params: {id, player1UserName, player2UserName}})
+			router.push({ name: 'PongGameWatch', params: {id, player1UserName, player2UserName, authorized:true}})
 		})
 
 		return { games, WatchGame }

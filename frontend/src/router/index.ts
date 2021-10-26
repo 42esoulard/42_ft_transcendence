@@ -115,7 +115,18 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/pong/watch/:id',
     name: 'PongGameWatch',
-    component: PongGameWatch
+    component: PongGameWatch,
+    beforeEnter(to, from, next) {
+      if (to.params.authorized)
+      {
+        next()
+      }
+      else
+      {
+        console.log('redirected to PongWatch')
+        next({name: 'PongWatch'})
+      }
+    }
   },
   {
     path: '/:catchAll(.*)',
