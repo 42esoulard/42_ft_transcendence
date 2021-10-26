@@ -1,7 +1,7 @@
 <template>
 	<h1> Select the game you want to watch </h1>
 	<div v-for="game in games" :key="game.id">
-		<button v-on:click="WatchGame(game.id)"> {{ game.id }} </button>
+		<button v-on:click="WatchGame(game.id)"> {{ game.id }} : {{ game.users[0].userId }} vs {{ game.users[0].userId }} </button>
 	</div>
 </template>
 
@@ -33,9 +33,10 @@ export default {
 	
 	async mounted()
 	{
-			const res = await fetch('http://localhost:3000/pong')
+			const res = await fetch('http://localhost:3000/pong/onGoingGames')
 			const json = await res.json()
 			this.games = json
+			console.log(this.games)
 
 	}
 }

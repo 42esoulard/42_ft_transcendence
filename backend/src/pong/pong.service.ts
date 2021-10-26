@@ -17,12 +17,18 @@ export class PongService {
 		return this.gameRepo.find()
 	}
 
-  async getUserbyId(id: number)
-  {
-    return this.userRepo.findOne(id, {
-      relations: ['games', 'gameStats']
-    })
+  async findonGoing() {
+    const games = await this.gameRepo.find({relations: ['users']})
+    const ongoingGames = games.filter(elem => elem.users[0].won == null) // 'won' attribute is set when game ends
+    return ongoingGames
   }
+
+  // async getUserbyId(id: number)
+  // {
+  //   return this.userRepo.findOne(id, {
+  //     relations: ['games', 'gameStats']
+  //   })
+  // }
 
 
 

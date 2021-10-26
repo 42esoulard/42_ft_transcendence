@@ -11,8 +11,13 @@ export class PongController {
 		return this.pongService.findAll()
 	}
 
-	@Get('id')
-	test() {
-		return this.pongService.getUserbyId(2)
-	}
+	@Get('onGoingGames')
+	onGoing() {
+		return this.pongService.findonGoing()
+	}	
+
+// 	@Get('id')
+// 	test() {
+// 		return this.pongService.getUserbyId(2)
+// 	}
 }
