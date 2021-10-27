@@ -10,6 +10,10 @@
 	<div v-if="gameIsOver">
 		<h1> {{ winningPlayer }} won ! </h1>
 	</div>
+	<p>
+		<button v-on:click="SendMoveMsg('up')"> Up </button>
+		<button v-on:click="SendMoveMsg('down')"> Down </button>
+	</p>
 </template>
 
 <script>
@@ -101,7 +105,7 @@ export default {
 
 		
 
-		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, game }
+		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, game, SendMoveMsg }
 
 	},
 
