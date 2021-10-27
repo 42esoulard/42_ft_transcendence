@@ -12,7 +12,7 @@ export class PongController {
 	}
 
 	@Get('onGoingGames')
-	GetOnGoingGames() {
+	GetOnGoingGames(): Promise<Game[]> {
 		return this.pongService.findonGoing()
 	}	
 
