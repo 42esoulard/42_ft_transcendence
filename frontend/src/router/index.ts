@@ -13,7 +13,6 @@ import Login from '../views/Login.vue';
 import { store } from "@/store";
 import axios from 'axios'
 import UserProfile from '../views/UserProfile.vue'
-import InitTwoFactor from '../views/InitTwoFactor.vue'
 import NotFound from '../views/NotFound.vue'
 import { User } from '@/types/User'
 import { useAuthApi } from "@/plugins/api.plugin";
@@ -39,14 +38,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/fake-login',
     name: 'FakeLogin',
     component: FakeLogin
-  },
-  {
-    path: '/init-otp',
-    name: 'InitTwoFactor',
-    component: InitTwoFactor,
-    meta: {
-      requiresAuth: true,
-    }
   },
   {
     path: '/users',

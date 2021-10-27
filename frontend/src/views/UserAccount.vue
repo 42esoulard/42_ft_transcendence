@@ -30,14 +30,14 @@
       <transition name="zoomin">
         <Modal v-if="showModal" @close="toggleModal(1)">
           <template v-slot:twofa>
-            <InitTwoFactor @close="toggleModal(1)" @success="handleSuccess" />
+            <InitTwoFactor @close="toggleModal(1)" />
           </template>
         </Modal>
       </transition>
       <transition name="zoomin">
         <Modal v-show="showModal2" @close="toggleModal(2)">
           <template v-slot:edit-user>
-            <UpdateUser @close="toggleModal(2)" />
+            <EditUser @close="toggleModal(2)" />
           </template>
         </Modal>
       </transition>
@@ -48,26 +48,23 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from "vue";
 import { useAuthApi} from "@/plugins/api.plugin";
-import { User } from "@/types/User";
 import { useStore } from "vuex";
 import moment from "moment"; // Should not be in this component
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
-import UpdateUser from "@/components/EditUser.vue";
+import EditUser from "@/components/EditUser.vue";
 import Modal from "@/components/Modal.vue";
 
 export default defineComponent({
   name: "UserAccount",
-  components: { Modal, InitTwoFactor, UpdateUser },
+  components: { Modal, InitTwoFactor, EditUser },
   setup() {
     const authApi = useAuthApi();
     const store = useStore();
 
-    const avatar = ref();
+    const avatarUrl = ref(store.state.user.avatar);
     const showModal = ref(false);
     const showModal2 = ref(false);
-    const error = ref("");
     const username = ref("");
-    const users = ref<User[]>([]);
 
     onMounted(() => {
       showModal2.value = store.state.firstTimeConnect;
@@ -99,11 +96,6 @@ export default defineComponent({
       }
     };
 
-    const handleSuccess = (message: string) => {
-      console.log(message);
-      store.dispatch("setMessage", message);
-    };
-
     const showBackdrop = computed(() => {
       return showModal.value || showModal2.value;
     });
@@ -112,13 +104,10 @@ export default defineComponent({
       user: computed(() => store.state.user),
       firstTimeConnect: computed(() => store.state.firstTimeConnect),
       formatedDate,
-      avatar,
       deactivateTwoFactor,
       showModal,
       showModal2,
       toggleModal,
-      error,
-      handleSuccess,
       showBackdrop,
       username,
     };
