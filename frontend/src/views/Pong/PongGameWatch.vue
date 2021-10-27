@@ -37,7 +37,6 @@ export default {
 		})
 
 		onBeforeRouteLeave(() => {
-			socket.value.emit('leaveGame', room.value)
 			socket.value.removeEventListener('position')
 			window.removeEventListener("resize", onResize)
 			console.log('leaving')
