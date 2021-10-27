@@ -10,12 +10,14 @@
 import { ref } from 'vue'
 import { clientSocket } from '../../App.vue'
 import { useRouter } from 'vue-router'
+import { useDefaultApi } from "@/plugins/api.plugin";
 
 export default {
 	setup()
 	{
 		const games = ref([])
 		const socket = ref(clientSocket)
+		const api = useDefaultApi()
 		
 		const WatchGame = (id) => {
 			// console.log('WatchGame emited, id: ' + id)
@@ -28,14 +30,13 @@ export default {
 			router.push({ name: 'PongGameWatch', params: {id, player1UserName, player2UserName, authorized:true}})
 		})
 
-		return { games, WatchGame }
+		return { games, WatchGame, api }
 	},
 	
 	async mounted()
 	{
-			const res = await fetch('http://localhost:3000/pong/onGoingGames')
-			const json = await res.json()
-			this.games = json
+			const res = await this.api.onGoing()
+			this.games = res.data
 
 			// filtering games where user is playing againt itself (which should not happen in production): causes problem as game.users[1] doesnt exist
 			this.games = this.games.filter((game) => game.users.length > 1)
