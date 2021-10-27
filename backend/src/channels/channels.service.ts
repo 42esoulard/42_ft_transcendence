@@ -69,6 +69,22 @@ export class ChannelsService {
     return await this.channelMemberService.getUserChannels(user);
   }
 
+  async getAvailableChannels(user_id: number): Promise<Channel[]> {
+    let channels = await this.getChannels();
+    await this.getUserChannels(user_id).then(async (res) => {
+      const userChannels = res.map((cm) => cm.channel);
+      channels = channels.filter(
+        (channels) =>
+          !userChannels
+            .map((userChannels) => userChannels.id)
+            .includes(channels.id),
+      );
+      
+      return await channels;
+    });
+    return await channels;
+  }
+
   /**
    * Gets a channel in database by its id
    * nb: findOne(id) is a function from the typeORM library

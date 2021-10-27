@@ -110,6 +110,11 @@ export class ChannelsController {
     return await this.channelService.getUserChannels(id);
   }
 
+  @Get('/avail/:id')
+  async getAvailableChannels(@Param('id') id: number): Promise<Channel[]> {
+    return await this.channelService.getAvailableChannels(id);
+  }
+
   @Get('/channelmember/:channel/:user')
   async getChannelMember(
     @Param('channel') channel_id: number,
