@@ -15,14 +15,14 @@
 import { onMounted, ref } from 'vue'
 import { clientSocket } from '../../App.vue'
 import { useRouter } from 'vue-router'
-import { useDefaultApi } from "@/plugins/api.plugin";
+import { usePongApi } from "@/plugins/api.plugin";
 
 export default {
 	setup()
 	{
 		const games = ref([])
 		const socket = ref(clientSocket)
-		const api = useDefaultApi()
+		const api = usePongApi()
 		
 		onMounted(() => {
 			api.
