@@ -1,7 +1,8 @@
 .profile {
   width: $profile-width;
   height: $profile-height;
-  display: flex;
+  display: grid;
+  grid-template: 100% / 50% 50%;
   color: white;
   justify-content: center;
   background-color: $profile-div-bg-color;
