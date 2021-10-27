@@ -14,6 +14,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Channels } from 'src/channels/entity/channels.entity';
+import { Friendships } from 'src/friendships/entity/friendships.entity';
 // import * as bcrypt from 'bcrypt';
 
 @Entity('users')
@@ -39,7 +40,7 @@ export class Users {
   @Column({ type: 'varchar', length: 36, nullable: true })
   refresh_token: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', default: () => 'now()' })
   expiry_date: Date;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
@@ -53,6 +54,14 @@ export class Users {
 
   @OneToMany(() => Messages, (message) => message.author)
   messages: Messages[];
+
+  @OneToMany(() => Friendships, (friendship) => friendship.requester)
+  @JoinTable()
+  friendships_requested: Friendships[];
+
+  @OneToMany(() => Friendships, (friendship) => friendship.adressee)
+  @JoinTable()
+  friendships_adressed: Friendships[];
 
   @ManyToMany(() => Channels, (channel) => channel.members)
   @JoinTable({

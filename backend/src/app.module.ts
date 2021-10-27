@@ -10,6 +10,7 @@ import { ChatModule } from './chat/chat.module';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
 import { PongModule } from './pong/pong.module';
+import { FriendshipsModule } from './friendships/friendships.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PongModule } from './pong/pong.module';
     MessagesModule,
     ChannelsModule,
     AuthModule,
+    FriendshipsModule,
     PassportModule.register({ session: true }),
     PongModule,
   ],

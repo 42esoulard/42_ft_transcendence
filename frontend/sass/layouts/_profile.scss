@@ -1,7 +1,8 @@
 .profile {
   width: $profile-width;
   height: $profile-height;
-  display: flex;
+  display: grid;
+  grid-template: 100% / 50% 50%;
   color: white;
   justify-content: center;
   background-color: $profile-div-bg-color;
@@ -73,6 +74,24 @@
 }
 
 .profile-main {
+  justify-self: center;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: $profile-main-width;
+  margin: $profile-main-margin;
+  padding: $profile-main-padding;
+  @media (max-width: 1100px){
+    margin: 0;
+  }
+  @media (max-width: 900px) {
+    padding: 0;
+    min-width: 100%;
+    height: 100%;
+  }
+}
+
+.profile-right {
   justify-self: center;
   display: flex;
   justify-content: center;

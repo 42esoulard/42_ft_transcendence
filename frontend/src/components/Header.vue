@@ -1,11 +1,11 @@
 <template>
   <transition name="fade--log">
-  <div class="header" v-if="user">
+  <div class="header">
     <div></div>
     <router-link to="/" class="header-link">
       <h1 class="header__title">Space Pong</h1>
     </router-link>
-    <div v-if="user" class="header-bloc">
+    <div v-if="user" :key="user.id" class="header-bloc">
       <router-link to="/account" class="user-bloc">
         <img class="user-bloc__avatar" :src="user.avatar" alt="">
         <span class="user-bloc__username">{{ user.username }}</span>
@@ -14,7 +14,6 @@
     </div>
   </div>
   </transition>
-  <div class="header header--invisible" v-if="!user"></div>
 </template>
 
 <script lang="ts">

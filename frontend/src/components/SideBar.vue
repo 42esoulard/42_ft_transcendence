@@ -2,7 +2,7 @@
   <transition name="fade--log">
     <div class="sidebar" v-if="user">
       <SideBarLink to="/" icon="fas fa-home">home</SidebarLink>
-      <SideBarLink to="/profile" icon="fas fa-user-circle">profile</SidebarLink>
+      <SideBarLink :to="userProfile" icon="fas fa-user-circle">profile</SidebarLink>
       <SideBarLink to="/chat" icon="fas fa-comments">chat</SidebarLink>
       <SideBarLink to="" icon="fas fa-trophy">ladder</SidebarLink>
       <SideBarLink to="/users" icon="fas fa-users">users</SidebarLink>
@@ -24,8 +24,15 @@
     components: { SideBarLink },
     setup() {
       const store = useStore();
+      const userProfile = computed(() => {
+        if (store.state.user)
+          return (`/profile/${store.state.user.username}`);
+        else
+          return (`/profile/`);
+      });
       return {
       user: computed(() => store.state.user),
+      userProfile,
     };
     }
   }

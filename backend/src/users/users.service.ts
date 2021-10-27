@@ -22,6 +22,20 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
+  async getUserGames(id: number): Promise<Users> {
+    const res = await this.usersRepository.findOne(id, {
+      relations: ['games', 'games.game'],
+    });
+    return res;
+  }
+
+  async getUserFriendships(id: number): Promise<Users> {
+    const res = await this.usersRepository.findOne(id, {
+      relations: ['friendships_requested', 'friendships_adressed'],
+    });
+    return res;
+  }
+
   async getUserChannels(id: number): Promise<Users> {
     const res = await this.usersRepository.findOne(id, {
       relations: ['channels'],
@@ -35,7 +49,6 @@ export class UsersService {
    * nb: findOne(id) is a function from the typeORM library
    */
   async getUserbyId(id: number): Promise<Users> {
-    console.log('in getuser byid', id);
     const res = await this.usersRepository.findOne(id);
     console.log('res', res);
     return res;

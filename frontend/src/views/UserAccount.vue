@@ -14,7 +14,7 @@
       </transition>
       <input type="text" v-model="username" maxlength="10" />
       <div>
-        <button class="button button--msg">Update username</button>
+        <button class="button button--primary">Update username</button>
       </div>
     </form>
     <p>Your login 42: {{ user.forty_two_login }}</p>
@@ -22,12 +22,12 @@
     <p>Profile created at: {{ formatedDate }}</p>
 
     <div v-if="!user.two_fa_enabled" class="ua-twofa">
-      <button class="button button--invite" @click="toggleModal(1)">
+      <button class="button button--third" @click="toggleModal(1)">
         Enable Two-Factor Authentication
       </button>
     </div>
     <div v-else class="ua-twofa">
-      <button class="button button--add" @click="deactivateTwoFactor">
+      <button class="button button--second" @click="deactivateTwoFactor">
         Disable Two-Factor Authentication
       </button>
     </div>
@@ -38,9 +38,9 @@
         <p v-if="error" class="error">{{ error }}</p>
       </transition>
       <input @change="handleFile" type="file" ref="avatar" id="avatar" />
-      <button class="button button--msg">Update avatar</button>
+      <button class="button button--primary">Update avatar</button>
     </form>
-    <button @click="toggleModal(2)" class="button button--invite">
+    <button @click="toggleModal(2)" class="button button--third">
       Edit profile
     </button>
     <teleport to="#modals">

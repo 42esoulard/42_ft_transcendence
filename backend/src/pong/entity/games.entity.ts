@@ -10,20 +10,22 @@ export class Game {
 
   @Column({ type: "varchar", length: 50, nullable: true, default: 'classic' })
   gameMode	: string;
-  
+
   @Column({ type: "int", nullable: true })
   score1: number;
-  
+
 	@Column({ type: "int", nullable: true })
   score2: number;
- 
+
   @CreateDateColumn({ type: "timestamp", default: () => "now()" })
   startedAt: Date;
 
-  @OneToMany(() => GameUser, gameuser => gameuser.game)
+  @OneToMany(() => GameUser, gameuser => gameuser.game, {
+    eager: true,
+  })
   users: GameUser[]
 
   // @ManyToMany(() => Users, user => user.games)
   // participants: Users[]
- 
+
 }

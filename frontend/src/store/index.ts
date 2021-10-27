@@ -1,4 +1,5 @@
 import { User } from '@/types/User'
+import { Friendship } from '@/types/Friendship'
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 
@@ -50,7 +51,7 @@ export const store = createStore<State>({
 
     setFirstTimeConnect(state: State, payload: boolean) {
       state.firstTimeConnect = payload;
-    }
+    },
   },
   actions: {
     setMessage(context, payload: string) {

@@ -104,9 +104,10 @@
   color: $progress-bar-label-color;
 }
 
-.game-history {
+.list-div {
   grid-column: 1/4;
-  height: $game-history-height;
+  width: $list-div-width;
+  height: $list-div-height;
 }
 
 .rainbow-border {
@@ -128,20 +129,24 @@
   font-family: $rainbow-title-font;
 }
 
-.game-history__title {
+.list-div__title {
   display: inline-block;
-  background-color: $game-history-title-bg;
-  width: $game-history-title-width;
+  background-color: $list-div-title-bg;
+  width: $list-div-title-width;
   border-radius: $rainbow-border-radius;
   align-self: center;
-  font-family: $game-history-title-font;
-  border: $game-history-title-border;
+  font-family: $list-div-title-font;
+  border: $list-div-title-border;
 }
 
-.game-history-panel {
+.list-div-panel {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  height: $game-history-panel-height;
-  background-color: $game-history-panel-bg;
+  overflow-y: scroll;
+  height: $list-div-panel-height;
+  background-color: $list-div-panel-bg;
+}
+
+.list-div-panel__list {
+  text-align: left;
+  font-family: 'Roboto';
 }
