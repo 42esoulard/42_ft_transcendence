@@ -40,7 +40,7 @@
       <input @change="handleFile" type="file" ref="avatar" id="avatar" />
       <button class="button button--primary">Update avatar</button>
     </form>
-    <button @click="toggleModal(2)" class="button button--invite">
+    <button @click="toggleModal(2)" class="button button--third">
       Edit profile
     </button>
     <teleport to="#modals">

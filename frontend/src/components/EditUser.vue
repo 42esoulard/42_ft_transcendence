@@ -18,14 +18,14 @@
         name="username"
       />
       <!-- <div class="otp_submit">
-        <button class="button button--invite">Update username</button>
+        <button class="button button--third">Update username</button>
       </div> -->
       <transition name="fade--error">
         <p v-if="error" class="error">{{ error }}</p>
       </transition>
       <h3>Update your avatar</h3>
       <input @change="handleFile" type="file" ref="avatar" id="avatar" />
-      <button class="button button--msg">Update your info</button>
+      <button class="button button--primary">Update your info</button>
     </form>
   </div>
 </template>

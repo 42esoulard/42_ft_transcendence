@@ -1,79 +1,78 @@
 <template>
-<div class="stats">
-  <div class="stats-bloc-border">
-  <div class="stats-bloc">
-    <span class="stats-bloc__number stats-bloc__number--win">{{ numberOfWin }}</span>
-    <span class="stats-bloc__text">win</span>
-  </div>
-  </div>
-  <div class="stats-bloc-border">
-  <div class="stats-bloc">
-    <span class="stats-bloc__number stats-bloc__number--rank">#4</span>
-    <span class="stats-bloc__text">rank</span>
-  </div>
-  </div>
-  <div class="stats-bloc-border">
-  <div class="stats-bloc">
-    <span class="stats-bloc__number stats-bloc__number--games">{{ numberOfGames }}</span>
-    <span class="stats-bloc__text">games</span>
-  </div>
-  </div>
-  <div class="progress-bar">
-    <div class="our-progress-bar__inside" :style="{'width':winRate}"></div>
-    <div class="our-progress-bar__label">winrate: {{ winRate }}</div>
-  </div>
-  <div class="game-history">
-    <span class="game-history__title">Game History</span>
-    <div class="game-history-panel">
-      <ul class="game-history-panel__list">
-       <li v-for="game in gameHistory" :key="game.id">
-        {{ historyString(game) }}
-       </li>
-      </ul>
+  <div class="stats">
+    <div class="stats-bloc-border">
+    <div class="stats-bloc">
+      <span class="stats-bloc__number stats-bloc__number--win">{{ numberOfWin }}</span>
+      <span class="stats-bloc__text">win</span>
+    </div>
+    </div>
+    <div class="stats-bloc-border">
+    <div class="stats-bloc">
+      <span class="stats-bloc__number stats-bloc__number--rank">#4</span>
+      <span class="stats-bloc__text">rank</span>
+    </div>
+    </div>
+    <div class="stats-bloc-border">
+    <div class="stats-bloc">
+      <span class="stats-bloc__number stats-bloc__number--games">{{ numberOfGames }}</span>
+      <span class="stats-bloc__text">games</span>
+    </div>
+    </div>
+    <div class="progress-bar">
+      <div class="our-progress-bar__inside" :style="{'width':winRate}"></div>
+      <div class="our-progress-bar__label">winrate: {{ winRate }}</div>
+    </div>
+    <div class="list-div">
+      <span class="list-div__title">Game History</span>
+      <div class="list-div-panel">
+        <ul class="list-div-panel__list">
+        <li v-for="game in gameHistory" :key="game.id">
+          {{ historyString(game) }}
+        </li>
+        </ul>
+      </div>
     </div>
   </div>
-      </div>
 </template>
 
 <script lang="ts">
   import { defineComponent, inject, ref, computed, onMounted } from "vue";
-  import { useStore } from "vuex";
   import moment from "moment";
-  import { useUserApi, usePongApi } from "@/plugins/api.plugin";
-  import { User } from "@/types/User";
   import { GameUser } from "@/types/GameUser";
   import { Game } from "@/types/Game";
   import axios from "axios";
-  import { ContentSaveCog } from "mdue";
+  import { useUserApi } from "@/plugins/api.plugin";
 
   export default defineComponent({
     name: "Stats",
-    setup() {
-      const store = useStore();
-      const user = computed(() => store.state.user);
+    props: {
+      user: {
+        type: Object,
+        required: true,
+      }
+    },
+    setup(props) {
+      const userApi = useUserApi();
       const games = ref<GameUser[]>([]);
       const gameHistory = ref<Game[]>([]);
+      const user = props.user;
 
-      const getUserGames = async () => {
-        await axios
-          .get(`http://localhost:3000/users/user-games/${store.state.user.id}`)
+      onMounted(() => {
+        userApi
+          .getUserGames(user.id)
           .then((res: any) => {
+            console.log(res.data);
             games.value = res.data.games;
             for (const gameUser of games.value){
               gameHistory.value.push(gameUser.game);
             }
           })
           .catch((err: any) => { console.log("not found")})
-      };
-      getUserGames();
-      const formatedDate = computed(() => {
-        return moment(store.state.user.created_at as Date).format(
-          "MM-DD-YYYY"
-        );
       });
 
+
       const historyString = function (game: Game){
-        const opponent = game.users[0].userId == store.state.user.id ? game.users[1] : game.users[0];
+        const opponent = game.users[0].userId == user.id ? game.users[1] : game.users[0];
         const result = opponent.won === true ? "loss" : "win";
         return `${moment(game.startedAt).format("MM-DD-YYYY")}: ${result} vs ${opponent.user.username}`
       };
@@ -88,7 +87,7 @@
           + '%')
       });
 
-      return { games, formatedDate, numberOfGames, numberOfWin, winRate, gameHistory, historyString }
+      return { games, numberOfGames, numberOfWin, winRate, gameHistory, historyString }
     }
   })
 </script>

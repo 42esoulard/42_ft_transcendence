@@ -1,19 +1,10 @@
 <template>
   <div class="profile" v-if="user">
     <div class="profile-left">
-        <img :src="user.avatar" class="profile-left__avatar-img" alt= "">
-        <span class="profile-left__name">{{ user.username }} </span>
-        <span class="profile-left__since">member since {{ formatedDate }}</span>
-        <span class="profile-left__status"><i class="status status--online fas fa-circle" /> online</span>
-        <div class="profile-left__social">
-          <button class="button button--second"><i class="upload-icon fas fa-user-plus" /> add friend</button>
-          <button class="button button--primary"><i class="upload-icon fas fa-envelope" /> send message</button>
-          <button class="button button--third"><i class="upload-icon fas fa-table-tennis" /> invite game</button>
-          <button class="button button--grey"><i class="upload-icon fas fa-ban" /> block</button>
-        </div>
+      <ProfileLeft :user="user"/>
     </div>
     <div class="profile-main">
-      <Stats />
+      <Stats :user="user"/>
     </div>
   </div>
 </template>
@@ -22,15 +13,36 @@
 import { defineComponent, inject, ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import Stats from "../components/Stats.vue";
+import ProfileLeft from "../components/ProfileLeft.vue";
+import { User } from "@/types/User";
+  import moment from "moment";
+import { useRoute } from 'vue-router';
+import { useUserApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
   name: "UserProfile",
-  components: { Stats },
+  components: { Stats, ProfileLeft },
   setup() {
-    const store = useStore();
-    const user = computed(() => store.state.user);
+    const userApi = useUserApi();
+    const route = useRoute();
+    const userRef = ref();
+    const username = route.params.username;
 
-    return { user };
+    onMounted(() => {
+      userApi
+        .getUserByUsername(username.toString())
+        .then((res: any) => {
+          userRef.value = res.data;
+        })
+        .catch((err: any) => console.log(err.message));
+    });
+
+    const formatedDate = computed(() => {
+        return moment(userRef.value.created_at as Date).format(
+          "MM-DD-YYYY"
+        );
+      });
+    return { user: computed(() => userRef.value), formatedDate };
   },
 });
 
