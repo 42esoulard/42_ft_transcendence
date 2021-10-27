@@ -35,7 +35,7 @@ export default {
 	
 	async mounted()
 	{
-			const res = await this.api.onGoing()
+			const res = await this.api.getOnGoingGames()
 			this.games = res.data
 
 			// filtering games where user is playing againt itself (which should not happen in production): causes problem as game.users[1] doesnt exist
