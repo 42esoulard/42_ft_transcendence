@@ -12,7 +12,7 @@
       <h2>New channel</h2>
 
       <label class="subtitle" for='name'>Channel name:*</label>
-      <input required type="text" name='name' id='chanName' placeholder='My Cool Channel' minlength="1" maxlength="200" v-model="channelName" @input="checkName()">
+      <input required type="text" name='name' id='chanName' placeholder='My Cool Channel' minlength="1" maxlength="14" v-model="channelName" @input="checkName()">
       
       <div class="channelAccessContainer">
         <label class="subtitle">Channel access:*</label>
