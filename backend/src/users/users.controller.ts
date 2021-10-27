@@ -5,12 +5,13 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { ApiBadRequestResponse, ApiCookieAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { editFileName, imageFileFilter } from '../utils/files-upload.utils';
+import { saveImageToStorage, IsFileExtensionSafe, removeFile } from '../utils/files-upload.utils';
+import { handleAvatar } from '../utils/files-manipulation.utils';
 import { createReadStream } from 'fs';
 import { extname, join } from 'path';
 import { Request, Response } from 'express';
 import { JwtTwoFactorGuard } from 'src/auth/guards/jwtTwoFactor.guard';
+import * as fs from "fs";
 
 @ApiTags('User')
 @Controller('users')
@@ -106,7 +107,7 @@ export class UsersController {
 		return user;
 	}
 
-  /**
+	/**
 	* Returns a user found in database by its login.
 	*/
 	@Get('/login/:login')
@@ -151,15 +152,8 @@ export class UsersController {
 	@ApiCookieAuth()
 	@Post('upload')
 	@UseGuards(JwtTwoFactorGuard)
-	@UseInterceptors(FileInterceptor('avatar', {
-		storage: diskStorage({
-			destination: './uploads/avatars',
-			filename: editFileName,
-		}),
-		fileFilter: imageFileFilter,
-		limits: { fileSize: 1024 * 1024 } //(in bytes)
-	}))
-	uploadFile(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
+	@UseInterceptors(FileInterceptor('avatar', saveImageToStorage))
+	async uploadFile(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
 		console.log(file);
 		if (req.fileValidationError) {
 			console.log(req.fileValidationError);
@@ -168,11 +162,27 @@ export class UsersController {
 		if (!file) {
 			throw new BadRequestException('Invalid file');
 		}
+		// To check if the ext corresponds to file content
+		if (! await IsFileExtensionSafe(`./${file.path}`)) {
+			removeFile(`./${file.path}`);
+			throw new BadRequestException('Invalid file, hacker !?');
+		}
+		// crop the avatar
+		let newFilePath = file.path;
+		const ext = extname(file.path);
+		if (ext != ".jpg") {
+			newFilePath = file.path.replace(ext, ".jpg");
+			file.filename = file.filename.replace(ext, ".jpg");
+			setTimeout(() => {
+				fs.unlinkSync(file.path);
+			}, 1000);
+		}
+		handleAvatar(`./${file.path}`, `./${newFilePath}`);
+		// Save the URL where the file will be accessible by frontend
 		this.userService.updateUser({
-      id: req.user.id,
-      username: req.user.username,
-      two_fa_enabled: req.user.two_fa_enabled,
-      avatar: `${process.env.BASE_URL}/users/avatars/${file.filename}` })
+			id: req.user.id,
+			avatar: `${process.env.BASE_URL}/users/avatars/${file.filename}`
+		})
 		const response = {
 			message: 'Avatar has been uploaded successfully',
 			originalname: file.originalname,
@@ -190,16 +200,16 @@ export class UsersController {
 	getAvatar(
 		@Param('imgpath') filename: string,
 		@Res({ passthrough: true }) res: Response
-		) {
-			const file = createReadStream(join('./uploads/avatars/', filename))
+	) {
+		const file = createReadStream(join('./uploads/avatars/', filename))
 			.on('error', () => {
 				// throw new NotFoundException("Avatar not found");
 				res.sendStatus(404);
 			})
-			const ext = extname(filename).replace('.', '');
-			res.set({
-				'Content-Type': `image/${ext}`,
-				'Content-Disposition': 'attachment; filename="avatar.png"',
+		const ext = extname(filename).replace('.', '');
+		res.set({
+			'Content-Type': `image/${ext}`,
+			'Content-Disposition': 'attachment; filename="avatar.png"',
 		});
 		return new StreamableFile(file);
 	}

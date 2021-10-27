@@ -10,7 +10,7 @@
       <input
         @change="handleFile"
         type="file"
-        accept="image/*"
+        accept=".png, .jpg, .jpeg, .gif"
         ref="avatarInput"
         id="avatar"
       />
@@ -20,9 +20,6 @@
     </div>
     <h3>Username</h3>
     <form @submit.prevent="updateUser">
-      <transition name="fade--error">
-        <p v-if="error_username" class="error">{{ error_username }}</p>
-      </transition>
       <input
         type="text"
         v-focus
@@ -31,11 +28,12 @@
         maxlength="10"
         :placeholder="user.username"
       />
-      <transition name="fade--error">
-        <p v-if="error" class="error">{{ error }}</p>
-      </transition>
+      <transition-group name="fade--error">
+        <p v-if="error_username" class="error">{{ error_username }}</p>
+        <p v-if="error_avatar" class="error">{{ error_avatar }}</p>
+      </transition-group>
       <hr />
-      <button @click="closeModal()" class="button button--msg">Update your info</button>
+      <button class="button button--primary">Update your info</button>
     </form>
   </div>
 </template>
@@ -47,16 +45,16 @@ import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 export default defineComponent({
-  name: "UpdateUser",
+  name: "EditUser",
   setup(props, context) {
     const store = useStore();
     const userApi = useUserApi();
 
     const username = ref("");
-    const error = ref("");
+    const error_avatar = ref("");
     const avatar = ref(); // should be typed !?
     const avatarInput = ref(); // should be typed !?
-    const avatarUrl = ref(store.state.user.avatar); // should be typed !?
+    const avatarUrl = ref(store.state.user.avatar);
     const users = ref<User[]>([]);
     const error_username = ref("");
 
@@ -115,34 +113,44 @@ export default defineComponent({
       await userApi
         .uploadFile({ data, withCredentials: true })
         .then(async (res: any) => {
-          // console.log(res);
           store.commit("updateAvatar", res.data.filename);
-          // store.commit("tagAvatar", Date.now()); // --> need a fixed img extension (chosen in bcknd)
           ret = true;
+          // console.log(res);
+          // store.commit("tagAvatar", Date.now()); // --> needs a fixed img extension (chosen in bcknd)
         })
         .catch(async err => {
-          error.value = err.response.data.message;
-          setTimeout(() => (error.value = ""), 2000);
+          error_avatar.value = err.response.data.message;
+          // setTimeout(() => (error_avatar.value = ""), 2000);
         });
       return ret;
     };
 
     const updateUser = async () => {
-      let updated = false;
+      let usernameUpdated = true;
+      let avatarUpdated = true;
       if (username.value) {
-        updated = await updateUsername();
+        usernameUpdated = await updateUsername();
         console.log("Update username to", username.value);
       } else {
         console.log("username is unchanged");
       }
       if (avatar.value) {
-        updated = await postAvatar();
+        avatarUpdated = await postAvatar();
         console.log("Update avatar to", avatar.value.name);
         console.log("Update avatar to", avatar.value);
       } else {
         console.log("avatar is unchanged");
       }
-      if (updated) {
+      if (usernameUpdated) {
+        username.value = "";
+        error_username.value = "";
+      }
+      if (avatarUpdated) {
+        avatar.value = null;
+        error_avatar.value = "";
+      }
+      if (usernameUpdated && avatarUpdated) {
+        closeModal();
         store.dispatch(
           "setMessage",
           "Your profile has been successfully updated"
@@ -169,7 +177,7 @@ export default defineComponent({
       avatarInput,
       avatarUrl,
       handleFile,
-      error,
+      error_avatar,
       error_username,
       user: computed(() => store.state.user)
     };
