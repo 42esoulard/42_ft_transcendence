@@ -17,7 +17,7 @@
         placeholder="000 000"
       />
       <div class="otp_submit">
-        <button class="button button--invite">Validate code</button>
+        <button class="button button--third">Validate code</button>
       </div>
     </form>
   </div>

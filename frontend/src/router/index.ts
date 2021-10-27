@@ -78,12 +78,13 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
-    path: '/profile',
+    path: '/profile/:username',
     name: 'UserProfile',
     component: UserProfile,
+    props: true,
     meta: {
       requiresAuth: true,
-    }
+    },
   },
   {
     path: '/pong',

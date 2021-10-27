@@ -67,7 +67,7 @@ export class AuthController {
     }
     const access_token = await this.authService.generateAccessToken(user);
     const refresh_token = await this.authService.generateRefreshToken(user.id);
-
+    user.refresh_token = refresh_token;
     res.cookie('tokens', { access_token: access_token, refresh_token }, {
       httpOnly: true,
       expires: new Date(Date.now() + 1000 * 86400),

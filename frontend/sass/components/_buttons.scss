@@ -9,21 +9,21 @@
   &:hover {
     @include button-hover;
   }
-  &--add {
-    background-color: $button-add-bg;
-    @include hover-modifier($button-add-bg);
+  &--primary {
+    background-color: $button-primary-bg;
+    @include hover-modifier($button-primary-bg);
   }
-  &--msg {
-    background-color: $button-msg-bg;
-    @include hover-modifier($button-msg-bg);
+  &--second {
+    background-color: $button-second-bg;
+    @include hover-modifier($button-second-bg);
   }
-  &--invite {
-    background-color: $button-invite-bg;
-    @include hover-modifier($button-invite-bg);
+  &--third {
+    background-color: $button-third-bg;
+    @include hover-modifier($button-third-bg);
   }
-  &--block {
-    background-color: $button-block-bg;
-    @include hover-modifier($button-block-bg);
+  &--grey {
+    background-color: $button-grey-bg;
+    @include hover-modifier($button-grey-bg);
   }
   &--log-out {
     background-color: rgba(0, 0, 0, 0.2);

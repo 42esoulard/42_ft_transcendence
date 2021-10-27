@@ -25,7 +25,7 @@ export default {
   <div class="main-div">
     <Header />
     <div class="router-view">
-      <router-view />
+      <router-view :key="$route.fullPath" />
     </div>
   </div>
   <transition name="toast">

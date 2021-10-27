@@ -57,8 +57,8 @@ export default defineComponent({
     const avatar = ref(); // should be typed !?
     const avatarInput = ref(); // should be typed !?
     const avatarUrl = ref(store.state.user.avatar); // should be typed !?
-    const error_username = ref("");
     const users = ref<User[]>([]);
+    const error_username = ref("");
 
     onMounted(() => {
       // Should not be on mounted as users can change everytime

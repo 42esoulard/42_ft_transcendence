@@ -12,7 +12,9 @@ export class GameUser {
 	@PrimaryColumn({ type: "number"})
 	userId: number
 
-	@ManyToOne(() => Users, user => user.games)
+	@ManyToOne(() => Users, user => user.games, {
+    eager: true,
+  })
 	@JoinColumn(({name: 'userId'}))
 	user: Users
 
@@ -23,5 +25,5 @@ export class GameUser {
 	@JoinColumn({ name: 'gameId'})
 	game: Game
 
- 
+
 }

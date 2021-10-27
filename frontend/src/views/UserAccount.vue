@@ -10,12 +10,12 @@
     <p>Profile created at: {{ formatedDate }}</p>
 
     <div v-if="!user.two_fa_enabled" class="ua-twofa">
-      <button class="button button--invite" @click="toggleModal(1)">
+      <button class="button button--third" @click="toggleModal(1)">
         Enable Two-Factor Authentication
       </button>
     </div>
     <div v-else class="ua-twofa">
-      <button class="button button--add" @click="deactivateTwoFactor">
+      <button class="button button--second" @click="deactivateTwoFactor">
         Disable Two-Factor Authentication
       </button>
     </div>
