@@ -9,7 +9,6 @@ import { JwtAuthGuard } from './guards/jwt.guard';
 import { JwtTwoFactorGuard } from './guards/jwtTwoFactor.guard';
 import { RefreshTwoFactorGuard } from './guards/refreshTwoFactor.guard';
 import { ApiCookieAuth, ApiOAuth2, ApiTags } from '@nestjs/swagger';
-import { timingSafeEqual } from 'crypto';
 
 @ApiTags('Auth')
 @Controller('auth')

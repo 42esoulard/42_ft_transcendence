@@ -8,6 +8,7 @@ export interface State {
   user: User | null,
   message: string,
   firstTimeConnect: boolean,
+  onlineUsers: User[];
 }
 
 // define injection key
@@ -21,6 +22,7 @@ export const store = createStore<State>({
     user: null,
     message: '',
     firstTimeConnect: false,
+    onlineUsers: [],
   },
   getters: {},
   mutations: {
@@ -30,6 +32,7 @@ export const store = createStore<State>({
         state.user.two_fa_enabled = payload;
       }
     },
+
     updateAvatar(state: State, payload: string) {
       if (state.user) {
         const tag = `?tag=${Date.now().toString()}`;
@@ -52,6 +55,12 @@ export const store = createStore<State>({
     setFirstTimeConnect(state: State, payload: boolean) {
       state.firstTimeConnect = payload;
     },
+
+    addOnlineUser(state: State, payload: User) {
+      state.onlineUsers.push(payload);
+    },
+
+
   },
   actions: {
     setMessage(context, payload: string) {

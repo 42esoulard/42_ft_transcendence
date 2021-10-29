@@ -61,7 +61,6 @@ export default defineComponent({
     const authApi = useAuthApi();
     const store = useStore();
 
-    const avatarUrl = ref(store.state.user.avatar);
     const showModal = ref(false);
     const showModal2 = ref(false);
     const username = ref("");

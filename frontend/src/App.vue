@@ -4,14 +4,16 @@ import Header from "./components/Header.vue";
 import Toast from "@/components/Toast.vue";
 import { io } from "socket.io-client";
 import { useStore } from "vuex";
-import { computed } from "vue";
+import { computed, reactive } from "vue";
 
 export const clientSocket = io("http://localhost:3000/pong");
+export const presenceSocket = io("http://localhost:3000/presence");
 
 export default {
   components: { SideBar, Header, Toast },
   setup() {
     const store = useStore();
+
     return {
       user: computed(() => store.state.user),
       message: computed(() => store.state.message)

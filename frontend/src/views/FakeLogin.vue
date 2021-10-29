@@ -19,19 +19,23 @@ import { defineComponent, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { User } from "@/types/User";
-import { useUserApi } from "@/plugins/api.plugin";
+import { useAuthApi, useUserApi } from "@/plugins/api.plugin";
+import { presenceSocket } from "@/App.vue";
+import { useStore } from "vuex";
 
 export default defineComponent({
   name: "Login",
   setup() {
     const router = useRouter();
 
-    const api = useUserApi();
+    const store = useStore();
+    const authApi = useAuthApi();
+    const userApi = useUserApi();
     const users = ref<User[]>([]);
     const selectedUser = ref<string>();
 
     onMounted(() => {
-      api
+      userApi
         .getUsers()
         .then((res: any) => {
           users.value = res.data;
@@ -46,17 +50,39 @@ export default defineComponent({
       console.log(selectedUser.value);
       await axios
         .post("http://localhost:3000/auth/fake-login", {
-          username: selectedUser.value,
+          username: selectedUser.value
         })
-        .then((res) => {
-          console.log(res);
+        .then(async res => {
+          await getProfile();
+          sendConnection();
           router.push("account");
         })
-        .catch((error) => console.log(error));
+        .catch(error => console.log(error));
     };
 
+    const getProfile = async () => {
+      await authApi
+        .profile({ withCredentials: true })
+        .then(response => {
+          store.state.user = response.data;
+        })
+        .catch((err: Error) => {
+          console.log("ERROR GET PROFILE");
+        });
+    };
+
+    const sendConnection = () => {
+      presenceSocket.emit("connection", store.state.user);
+      // console.log("NEWLY CONNECTED USER", store.state.user);
+    };
+
+    presenceSocket.on("newUser", (user: User) => {
+      store.commit("addOnlineUser", user);
+      console.log("onlineUsers", store.state.onlineUsers);
+    });
+
     return { Fakelogin, users, selectedUser };
-  },
+  }
 });
 </script>
 
@@ -100,6 +126,6 @@ button {
   text-align: center;
 }
 .submit:hover {
-  opacity: .8;
+  opacity: 0.8;
 }
 </style>
