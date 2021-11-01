@@ -79,7 +79,7 @@ export class ChannelsService {
             .map((userChannels) => userChannels.id)
             .includes(channels.id),
       );
-      
+
       return await channels;
     });
     return await channels;

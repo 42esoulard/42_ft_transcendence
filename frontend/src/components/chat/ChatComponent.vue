@@ -1,11 +1,12 @@
 <template>
   <h1>Chat Room</h1>
-  <div class="container">
+  <!-- <div class="container"> -->
       
-    <ChannelsList :joinedChannels="joinedChannels" :availableChannels="availableChannels" />
+    
     
     <!-- <div class="chatContainer"> -->
-    <div class="chatContainer">
+    <div class="chat">
+      <ChannelsList :joinedChannels="joinedChannels" :availableChannels="availableChannels" />
         <!-- <div>
           <p v-for="(user, i) in info" :key="i">
             {{ user.username }} {{ user.action }}
@@ -15,12 +16,15 @@
         <!-- <h2>{{ user.username }}</h2> -->
         <!-- <div class="chat"> -->
 
-          <div class="chatHeader">
             <!-- <h4> -->
-            <div v-if="activeChannel" class='channel-header'>
-              <div class="activeChannel">{{ activeChannel.channel.name }}</div>
-              <div v-if="activeChannel.is_owner" class="tag owner-tag" title="Channel Owner">owner</div>
-              <div v-if="activeChannel.is_admin" class="tag admin-tag" title="Channel Admin">admin</div>
+        <div class="chat-box">
+            <div v-if="activeChannel" class='chat-header'>
+              <div class="chat-header__channel-name" :title="activeChannel.channel.name">{{ activeChannel.channel.name }}</div>
+              <div>
+              <img v-if="activeChannel.is_owner" class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner" />
+              <img v-if="activeChannel.is_admin" class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" />
+              </div>
+              <span class="chat-header__online">{{ connections }} online</span>
             </div>
 
             <!-- leave chan: ['fas', 'sign-out-alt'] -->
@@ -31,37 +35,37 @@
 
               <!-- <button v-if="!isMemberOfActiveChannel()" class="joinBtn" @click="toggleChannelMembership()">Join Channel</button> -->
               <!-- <button v-else class="joinBtn" @click="toggleChannelMembership()">Leave Channel</button> -->
-              <span class="online">{{ connections }} online</span>
+              
             <!-- </h4> -->
+
+
+          <div class="chat-messages">
+            <div>
+              <ul class="chat-messages__list" id="messages">
+                <small v-if="typing">{{ typing }} is typing</small>
+                <li class="chat-messages__item" v-for="(message) in channelMessages" :key="message.id">
+                    <div class="chat-messages__author">{{ message.author.username }}</div>
+                    <div>: </div>
+                    <div class="chat-messages__content">{{ message.content }}</div>
+                </li>
+              </ul>
+            </div>
           </div>
 
-          <div class="messages-wrapper">
           <div>
-          <ul class="messages" id="messages">
-            <small v-if="typing" class="text-white">{{ typing }} is typing</small>
-            <li class="list-group-item" v-for="(message) in channelMessages" :key="message.id">
-              <span class="message">
-                <div class="message-author">{{ message.author.username }}</div>
-                <div>: </div>
-                <div class="message-content">{{ message.content }}</div>
-              </span>
-            </li>
-          </ul>
-          </div>
-          </div>
-
-          <div class="card-body">
             <form @submit.prevent="send">
-              <div class="form-group">
+              <div>
                 <input
-                  v-if="isMemberOfActiveChannel()"
+                  v-if="isMember"
                   type="text"
-                  class="form-control"
+                  class="chat-box__input"
                   v-model="newMessage"
                   placeholder="Enter message here"
                 />
                 <div v-else>
-                  <div class="form-control greyed-input">Join the channel to send messages</div>
+                  <button class="chat-box__input chat-box__input--greyed" @click="joinChannel(activeChannel.channel)">
+                    <div>Join the channel to send messages</div>
+                  </button>
                 </div>
               </div>
             </form>
@@ -70,11 +74,11 @@
         <!-- </div> -->
         
     </div>
+    </div>
       <div z-index="-1" v-if="newChannelForm" class="greyed-background" @click="newChannelForm = false"></div>
       <NewChannelForm z-index="-1" v-if="newChannelForm" :socket="socket" />
 
-    <!-- </div> -->
-  </div>
+  <!-- </div> -->
   
 </template>
 
@@ -114,12 +118,14 @@ export const ChatComponent = defineComponent({
     const newMessage = ref("");
     const messageId = ref(0);
 
-    const allMessages: {
-        [key: number]: Array<Message>,
-      } = {};
+    // const allMessages: {
+    //     [key: number]: Array<Message>,
+    //   } = {};
     const channelMessages = ref<Message[]>([]);
     
     const activeChannel = ref<ChannelMember>();
+    const isMember = ref(false);
+
     const getDefaultChannel = async () => {
       await api.getChannelById(1)
       .then(async (chan) => {
@@ -176,25 +182,36 @@ export const ChatComponent = defineComponent({
     const getMessagesUpdate = async (channel: Channel) => {
       await api.getChannelById(channel.id)
       .then((res) => {
-        if (activeChannel.value!.channel.id === channel.id) {
-          activeChannel.value!.channel = res.data
+        if (activeChannel.value!.channel && activeChannel.value!.channel.id === channel.id) {
+          console.log("bef bug")
+          activeChannel.value!.channel = res.data;
+          console.log("aft bug")
           channelMessages.value = res.data.messages;
         }
+        console.log("messages ok", activeChannel.value!.channel, channelMessages.value)
         return res;
       })
       
     }
 
-    const isMemberOfActiveChannel = async () => {
-      // await api.getChannelMember(1, 1) //REPLACE WITH GET CHANNEL ID, GET USER ID
-      // .then(() => {
+    // const isMemberOfActiveChannel = async () => {
+    //   // await api.getChannelMember(1, 1) //REPLACE WITH GET CHANNEL ID, GET USER ID
+    //   // .then(() => {
 
-      // })
-      return true;
-    }
+    //   // })
+    //   return true;
+    // }
 
     const toggleChannelForm = () => {
       newChannelForm.value = !newChannelForm.value;
+    }
+
+    const previewChannel = (channel: Channel) => {
+      activeChannel.value!.channel = channel;
+      activeChannel.value!.is_admin = false;
+      activeChannel.value!.is_owner = false;
+      isMember.value = false;
+      channelMessages.value = channel.messages;
     }
 
     const joinChannel = async (channel: Channel) => {
@@ -203,6 +220,7 @@ export const ChatComponent = defineComponent({
           console.log(res)
           updateChannelsList();
           activeChannel.value = res.data;
+          isMember.value = true;
           console.log("ACTIVECHANNEL", activeChannel)
           getMessagesUpdate(res.data.channel);
           return res;
@@ -218,9 +236,10 @@ export const ChatComponent = defineComponent({
     //   // FIND A CLEANER SOLUTION TO WAIT FOR DOM ELEM TO BE CREATED
     // }
 
-    const switchChannel = async (info: ChannelMember) => {
+    const switchChannel =  (info: ChannelMember) => {
         
       activeChannel.value = info;
+      isMember.value = true;
       console.log("in switchChannel", activeChannel)
 
       // selectActiveChannel();
@@ -343,10 +362,12 @@ export const ChatComponent = defineComponent({
       allChannels,
       activeChannel,
       switchChannel,
+      previewChannel,
       joinChannel,
       newChannelForm,
+      isMember,
       toggleChannelForm,
-      isMemberOfActiveChannel,
+      // isMemberOfActiveChannel,
     };
   },
 });
@@ -355,7 +376,7 @@ export default ChatComponent;
 </script>
 
 <style>
-.container {
+/* .container {
   display: flex;
   flex-direction: row;
   height: 600px;
@@ -366,24 +387,24 @@ export default ChatComponent;
   width: 80%;
   background-color: rgba(0, 0, 0, 0.733);
   padding-right: 15px;
-}
-.chatHeader {
+} */
+/* .chatHeader {
   padding: 10px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   margin-top: 38px;
-}
-.channel-header {
+} */
+/* .channel-header {
   display: flex;
   flex-direction: row;
-}
-.activeChannel {
+} */
+/* .activeChannel {
   font-size: 1.5em;
   color: white;
   display: inline;
-}
-.tag {
+} */
+/* .tag {
   border-style: solid;
   border-radius: 15%;
   padding-top: 5px;
@@ -394,55 +415,55 @@ export default ChatComponent;
 }
 .admin-tag {
   color: rgba(180, 230, 63, 0.801);
-}
+} */
 
-.message {
+/* .message {
   color: black;
   display: flex;
   flex-direction: row;
   align-items: center;
-}
-.message-author {
+} */
+/* .message-author {
   min-width: 5em;
-  /* display: inline-flex; */
-  /* overflow-x: scroll; */
+  //display: inline-flex;
+  //overflow-x: scroll;
   padding: 0;
   margin: 0;
   text-align: left;
-}
-.message-content {
+} */
+/* .message-content {
   overflow-wrap: anywhere;
   padding-left: 10px;
-}
-.messages-wrapper {
+} */
+/* .messages-wrapper {
   height: 70%;
   overflow-x:auto; 
   display:flex; 
   flex-direction:column-reverse;
   margin-left: -20px;
-}
+} */
 /* .messages {
   overflow-y: scroll;
 } */
-.selectChannel {
+/* .selectChannel {
   padding-top: 5px;
   border-radius: 10px;
   font-size: 20px;
-}
-.joinBtn, .createBtn {
+} */
+/* .joinBtn, .createBtn {
   font-size: 18px;
   margin-left:10px;
-}
-
+} */
+/* 
 .optionChannel.active {
   color:aliceblue;
   background: blue;  
-}
+} */
 
-.greyed-input {
+/* .greyed-input {
   background-color: gray;
   font-style: italic;
-}
+} */
 
 .greyed-background {
   background-color: rgba(138, 138, 138, 0.424);

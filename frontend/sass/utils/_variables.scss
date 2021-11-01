@@ -53,6 +53,25 @@ $profile-social-width-column: 50%;
 $profile-social-gap: 5px;
 $profile-social-margin: 1rem 0 0 0;
 
+//CHAT
+$chat-height: 600px;
+$chat-width: 70%;
+$chat-margin-left: 15%;
+$chat-bg: rgba(0, 0, 0, 50%);
+$cb-width: 100%;
+$cb-min-width: 200px;
+$cb-input-width: 95%;
+$cb-input-height: 2rem;
+$cb-input-padding: 20px;
+$cb-input-margin-left: 10px;
+$cb-input-color: black;
+$cb-input-bg: white;
+$cb-input-border: 1px solid grey;
+$cb-input-border-radius: 10px;
+$chat-greyed-input: rgba(114, 114, 114, 0.822);
+$chat-header-padding: 48px 10px 10px 10px;
+$chat-header-bg: rgba(240, 255, 255, 0.253);
+
 //STATS
 $stats-width: 100%;
 $stats-height: 100%;

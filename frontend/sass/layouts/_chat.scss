@@ -1,0 +1,178 @@
+.chat {
+  display: flex;
+  flex-direction: row;
+  height: $chat-height;
+  width: $chat-width;
+  margin-left: $chat-margin-left;
+  background-color: $chat-bg;
+}
+
+.chat-box {
+  width: $cb-width;
+  min-width: $cb-min-width;
+}
+
+.chat-box__input {
+  display: block;
+  width: $cb-input-width;
+  height: $cb-input-height;
+  padding: $cb-input-padding;
+  color: $cb-input-color;
+  background-color: $cb-input-bg;
+  border-radius: $cb-input-border-radius;
+  border: $cb-input-border;
+  margin-left: $cb-input-margin-left;
+  &--greyed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $chat-greyed-input;
+    &:hover {
+      background-color: $prim-color;
+      transition: 200ms;
+    }
+  }
+}
+
+// Info band at the top
+.chat-header {
+  width:100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: $chat-header-padding;
+  background-color:$chat-header-bg;
+}
+
+.chat-header__channel-name {
+  font-size: 1.5em;
+  color: white;
+  width: 60%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.chat-header__tag {
+  border-style: solid;
+  border-radius: 15%;
+  margin-bottom: 5px;
+  margin-left: 10px;
+  &--owner {
+  color: $second-color;
+  }
+  &--admin {
+  color: $third-color;
+  }
+}
+
+// .chat-header__online {
+
+// }
+
+.chat-messages {
+  height: 70%;
+  overflow-x:auto; 
+  display:flex; 
+  flex-direction:column-reverse;
+  margin-left: -20px;
+}
+// .chat-messages__list {
+
+// }
+.chat-messages__item {
+  overflow-y: scroll;
+  border-bottom: solid;
+  border-bottom-width: 1px;
+  border-color: grey;
+  display: flex;
+  padding: 10px;
+}
+.chat-messages__author {
+  min-width: 5em;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+
+}
+.chat-messages__content {
+  overflow-wrap: anywhere;
+  padding-left: 10px;
+}
+
+// Channels list on the left (or TBD: superimposed in tiny mode)
+.chat-channels {
+  padding-top:30px;
+  padding-bottom:30px;
+  background-color: rgba(12, 12, 12, 0.651);
+  color: gainsboro;
+  height: 100%;
+  width: 35%;
+  min-width: 170px;
+  overflow-x:auto;
+}
+
+.chat-channels__list {
+  list-style-type: none;
+  padding: 0;
+}
+.chat-channels__item {
+  width: 100%;
+  background-color:rgba(0, 0, 0, 0.609);
+  color: gainsboro;
+  border-style: none;
+  padding: 5px 10px;
+  text-align: left;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  &:hover, &:focus {
+    width: 100%;
+    background-color:rgba(218, 218, 218, 0.384);
+    color: rgb(0, 0, 0);
+    border-style: none;
+    transition: 150ms;
+  }
+}
+
+.chat-channels__name {
+  width: 70%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.chat-channels__tag {
+  margin-left: 0.2rem;
+  &--owner {
+    color: $second-color;
+  }
+  &--admin {
+    color: $third-color;
+  }
+}
+
+.chat-channels__create {
+  white-space: nowrap;
+  width: 100%;
+  padding: 20px;
+  background-color:rgba(0, 0, 0, 0.609);
+  color: gainsboro;
+  border-style:double;
+  &:hover {
+    width: 100%;
+    background-color:rgba(218, 218, 218, 0.384);
+    color: rgb(0, 0, 0);
+    transition: 150ms;
+  }
+}
+
+.chat-channels__title {
+  background-color:black;
+  padding: 20px;
+  white-space: nowrap;
+  text-align: center;
+  text-decoration-line:overline underline;  
+  /* font-size: 1.1em; */
+  font-weight: bold;
+}
