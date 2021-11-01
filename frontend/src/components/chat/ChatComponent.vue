@@ -381,95 +381,8 @@ export const ChatComponent = defineComponent({
 export default ChatComponent;
 </script>
 
-<style>
-/* .container {
-  display: flex;
-  flex-direction: row;
-  height: 600px;
-  margin-left: 100px;
-}
-.chatContainer {
-  height: 100%;
-  width: 80%;
-  background-color: rgba(0, 0, 0, 0.733);
-  padding-right: 15px;
-} */
-/* .chatHeader {
-  padding: 10px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin-top: 38px;
-} */
-/* .channel-header {
-  display: flex;
-  flex-direction: row;
-} */
-/* .activeChannel {
-  font-size: 1.5em;
-  color: white;
-  display: inline;
-} */
-/* .tag {
-  border-style: solid;
-  border-radius: 15%;
-  padding-top: 5px;
-  margin-left: 10px;
-}
-.owner-tag {
-  color: rgba(230, 218, 63, 0.89);
-}
-.admin-tag {
-  color: rgba(180, 230, 63, 0.801);
-} */
-
-/* .message {
-  color: black;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-} */
-/* .message-author {
-  min-width: 5em;
-  //display: inline-flex;
-  //overflow-x: scroll;
-  padding: 0;
-  margin: 0;
-  text-align: left;
-} */
-/* .message-content {
-  overflow-wrap: anywhere;
-  padding-left: 10px;
-} */
-/* .messages-wrapper {
-  height: 70%;
-  overflow-x:auto; 
-  display:flex; 
-  flex-direction:column-reverse;
-  margin-left: -20px;
-} */
-/* .messages {
-  overflow-y: scroll;
-} */
-/* .selectChannel {
-  padding-top: 5px;
-  border-radius: 10px;
-  font-size: 20px;
-} */
-/* .joinBtn, .createBtn {
-  font-size: 18px;
-  margin-left:10px;
-} */
-/* 
-.optionChannel.active {
-  color:aliceblue;
-  background: blue;  
-} */
-
-/* .greyed-input {
-  background-color: gray;
-  font-style: italic;
-} */
+<style lang="scss">
+  @import "../../../sass/main.scss";
 
 .greyed-background {
   background-color: rgba(138, 138, 138, 0.424);
@@ -479,7 +392,6 @@ export default ChatComponent;
   top:0;
   left:0;
 }
-
 
 </style>
 

@@ -165,8 +165,7 @@
 }
 
 .chat-channels__title {
-  background-color:black;
-  padding: 20px;
+  padding: $chans-title-padding;
   white-space: nowrap;
   text-align: center;
   text-decoration-line:overline underline;  
