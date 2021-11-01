@@ -8,8 +8,8 @@
           <button class='chat-channels__item' @click="switchChannel(cm)">
             <div class='chat-channels__name'># {{ cm.channel.name }}</div>
             <div>
-              <img v-if="cm.is_owner" class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner'"/>
-              <img v-if="cm.is_admin" class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin"/>
+              <span v-if="cm.is_owner"><img class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner'"/></span>
+              <span v-if="cm.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin"/></span>
             </div>
           </button>
         </li>

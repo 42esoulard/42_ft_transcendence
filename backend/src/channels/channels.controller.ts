@@ -75,7 +75,7 @@ export class ChannelsController {
     description: 'Invalid ID supplied',
   })
   async getChannelByName(@Param('name') name: string): Promise<Channel> {
-    const channel: Channel = await this.channelService.getChannelByName(name);
+    const channel: Channel = await this.channelService.getChannelByName(name)
     if (channel == undefined) {
       throw new NotFoundException('Channel not found');
     }

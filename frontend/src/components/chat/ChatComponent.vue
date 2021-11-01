@@ -21,8 +21,8 @@
             <div v-if="activeChannel" class='chat-header'>
               <div class="chat-header__channel-name" :title="activeChannel.channel.name">{{ activeChannel.channel.name }}</div>
               <div>
-              <img v-if="activeChannel.is_owner" class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner" />
-              <img v-if="activeChannel.is_admin" class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" />
+                <span v-if="activeChannel.is_owner"><img class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner" /></span>
+                <span v-if="activeChannel.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
               </div>
               <span class="chat-header__online">{{ connections }} online</span>
             </div>
@@ -63,7 +63,7 @@
                   placeholder="Enter message here"
                 />
                 <div v-else>
-                  <button class="chat-box__input chat-box__input--greyed" @click="joinChannel(activeChannel.channel)">
+                  <button v-if="activeChannel" class="chat-box__input chat-box__input--greyed" @click="joinChannel(activeChannel.channel)">
                     <div>Join the channel to send messages</div>
                   </button>
                 </div>
@@ -140,6 +140,7 @@ export const ChatComponent = defineComponent({
         //   return res;
         // })
       })
+      .catch((err) => console.log(err));
     }
     getDefaultChannel();
 
@@ -173,25 +174,28 @@ export const ChatComponent = defineComponent({
           availableChannels.value = res.data;
           console.log("avail", availableChannels.value);
         })
+        .catch((err) => console.log(err));
       })
       .catch((err) => { console.log("not found")})
     }
     updateChannelsList();
 
 
-    const getMessagesUpdate = async (channel: Channel) => {
-      await api.getChannelById(channel.id)
-      .then((res) => {
-        if (activeChannel.value!.channel && activeChannel.value!.channel.id === channel.id) {
-          console.log("bef bug")
-          activeChannel.value!.channel = res.data;
-          console.log("aft bug")
-          channelMessages.value = res.data.messages;
-        }
-        console.log("messages ok", activeChannel.value!.channel, channelMessages.value)
-        return res;
-      })
+    const getMessagesUpdate = async (channelId: number) => {
+      console.log("in get messages channel", channelId)
+      if (activeChannel.value!.channel && activeChannel.value!.channel.id === channelId) {
+        await api.getChannelById(channelId)
+        .then((res) => {
+            console.log("bef bug")
+            activeChannel.value!.channel = res.data;
+            console.log("aft bug")
+            channelMessages.value = res.data.messages;
       
+          console.log("messages ok", activeChannel.value, channelMessages.value)
+          return res;
+        })
+        .catch((err) => console.log(err));
+        }
     }
 
     // const isMemberOfActiveChannel = async () => {
@@ -222,9 +226,10 @@ export const ChatComponent = defineComponent({
           activeChannel.value = res.data;
           isMember.value = true;
           console.log("ACTIVECHANNEL", activeChannel)
-          getMessagesUpdate(res.data.channel);
+          getMessagesUpdate(res.data.channel.id);
           return res;
         })
+        .catch((err) => console.log(err));
     }
 
   
@@ -236,14 +241,14 @@ export const ChatComponent = defineComponent({
     //   // FIND A CLEANER SOLUTION TO WAIT FOR DOM ELEM TO BE CREATED
     // }
 
-    const switchChannel =  (info: ChannelMember) => {
+    const switchChannel =  (cm: ChannelMember) => {
         
-      activeChannel.value = info;
+      activeChannel.value = cm;
       isMember.value = true;
-      console.log("in switchChannel", activeChannel)
+      console.log("in switchChannel", cm.channel.id)
 
       // selectActiveChannel();
-      getMessagesUpdate(activeChannel.value.channel);
+      getMessagesUpdate(cm.channel.id);
     }
 
     window.onbeforeunload = () => {
@@ -269,6 +274,7 @@ export const ChatComponent = defineComponent({
       .then(() => {
         switchChannel(cm);
       })
+      .catch((err) => console.log(err));
     })
 
     socket.on('addChannel', (info: Channel) => {
@@ -333,7 +339,7 @@ export const ChatComponent = defineComponent({
           content: newContent.content,
       })
       .then(() => { 
-        getMessagesUpdate(newContent.channel); 
+        getMessagesUpdate(newContent.channel.id); 
         socket.emit("chat-message", newContent); 
       })
       .catch((err: any) => console.log(err.message));

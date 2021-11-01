@@ -71,17 +71,19 @@ export class ChannelsService {
 
   async getAvailableChannels(user_id: number): Promise<Channel[]> {
     let channels = await this.getChannels();
-    await this.getUserChannels(user_id).then(async (res) => {
-      const userChannels = res.map((cm) => cm.channel);
-      channels = channels.filter(
-        (channels) =>
-          !userChannels
-            .map((userChannels) => userChannels.id)
-            .includes(channels.id),
-      );
+    await this.getUserChannels(user_id)
+      .then(async (res) => {
+        const userChannels = res.map((cm) => cm.channel);
+        channels = channels.filter(
+          (channels) =>
+            !userChannels
+              .map((userChannels) => userChannels.id)
+              .includes(channels.id),
+        );
 
-      return await channels;
-    });
+        return await channels;
+      })
+      .catch((err) => console.log(err));
     return await channels;
   }
 
@@ -161,20 +163,23 @@ export class ChannelsService {
     await this.channelsRepository.save(newChannel);
 
     if (newChannel.type === 'public') {
-      await this.userService.getUsers().then((res) => {
-        res.forEach(async (user) => {
-          if (user.id === newChannel.owner.id) {
-            newChannelOwner = this.channelMemberService.createChannelMember(
-              newChannel,
-              user,
-              true,
-              true,
-            );
-          } else {
-            this.channelMemberService.createChannelMember(newChannel, user);
-          }
-        });
-      });
+      await this.userService
+        .getUsers()
+        .then((res) => {
+          res.forEach(async (user) => {
+            if (user.id === newChannel.owner.id) {
+              newChannelOwner = this.channelMemberService.createChannelMember(
+                newChannel,
+                user,
+                true,
+                true,
+              );
+            } else {
+              this.channelMemberService.createChannelMember(newChannel, user);
+            }
+          });
+        })
+        .catch((err) => console.log(err));
     } else {
       newChannelOwner = this.channelMemberService.createChannelMember(
         newChannel,

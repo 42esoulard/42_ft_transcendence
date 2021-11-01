@@ -68,7 +68,8 @@ export class ChannelMembersService {
           res.is_admin = !res.is_admin;
           return this.channelMembersRepository.save(res);
         }
-      });
+      })
+      .catch((err) => console.log(err));
   }
 
   // /**
