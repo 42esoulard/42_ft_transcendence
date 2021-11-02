@@ -142,13 +142,17 @@
   white-space: nowrap;
   overflow: hidden;
 }
+
 .chat-channels__tag {
-  margin-left: 0.2rem;
+  // margin-left: 0.2rem;
   &--owner {
     color: $second-color;
   }
   &--admin {
     color: $third-color;
+  }
+  &--locked {
+    color: $chat-font-light;
   }
 }
 

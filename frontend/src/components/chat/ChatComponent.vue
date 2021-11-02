@@ -1,6 +1,6 @@
 <template>
   <transition name="toast">
-    <Toast v-if="message" :message="message" />
+    <Toast v-if="toastMessage" :toastMessage="toastMessage" />
   </transition>
   <h1>Chat Room</h1>
     <div class="chat">
@@ -14,6 +14,10 @@
         <div class="chat-box">
             <div v-if="activeChannel" class='chat-header'>
               <div class="chat-header__channel-name" :title="activeChannel.channel.name">{{ activeChannel.channel.name }}</div>
+              <div>
+                <span v-if="activeChannel.channel.type === 'private'"><img class="fas fa-eye-slash chat-channels__tag chat-channels__tag--private" title="This community is private" /></span>
+                <span v-if="activeChannel.channel.password"><img class="fas fa-lock chat-channels__tag chat-channels__tag--locked" title="This channel is password-protected" /></span>
+              </div>
               <div>
                 <span v-if="activeChannel.is_owner"><img class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner" /></span>
                 <span v-if="activeChannel.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
@@ -47,7 +51,7 @@
                   placeholder="Enter message here"
                 />
                 <div v-else>
-                  <button v-if="activeChannel" class="chat-box__input chat-box__input--greyed" @click="joinChannel(activeChannel.channel)">
+                  <button v-if="activeChannel" class="chat-box__input chat-box__input--greyed" @click="applyForMembership(activeChannel.channel)">
                     <div>Join the channel to send messages</div>
                   </button>
                 </div>
@@ -62,9 +66,14 @@
         <div v-if="newChannelForm" class="backdrop"></div>
       </transition>
       <transition-group name="zoomin">
-        <Modal v-if="newChannelForm" @close="toggleChannelForm()">
+        <Modal v-if="newChannelForm" @close="toggleModal(0)">
           <template v-slot:new-channel-form>
-            <newChannelForm @close="toggleChannelForm()" />
+            <NewChannelForm @close="toggleModal(0)" />
+          </template>
+        </Modal>
+        <Modal v-if="passwordPrompt && activeChannel" @close="toggleModal(1)">
+          <template v-slot:locked-channel-form>
+            <LockedChannelForm :channel="activeChannel.channel" @close="toggleModal(1)" @join-channel="joinChannel" />
           </template>
         </Modal>
       </transition-group>
@@ -83,14 +92,18 @@ import { Channel } from "@/types/Channel"
 import { ChannelMember } from "@/types/ChannelMember"
 import Modal from "@/components/Modal.vue";
 import Toast from "@/components/Toast.vue";
-import NewChannelForm from "@/components/chat/NewChannelForm.vue"
-import ChannelsList from "@/components/chat/ChannelsList.vue"
+import NewChannelForm from "@/components/chat/NewChannelForm.vue";
+import LockedChannelForm from "@/components/chat/LockedChannelForm.vue";
+import ChannelsList from "@/components/chat/ChannelsList.vue";
 
+/*
+** socket is defined here to be able to import it from other chat related components
+*/ 
 export const socket = io("http://localhost:3000/chat");
 
 export const ChatComponent = defineComponent({
   name: "ChatComponent",
-  components: { NewChannelForm, ChannelsList, Modal, Toast },
+  components: { NewChannelForm, LockedChannelForm, ChannelsList, Modal, Toast },
   
   beforePageLeave() {
     this.socket.emit("leave", 'a user');
@@ -106,57 +119,38 @@ export const ChatComponent = defineComponent({
     const store = useStore();
     const user = computed(() => store.state.user);
     const firstTimeConnect = computed(() => store.state.firstTimeConnect);
-    
+    const connections = ref(1);
 
     const newMessage = ref("");
     const messageId = ref(0);
+    const typing = ref("");
+    const info = reactive<Info[]>([]);
 
-    // const allMessages: {
-    //     [key: number]: Array<Message>,
-    //   } = {};
     const channelMessages = ref<Message[]>([]);
-    
     const activeChannel = ref<ChannelMember>();
+    const joinedChannels = ref<ChannelMember[]>([]);
+    const availableChannels = ref<Channel[]>([]);
+    const newChannelForm = ref(false);
+    const passwordPrompt = ref(false);
+
     const isMember = ref(false);
 
+    /*
+    ** Default channel = id 1, "General". Automatically joined on connection, can't be left.
+    */
     const getDefaultChannel = async () => {
       await api.getChannelById(1)
       .then(async (chan) => {
         return await joinChannel(chan.data);
-        // await api.joinChannel(1, user.value.id)
-        // .then((res)=> {
-        //   console.log(res)
-        //   updateChannelsList();
-        //   activeChannel.value = res.data;
-        //   console.log("ACTIVECHANNEL", activeChannel)
-        //   getMessagesUpdate(res.data.channel);
-        //   return res;
-        // })
       })
       .catch((err) => console.log(err));
     }
     getDefaultChannel();
 
-    
-    let newChannelForm = ref(false);
-
-    const typing = ref("");
-    const info = reactive<Info[]>([]);
-
-    const connections = ref(1);
-
-    /* INITIALIZE FROM DB + UPDATE (on logout? on fixed interval? on fixed nb of messages?):
-        - channels:
-          1) public joined channels
-          2) private joined channels
-          3) public non joined channels (aka available channels)
-        - messages
+    /*
+    ** Called upon connection or when channels list update is triggered,
+    ** ie: a channel is created/deleted. Re-fetches all channel infos from API.
     */
-
-    let joinedChannels = ref<ChannelMember[]>([]);
-    let availableChannels = ref<Channel[]>([]);
-    const allChannels = ref<ChannelMember[]>([]);
-
     const updateChannelsList = async () => {
       await api.getUserChannels(user.value.id)
       .then(async (res) => {
@@ -173,45 +167,83 @@ export const ChatComponent = defineComponent({
     }
     updateChannelsList();
 
-
+    /*
+    ** When the currently viewed channel gets a new message (either sent or received).
+    ** All channel info is refetched from the API to get the whole message info and 
+    ** updated related infos (channel, user..)
+    */
     const getMessagesUpdate = async (channelId: number) => {
       console.log("in get messages channel", channelId)
       if (activeChannel.value!.channel && activeChannel.value!.channel.id === channelId) {
         await api.getChannelById(channelId)
         .then((res) => {
-            console.log("bef bug")
-            activeChannel.value!.channel = res.data;
-            console.log("aft bug")
-            channelMessages.value = res.data.messages;
-      
-          console.log("messages ok", activeChannel.value, channelMessages.value)
+          activeChannel.value!.channel = res.data;
+          channelMessages.value = res.data.messages;
           return res;
         })
         .catch((err) => console.log(err));
         }
     }
 
-    // const isMemberOfActiveChannel = async () => {
-    //   // await api.getChannelMember(1, 1) //REPLACE WITH GET CHANNEL ID, GET USER ID
-    //   // .then(() => {
+    const send = async () => {
+      
+      if (!newMessage.value)
+        return;
+      const newContent = {
+        content: newMessage.value,
+        author: user.value.username,
+        author_id: user.value.id,
+        channel: activeChannel.value!.channel,
+        channel_id: activeChannel.value!.channel.id,
+        id: messageId.value,
+        created_at: Date.now().toString(),
+      }
 
-    //   // })
-    //   return true;
-    // }
+      newMessage.value = "";
+      messageId.value++;
 
-    const toggleChannelForm = () => {
-      newChannelForm.value = !newChannelForm.value;
+      await api.saveMessage({
+          channel_id: newContent.channel_id,
+          author_id: newContent.author_id, 
+          content: newContent.content,
+      })
+      .then(() => { 
+        getMessagesUpdate(newContent.channel.id); 
+        socket.emit("chat-message", newContent); 
+      })
+      .catch((err: any) => console.log(err.message));
     }
 
+    /*
+    ** For non-joined channels display
+    */
     const previewChannel = (channel: Channel) => {
-      activeChannel.value!.channel = channel;
-      activeChannel.value!.is_admin = false;
-      activeChannel.value!.is_owner = false;
+      activeChannel.value = {
+        id: 0,
+        channel: channel,
+        is_admin: false,
+        is_owner: false,
+        member: user.value,
+      }
       isMember.value = false;
       channelMessages.value = channel.messages;
     }
 
+    const applyForMembership = async (channel: Channel) => {
+      if (channel.password) {
+        passwordPrompt.value = true;
+      } else {
+        joinChannel(channel);
+      }
+    }
+
+    socket.on("join-channel", (chan: Channel) => {
+      console.log("IN JOIN CHANNEL")
+      joinChannel(chan);
+    });
+
     const joinChannel = async (channel: Channel) => {
+
       await api.joinChannel(channel.id, user.value.id)
         .then((res)=> {
           console.log(res)
@@ -221,34 +253,29 @@ export const ChatComponent = defineComponent({
           console.log("ACTIVECHANNEL", activeChannel)
           getMessagesUpdate(res.data.channel.id);
           if (channel.id !== 1)
-            store.dispatch("setMessage", "You joined channel [" + channel.name + "]");
+            store.dispatch("setMessage", "You're now a member of channel [" + channel.name.substring(0, 15) + "]");
           return res;
         })
         .catch((err) => console.log(err));
     }
 
-  
-
-    // const selectActiveChannel = () => {
-    //   console.log("IN SELECT ACITVE CHAN", activeChannel)
-    //   const selectedChannel = document.getElementById(activeChannel.value!.channel.name)!;
-    //   selectedChannel.setAttribute("selected", "true");
-    //   // FIND A CLEANER SOLUTION TO WAIT FOR DOM ELEM TO BE CREATED
-    // }
-
-    const switchChannel =  (cm: ChannelMember) => {
-        
-      activeChannel.value = cm;
-      isMember.value = true;
-      console.log("in switchChannel", cm.channel.id)
-
-      // selectActiveChannel();
-      getMessagesUpdate(cm.channel.id);
+    const toggleModal = (idx: number) => {
+      switch(idx) {
+        case 0:
+          newChannelForm.value = !newChannelForm.value;
+          break;
+        case 1:
+          passwordPrompt.value = !passwordPrompt.value;
+          
+      }
     }
 
-    window.onbeforeunload = () => {
-      socket.emit("leave", user.value.username);
-    };
+    const switchChannel =  (cm: ChannelMember) => {
+      activeChannel.value = cm;
+      isMember.value = true;
+      console.log("in switchChannel", cm)
+      getMessagesUpdate(cm.channel.id);
+    }
 
     socket.on("chat-message", (data: any) => {
       console.log("RECEIVED CHAT MESSAGE, data:", data)
@@ -264,7 +291,7 @@ export const ChatComponent = defineComponent({
     });
 
     socket.on('createdChannel', async (cm: ChannelMember) => {
-      toggleChannelForm();
+      toggleModal(0);
       await updateChannelsList()
       .then(() => {
         switchChannel(cm);
@@ -311,38 +338,9 @@ export const ChatComponent = defineComponent({
         : socket.emit("stopTyping");
     });
 
-    const send = async () => {
-      
-      if (!newMessage.value)
-        return;
-      const newContent = {
-        content: newMessage.value,
-        author: user.value.username,
-        author_id: user.value.id,
-        channel: activeChannel.value!.channel,
-        channel_id: activeChannel.value!.channel.id,
-        id: messageId.value,
-        created_at: Date.now().toString(),
-      }
-
-      newMessage.value = "";
-      messageId.value++;
-
-      await api.saveMessage({
-          channel_id: newContent.channel_id,
-          author_id: newContent.author_id, 
-          content: newContent.content,
-      })
-      .then(() => { 
-        getMessagesUpdate(newContent.channel.id); 
-        socket.emit("chat-message", newContent); 
-      })
-      .catch((err: any) => console.log(err.message));
-    }
-
-    // const addUser = () => {
-    //   socket.emit("join", user.value.username);
-    // }
+    window.onbeforeunload = () => {
+      socket.emit("leave", user.value.username);
+    };
 
     return {
       socket,
@@ -353,7 +351,6 @@ export const ChatComponent = defineComponent({
       getMessagesUpdate,
       typing,
 
-      // addUser,
       user,
       info,
       connections,
@@ -363,13 +360,15 @@ export const ChatComponent = defineComponent({
       activeChannel,
       switchChannel,
       previewChannel,
+      applyForMembership,
       joinChannel,
-      toggleChannelForm,
-      newChannelForm,
       isMember,
-      // isMemberOfActiveChannel,
 
-      message: computed(() => store.state.message),
+      newChannelForm,
+      passwordPrompt,
+      toggleModal,
+
+      toastMessage: computed(() => store.state.message),
     };
   },
 });

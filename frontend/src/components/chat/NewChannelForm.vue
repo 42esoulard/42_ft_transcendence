@@ -2,7 +2,6 @@
   <!-- 
     - Name? [check it doesn't exist yet in db]
     - Type [radio buttons]: public? Private (newcomers must be invited by a member)?
-    password-protected (newcomers can join provided they know the room password)?
     - If password-protected: [check regex OK, check password match]
       1) please enter a password for the room (a-zA-Z0-9/*-+_):
       2) please re-enter the password:
@@ -26,9 +25,6 @@
         <label class='chat-create-channel__radio-container'  title='An invite-only channel is only accessible to members who have been invited to join by a channel member' id='Private (invite-only)'>
           <input type='radio' class='chat-create-channel__radio-unit' id='chanPrivate' name='unit' value='private' v-model="channelType">Private
         </label>
-        <!-- <label class='radioContainer'  title='A password-protected channel is accessible to any member who possesses the channel password set by the admin' id='Private (password-protected)'>
-          <input type='radio' class='radioUnit' id='chanPassword-protected' name='unit' value='password-protected' v-model="channelType">Private (password-protected)
-        </label> -->
       </div>
 
       <label class="chat-create-channel__subtitle" for='password'>Channel password (optional):</label>
@@ -43,7 +39,6 @@
 
 <script lang="ts">
 import { ref, defineComponent, computed, onMounted } from "vue";
-// import { Socket, io } from "socket.io-client"
 import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
 import { socket } from "./ChatComponent.vue"
 import { useStore } from 'vuex'
@@ -130,7 +125,6 @@ export default defineComponent({
         socket.emit('createChannel', res.data)
       })
       .catch((err) => console.log("Failed to create channel: ", err))
-
     }
 
     return {
@@ -143,7 +137,6 @@ export default defineComponent({
       checkPasswordConf,
       submitInputs,
       closeModal,
-
     }
   }
 });

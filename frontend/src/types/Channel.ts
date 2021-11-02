@@ -6,5 +6,6 @@ export interface Channel {
   name: string;
   type: string;
   messages: Message[];
+  password: string;
   channel_members: ChannelMember[];
 }

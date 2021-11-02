@@ -3,6 +3,7 @@
     <slot name="twofa"></slot>
     <slot name="update-user"></slot>
     <slot name="new-channel-form"></slot>
+    <slot name="locked-channel-form"></slot>
   </div>
 </template>
 

@@ -14,8 +14,6 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
-import { User } from 'src/users/interfaces/user.interface';
-import { UsersModule } from 'src/users/users.module';
 import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
 // import { UpdateChannelDto } from './dto/updateChannel.dto';
 
@@ -75,7 +73,7 @@ export class ChannelsController {
     description: 'Invalid ID supplied',
   })
   async getChannelByName(@Param('name') name: string): Promise<Channel> {
-    const channel: Channel = await this.channelService.getChannelByName(name)
+    const channel: Channel = await this.channelService.getChannelByName(name);
     if (channel == undefined) {
       throw new NotFoundException('Channel not found');
     }
@@ -100,10 +98,14 @@ export class ChannelsController {
     return await this.channelService.joinChannel(channel_id, user_id);
   }
 
-  // @Get('/joinallchannels/:user')
-  // async joinAllChannels(@Param('user') user_id: number): Promise<ChannelMember> {
-  //   return await this.channelService.joinAllChannels(user_id);
-  // }
+  @Get('/join-protected/:channel/:attempt')
+  async checkPasswordMatch(
+    @Param('channel') channel_id: number,
+    @Param('attempt') attempt: string,
+  ): Promise<boolean> {
+    console.log("in controller attempt", attempt)
+    return await this.channelService.checkPasswordMatch(channel_id, attempt);
+  }
 
   @Get('/user/:id')
   async getUserChannels(@Param('id') id: number): Promise<ChannelMember[]> {
@@ -129,17 +131,5 @@ export class ChannelsController {
     @Param('user') user_id: number,
   ) {
     await this.channelService.leaveChannel(channel_id, user_id);
-    // const channel = await this.getChannelById(channel_id);
-    // const user = await this.userService.getUserbyId(user_id);
-    // await this.channelService.leaveChannel(channel, user);
   }
-
-  // @Post()
-  // @ApiCreatedResponse({
-  // 	description: 'The channel has been successfully updated.',
-  // 	type: Channel,
-  //   })
-  // async updateChannel(@Body() updatedChannel : UpdateChannelDto) : Promise<Channel> {
-  // 	return await this.channelService.updateChannel(updatedChannel);
-  // }
 }

@@ -7,7 +7,7 @@ export class Channel {
   name: string;
   type: string;
   salt: string | null;
-  password: string | null;
+  password: string;
   // owner: User | null;
   messages: Message[];
   channel_members: ChannelMember[];
