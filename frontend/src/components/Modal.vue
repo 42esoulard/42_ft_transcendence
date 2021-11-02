@@ -2,6 +2,7 @@
   <div class="modal-container" @click.self="closeModal">
     <slot name="twofa"></slot>
     <slot name="update-user"></slot>
+    <slot name="new-channel-form"></slot>
   </div>
 </template>
 

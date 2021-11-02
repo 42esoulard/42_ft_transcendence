@@ -1,4 +1,6 @@
 .chat {
+  border-radius: $chat-border-radius;
+  font-family: $chat-main-font;
   display: flex;
   flex-direction: row;
   height: $chat-height;
@@ -169,6 +171,58 @@
   white-space: nowrap;
   text-align: center;
   text-decoration-line:overline underline;  
-  /* font-size: 1.1em; */
   font-weight: bold;
 }
+
+// New channel form (in modal)
+.chat-create-channel {
+  position: absolute;
+  background-color: $chat-bg-dark;
+  color:$chat-font-light;
+  width: $create-channel-width;
+  padding: $create-channel-padding;
+  left: $create-channel-position;
+  top: $create-channel-position;
+  margin-top: $create-channel-margin;
+  margin-left: $create-channel-margin;
+  border-radius: $create-channel-border-radius;
+  font-family: $chat-main-font;
+}
+
+.chat-create-channel__title {
+  border-radius: $create-channel-title-border-radius;
+  background-color: $chat-bg-dark;
+  padding: $create-channel-title-padding;
+  margin: $create-channel-title-margin;
+  width: $create-channel-title-width;
+  font-size: $create-channel-title-font-size;
+  white-space: nowrap;
+  text-align:center;  
+}
+
+.chat-create-channel__subtitle {
+  font-size: $create-channel-subtitle-font-size;
+  margin-top: $create-channel-subtitle-margin;
+  display: block;
+  align-self: left;
+}
+
+.chat-create-channel__form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chat-create-channel__radio-container {
+  align-self: left;
+  margin-right: $create-channel-radio-margin;
+}
+
+.chat-create-channel__input {
+  border-radius: $create-channel-input-radius;
+}
+
+// .chat-create-channel__radio-unit {
+
+// }
+

@@ -1,10 +1,8 @@
 <template>
+  <transition name="toast">
+    <Toast v-if="message" :message="message" />
+  </transition>
   <h1>Chat Room</h1>
-  <!-- <div class="container"> -->
-      
-    
-    
-    <!-- <div class="chatContainer"> -->
     <div class="chat">
       <ChannelsList :joinedChannels="joinedChannels" :availableChannels="availableChannels" />
         <!-- <div>
@@ -13,10 +11,6 @@
           </p>
         </div> -->
         
-        <!-- <h2>{{ user.username }}</h2> -->
-        <!-- <div class="chat"> -->
-
-            <!-- <h4> -->
         <div class="chat-box">
             <div v-if="activeChannel" class='chat-header'>
               <div class="chat-header__channel-name" :title="activeChannel.channel.name">{{ activeChannel.channel.name }}</div>
@@ -28,16 +22,6 @@
             </div>
 
             <!-- leave chan: ['fas', 'sign-out-alt'] -->
-              <!-- <select class="selectChannel">
-                <option v-for="(cm) in joinedChannels" :key="cm.channel.name" class="optionChannel" @click="switchChannel(cm)" :id="cm.channel.name" >{{ cm.channel.name }}</option>
-              </select> -->
-              <!-- <button class="createBtn" @click="newChannelForm = true">Create Channel</button> -->
-
-              <!-- <button v-if="!isMemberOfActiveChannel()" class="joinBtn" @click="toggleChannelMembership()">Join Channel</button> -->
-              <!-- <button v-else class="joinBtn" @click="toggleChannelMembership()">Leave Channel</button> -->
-              
-            <!-- </h4> -->
-
 
           <div class="chat-messages">
             <div>
@@ -69,37 +53,44 @@
                 </div>
               </div>
             </form>
-          </div>
-
-        <!-- </div> -->
-        
+          </div>        
+        </div>
     </div>
-    </div>
-      <div z-index="-1" v-if="newChannelForm" class="greyed-background" @click="newChannelForm = false"></div>
-      <NewChannelForm z-index="-1" v-if="newChannelForm" :socket="socket" />
 
-  <!-- </div> -->
-  
+    <teleport to="#modals">
+      <transition name="fade--error">
+        <div v-if="newChannelForm" class="backdrop"></div>
+      </transition>
+      <transition-group name="zoomin">
+        <Modal v-if="newChannelForm" @close="toggleChannelForm()">
+          <template v-slot:new-channel-form>
+            <newChannelForm @close="toggleChannelForm()" />
+          </template>
+        </Modal>
+      </transition-group>
+    </teleport>  
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, watch, computed } from "vue";
 import { io } from "socket.io-client";
+import { useStore } from 'vuex';
+import { defineComponent, reactive, ref, watch, computed } from "vue";
+import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
+import { useUserApi } from "@/plugins/api.plugin";
+import { Info } from "@/types/Info";
 import { Message } from "@/types/Message";
 import { Channel } from "@/types/Channel"
 import { ChannelMember } from "@/types/ChannelMember"
+import Modal from "@/components/Modal.vue";
+import Toast from "@/components/Toast.vue";
 import NewChannelForm from "@/components/chat/NewChannelForm.vue"
 import ChannelsList from "@/components/chat/ChannelsList.vue"
-import { Info } from "@/types/Info";
-import {  DefaultApi } from "@/../sdk/typescript-axios-client-generated";
-import { useStore } from 'vuex';
-import { useUserApi } from "@/plugins/api.plugin";
 
 export const socket = io("http://localhost:3000/chat");
 
 export const ChatComponent = defineComponent({
   name: "ChatComponent",
-  components: { NewChannelForm, ChannelsList },
+  components: { NewChannelForm, ChannelsList, Modal, Toast },
   
   beforePageLeave() {
     this.socket.emit("leave", 'a user');
@@ -112,8 +103,10 @@ export const ChatComponent = defineComponent({
 
     const api = new DefaultApi();
     const userApi = useUserApi();
-    const user = computed(() => useStore().state.user);
-    const firstTimeConnect = computed(() => useStore().state.firstTimeConnect);
+    const store = useStore();
+    const user = computed(() => store.state.user);
+    const firstTimeConnect = computed(() => store.state.firstTimeConnect);
+    
 
     const newMessage = ref("");
     const messageId = ref(0);
@@ -227,6 +220,8 @@ export const ChatComponent = defineComponent({
           isMember.value = true;
           console.log("ACTIVECHANNEL", activeChannel)
           getMessagesUpdate(res.data.channel.id);
+          if (channel.id !== 1)
+            store.dispatch("setMessage", "You joined channel [" + channel.name + "]");
           return res;
         })
         .catch((err) => console.log(err));
@@ -345,9 +340,9 @@ export const ChatComponent = defineComponent({
       .catch((err: any) => console.log(err.message));
     }
 
-    const addUser = () => {
-      socket.emit("join", user.value.username);
-    }
+    // const addUser = () => {
+    //   socket.emit("join", user.value.username);
+    // }
 
     return {
       socket,
@@ -358,22 +353,23 @@ export const ChatComponent = defineComponent({
       getMessagesUpdate,
       typing,
 
-      addUser,
+      // addUser,
       user,
       info,
       connections,
 
       joinedChannels,
       availableChannels,
-      allChannels,
       activeChannel,
       switchChannel,
       previewChannel,
       joinChannel,
+      toggleChannelForm,
       newChannelForm,
       isMember,
-      toggleChannelForm,
       // isMemberOfActiveChannel,
+
+      message: computed(() => store.state.message),
     };
   },
 });
@@ -383,15 +379,5 @@ export default ChatComponent;
 
 <style lang="scss">
   @import "../../../sass/main.scss";
-
-.greyed-background {
-  background-color: rgba(138, 138, 138, 0.424);
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top:0;
-  left:0;
-}
-
 </style>
 

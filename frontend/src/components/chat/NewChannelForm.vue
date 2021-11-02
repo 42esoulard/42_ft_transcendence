@@ -7,34 +7,36 @@
       1) please enter a password for the room (a-zA-Z0-9/*-+_):
       2) please re-enter the password:
   -->
-  <div class='formContainer'>
-    <form @submit.prevent='submitInputs()'>
-      <h2>New channel</h2>
+  <div class='chat-create-channel'>
+    <div @click="closeModal()" class="close-cross">
+      &times;
+    </div>
 
-      <label class="subtitle" for='name'>Channel name:*</label>
-      <input required type="text" name='name' id='chanName' placeholder='My Cool Channel' minlength="1" maxlength="200" v-model="channelName" @input="checkName()">
+    <form class="chat-create-channel__form" @submit.prevent='submitInputs()'>
+      <div class="chat-create-channel__title">Creating a new channel</div>
+
+      <label class="chat-create-channel__subtitle" for='name'>Channel name:*</label>
+      <input class="chat-create-channel__input" required type="text" name='name' id='chanName' placeholder='My Cool Channel' minlength="1" maxlength="200" v-model="channelName" @input="checkName()">
       
       <div class="channelAccessContainer">
-        <label class="subtitle">Channel access:*</label>
-        <label class='radioContainer'  title='A public channel is visible and accessible to any member' id='public'>
-          <input type='radio' class='radioUnit' id='chanPublic' name='unit' value='public' v-model="channelType">Public
+        <label class="chat-create-channel__subtitle">Channel access:*</label>
+        <label class='chat-create-channel__radio-container'  title='A public channel is visible and accessible to any user' id='public'>
+          <input type='radio' class='chat-create-channel__radio-unit' id='chanPublic' name='unit' value='public' v-model="channelType">Public
         </label>
-        <label class='radioContainer'  title='An invite-only channel is only accessible to members who have been invited to join by a channel member' id='Private (invite-only)'>
-          <input type='radio' class='radioUnit' id='chanPrivate' name='unit' value='private' v-model="channelType">Private (invite-only)
+        <label class='chat-create-channel__radio-container'  title='An invite-only channel is only accessible to members who have been invited to join by a channel member' id='Private (invite-only)'>
+          <input type='radio' class='chat-create-channel__radio-unit' id='chanPrivate' name='unit' value='private' v-model="channelType">Private
         </label>
-        <label class='radioContainer'  title='A password-protected channel is accessible to any member who possesses the channel password set by the admin' id='Private (password-protected)'>
+        <!-- <label class='radioContainer'  title='A password-protected channel is accessible to any member who possesses the channel password set by the admin' id='Private (password-protected)'>
           <input type='radio' class='radioUnit' id='chanPassword-protected' name='unit' value='password-protected' v-model="channelType">Private (password-protected)
-        </label>
+        </label> -->
       </div>
 
-      <div v-if="channelType === 'password-protected'">
-        <label for='password'>Channel password:*</label>
-        <input required type="text" name='password' id='password' placeholder="Password" minlength="8" maxlength="20" v-model="channelPassword" @input="checkPassword()">
-        <label for='passwordConfirmation'>Please confirm the channel password:*</label>
-        <input required type="text" name='passwordConfirmation' id='passwordConfirmation' placeholder="Password" v-model="channelPasswordConf" @input="checkPasswordConf()">
-      </div>
+      <label class="chat-create-channel__subtitle" for='password'>Channel password (optional):</label>
+      <input class="chat-create-channel__input" type="text" name='password' id='password' placeholder="Password (optionnal)" minlength="8" maxlength="20" v-model="channelPassword" @input="checkPassword()">
+      <label class="chat-create-channel__subtitle" for='passwordConfirmation'>Password confirmation:</label>
+      <input class="chat-create-channel__input" type="text" name='passwordConfirmation' id='passwordConfirmation' v-model="channelPasswordConf" @input="checkPasswordConf()">
 
-      <button type='submit'>Submit</button>
+      <button class="button button--create-chan" type='submit'>Submit</button>
     </form>
   </div>
 </template>
@@ -48,7 +50,7 @@ import { useStore } from 'vuex'
  
 export default defineComponent({
   name: 'NewChannelForm',
-  setup() {
+  setup(props, context) {
     const api = new DefaultApi();
 
     const channelName = ref('');
@@ -61,7 +63,9 @@ export default defineComponent({
     let validPassword = true;
     let validPasswordConf = true;
 
-    const errors: Array<string> = [];
+    const closeModal = () => {
+      context.emit("close");
+    };
 
     const checkName = () => {
       const nameInput =  <HTMLInputElement>document.querySelector('input[id=\'chanName\']')!;
@@ -107,12 +111,11 @@ export default defineComponent({
     const submitInputs = () => {
  
       checkName();
-      if (channelType.value === 'password-protected') {
-        checkPassword();
-        checkPasswordConf();
-        if (!validPassword || !validPasswordConf)
-          return;
-      }
+      checkPassword();
+      checkPasswordConf();
+      if (!validPassword || !validPasswordConf)
+        return;
+    
       if (!validName)
         return;
       console.log(channelName.value, channelType.value, channelPassword.value)
@@ -125,28 +128,9 @@ export default defineComponent({
       .then((res) => {
         console.log("in createChannel res", res)
         socket.emit('createChannel', res.data)
-        // console.log("AAA", res.data)
-        // console.log("BBB", res.data.ownerId)
-      //   api.saveChannelMember({
-      //     channelId: res.data.id,
-      //     userId: res.data.ownerId, // API MUST FETCH THE CURRENT USER ID
-      //     isAdmin: true
-      //   })
-      //   .then(() => {
-      //     socket.emit('createRoom', {
-      //     name: channelName.value,
-      //     // ownerId: api.getCurrentUserId
-      //     ownerId: 1, // API MUST FETCH THE PROPER USER ID
-      //     type: channelType.value,
-      //     password: channelPassword.value
-      // })
-      //   })
-      //   .catch((err) => console.log('Failed to join channel' + channelName.value + ':' + err));
-        // socket.emit('createRoom', channelName.value)
       })
       .catch((err) => console.log("Failed to create channel: ", err))
 
-      
     }
 
     return {
@@ -158,62 +142,13 @@ export default defineComponent({
       checkPassword,
       checkPasswordConf,
       submitInputs,
-      errors
+      closeModal,
 
     }
   }
 });
 </script>
 
-<style scoped>
-.formContainer {
-  position: absolute;
-  background-color: rgba(36, 36, 36, 0.897);
-  color:white;
-  width: 300px;
-  padding: 15px;
-  left: 50%;
-  top:50%;
-  margin-top: -150px;
-  margin-left: -150px;
-}
-form {
-  font-size: 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.radioContainer {
-  margin-left: 10px;
-  align-self: left;
-}
-label {
-  margin-top: 10px;
-  display: block;
-  align-self: left;
-}
-.subtitle {
-  font-size: 17px;
-}
-h2 {
-  background-color: rgba(122, 122, 122, 0.658);
-  padding: 5px;
-  width: 100%;
-}
-input#name {
-  width: 150px;
-  display: block;
-}
-.errorsContainer {
-  background-color: rgba(207, 11, 50, 0.705);
-  padding: 5px;
-  margin:5px;
-}
-.errors {
-  list-style: none;
-  padding: 0;
-}
-/* .error {
-
-} */
+<style lang="scss">
+  @import "../../../sass/main.scss";
 </style>

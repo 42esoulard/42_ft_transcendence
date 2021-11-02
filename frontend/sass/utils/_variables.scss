@@ -54,12 +54,14 @@ $profile-social-gap: 5px;
 $profile-social-margin: 1rem 0 0 0;
 
 //CHAT
+$chat-main-font: "Saira", Arial;
 $chat-font-light: white;
 $chat-font-dark: black;
-$chat-bg-light:rgba(240, 255, 255, 0.253);;
-$chat-bg-dark:rgba(0, 0, 0, 0.609);;
+$chat-bg-light:rgba(240, 255, 255, 0.253);
+$chat-bg-dark:rgba(0, 0, 0, 0.808);
 $chat-height: 600px;
 $chat-width: 70%;
+$chat-border-radius: 10px;
 $chat-margin-left: 15%;
 $chat-bg: rgba(0, 0, 0, 0.705);
 $chat-box-width: 100%;
@@ -103,6 +105,20 @@ $chans-createbtn-width: 100%;
 $chans-createbtn-padding: 20px;
 $chans-createbtn-bg: rgba(0, 0, 0, 0.609);
 $chans-title-padding: 20px;
+$create-channel-width: 300px;
+$create-channel-padding: 20px;
+$create-channel-position: 50%;
+$create-channel-margin: - ($create-channel-width * 0.5);
+$create-channel-border-radius: 15px;
+$create-channel-title-padding: 10px;
+$create-channel-title-margin: 10px;
+$create-channel-title-width: 85%;
+$create-channel-title-font-size: 1.2rem;
+$create-channel-title-border-radius: 15px;
+$create-channel-subtitle-font-size: 1.1rem;
+$create-channel-subtitle-margin: 10px;
+$create-channel-input-radius: 10px;
+$create-channel-radio-margin: 10px;
 
 //STATS
 $stats-width: 100%;
