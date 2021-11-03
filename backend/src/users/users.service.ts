@@ -50,7 +50,6 @@ export class UsersService {
    */
   async getUserbyId(id: number): Promise<Users> {
     const res = await this.usersRepository.findOne(id);
-    console.log('res', res);
     return res;
   }
 
@@ -66,14 +65,15 @@ export class UsersService {
   }
 
   /**
-	* Gets a user in database by its forty_two_login
-	*
-	*/
-	async getUserByLogin(login: string): Promise<User> | undefined {
-		const user = await this.usersRepository
-			.findOne({ where: { forty_two_login: login } });
-		return user;
-	}
+   * Gets a user in database by its forty_two_login
+   *
+   */
+  async getUserByLogin(login: string): Promise<User> | undefined {
+    const user = await this.usersRepository.findOne({
+      where: { forty_two_login: login },
+    });
+    return user;
+  }
 
   /**
    * Saves a new user into db after generating pw hash and salt

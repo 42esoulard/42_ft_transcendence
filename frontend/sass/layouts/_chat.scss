@@ -1,0 +1,230 @@
+.chat {
+  border-radius: $chat-border-radius;
+  font-family: $chat-main-font;
+  display: flex;
+  flex-direction: row;
+  height: $chat-height;
+  width: $chat-width;
+  margin-left: $chat-margin-left;
+  background-color: $chat-bg;
+}
+
+.chat-box {
+  width: $chat-box-width;
+  min-width: $chat-min-width;
+}
+
+.chat-box__input {
+  display: block;
+  width: $chat-input-width;
+  height: $chat-input-height;
+  padding: $chat-input-padding;
+  color: $chat-input-color;
+  background-color: $chat-input-bg;
+  border-radius: $chat-input-border-radius;
+  border: $chat-input-border;
+  margin-left: $chat-input-margin-left;
+  &--greyed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $chat-greyed-input;
+    &:hover {
+      background-color: $prim-color;
+      transition: 200ms;
+    }
+  }
+}
+
+// Info band at the top
+.chat-header {
+  width: $chat-header-width;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: $chat-header-padding;
+  background-color:$chat-header-bg;
+}
+
+.chat-header__channel-name {
+  font-size: $chat-header-font-size;
+  color: $chat-font-light;
+  width: $chat-header-name-width;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.chat-header__tag {
+  border-style: solid;
+  border-radius: $chat-header-border-radius;
+  margin: $chat-header-margin;
+  &--owner {
+  color: $second-color;
+  }
+  &--admin {
+  color: $third-color;
+  }
+}
+
+// .chat-header__online {
+
+// }
+
+.chat-messages {
+  height: $chat-msg-container-height;
+  overflow-x:auto; 
+  display:flex; 
+  flex-direction:column-reverse;
+  margin: $chat-msg-container-margin;
+}
+
+// .chat-messages__list {
+
+// }
+
+.chat-messages__item {
+  // overflow-y: scroll;
+  border-bottom: solid;
+  border-bottom-width: $chat-msg-border-width;
+  border-color: $chat-msg-border-color;
+  display: flex;
+  padding: $chat-msg-padding;
+}
+.chat-messages__author {
+  min-width: $chat-msg-author-width;
+  text-align: left;
+
+}
+.chat-messages__content {
+  overflow-wrap: anywhere;
+  padding-left: $chat-msg-content-padding;
+}
+
+// Channels list on the left (or TBD: superimposed in tiny mode)
+.chat-channels {
+  padding: $chans-padding;
+  background-color: $chans-bg;
+  color: $chat-font-light;
+  height: $chans-height;
+  width: $chans-width;
+  min-width: $chans-min-width;
+  overflow-x:hidden;
+}
+
+.chat-channels__list {
+  list-style-type: none;
+  padding: $chans-list-padding;
+}
+.chat-channels__item {
+  width: $chans-item-width;
+  background-color: $chans-item-bg;
+  color: $chat-font-light;
+  border-style: none;
+  padding: $chans-item-padding;
+  text-align: left;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  &:hover, &:focus {
+    background-color: $chans-item-hover-bg;
+    color: $chat-font-dark;
+    border-style: none;
+    transition: 150ms;
+  }
+}
+
+.chat-channels__name {
+  width: $chans-item-name-width;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.chat-channels__tag {
+  // margin-left: 0.2rem;
+  &--owner {
+    color: $second-color;
+  }
+  &--admin {
+    color: $third-color;
+  }
+  &--locked {
+    color: $chat-font-light;
+  }
+}
+
+.chat-channels__create {
+  white-space: nowrap;
+  width: $chans-createbtn-width;
+  padding: $chans-createbtn-padding;
+  background-color:$chans-createbtn-bg;
+  color: $chat-font-light;
+  border-style: double;
+  &:hover {
+    background-color:$chat-bg-light;
+    color: $chat-bg-dark;
+    transition: 150ms;
+  }
+}
+
+.chat-channels__title {
+  padding: $chans-title-padding;
+  white-space: nowrap;
+  text-align: center;
+  text-decoration-line:overline underline;  
+  font-weight: bold;
+}
+
+// New channel form (in modal)
+.chat-channel-form {
+  position: absolute;
+  background-color: $chat-bg-dark;
+  color:$chat-font-light;
+  width: $channel-form-width;
+  padding: $channel-form-padding;
+  left: $channel-form-position;
+  top: $channel-form-position;
+  margin-top: $channel-form-margin;
+  margin-left: $channel-form-margin;
+  border-radius: $channel-form-border-radius;
+  font-family: $chat-main-font;
+}
+
+.chat-channel-form__title {
+  border-radius: $channel-form-title-border-radius;
+  background-color: $chat-bg-dark;
+  padding: $channel-form-title-padding;
+  margin: $channel-form-title-margin;
+  width: $channel-form-title-width;
+  font-size: $channel-form-title-font-size;
+  text-align:center;  
+}
+
+.chat-channel-form__subtitle {
+  font-size: $channel-form-subtitle-font-size;
+  margin-top: $channel-form-subtitle-margin;
+  display: block;
+  text-align: center;
+}
+
+.chat-channel-form__form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chat-channel-form__radio-container {
+  margin-right: $channel-form-radio-margin;
+}
+
+.chat-channel-form__input {
+  border-radius: $channel-form-input-radius;
+  margin-bottom: 10px;
+}
+
+// .chat-channel-form__radio-unit {
+
+// }

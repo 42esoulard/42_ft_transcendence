@@ -1,9 +1,31 @@
-import { Controller, Get, Post, Put, Body, Param, NotFoundException, UseInterceptors, UploadedFile, Res, StreamableFile, UseGuards, BadRequestException, Req, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  Param,
+  NotFoundException,
+  UseInterceptors,
+  UploadedFile,
+  Res,
+  StreamableFile,
+  UseGuards,
+  BadRequestException,
+  Req,
+  HttpStatus,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
-import { ApiBadRequestResponse, ApiCookieAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiCookieAuth,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { saveImageToStorage, IsFileExtensionSafe, removeFile } from '../utils/files-upload.utils';
 import { handleAvatar } from '../utils/files-manipulation.utils';
@@ -16,21 +38,19 @@ import * as fs from "fs";
 @ApiTags('User')
 @Controller('users')
 export class UsersController {
-	constructor(private readonly userService: UsersService) { }
+  constructor(private readonly userService: UsersService) {}
 
-	/**
-	* Lists all users in database.
-	*/
-	@Get()
-	async getUsers(): Promise<User[]> {
-		const users: User[] = await this.userService.getUsers()
-		if (users == undefined) {
-			throw new NotFoundException('No users in database');
-		}
-		return users;
-	}
-
-
+  /**
+   * Lists all users in database.
+   */
+  @Get()
+  async getUsers(): Promise<User[]> {
+    const users: User[] = await this.userService.getUsers();
+    if (users == undefined) {
+      throw new NotFoundException('No users in database');
+    }
+    return users;
+  }
 
 
 	/**
@@ -55,17 +75,17 @@ export class UsersController {
 		return user;
 	}
 
-	/*
-	* Returns a user and its 'channels' (joined channels) property
-	*/
-	@Get('/channels/:id')
-	async getUserChannels(@Param('id') id: number): Promise<User> {
-		const user: User = await this.userService.getUserChannels(id)
-		if (user == undefined) {
-			throw new NotFoundException('User not found');
-		}
-		return user;
-	}
+  /*
+   * Returns a user and its 'channels' (joined channels) property
+   */
+  // @Get('/channels/:id')
+  // async getUserChannels(@Param('id') id: number): Promise<User> {
+  // 	const user: User = await this.userService.getUserChannels(id)
+  // 	if (user == undefined) {
+  // 		throw new NotFoundException('User not found');
+  // 	}
+  // 	return user;
+  // }
 
 	@Get('/user-games/:id')
 	async getUserGames(@Param('id') id: number): Promise<User> {
@@ -129,21 +149,21 @@ export class UsersController {
 		return user;
 	}
 
-	/**
-	* Save a new user to database from the POST body
-	*/
-	@Post()
-	async saveUser(@Body() newUser: CreateUserDto): Promise<User> {
-		return await this.userService.saveUser(newUser);
-	}
+  /**
+   * Save a new user to database from the POST body
+   */
+  @Post()
+  async saveUser(@Body() newUser: CreateUserDto): Promise<User> {
+    return await this.userService.saveUser(newUser);
+  }
 
-	/**
-	* Update user from the POST body
-	*/
-	@Post('update-user')
-	async updateUser(@Body() updatedUser: UpdateUserDto): Promise<User> {
-		return await this.userService.updateUser(updatedUser);
-	}
+  /**
+   * Update user from the POST body
+   */
+  @Post('update-user')
+  async updateUser(@Body() updatedUser: UpdateUserDto): Promise<User> {
+    return await this.userService.updateUser(updatedUser);
+  }
 
 	/**
 	 * Recieve user picture from frontend
@@ -214,12 +234,12 @@ export class UsersController {
 		return new StreamableFile(file);
 	}
 
-	// @Post()
-	// @ApiCreatedResponse({
-	// 	description: 'The user has been successfully updated.',
-	// 	type: User,
-	//   })
-	// async updateUser(@Body() updatedUser : UpdateUserDto) : Promise<User> {
-	// 	return await this.userService.updateUser(updatedUser);
-	// }
+  // @Post()
+  // @ApiCreatedResponse({
+  // 	description: 'The user has been successfully updated.',
+  // 	type: User,
+  //   })
+  // async updateUser(@Body() updatedUser : UpdateUserDto) : Promise<User> {
+  // 	return await this.userService.updateUser(updatedUser);
+  // }
 }
