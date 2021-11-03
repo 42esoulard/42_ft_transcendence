@@ -1,6 +1,6 @@
 <template>
   <transition name="toast">
-    <Toast v-if="toastMessage" :toastMessage="toastMessage" />
+    <Toast v-if="toastMessage" :message="toastMessage" />
   </transition>
   <h1>Chat Room</h1>
     <div class="chat">
@@ -63,7 +63,7 @@
 
     <teleport to="#modals">
       <transition name="fade--error">
-        <div v-if="newChannelForm" class="backdrop"></div>
+        <div v-if="newChannelForm || passwordPrompt" class="backdrop"></div>
       </transition>
       <transition-group name="zoomin">
         <Modal v-if="newChannelForm" @close="toggleModal(0)">

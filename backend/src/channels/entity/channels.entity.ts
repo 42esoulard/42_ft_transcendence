@@ -26,7 +26,7 @@ export class Channels {
   @Column({ nullable: true })
   salt: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   password: string;
 
   @ManyToOne(() => Users, { onDelete: 'SET NULL' })

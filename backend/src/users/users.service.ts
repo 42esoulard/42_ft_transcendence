@@ -27,9 +27,7 @@ export class UsersService {
    * nb: findOne(id) is a function from the typeORM library
    */
   async getUserbyId(id: number): Promise<Users> {
-    console.log('in getuser byid', id);
     const res = await this.usersRepository.findOne(id);
-    console.log('res', res);
     return res;
   }
 

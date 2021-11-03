@@ -103,7 +103,10 @@ export class ChannelsController {
     @Param('channel') channel_id: number,
     @Param('attempt') attempt: string,
   ): Promise<boolean> {
-    console.log("in controller attempt", attempt)
+    console.log('in controller attempt', attempt);
+    console.log(
+      await this.channelService.checkPasswordMatch(channel_id, attempt),
+    );
     return await this.channelService.checkPasswordMatch(channel_id, attempt);
   }
 

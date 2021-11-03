@@ -86,7 +86,7 @@
 // }
 
 .chat-messages__item {
-  overflow-y: scroll;
+  // overflow-y: scroll;
   border-bottom: solid;
   border-bottom-width: $chat-msg-border-width;
   border-color: $chat-msg-border-color;
@@ -111,7 +111,7 @@
   height: $chans-height;
   width: $chans-width;
   min-width: $chans-min-width;
-  overflow-x:auto;
+  overflow-x:hidden;
 }
 
 .chat-channels__list {
@@ -179,54 +179,52 @@
 }
 
 // New channel form (in modal)
-.chat-create-channel {
+.chat-channel-form {
   position: absolute;
   background-color: $chat-bg-dark;
   color:$chat-font-light;
-  width: $create-channel-width;
-  padding: $create-channel-padding;
-  left: $create-channel-position;
-  top: $create-channel-position;
-  margin-top: $create-channel-margin;
-  margin-left: $create-channel-margin;
-  border-radius: $create-channel-border-radius;
+  width: $channel-form-width;
+  padding: $channel-form-padding;
+  left: $channel-form-position;
+  top: $channel-form-position;
+  margin-top: $channel-form-margin;
+  margin-left: $channel-form-margin;
+  border-radius: $channel-form-border-radius;
   font-family: $chat-main-font;
 }
 
-.chat-create-channel__title {
-  border-radius: $create-channel-title-border-radius;
+.chat-channel-form__title {
+  border-radius: $channel-form-title-border-radius;
   background-color: $chat-bg-dark;
-  padding: $create-channel-title-padding;
-  margin: $create-channel-title-margin;
-  width: $create-channel-title-width;
-  font-size: $create-channel-title-font-size;
-  white-space: nowrap;
+  padding: $channel-form-title-padding;
+  margin: $channel-form-title-margin;
+  width: $channel-form-title-width;
+  font-size: $channel-form-title-font-size;
   text-align:center;  
 }
 
-.chat-create-channel__subtitle {
-  font-size: $create-channel-subtitle-font-size;
-  margin-top: $create-channel-subtitle-margin;
+.chat-channel-form__subtitle {
+  font-size: $channel-form-subtitle-font-size;
+  margin-top: $channel-form-subtitle-margin;
   display: block;
-  align-self: left;
+  text-align: center;
 }
 
-.chat-create-channel__form {
+.chat-channel-form__form {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.chat-create-channel__radio-container {
-  align-self: left;
-  margin-right: $create-channel-radio-margin;
+.chat-channel-form__radio-container {
+  margin-right: $channel-form-radio-margin;
 }
 
-.chat-create-channel__input {
-  border-radius: $create-channel-input-radius;
+.chat-channel-form__input {
+  border-radius: $channel-form-input-radius;
+  margin-bottom: 10px;
 }
 
-// .chat-create-channel__radio-unit {
+// .chat-channel-form__radio-unit {
 
 // }
-

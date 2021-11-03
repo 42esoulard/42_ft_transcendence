@@ -101,15 +101,9 @@ export class ChannelsService {
     attempt: string,
   ): Promise<boolean> {
     const channel: Channels = await this.getChannelById(channel_id);
-    console.log(attempt)
-    await bcrypt
-      .compare(attempt, channel.password)
-      .then((res) => {
-        console.log("bcrypt compare returns ", attempt, res, channel.password);
-        return res;
-      })
-      .catch((err) => console.log(err));
-    return false;
+    console.log(attempt);
+    const ret = await bcrypt.compare(attempt, channel.password);
+    return await ret;
   }
 
   async joinChannel(
