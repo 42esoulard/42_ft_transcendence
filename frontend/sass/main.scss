@@ -3,6 +3,7 @@
 @import "./utils/mixins";
 @import "./utils/functions";
 @import "./components/buttons";
+@import "./components/links";
 @import "./base/transitions";
 @import "./base/app";
 @import "./layouts/header";
@@ -12,6 +13,7 @@
 @import "./layouts/otpForm";
 @import "./layouts/errors";
 @import "./layouts/account";
+@import "./layouts/menu";
 @import "./components/toasts";
 @import "./components/modal";
 @import "./layouts/editUser";

@@ -43,6 +43,7 @@ import { useUserApi } from "@/plugins/api.plugin";
 import { User } from "@/types/User";
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "EditUser",
@@ -57,6 +58,7 @@ export default defineComponent({
     const avatarUrl = ref(store.state.user.avatar);
     const users = ref<User[]>([]);
     const error_username = ref("");
+    const router = useRouter();
 
     onMounted(() => {
       // Should not be on mounted as users can change everytime
@@ -151,10 +153,14 @@ export default defineComponent({
       }
       if (usernameUpdated && avatarUpdated) {
         closeModal();
+        if (usernameUpdated)
+          router.push({ path: `/profile/${store.state.user.username}` })
         store.dispatch(
           "setMessage",
           "Your profile has been successfully updated"
         );
+
+
       }
     };
 

@@ -3,7 +3,7 @@
     <div class="profile-left">
       <ProfileLeft :user="user"/>
     </div>
-    <div class="profile-main">
+    <div class="profile-right">
       <Stats :user="user"/>
     </div>
   </div>

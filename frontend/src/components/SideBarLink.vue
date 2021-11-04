@@ -1,4 +1,5 @@
 <template>
+
     <router-link :to="to" class="sidebar-link" :class="{ active: isActive }">
       <i class="sidebar-link__icon" :class="icon" />
       <slot />

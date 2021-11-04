@@ -23,10 +23,14 @@
   color: $header-text-color;
   font-size: $header-font-size;
   font-family: $header-font;
+  padding-left: $sidebar-width;
+  @media (max-width: 950px){
+    padding-left: 0;
+  }
  }
 
  .header-bloc {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: $header-bloc-bg;
   padding: 5px 10px;
   border-radius: 25px;
   margin: $user-bloc-margin;
@@ -52,6 +56,12 @@
   font-family: $user-bloc-name-font;
   font-size: $user-bloc-name-size;
   color: $user-bloc-name-color;
+  @media (max-width: 1200px){
+    font-size: 1rem;
+  }
+  @media (max-width: 950px){
+    font-size: 0.7rem;
+  }
  }
 
  .user-bloc__avatar {

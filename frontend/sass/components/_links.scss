@@ -1,0 +1,10 @@
+.link {
+  color: $link-color;
+  &--neutral {
+    text-decoration: none;
+    &:hover {
+      text-decoration: none;
+      color: $link-neutral-hover;
+    }
+  }
+}

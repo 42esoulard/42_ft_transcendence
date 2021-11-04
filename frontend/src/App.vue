@@ -23,11 +23,13 @@ export default {
 </script>
 
 <template>
-  <SideBar />
+  <Header />
   <div class="main-div">
-    <Header />
+    <SideBar />
     <div class="router-view">
-      <router-view :key="$route.fullPath" />
+      <transition name="fade--log">
+        <router-view :key="$route.fullPath" />
+      </transition>
     </div>
   </div>
   <transition name="toast">
