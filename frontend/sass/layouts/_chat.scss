@@ -34,6 +34,12 @@
       transition: 200ms;
     }
   }
+  &--blued {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $prim-color;
+  }
 }
 
 // Info band at the top
@@ -84,6 +90,30 @@
 // .chat-messages__list {
 
 // }
+
+.chat-channels__locked-msg {
+  height: $chat-msg-container-height;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.chat-channels__lock-img {
+  cursor: pointer;
+  &--unlocked {
+    color:$prim-color;
+    animation: fadein ease-out 200ms;
+  }
+  @keyframes fadein {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fadeout {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+}
 
 .chat-messages__item {
   // overflow-y: scroll;

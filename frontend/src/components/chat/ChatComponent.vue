@@ -27,10 +27,10 @@
 
             <!-- leave chan: ['fas', 'sign-out-alt'] -->
 
-          <div class="chat-messages">
+          <div v-if="isMember || (activeChannel && !activeChannel.channel.password)" class="chat-messages">
             <div>
               <ul class="chat-messages__list" id="messages">
-                <small v-if="typing">{{ typing }} is typing</small>
+                <!-- <small v-if="typing">{{ typing }} is typing</small> -->
                 <li class="chat-messages__item" v-for="(message) in channelMessages" :key="message.id">
                     <div class="chat-messages__author">{{ message.author.username }}</div>
                     <div>: </div>
@@ -39,6 +39,13 @@
               </ul>
             </div>
           </div>
+          <div v-if="!isMember && activeChannel && activeChannel.channel.password" class="chat-channels__locked-msg">
+            <div @mouseover="hoveringLock = true" @mouseout="hoveringLock = false">
+              <span v-if="!hoveringLock"><img class="fa fa-lock fa-10x chat-channels__lock-img" title="This channel is password-protected" /></span>
+              <span v-else @click="applyForMembership(activeChannel.channel)"><img class="fa fa-unlock fa-10x chat-channels__lock-img chat-channels__lock-img--unlocked" title="This channel is password-protected" /></span>
+            </div>
+          </div>
+          
 
           <div>
             <form @submit.prevent="send">
@@ -50,10 +57,18 @@
                   v-model="newMessage"
                   placeholder="Enter message here"
                 />
-                <div v-else>
+                <div v-else @mouseover="hoveringLock = true" @mouseout="hoveringLock = false">
+                  <div v-if="hoveringLock">
+                  <button v-if="activeChannel" class="chat-box__input chat-box__input--blued" @click="applyForMembership(activeChannel.channel)">
+                    <div>Join the channel to send messages</div>
+                  </button>
+                  </div>
+                  <div v-else>
                   <button v-if="activeChannel" class="chat-box__input chat-box__input--greyed" @click="applyForMembership(activeChannel.channel)">
                     <div>Join the channel to send messages</div>
                   </button>
+                  </div>
+
                 </div>
               </div>
             </form>
@@ -111,7 +126,11 @@ export const ChatComponent = defineComponent({
   beforeRouteLeave() {
     this.socket.emit("leave", 'a user');
   },
-
+  data() {
+    return {
+      hoveringLock: false,
+    }
+  },
   setup() {
 
     const api = new DefaultApi();
@@ -179,6 +198,7 @@ export const ChatComponent = defineComponent({
         .then((res) => {
           activeChannel.value!.channel = res.data;
           channelMessages.value = res.data.messages;
+          console.log("in get messages:", channelMessages.value);
           return res;
         })
         .catch((err) => console.log(err));
@@ -191,10 +211,8 @@ export const ChatComponent = defineComponent({
         return;
       const newContent = {
         content: newMessage.value,
-        author: user.value.username,
-        author_id: user.value.id,
+        author: user.value,
         channel: activeChannel.value!.channel,
-        channel_id: activeChannel.value!.channel.id,
         id: messageId.value,
         created_at: Date.now().toString(),
       }
@@ -203,8 +221,8 @@ export const ChatComponent = defineComponent({
       messageId.value++;
 
       await api.saveMessage({
-          channel_id: newContent.channel_id,
-          author_id: newContent.author_id, 
+          channel_id: newContent.channel.id,
+          author_id: newContent.author.id, 
           content: newContent.content,
       })
       .then(() => { 
@@ -279,7 +297,11 @@ export const ChatComponent = defineComponent({
 
     socket.on("chat-message", (data: any) => {
       console.log("RECEIVED CHAT MESSAGE, data:", data)
-      getMessagesUpdate(data.channel);
+      if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
+        channelMessages.value.push(data);
+        console.log("in get messages:", channelMessages.value);
+    }
+      // getMessagesUpdate(data.channel);
     });
 
     socket.on("typing", (user: string) => {
