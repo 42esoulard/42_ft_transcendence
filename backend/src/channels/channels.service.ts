@@ -78,6 +78,7 @@ export class ChannelsService {
               .map((userChannels) => userChannels.id)
               .includes(channels.id),
         );
+        channels = channels.filter((channels) => channels.type === 'public');
 
         return await channels;
       })
