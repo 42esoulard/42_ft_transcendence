@@ -32,10 +32,26 @@
               <ul class="chat-messages__list" id="messages">
                 <!-- <small v-if="typing">{{ typing }} is typing</small> -->
                 <li class="chat-messages__item" v-for="(message) in channelMessages" :key="message.id">
-                    <div class="chat-messages__author">{{ message.author.username }}</div>
+                    <div class="chat-messages__author-container">
+                      <div class='chat-messages__author'>{{ message.author.username }}</div>
+                      <div class="chat-user__card">
+                          <!-- <div class="chat-user__username"> {{ message.author.username }} </div>
+                          <div class="chat-user__login"> {{ message.author.forty_two_login }} </div>
+                          <img class="chat-user__avatar" :src="message.author.avatar"> -->
+                          <button class="button" title="Profile" >
+                            <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: message.author.username} }">
+                            <i class="fas fa-user-circle" /></router-link>
+                          </button>
+                          <button class="button link link--neutral" title="DM" @click="directMessage(message.author)"><i class="fas fa-envelope" /></button>
+                          <button class="button" title="Challenge"><i class="fas fa-table-tennis" /></button>
+                          <button class="button" title="Block"><i class="fas fa-ban" /></button>
+                          <button v-if="activeChannel && activeChannel.is_admin" class="button" title="Admin Actions"><i class="fas fa-cog" /></button>
+                      </div>
+                    </div>
                     <div>: </div>
                     <div class="chat-messages__content">{{ message.content }}</div>
                 </li>
+                
               </ul>
             </div>
           </div>
@@ -99,7 +115,7 @@
 import { io } from "socket.io-client";
 import { useStore } from 'vuex';
 import { defineComponent, reactive, ref, watch, computed } from "vue";
-import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
+import { DefaultApi, User } from "@/../sdk/typescript-axios-client-generated";
 import { useUserApi } from "@/plugins/api.plugin";
 import { Info } from "@/types/Info";
 import { Message } from "@/types/Message";
@@ -125,11 +141,6 @@ export const ChatComponent = defineComponent({
   },
   beforeRouteLeave() {
     this.socket.emit("leave", 'a user');
-  },
-  data() {
-    return {
-      hoveringLock: false,
-    }
   },
   setup() {
 
@@ -277,6 +288,24 @@ export const ChatComponent = defineComponent({
         .catch((err) => console.log(err));
     }
 
+    // const sendInvite = (channel: Channel, recipient: User) => {
+
+    // }
+
+    // const directMessage = (recipient: User) => {
+    //   const newChannel = api.saveChannel({
+    //     name: user.value.login + ' to ' + recipient.forty_two_login,
+    //     owner_id: user.value.id, 
+    //     type: 'private',
+    //     password: '',
+    //   })
+    //   .then((res) => {
+    //     console.log("in createChannel res", res)
+    //     socket.emit('createChannel', res.data)
+    //   })
+    //   .catch((err) => console.log("Failed to create channel: ", err))
+    // }
+
     const toggleModal = (idx: number) => {
       switch(idx) {
         case 0:
@@ -391,6 +420,8 @@ export const ChatComponent = defineComponent({
       toggleModal,
 
       toastMessage: computed(() => store.state.message),
+      hoveringLock: ref(false),
+      userInfo: ref(false),
     };
   },
 });

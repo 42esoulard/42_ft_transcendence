@@ -81,7 +81,7 @@
 
 .chat-messages {
   height: $chat-msg-container-height;
-  overflow-x:auto; 
+  overflow-x:hidden; 
   display:flex; 
   flex-direction:column-reverse;
   margin: $chat-msg-container-margin;
@@ -255,6 +255,30 @@
   margin-bottom: 10px;
 }
 
-// .chat-channel-form__radio-unit {
+// .chat-messages__list {
+//   position: relative;
+// }
 
+.chat-user__card {
+  background-color: rgba(59, 59, 59, 0.466);
+  display: none;
+  position:absolute;
+  height: 2.75rem;
+  width: 300px;
+  left:5rem;
+  top:-0.6rem;
+  z-index: 3000000;
+}
+
+.chat-messages__author-container {
+  position: relative;
+}
+
+.chat-messages__author-container > .chat-messages__author:hover + .chat-user__card, .chat-messages__author-container > .chat-user__card:hover {
+  display:block;
+}
+// .chat-user__card {
+//   &:hover {
+//     display:block;
+//   }
 // }
