@@ -11,7 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
 import { PongModule } from './pong/pong.module';
 import { FriendshipsModule } from './friendships/friendships.module';
-import { PresenceGateway } from './presence/presence.gateway';
+import { PresenceModule } from './presence/presence.module';
 
 @Module({
   imports: [
@@ -24,8 +24,9 @@ import { PresenceGateway } from './presence/presence.gateway';
     FriendshipsModule,
     PassportModule.register({ session: true }),
     PongModule,
+    PresenceModule
   ],
   controllers: [AppController],
-  providers: [AppService, PresenceGateway],
+  providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
