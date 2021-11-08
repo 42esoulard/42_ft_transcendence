@@ -14,6 +14,8 @@ var NET_WIDTH_RATIO = 400
 
 const getDraw = () => {
 
+	// returned variables
+
 	const context = ref({})
 	const ballPosition = ref({x:0, y:0})
 	const playerPositions = ref({player1:0, player2:0})
@@ -22,9 +24,13 @@ const getDraw = () => {
 	const game = ref(null)
 	
 	// helper variables
+
 	var canvasWidth = windowWidth.value / CANVAS_WIDTH_RATIO
 	var canvasHeight = windowWidth.value / CANVAS_HEIGHT_RATIO
 	
+
+	// returned functions
+
 	const draw = () => {
 		context.value.clearRect(0, 0, canvasWidth, canvasHeight)
 		drawBackground()
@@ -47,7 +53,7 @@ const getDraw = () => {
 	const initCanvas = () => {
 		game.value.width = windowWidth.value / CANVAS_WIDTH_RATIO
 		game.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
-		game.value.style="border: 3px solid white"		
+		game.value.style="border: 3px solid white"
 		drawBackground()
 	}
 
