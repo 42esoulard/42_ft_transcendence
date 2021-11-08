@@ -1,7 +1,7 @@
 <template>
 	<p> Game # {{ room }} </p>
 	<h1> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
-	<canvas ref="game" style="border: 3px solid white"> </canvas>
+	<canvas ref="game"> </canvas>
 
 	<div v-if="!gameHasStarted">
 		<h1> Get ready, game is about to start ! </h1>
@@ -33,7 +33,7 @@ export default {
 		const { 
 			context, game, 
 			ballPosition, playerPositions, score, 
-			windowWidth, onResize, setInitalCanvasSize, 
+			windowWidth, onResize, initCanvas, 
 			draw } = getDraw()
 
 		// lifecycle hooks
@@ -42,7 +42,7 @@ export default {
 			window.addEventListener("resize", onResize)
 			console.log('mounted')
 			context.value = game.value.getContext("2d")
-			setInitalCanvasSize()
+			initCanvas()
 		})
 
 		onBeforeRouteLeave(() => {

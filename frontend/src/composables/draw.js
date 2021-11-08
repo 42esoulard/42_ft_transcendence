@@ -21,10 +21,11 @@ const getDraw = () => {
 	const windowWidth = ref(window.innerWidth)
 	const game = ref(null)
 	
+	const canvasWidth = windowWidth.value / CANVAS_WIDTH_RATIO
+	const canvasHeight = windowWidth.value / CANVAS_HEIGHT_RATIO
+	
 	const draw = () => {
 
-		const canvasWidth = windowWidth.value / CANVAS_WIDTH_RATIO
-		const canvasHeight = windowWidth.value / CANVAS_HEIGHT_RATIO
 		context.value.clearRect(0, 0, canvasWidth, canvasHeight)
 
 		// background black rectangle
@@ -72,11 +73,19 @@ const getDraw = () => {
 		game.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
 	}
 
-	const setInitalCanvasSize = () => {
+	const initCanvas = () => {
 			game.value.width = windowWidth.value / CANVAS_WIDTH_RATIO
 			game.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
+			game.value.style="border: 3px solid white"
+		
+			// background black rectangle
+			context.value.beginPath()
+			context.value.fillStyle = "black"
+			context.value.rect(0, 0, canvasWidth, canvasHeight)
+			context.value.fill()
+			context.value.closePath()
 	}
-	return { context, ballPosition, playerPositions, score, windowWidth, game, draw, onResize, setInitalCanvasSize}
+	return { context, ballPosition, playerPositions, score, windowWidth, game, draw, onResize, initCanvas}
 }
 
 export default getDraw
