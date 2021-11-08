@@ -21,42 +21,66 @@ const getDraw = () => {
 	const windowWidth = ref(window.innerWidth)
 	const game = ref(null)
 	
-	const canvasWidth = windowWidth.value / CANVAS_WIDTH_RATIO
-	const canvasHeight = windowWidth.value / CANVAS_HEIGHT_RATIO
+	// helper variables
+	var canvasWidth = windowWidth.value / CANVAS_WIDTH_RATIO
+	var canvasHeight = windowWidth.value / CANVAS_HEIGHT_RATIO
 	
 	const draw = () => {
-
 		context.value.clearRect(0, 0, canvasWidth, canvasHeight)
+		drawBackground()
+		drawRacquets()
+		drawBall()
+		drawScore()
+		drawNet()
+	}
+	
+	const onResize = () => {
+		windowWidth.value = window.innerWidth
+		
+		canvasWidth = windowWidth.value / CANVAS_WIDTH_RATIO
+		canvasHeight = windowWidth.value / CANVAS_HEIGHT_RATIO
+		game.value.width = canvasWidth
+		game.value.height = canvasHeight
 
-		// background black rectangle
+	}
+
+	const initCanvas = () => {
+		game.value.width = windowWidth.value / CANVAS_WIDTH_RATIO
+		game.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
+		game.value.style="border: 3px solid white"		
+		drawBackground()
+	}
+
+	// helper functions
+
+	const drawBackground = () => {
 		context.value.beginPath()
 		context.value.fillStyle = "black"
 		context.value.rect(0, 0, canvasWidth, canvasHeight)
 		context.value.fill()
 		context.value.closePath()
-		
-		context.value.beginPath()
+	}
+	
+	const drawRacquets = () => {
 		context.value.fillStyle = 'white'
-		
-		// racquets
+		context.value.beginPath()
 		const racquetLenght = windowWidth.value / RACQUET_LENGTH_RATIO
 		const racquetWidth = windowWidth.value / RACQUET_WIDTH_RATIO
 		context.value.rect(0, playerPositions.value.player1, racquetWidth, racquetLenght)
 		context.value.rect(canvasWidth - racquetWidth, playerPositions.value.player2, racquetWidth, racquetLenght)
-		
-		// ball
-		context.value.arc(ballPosition.value.x, ballPosition.value.y, windowWidth.value / BALL_RATIO, 0, Math.PI*2, false);
-
 		context.value.fill()
 		context.value.closePath()
-		
-		//scores
-		var font_size = windowWidth.value / SCORE_RATIO
-		context.value.font = `${font_size}px Arial`;
-		context.value.fillText(score.value.player1, canvasWidth / 4, canvasHeight / 5)
-		context.value.fillText(score.value.player2, canvasWidth * 3 / 4, canvasHeight / 5)
-		
-		// net
+	}
+
+	const drawBall = () => {
+		context.value.fillStyle = 'white'
+		context.value.beginPath()
+		context.value.arc(ballPosition.value.x, ballPosition.value.y, windowWidth.value / BALL_RATIO, 0, Math.PI*2, false);
+		context.value.fill()
+		context.value.closePath()
+	}
+	
+	const drawNet = () => {
 		context.value.beginPath()
 		context.value.strokeStyle = 'white'
 		context.value.lineWidth = windowWidth.value / NET_WIDTH_RATIO
@@ -64,27 +88,17 @@ const getDraw = () => {
 		context.value.moveTo(canvasWidth / 2, 0);
 		context.value.lineTo(canvasWidth /2, canvasHeight);
 		context.value.stroke()
+		context.value.closePath()
 	}
 	
-	const onResize = () => {
-		windowWidth.value = window.innerWidth
-		// console.log(windowWidth.value)
-		game.value.width = windowWidth.value / CANVAS_WIDTH_RATIO
-		game.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
+	const drawScore = () => {
+		var font_size = windowWidth.value / SCORE_RATIO
+		context.value.font = `${font_size}px Arial`;
+		context.value.fillText(score.value.player1, canvasWidth / 4, canvasHeight / 5)
+		context.value.fillText(score.value.player2, canvasWidth * 3 / 4, canvasHeight / 5)
 	}
 
-	const initCanvas = () => {
-			game.value.width = windowWidth.value / CANVAS_WIDTH_RATIO
-			game.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
-			game.value.style="border: 3px solid white"
-		
-			// background black rectangle
-			context.value.beginPath()
-			context.value.fillStyle = "black"
-			context.value.rect(0, 0, canvasWidth, canvasHeight)
-			context.value.fill()
-			context.value.closePath()
-	}
+
 	return { context, ballPosition, playerPositions, score, windowWidth, game, draw, onResize, initCanvas}
 }
 
