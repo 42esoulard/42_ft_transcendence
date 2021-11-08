@@ -30,7 +30,7 @@ export default {
 
 		const router = useRouter()
 		socket.value.on('gameReadyToStart', (id, player1UserName, player2UserName) => {
-			router.push({ name: 'PongGame', params: {id, player1UserName, player2UserName, authorized: true}})
+			router.push({ name: 'PongGame', params: {id, player1UserName, player2UserName, authorized: 'ok'}})
 		})
 
 		onBeforeRouteLeave(() => {
