@@ -27,8 +27,16 @@ const getDraw = () => {
 		const canvasHeight = windowWidth.value / CANVAS_HEIGHT_RATIO
 		context.value.clearRect(0, 0, canvasWidth, canvasHeight)
 
+		// background black rectangle
 		context.value.beginPath()
-
+		context.value.fillStyle = "black"
+		context.value.rect(0, 0, canvasWidth, canvasHeight)
+		context.value.fill()
+		context.value.closePath()
+		
+		context.value.beginPath()
+		context.value.fillStyle = 'white'
+		
 		// racquets
 		const racquetLenght = windowWidth.value / RACQUET_LENGTH_RATIO
 		const racquetWidth = windowWidth.value / RACQUET_WIDTH_RATIO
@@ -37,7 +45,6 @@ const getDraw = () => {
 		
 		// ball
 		context.value.arc(ballPosition.value.x, ballPosition.value.y, windowWidth.value / BALL_RATIO, 0, Math.PI*2, false);
-		
 
 		context.value.fill()
 		context.value.closePath()
@@ -50,6 +57,7 @@ const getDraw = () => {
 		
 		// net
 		context.value.beginPath()
+		context.value.strokeStyle = 'white'
 		context.value.lineWidth = windowWidth.value / NET_WIDTH_RATIO
 		context.value.setLineDash([windowWidth.value / NET_ELEM_LENGHT_RATIO, windowWidth.value / NET_ELEM_GAP_RATIO])
 		context.value.moveTo(canvasWidth / 2, 0);
