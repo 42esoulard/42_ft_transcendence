@@ -13,7 +13,7 @@
 import { defineComponent, inject, ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import Stats from "../components/Stats.vue";
-import ProfileLeft from "../components/ProfileLefTyped.vue";
+import ProfileLeft from "../components/ProfileLeft.vue";
 import { User } from "@/types/User";
 import moment from "moment";
 import { useRoute } from "vue-router";

@@ -55,9 +55,9 @@ export default {
   <div class="main-div">
     <SideBar />
     <div class="router-view">
-      <transition name="fade--log">
+      <!-- <transition name="fade--log"> -->
         <router-view :key="$route.fullPath" />
-      </transition>
+      <!-- </transition> -->
     </div>
   </div>
   <transition name="toast">
