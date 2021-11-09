@@ -7,6 +7,7 @@ export interface State {
   user: User | null,
   message: string,
   firstTimeConnect: boolean,
+  isConnected: boolean,
   onlineUsers: User[];
 }
 
@@ -21,6 +22,7 @@ export const store = createStore<State>({
     user: null,
     message: '',
     firstTimeConnect: false,
+    isConnected: false,
     onlineUsers: [],
   },
   getters: {},

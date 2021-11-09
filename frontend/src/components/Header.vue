@@ -21,7 +21,7 @@ import { computed, defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { useAuthApi } from "@/plugins/api.plugin";
-import { presenceSocket } from "@/App.vue";
+import { presenceSocket } from "@/views/UserAccount.vue";
 
 export default defineComponent({
   name: "UserAccount",
@@ -34,7 +34,7 @@ export default defineComponent({
         authApi.logout({ withCredentials: true })
         .then((response) => {
           console.log(response);
-          presenceSocket.emit("closeConnection");
+          presenceSocket.emit("closeConnection", store.state.user);
           store.state.user = null;
           router.push('/login');
         })

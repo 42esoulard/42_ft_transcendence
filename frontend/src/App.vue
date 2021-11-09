@@ -4,19 +4,30 @@ import Header from "./components/Header.vue";
 import Toast from "@/components/Toast.vue";
 import { io } from "socket.io-client";
 import { useStore } from "vuex";
-import { computed, reactive } from "vue";
+import { computed, onActivated, onUpdated, reactive } from "vue";
 import { User } from "./types/User";
+import { presenceSocket } from "@/views/UserAccount.vue";
 
 export const clientSocket = io("http://localhost:3000/pong");
-export const presenceSocket = io("http://localhost:3000/presence", {
-  withCredentials: true
-});
+// export const presenceSocket = io("http://localhost:3000/presence", {
+//   withCredentials: true
+// });
 
 export default {
   components: { SideBar, Header, Toast },
   setup() {
     const store = useStore();
 
+    onUpdated(() => {
+      // console.log("onUpdated", store.state.user);
+      if (store.state.user) {
+        if (!store.state.isConnected) {
+          console.log("newConnection");
+          presenceSocket.emit("newConnection", store.state.user);
+          store.state.isConnected = true;
+        }
+      }
+    });
     presenceSocket.on("newUser", (user: User) => {
       store.commit("addOnlineUser", user);
       console.log("onlineUsers", store.state.onlineUsers);
@@ -25,7 +36,7 @@ export default {
       store.commit("allConnectedUsers", user);
       console.log("onlineUsers", store.state.onlineUsers);
     });
-    presenceSocket.on("outUser", (id: number) => {
+    presenceSocket.on("leftUser", (id: number) => {
       console.log("removedUser", id);
       store.commit("removeOnlineUser", id);
       console.log("OnlineUsers(afterRemoved)", store.state.onlineUsers);

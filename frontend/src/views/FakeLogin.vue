@@ -22,7 +22,7 @@ import { User } from "@/types/User";
 import { useAuthApi, useUserApi } from "@/plugins/api.plugin";
 import { io } from "socket.io-client";
 import { useStore } from "vuex";
-import { presenceSocket } from "@/App.vue";
+import { presenceSocket } from "@/views/UserAccount.vue";
 
 export default defineComponent({
   name: "Login",
