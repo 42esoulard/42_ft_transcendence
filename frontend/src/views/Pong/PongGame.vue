@@ -41,7 +41,8 @@ export default defineComponent({
 			window.addEventListener("keydown", onKeyDown)
 			window.addEventListener("resize", onResize)
 			console.log('mounted')
-			context.value = game.value.getContext("2d")
+			if (game.value)
+				context.value = game.value.getContext("2d")
 			initCanvas()
 		})
 
