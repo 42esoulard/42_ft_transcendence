@@ -16,12 +16,12 @@ const getDraw = () => {
 
 	// returned variables
 
+	const windowWidth = ref(window.innerWidth)
 	const context = ref<CanvasRenderingContext2D | null>(null)
+	const canvas = ref<HTMLCanvasElement | null>(null)
 	const ballPosition = ref({x:0, y:0})
 	const playerPositions = ref({player1:0, player2:0})
 	const score = ref({player1: 0,player2: 0})
-	const windowWidth = ref(window.innerWidth)
-	const canvas = ref<HTMLCanvasElement | null>(null)
 	
 	// helper variables
 

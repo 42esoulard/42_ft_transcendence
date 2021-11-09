@@ -30,11 +30,8 @@ export default defineComponent({
 		const player1UserName = ref(route.params.player1UserName)
 		const player2UserName = ref(route.params.player2UserName)
 
-		const { 
-			context, canvas, 
-			ballPosition, playerPositions, score, 
-			windowWidth, onResize, initCanvas, 
-			draw } = getDraw()
+		const { context, canvas, ballPosition, playerPositions, score, windowWidth, 
+			onResize, initCanvas, draw } = getDraw()
 
 		// lifecycle hooks
 		onMounted(() => {
