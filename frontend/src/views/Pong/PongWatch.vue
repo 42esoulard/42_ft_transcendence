@@ -13,7 +13,7 @@
 <script lang="ts">
 
 import { defineComponent, onMounted, ref } from 'vue'
-import { clientSocket } from '../../App.vue'
+import { clientSocket } from '@/App.vue'
 import { useRouter } from 'vue-router'
 import { usePongApi } from "@/plugins/api.plugin";
 import { Game } from '@/types/Game'

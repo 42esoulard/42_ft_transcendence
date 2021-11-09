@@ -17,10 +17,10 @@
 </template>
 
 <script lang="ts">
-import { clientSocket } from '../../App.vue'
+import { clientSocket } from '@/App.vue'
 import { defineComponent, onMounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
-import getDraw from '../../composables/draw'
+import getDraw from '@/composables/draw'
 
 export default defineComponent({
 	setup() {

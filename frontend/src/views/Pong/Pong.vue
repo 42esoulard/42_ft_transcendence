@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { clientSocket } from '../../App.vue'
+import { clientSocket } from '@/App.vue'
 import { useStore } from 'vuex'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 
