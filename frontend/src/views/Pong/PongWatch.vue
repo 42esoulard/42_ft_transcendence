@@ -41,9 +41,14 @@ export default {
 			router.push({ name: 'PongGameWatch', params: {id, player1UserName, player2UserName, authorized: 'ok'}})
 		})
 
-		socket.value.on('newGame', game => {
-			console.log('new game received')
+		socket.value.on('newGame', (game: Game) => {
+			console.log('new game received ' + game.id)
 			games.value.push(game)
+		})
+		
+		socket.value.on('endGame', (game: Game) => {
+			console.log('game ended ' + game.id)
+			games.value = games.value.filter(elem => elem.id != game.id)
 		})
 
 		return { games, WatchGame }

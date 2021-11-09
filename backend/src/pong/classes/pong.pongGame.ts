@@ -94,7 +94,7 @@ export class pongGame {
     await this.player1.clientSocket.join(this.room)
     await this.player2.clientSocket.join(this.room)
     this.server.to(this.room).emit('gameReadyToStart', this.room, this.player1.userName, this.player2.userName)
-    await this.spectatorWarnNewGame()
+    this.spectatorWarnNewGame()
     this.timeout = setTimeout(() => {
       this.server.to(this.room).emit('gameStarting')
       this.startMoving()
@@ -128,10 +128,17 @@ export class pongGame {
     this.logger.log('interval cleared: ' + this.room )
     clearTimeout(this.timeout)
     clearInterval(this.interval)
+    this.spectatorWarnEndGame()
     await this.gameUserRepo.update({userId: this.player1.userId, gameId: this.gameId}, { won: player1Won})
     await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.gameId}, { won: !player1Won})
     this.server.to(this.room).emit('gameOver', player1Won)
   }
+  
+  async spectatorWarnEndGame() {
+    const game = await this.gameRepo.findOne(this.gameId, {relations: ['users', 'users.user']})
+    this.server.emit('endGame', game)
+  }
+
  
   sendPositions(): void
   {
