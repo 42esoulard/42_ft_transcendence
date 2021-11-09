@@ -1,9 +1,9 @@
 <template>
 	<p> Watching Game # {{ room }} </p>
-	<h1> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
+	<h1 class="header__title"> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
 	<canvas ref="canvas"> </canvas>
 
-	<div v-if="gameIsOver">
+	<div class="header__title" v-if="gameIsOver">
 		<h1> {{ winningPlayer }} won ! </h1>
 	</div>
 </template>

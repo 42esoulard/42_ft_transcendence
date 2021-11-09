@@ -1,18 +1,18 @@
 <template>
 	<p> Game # {{ room }} </p>
-	<h1> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
+	<h1 class="header__title"> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
 	<canvas ref="canvas"> </canvas>
 
-	<div v-if="!gameHasStarted">
+	<div class="header__title" v-if="!gameHasStarted">
 		<h1> Get ready, game is about to start ! </h1>
 	</div>
 
-	<div v-if="gameIsOver">
+	<div class="header__title" v-if="gameIsOver">
 		<h1> {{ winningPlayer }} won ! </h1>
 	</div>
 	<p>
-		<button v-on:click="SendMoveMsg('up')"> Up </button>
-		<button v-on:click="SendMoveMsg('down')"> Down </button>
+		<button class="button" v-on:click="SendMoveMsg('up')"> Up </button>
+		<button class="button" v-on:click="SendMoveMsg('down')"> Down </button>
 	</p>
 </template>
 
@@ -109,3 +109,7 @@ export default defineComponent({
 
 })
 </script>
+
+<style lang="scss">
+@import "../../../sass/main.scss";
+</style>

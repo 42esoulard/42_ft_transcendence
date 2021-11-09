@@ -1,5 +1,5 @@
 <template>
-	<h1> Select the game you want to watch </h1>
+	<h1 class="header__title"> Select the game you want to watch </h1>
 	<div v-for="game in games" :key="game.id">
 		<div v-if="game.users.length == 1">
 			<button class="button" v-on:click="WatchGame(game.id)"> game #{{ game.id }} : {{ game.users[0].user.username }} vs {{ game.users[0].user.username }} </button>

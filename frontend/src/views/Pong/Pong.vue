@@ -1,8 +1,8 @@
 
 <template>
   <div v-if="!queuing">
-    <h1>Click to play</h1>
-		<button class="button" v-on:click="JoinQueue()"> Join Game </button>
+    <h1 class="header__title">Click to play</h1>
+		<button class="button button--log-in" v-on:click="JoinQueue()"> Join Game </button>
   </div>
 
   <div v-else>
