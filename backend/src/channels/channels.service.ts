@@ -62,6 +62,26 @@ export class ChannelsService {
     return await this.channelMemberService.getChannelMember(channel, user);
   }
 
+  async getChannelMembers(channel_id: number): Promise<ChannelMember> {
+    const channel: Channels = await this.getChannelById(channel_id);
+
+    return await this.channelMemberService.getChannelMembers(channel);
+  }
+
+  // async getChannelMutedMembers(channel_id: number): Promise<ChannelMember> {
+  //   const channel: Channels = await this.getChannelById(channel_id);
+
+  //   return await this.channelMemberService.getChannelMutedMembers(channel);
+  // }
+
+  // async getChannelBannedMembers(
+  //   channel_id: number,
+  // ): Promise<ChannelMember> {
+  //   const channel: Channels = await this.getChannelById(channel_id);
+
+  //   return await this.channelMemberService.getChannelMutedMembers(channel);
+  // }
+
   async getUserChannels(user_id: number): Promise<ChannelMember[]> {
     const user: Users = await this.userService.getUserbyId(user_id);
     return await this.channelMemberService.getUserChannels(user);

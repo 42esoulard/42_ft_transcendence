@@ -17,7 +17,7 @@ export class ChannelMembers {
   @ManyToOne(() => Channels, (channel) => channel.channel_members)
   channel: Channels;
 
-  @ManyToOne(() => Users, (user) => user.channel_members)
+  @ManyToOne(() => Users, (user) => user.channel_members, { eager: true })
   member: Users;
 
   @Column({ default: false })
@@ -25,6 +25,12 @@ export class ChannelMembers {
 
   @Column({ default: false })
   is_admin: boolean;
+
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  ban: Date;
+
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  mute: Date;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
   created_at: Date;

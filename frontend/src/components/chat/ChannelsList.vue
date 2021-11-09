@@ -20,7 +20,8 @@
       <div class='chat-channels__title'>More channels</div>
       <ul class='chat-channels__list'>
         <li v-for="(chan) in availableChannels" :key="chan.name"> 
-          <button class='chat-channels__item' @click="previewChannel(chan)"> # {{ chan.name }}
+          <button class='chat-channels__item' @click="previewChannel(chan)">
+          <div class='chat-channels__name' :title="chan.name">#{{ chan.name }}</div>
           <span v-if="chan.password"><img class="fas fa-lock chat-channels__tag chat-channels__tag--locked" title="Password-protected" /></span>
           </button>
         </li>

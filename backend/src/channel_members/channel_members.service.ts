@@ -16,7 +16,7 @@ export class ChannelMembersService {
   async getUserChannels(user: Users): Promise<ChannelMembers[]> {
     const res = await this.channelMembersRepository.find({
       where: { member: user },
-      relations: ['channel'],
+      relations: ['channel', 'member'],
       order: { id: 'ASC' },
     });
     // const res = await this.channelMembersRepository
@@ -32,6 +32,15 @@ export class ChannelMembersService {
       where: {
         channel: channel,
         member: user,
+      },
+      relations: ['channel', 'member'],
+    });
+  }
+
+  async getChannelMembers(channel: Channels) {
+    return await this.channelMembersRepository.findOne({
+      where: {
+        channel: channel,
       },
       relations: ['channel', 'member'],
     });

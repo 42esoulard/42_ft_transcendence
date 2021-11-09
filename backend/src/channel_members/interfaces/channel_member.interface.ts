@@ -7,5 +7,7 @@ export class ChannelMember {
   member: User;
   is_owner: boolean;
   is_admin: boolean;
+  mute: Date | null;
+  ban: Date | null;
   // created_at: Date;
 }

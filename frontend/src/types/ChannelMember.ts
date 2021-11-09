@@ -9,6 +9,9 @@ export interface ChannelMember {
   // avatar: string;
   is_admin: boolean;
   is_owner: boolean;
+  mute: string | null;
+  ban: string | null;
+
 
   // two_fa_enabled: string;
   // refresh_token: string;

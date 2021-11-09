@@ -2,16 +2,17 @@
   <transition name="toast">
     <Toast v-if="toastMessage" :message="toastMessage" />
   </transition>
-  <h1>Chat Room</h1>
+  <!-- <h1>Chat Room</h1> -->
     <div class="chat">
-      <ChannelsList :joinedChannels="joinedChannels" :availableChannels="availableChannels" />
+      <ChannelsList :joinedChannels="joinedChannels" :availableChannels="availableChannels" :channelSettings="channelSettings" />
         <!-- <div>
           <p v-for="(user, i) in info" :key="i">
             {{ user.username }} {{ user.action }}
           </p>
         </div> -->
-        
-        <div class="chat-box">
+  
+        <ChannelSettings @close-settings="channelSettings = false" v-if="channelSettings" :activeChannel="activeChannel" />
+        <div v-else class="chat-box">
             <div v-if="activeChannel" class='chat-header'>
               <div class="chat-header__channel-name" :title="activeChannel.channel.name">{{ activeChannel.channel.name }}</div>
               <div>
@@ -21,7 +22,7 @@
               <div v-if="activeChannel.is_admin || activeChannel.is_owner" class="chat-channels__tag-container">
                 <span v-if="activeChannel.is_owner"><img class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner" /></span>
                 <span v-if="activeChannel.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
-                <span><img class="fas fa-lg fa-cogs chat-channels__tag chat-channels__tag--settings" title="Channel Settings" @click="toggleModal(2)"/></span>
+                <span @click="channelSettings = true"><img class="fas fa-lg fa-cogs chat-channels__tag chat-channels__tag--settings" title="Channel Settings"  /></span>
               </div>
               <span v-if="isMember && activeChannel.id !== 1" @click="leaveChannel()" ><img class="fas fa-lg fa-sign-out-alt chat-channels__tag chat-channels__tag--leave" title="Leave Channel" /></span>
             </div>
@@ -106,11 +107,11 @@
             <LockedChannelForm :channel="activeChannel.channel" @close="toggleModal(1)" @join-channel="joinChannel" />
           </template>
         </Modal>
-        <Modal v-if="settingsModal" @close="toggleModal(2)">
+        <!-- <Modal v-if="settingsModal && activeChannel" @close="toggleModal(2)">
           <template v-slot:settings-modal>
-            <SettingsModal @close="toggleModal(2)" />
+            <SettingsModal :channelMembers="activeChannel.channel.channel_members" @close="toggleModal(2)" />
           </template>
-        </Modal>
+        </Modal> -->
       </transition-group>
     </teleport>  
 </template>
@@ -129,7 +130,7 @@ import Modal from "@/components/Modal.vue";
 import Toast from "@/components/Toast.vue";
 import NewChannelForm from "@/components/chat/NewChannelForm.vue";
 import LockedChannelForm from "@/components/chat/LockedChannelForm.vue";
-import SettingsModal from "@/components/chat/SettingsModal.vue";
+import ChannelSettings from "@/components/chat/ChannelSettings.vue";
 import ChannelsList from "@/components/chat/ChannelsList.vue";
 
 /*
@@ -139,7 +140,7 @@ export const socket = io("http://localhost:3000/chat");
 
 export const ChatComponent = defineComponent({
   name: "ChatComponent",
-  components: { NewChannelForm, LockedChannelForm, SettingsModal, ChannelsList, Modal, Toast },
+  components: { NewChannelForm, LockedChannelForm, ChannelSettings, ChannelsList, Modal, Toast },
   
   beforePageLeave() {
     this.socket.emit("leave", 'a user');
@@ -167,7 +168,7 @@ export const ChatComponent = defineComponent({
     const availableChannels = ref<Channel[]>([]);
     const newChannelForm = ref(false);
     const passwordPrompt = ref(false);
-    const settingsModal = ref(false);
+    const channelSettings = ref(false);
     const isMember = ref(false);
 
     /*
@@ -258,6 +259,8 @@ export const ChatComponent = defineComponent({
         is_admin: false,
         is_owner: false,
         member: user.value,
+        ban: null,
+        mute: null,
       }
       isMember.value = false;
       channelMessages.value = channel.messages;
@@ -331,14 +334,20 @@ export const ChatComponent = defineComponent({
         case 1:
           passwordPrompt.value = !passwordPrompt.value;
           break;
-        case 1:
-          settingsModal.value = !settingsModal.value;
+        case 2:
+          channelSettings.value = !channelSettings.value;
           break;
-          
       }
+      console.log("channelSettings", channelSettings)
     }
 
+    // const toggleAdminSettings = async () => {
+    //   const channelMembers = await api.getChannelMembers(activeChannel.value!.channel.id);
+    //   settingsModal.value = true;
+    // }
+
     const switchChannel =  (cm: ChannelMember) => {
+      channelSettings.value = false;
       activeChannel.value = cm;
       isMember.value = true;
       console.log("in switchChannel", cm)
@@ -439,7 +448,8 @@ export const ChatComponent = defineComponent({
 
       newChannelForm,
       passwordPrompt,
-      settingsModal,
+      channelSettings,
+      // toggleAdminSettings,
       toggleModal,
 
       toastMessage: computed(() => store.state.message),

@@ -6,7 +6,7 @@ export class Channel {
   id: number;
   name: string;
   type: string;
-  salt: string | null;
+  // salt: string | null;
   password: string;
   // owner: User | null;
   messages: Message[];
