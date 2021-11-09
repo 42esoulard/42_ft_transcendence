@@ -1,7 +1,7 @@
 <template>
 	<p> Game # {{ room }} </p>
 	<h1> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
-	<canvas ref="game"> </canvas>
+	<canvas ref="canvas"> </canvas>
 
 	<div v-if="!gameHasStarted">
 		<h1> Get ready, game is about to start ! </h1>
@@ -31,7 +31,7 @@ export default defineComponent({
 		const player2UserName = ref(route.params.player2UserName)
 
 		const { 
-			context, game, 
+			context, canvas, 
 			ballPosition, playerPositions, score, 
 			windowWidth, onResize, initCanvas, 
 			draw } = getDraw()
@@ -41,8 +41,8 @@ export default defineComponent({
 			window.addEventListener("keydown", onKeyDown)
 			window.addEventListener("resize", onResize)
 			console.log('mounted')
-			if (game.value)
-				context.value = game.value.getContext("2d")
+			if (canvas.value)
+				context.value = canvas.value.getContext("2d")
 			initCanvas()
 		})
 
@@ -106,7 +106,7 @@ export default defineComponent({
 
 		
 
-		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, game, SendMoveMsg }
+		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, canvas, SendMoveMsg }
 
 	},
 

@@ -21,7 +21,7 @@ const getDraw = () => {
 	const playerPositions = ref({player1:0, player2:0})
 	const score = ref({player1: 0,player2: 0})
 	const windowWidth = ref(window.innerWidth)
-	const game = ref<HTMLCanvasElement | null>(null)
+	const canvas = ref<HTMLCanvasElement | null>(null)
 	
 	// helper variables
 
@@ -46,19 +46,19 @@ const getDraw = () => {
 		
 		canvasWidth = windowWidth.value / CANVAS_WIDTH_RATIO
 		canvasHeight = windowWidth.value / CANVAS_HEIGHT_RATIO
-		if (game.value)
+		if (canvas.value)
 		{
-			game.value.width = canvasWidth
-			game.value.height = canvasHeight
+			canvas.value.width = canvasWidth
+			canvas.value.height = canvasHeight
 		}
 	}
 
 	const initCanvas = () => {
-		if (game.value)
+		if (canvas.value)
 		{
-			game.value.width = windowWidth.value / CANVAS_WIDTH_RATIO
-			game.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
-			game.value.style.border = "1px solid white"
+			canvas.value.width = windowWidth.value / CANVAS_WIDTH_RATIO
+			canvas.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
+			canvas.value.style.border = "1px solid white"
 			drawBackground()
 		}
 	}
@@ -126,7 +126,7 @@ const getDraw = () => {
 	}
 
 
-	return { context, ballPosition, playerPositions, score, windowWidth, game, draw, onResize, initCanvas}
+	return { context, ballPosition, playerPositions, score, windowWidth, canvas, draw, onResize, initCanvas}
 }
 
 export default getDraw
