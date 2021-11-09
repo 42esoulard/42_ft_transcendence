@@ -16,13 +16,13 @@
 	</p>
 </template>
 
-<script>
+<script lang="ts">
 import { clientSocket } from '../../App.vue'
-import { onMounted, ref } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import getDraw from '../../composables/draw'
 
-export default {
+export default defineComponent({
 	setup() {
 		
 		const route = useRoute()
@@ -47,7 +47,7 @@ export default {
 
 		onBeforeRouteLeave(() => {
 			socket.value.emit('leaveGame', room.value)
-			socket.value.removeEventListener('position')
+			socket.value.off('position')
 			window.removeEventListener("resize", onResize)
 			window.removeEventListener("keydown", onKeyDown)
 			console.log('leaving')
@@ -74,26 +74,26 @@ export default {
 			gameHasStarted.value = true
 		})
 		
-		const winningPlayer = ref(null)
+		const winningPlayer = ref<string | string[]>('')
 		const gameIsOver = ref(false)
 		socket.value.on("gameOver", (player1Won) => {
 			window.removeEventListener("keydown", onKeyDown)
 			gameHasStarted.value = true
 			gameIsOver.value = true
 			if (player1Won)
-				winningPlayer.value = player1UserName
+				winningPlayer.value = player1UserName.value
 			else
-				winningPlayer.value = player2UserName
+				winningPlayer.value = player2UserName.value
 		})
 		
 
 		// socket emit
-		const SendMoveMsg = (direction) => {
+		const SendMoveMsg = (direction: string) => {
 			if (gameHasStarted.value)
 				socket.value.emit('moveRacquet', {room: room.value, text: direction})
 		}
 		
-		const onKeyDown = (event) => {
+		const onKeyDown = (event: KeyboardEvent) => {
 			const codes = ['ArrowUp', 'ArrowDown'];
 			if (!codes.includes(event.code))
 				return;
@@ -109,5 +109,5 @@ export default {
 
 	},
 
-}
+})
 </script>

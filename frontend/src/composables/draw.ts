@@ -16,12 +16,12 @@ const getDraw = () => {
 
 	// returned variables
 
-	const context = ref({})
+	const context = ref<any>({})
 	const ballPosition = ref({x:0, y:0})
 	const playerPositions = ref({player1:0, player2:0})
 	const score = ref({player1: 0,player2: 0})
 	const windowWidth = ref(window.innerWidth)
-	const game = ref(null)
+	const game = ref<any>(null)
 	
 	// helper variables
 

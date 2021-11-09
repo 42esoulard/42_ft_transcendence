@@ -11,13 +11,13 @@
 </template>
 
 
-<script>
-import { ref } from 'vue'
+<script lang="ts">
+import { defineComponent, ref } from 'vue'
 import { clientSocket } from '../../App.vue'
 import { useStore } from 'vuex'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 
-export default {
+export default defineComponent ({
 	setup() {
 		const socket = ref(clientSocket)
 		const queuing = ref(false)
@@ -41,7 +41,7 @@ export default {
 		return {queuing, JoinQueue}
 	}
 
-}
+})
 </script>
 
 <style>

@@ -12,13 +12,13 @@
 
 <script lang="ts">
 
-import { onMounted, ref } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
 import { clientSocket } from '../../App.vue'
 import { useRouter } from 'vue-router'
 import { usePongApi } from "@/plugins/api.plugin";
 import { Game } from '@/types/Game'
 
-export default {
+export default defineComponent({
 	setup()
 	{
 		const games = ref<Game[]>([])
@@ -54,7 +54,7 @@ export default {
 		return { games, WatchGame }
 	},
 	
-}
+})
 </script>
 
 <style>

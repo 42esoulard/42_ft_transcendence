@@ -8,13 +8,13 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 import { clientSocket } from '../../App.vue'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { defineComponent, onMounted, onUnmounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import getDraw from '../../composables/draw'
 
-export default {
+export default defineComponent({
 	setup() {
 		
 		const route = useRoute()
@@ -37,7 +37,7 @@ export default {
 		})
 
 		onBeforeRouteLeave(() => {
-			socket.value.removeEventListener('position')
+			socket.value.off('position')
 			window.removeEventListener("resize", onResize)
 			console.log('leaving')
 		})
@@ -62,14 +62,14 @@ export default {
 			draw()
 		})
 		
-		const winningPlayer = ref(null)
+		const winningPlayer = ref<string | string[]>('')
 		const gameIsOver = ref(false)
 		socket.value.on("gameOver", (player1Won) => {
 			gameIsOver.value = true
 			if (player1Won)
-				winningPlayer.value = player1UserName
+				winningPlayer.value = player1UserName.value
 			else
-				winningPlayer.value = player2UserName
+				winningPlayer.value = player2UserName.value
 		})
 		
 
@@ -78,5 +78,5 @@ export default {
 
 	},
 
-}
+})
 </script>
