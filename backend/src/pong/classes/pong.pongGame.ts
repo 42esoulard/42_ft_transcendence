@@ -110,7 +110,9 @@ export class pongGame {
   {
     client.join(this.room)
     client.emit('GoToGame', this.room, this.player1.userName, this.player2.userName)
-    client.emit('score', this.getPlayerScores())
+    // update score for spectator if score is not 0-0 (else spectator will need to wait for next score)
+    if (this.player1.score || this.player2.score)
+      client.emit('score', this.getPlayerScores())
   }
 
   startMoving()
