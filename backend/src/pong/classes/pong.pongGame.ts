@@ -93,12 +93,17 @@ export class pongGame {
     this.room = this.gameId.toString()
     await this.player1.clientSocket.join(this.room)
     await this.player2.clientSocket.join(this.room)
-    
     this.server.to(this.room).emit('gameReadyToStart', this.room, this.player1.userName, this.player2.userName)
+    await this.spectatorWarnNewGame()
     this.timeout = setTimeout(() => {
       this.server.to(this.room).emit('gameStarting')
       this.startMoving()
     }, INITAL_DELAY_IN_MS)
+  }
+  
+  async spectatorWarnNewGame() {
+    const game = await this.gameRepo.findOne(this.gameId, {relations: ['users', 'users.user']})
+    this.server.emit('newGame', game)
   }
 
   async addSpectator(client: Socket)
