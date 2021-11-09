@@ -4,6 +4,7 @@
     <slot name="edit-user"></slot>
     <slot name="new-channel-form"></slot>
     <slot name="locked-channel-form"></slot>
+    <slot name="settings-modal"></slot>
   </div>
 </template>
 

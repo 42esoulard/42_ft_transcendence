@@ -122,11 +122,8 @@ export class ChannelsService {
     return await this.channelMemberService.createChannelMember(channel, user);
   }
 
-  async leaveChannel(channel_id: number, user_id: number) {
-    const channel: Channels = await this.getChannelById(channel_id);
-    const user: Users = await this.userService.getUserbyId(user_id);
-
-    await this.channelMemberService.deleteChannelMember(channel, user);
+  async leaveChannel(cm_id: number) {
+    await this.channelMemberService.deleteChannelMember(cm_id);
   }
 
   /**

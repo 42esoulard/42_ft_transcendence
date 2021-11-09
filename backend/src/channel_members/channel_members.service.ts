@@ -37,6 +37,15 @@ export class ChannelMembersService {
     });
   }
 
+  async getChannelMemberById(cm_id: number) {
+    return await this.channelMembersRepository.findOne({
+      where: {
+        id: cm_id,
+      },
+      relations: ['channel', 'member'],
+    });
+  }
+
   async createChannelMember(
     channel: Channels,
     user: Users,
@@ -51,11 +60,8 @@ export class ChannelMembersService {
     });
   }
 
-  async deleteChannelMember(channel: Channels, user: Users) {
-    this.channelMembersRepository.delete({
-      channel: channel,
-      member: user,
-    });
+  async deleteChannelMember(cm_id: number) {
+    this.channelMembersRepository.delete(cm_id);
   }
 
   async toggleAdmin(channel: Channels, user: Users) {

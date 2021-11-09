@@ -63,17 +63,20 @@
   overflow: hidden;
 }
 
-.chat-header__tag {
-  border-style: solid;
-  border-radius: $chat-header-border-radius;
-  margin: $chat-header-margin;
-  &--owner {
-  color: $second-color;
-  }
-  &--admin {
-  color: $third-color;
-  }
-}
+// .chat-header__tag {
+//   border-style: solid;
+//   border-radius: $chat-header-border-radius;
+//   margin: $chat-header-margin;
+//   &--owner {
+//   color: $second-color;
+//   }
+//   &--admin {
+//   color: $third-color;
+//   }
+//   &--settings {
+//     margin-left: 0px;
+//   }
+// }
 
 // .chat-header__online {
 
@@ -173,6 +176,10 @@
   overflow: hidden;
 }
 
+.chat-channels__tag-container {
+  background-color:rgba(59, 59, 59, 0.466)
+}
+
 .chat-channels__tag {
   // margin-left: 0.2rem;
   &--owner {
@@ -183,6 +190,13 @@
   }
   &--locked {
     color: $chat-font-light;
+  }
+  &--settings {
+    margin-left: 2px;
+    cursor: pointer;
+  }
+  &--leave {
+    cursor: pointer;
   }
 }
 
@@ -277,6 +291,7 @@
 .chat-messages__author-container > .chat-messages__author:hover + .chat-user__card, .chat-messages__author-container > .chat-user__card:hover {
   display:block;
 }
+
 // .chat-user__card {
 //   &:hover {
 //     display:block;

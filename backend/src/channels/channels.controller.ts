@@ -92,7 +92,7 @@ export class ChannelsController {
     return await this.channelService.saveChannel(newChannel);
   }
 
-  @Get('/joinchannel/:channel/:user')
+  @Get('/join-channel/:channel/:user')
   async joinChannel(
     @Param('channel') channel_id: number,
     @Param('user') user_id: number,
@@ -122,7 +122,7 @@ export class ChannelsController {
     return await this.channelService.getAvailableChannels(id);
   }
 
-  @Get('/channelmember/:channel/:user')
+  @Get('/channel-member/:channel/:user')
   async getChannelMember(
     @Param('channel') channel_id: number,
     @Param('user') user_id: number,
@@ -130,11 +130,8 @@ export class ChannelsController {
     return await this.channelService.getChannelMember(channel_id, user_id);
   }
 
-  @Post('/leavechannel/:channel/:user')
-  async leaveChannel(
-    @Param('channel') channel_id: number,
-    @Param('user') user_id: number,
-  ) {
-    await this.channelService.leaveChannel(channel_id, user_id);
+  @Post('/leave-channel/:cm_id')
+  async leaveChannel(@Param('cm_id') cm_id: number) {
+    await this.channelService.leaveChannel(cm_id);
   }
 }
