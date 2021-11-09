@@ -115,7 +115,7 @@
 import { io } from "socket.io-client";
 import { useStore } from 'vuex';
 import { defineComponent, reactive, ref, watch, computed } from "vue";
-import { DefaultApi, User } from "@/../sdk/typescript-axios-client-generated";
+import { ChatApi, User } from "@/../sdk/typescript-axios-client-generated";
 import { useUserApi } from "@/plugins/api.plugin";
 import { Info } from "@/types/Info";
 import { Message } from "@/types/Message";
@@ -144,7 +144,7 @@ export const ChatComponent = defineComponent({
   },
   setup() {
 
-    const api = new DefaultApi();
+    const api = new ChatApi();
     const userApi = useUserApi();
     const store = useStore();
     const user = computed(() => store.state.user);
