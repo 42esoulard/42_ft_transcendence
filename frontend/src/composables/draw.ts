@@ -16,7 +16,7 @@ const getDraw = () => {
 
 	// returned variables
 
-	const context = ref<any>({})
+	const context = ref<CanvasRenderingContext2D | null>(null)
 	const ballPosition = ref({x:0, y:0})
 	const playerPositions = ref({player1:0, player2:0})
 	const score = ref({player1: 0,player2: 0})
@@ -32,7 +32,8 @@ const getDraw = () => {
 	// returned functions
 
 	const draw = () => {
-		context.value.clearRect(0, 0, canvasWidth, canvasHeight)
+		if (context.value)
+			context.value.clearRect(0, 0, canvasWidth, canvasHeight)
 		drawBackground()
 		drawRacquets()
 		drawBall()
@@ -65,48 +66,63 @@ const getDraw = () => {
 	// helper functions
 
 	const drawBackground = () => {
-		context.value.beginPath()
-		context.value.fillStyle = "black"
-		context.value.rect(0, 0, canvasWidth, canvasHeight)
-		context.value.fill()
-		context.value.closePath()
+		if (context.value)
+		{
+			context.value.beginPath()
+			context.value.fillStyle = "black"
+			context.value.rect(0, 0, canvasWidth, canvasHeight)
+			context.value.fill()
+			context.value.closePath()
+		}
 	}
 	
 	const drawRacquets = () => {
-		context.value.fillStyle = 'white'
-		context.value.beginPath()
-		const racquetLenght = windowWidth.value / RACQUET_LENGTH_RATIO
-		const racquetWidth = windowWidth.value / RACQUET_WIDTH_RATIO
-		context.value.rect(0, playerPositions.value.player1, racquetWidth, racquetLenght)
-		context.value.rect(canvasWidth - racquetWidth, playerPositions.value.player2, racquetWidth, racquetLenght)
-		context.value.fill()
-		context.value.closePath()
+		if (context.value)
+		{
+			context.value.fillStyle = 'white'
+			context.value.beginPath()
+			const racquetLenght = windowWidth.value / RACQUET_LENGTH_RATIO
+			const racquetWidth = windowWidth.value / RACQUET_WIDTH_RATIO
+			context.value.rect(0, playerPositions.value.player1, racquetWidth, racquetLenght)
+			context.value.rect(canvasWidth - racquetWidth, playerPositions.value.player2, racquetWidth, racquetLenght)
+			context.value.fill()
+			context.value.closePath()
+		}
 	}
 
 	const drawBall = () => {
-		context.value.fillStyle = 'white'
-		context.value.beginPath()
-		context.value.arc(ballPosition.value.x, ballPosition.value.y, windowWidth.value / BALL_RATIO, 0, Math.PI*2, false);
-		context.value.fill()
-		context.value.closePath()
+		if (context.value)
+		{
+			context.value.fillStyle = 'white'
+			context.value.beginPath()
+			context.value.arc(ballPosition.value.x, ballPosition.value.y, windowWidth.value / BALL_RATIO, 0, Math.PI*2, false);
+			context.value.fill()
+			context.value.closePath()
+		}
 	}
 	
 	const drawNet = () => {
-		context.value.beginPath()
-		context.value.strokeStyle = 'white'
-		context.value.lineWidth = windowWidth.value / NET_WIDTH_RATIO
-		context.value.setLineDash([windowWidth.value / NET_ELEM_LENGHT_RATIO, windowWidth.value / NET_ELEM_GAP_RATIO])
-		context.value.moveTo(canvasWidth / 2, 0);
-		context.value.lineTo(canvasWidth /2, canvasHeight);
-		context.value.stroke()
-		context.value.closePath()
+		if (context.value)
+		{
+			context.value.beginPath()
+			context.value.strokeStyle = 'white'
+			context.value.lineWidth = windowWidth.value / NET_WIDTH_RATIO
+			context.value.setLineDash([windowWidth.value / NET_ELEM_LENGHT_RATIO, windowWidth.value / NET_ELEM_GAP_RATIO])
+			context.value.moveTo(canvasWidth / 2, 0);
+			context.value.lineTo(canvasWidth /2, canvasHeight);
+			context.value.stroke()
+			context.value.closePath()
+		}
 	}
 	
 	const drawScore = () => {
-		var font_size = windowWidth.value / SCORE_RATIO
-		context.value.font = `${font_size}px Arial`;
-		context.value.fillText(score.value.player1, canvasWidth / 4, canvasHeight / 5)
-		context.value.fillText(score.value.player2, canvasWidth * 3 / 4, canvasHeight / 5)
+		if (context.value)
+		{
+			var font_size = windowWidth.value / SCORE_RATIO
+			context.value.font = `${font_size}px Arial`;
+			context.value.fillText(score.value.player1.toString(), canvasWidth / 4, canvasHeight / 5)
+			context.value.fillText(score.value.player2.toString(), canvasWidth * 3 / 4, canvasHeight / 5)
+		}
 	}
 
 
