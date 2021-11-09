@@ -24,9 +24,6 @@ import { useRoute, useRouter } from "vue-router";
 import OtpInput from "@/components/OtpInput.vue";
 import { useStore } from "vuex";
 import { useAuthApi } from "@/plugins/api.plugin";
-import { User } from "@/types/User";
-import { presenceSocket } from "@/App.vue";
-
 
 export default defineComponent({
   name: "Login",
@@ -40,9 +37,9 @@ export default defineComponent({
     const isTwoFactorEnabled = ref(false);
     const qrcodeURL = ref("");
     const codeSendToUrl = ref("authenticate");
-    
+    // const connected = ref(false);
 
-    onBeforeMount(() => {
+    onBeforeMount(async () => {
       let redirectUrl = "account";
       if (route.query.state != "undefined") {
         redirectUrl = route.query.state as string;
@@ -51,43 +48,20 @@ export default defineComponent({
         const code = route.query.code;
         // router.replace("/login"); // to remove code from URL: DIRTY ?
 
-        authApi
+        await authApi
           .login({ params: { code: code }, withCredentials: true })
-          .then(async (res: any) => {
+          .then((res: any) => {
             if (res.status === 206) {
               isTwoFactorEnabled.value = true;
             } else if (res.status === 200) {
               if (res.data.newlyCreated == true) {
                 store.commit("setFirstTimeConnect", true);
               }
-              await getProfile();
-              sendConnection();
               router.push(redirectUrl);
             }
           })
           .catch((err: any) => console.log(err.message));
       }
-    });
-
-    const getProfile = async () => {
-      await authApi
-        .profile({withCredentials: true})
-        .then(response => {
-          store.state.user = response.data;
-        })
-        .catch( (err: Error) => {
-          console.log("ERROR GET PROFILE");
-        });
-    };
-
-    const sendConnection = () => {
-      presenceSocket.emit("connection", store.state.user);
-      // console.log("NEWLY CONNECTED USER", store.state.user);
-    };
-
-    presenceSocket.on("newUser", (user: User) => {
-      store.commit('addOnlineUser', user);
-      console.log("onlineUsers", store.state.onlineUsers);
     });
 
     const logInWith42 = () => {

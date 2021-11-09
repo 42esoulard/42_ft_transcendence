@@ -1,5 +1,4 @@
 import { User } from '@/types/User'
-import { Friendship } from '@/types/Friendship'
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 
@@ -8,6 +7,7 @@ export interface State {
   user: User | null,
   message: string,
   firstTimeConnect: boolean,
+  isConnected: boolean,
   onlineUsers: User[];
 }
 
@@ -22,6 +22,7 @@ export const store = createStore<State>({
     user: null,
     message: '',
     firstTimeConnect: false,
+    isConnected: false,
     onlineUsers: [],
   },
   getters: {},
@@ -56,8 +57,21 @@ export const store = createStore<State>({
       state.firstTimeConnect = payload;
     },
 
-    addOnlineUser(state: State, payload: User) {
-      state.onlineUsers.push(payload);
+    addOnlineUser(state: State, newUser: User) {
+      const user = state.onlineUsers.find(user => user.id === newUser.id);
+      if (!user)
+        state.onlineUsers.push(newUser);
+    },
+
+    allConnectedUsers(state: State, connectedUsers: User[]) {
+      if (connectedUsers.length)
+        state.onlineUsers = connectedUsers;
+    },
+
+    removeOnlineUser(state: State, id: number) {
+      if (id) {
+        state.onlineUsers = state.onlineUsers.filter(u => u.id !== id);
+      }
     },
 
 

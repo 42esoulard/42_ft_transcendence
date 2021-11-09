@@ -20,8 +20,9 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 import { User } from "@/types/User";
 import { useAuthApi, useUserApi } from "@/plugins/api.plugin";
-import { presenceSocket } from "@/App.vue";
+import { io } from "socket.io-client";
 import { useStore } from "vuex";
+import { presenceSocket } from "@/views/UserAccount.vue";
 
 export default defineComponent({
   name: "Login",
@@ -32,7 +33,7 @@ export default defineComponent({
     const authApi = useAuthApi();
     const userApi = useUserApi();
     const users = ref<User[]>([]);
-    const selectedUser = ref<string>();
+    const selectedUser = ref('');
 
     onMounted(() => {
       userApi
@@ -47,7 +48,7 @@ export default defineComponent({
     });
 
     const Fakelogin = async () => {
-      console.log(selectedUser.value);
+      // console.log(selectedUser.value);
       await axios
         .post("http://localhost:3000/auth/fake-login", {
           username: selectedUser.value
@@ -72,10 +73,9 @@ export default defineComponent({
     };
 
     const sendConnection = () => {
-      presenceSocket.emit("connection", store.state.user);
+      presenceSocket.emit("newConnection", store.state.user);
       // console.log("NEWLY CONNECTED USER", store.state.user);
     };
-
     presenceSocket.on("newUser", (user: User) => {
       store.commit("addOnlineUser", user);
       console.log("onlineUsers", store.state.onlineUsers);

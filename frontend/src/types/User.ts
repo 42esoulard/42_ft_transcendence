@@ -13,5 +13,5 @@ export interface User {
   games: GameUser[];
   friendships_requested: Friendship[];
   friendships_adressed: Friendship[];
-
+  created_at?: string;
 }

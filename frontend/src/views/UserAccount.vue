@@ -53,6 +53,11 @@ import moment from "moment"; // Should not be in this component
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import EditUser from "@/components/EditUser.vue";
 import Modal from "@/components/Modal.vue";
+import { io } from "socket.io-client";
+
+export const presenceSocket = io("http://localhost:3000/presence", {
+  withCredentials: true
+});
 
 export default defineComponent({
   name: "UserAccount",
