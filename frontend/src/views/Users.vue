@@ -1,18 +1,22 @@
 <template>
-  <h1>List of all users in database</h1>
   <div v-if="users.length" class="users-div">
-    <div>
-      <div v-for="user in users" :key="user.id" class="user">
-        <h2>
-          <router-link :to="{ name: 'UserProfile', params: {username: user.username} }">
-            {{ user.username }}
-          </router-link>
-        </h2>
-
+    <div class="users">
+      <div class="users__title">All Users</div>
+      <div class="users-list">
+          <tr v-for="user in users" :key="user.id" class="users-list__elt">
+            <td>
+              <img class="users-list__avatar" :src="user.avatar" />
+            </td>
+            <td>
+              <router-link class="link link--user-list" :to="{ name: 'UserProfile', params: {username: user.username} }">
+                {{ user.username }}
+              </router-link>
+            </td>
+            <td>
+            </td>
+          </tr>
       </div>
-    </div>
-    <div>
-      <FriendsList />
+      <div class="users__search">searchbar</div>
     </div>
   </div>
   <div v-else>
@@ -42,31 +46,15 @@ export default defineComponent({
         .catch((err: any) => console.log(err.message));
   });
 
-    return {  users };
+  const   orderUsers = computed(() => {
+      return (users.value.sort((a, b) => a.username.localeCompare(b.username)));
+  })
+
+    return {  users, orderUsers };
   },
 });
 </script>
 
 <style scoped>
-.users-div {
-  display: grid;
-  grid-template: 100% / 80% 20%;
-  width: 80%;
-  margin: auto;
-}
-.user {
-  background: #f4f4f4;
-  padding: 20px;
-  border-radius: 10px;
-  margin: 10px auto;
-  max-width: 600px;
-  cursor: pointer;
-  color: #444;
-}
-.user:hover {
-  background: #ddd;
-}
-.user a {
-  text-decoration: none;
-}
+
 </style>
