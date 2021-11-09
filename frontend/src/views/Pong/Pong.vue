@@ -2,7 +2,7 @@
 <template>
   <div v-if="!queuing">
     <h1>Click to play</h1>
-		<button v-on:click="JoinQueue()"> Join Game </button>
+		<button class="button" v-on:click="JoinQueue()"> Join Game </button>
   </div>
 
   <div v-else>
@@ -44,6 +44,7 @@ export default defineComponent ({
 })
 </script>
 
-<style>
+<style lang="scss">
+@import "../../../sass/main.scss";
 
 </style>

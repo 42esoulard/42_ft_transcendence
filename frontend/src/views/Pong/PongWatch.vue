@@ -2,10 +2,10 @@
 	<h1> Select the game you want to watch </h1>
 	<div v-for="game in games" :key="game.id">
 		<div v-if="game.users.length == 1">
-			<button v-on:click="WatchGame(game.id)"> game #{{ game.id }} : {{ game.users[0].user.username }} vs {{ game.users[0].user.username }} </button>
+			<button class="button" v-on:click="WatchGame(game.id)"> game #{{ game.id }} : {{ game.users[0].user.username }} vs {{ game.users[0].user.username }} </button>
 		</div>
 		<div v-else>
-			<button v-on:click="WatchGame(game.id)"> game #{{ game.id }} : {{ game.users[0].user.username }} vs {{ game.users[1].user.username }} </button>
+			<button class="button" v-on:click="WatchGame(game.id)"> game #{{ game.id }} : {{ game.users[0].user.username }} vs {{ game.users[1].user.username }} </button>
 		</div>
 	</div>
 </template>
@@ -57,6 +57,7 @@ export default defineComponent({
 })
 </script>
 
-<style>
+<style lang="scss">
+@import "../../../sass/main.scss";
 
 </style>
