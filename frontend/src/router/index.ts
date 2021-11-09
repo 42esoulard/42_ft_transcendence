@@ -116,7 +116,7 @@ const routes: Array<RouteRecordRaw> = [
     component: PongWatch
   },
   {
-    path: '/pong/watch/:id',
+    path: '/pong/watch/live',
     name: 'PongGameWatch',
     component: PongGameWatch,
     beforeEnter(to, from, next) {
