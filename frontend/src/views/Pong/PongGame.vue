@@ -21,6 +21,7 @@ import { clientSocket } from '@/App.vue'
 import { defineComponent, onMounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import getDraw from '@/composables/draw'
+import { Coordinates, PlayerPositions, PlayerScores } from '@/types/PongGame'
 
 export default defineComponent({
 	setup() {
@@ -54,7 +55,7 @@ export default defineComponent({
 
 		// socket event listeners
 		const socket = ref(clientSocket)
-		socket.value.on("position", (newBallPosition, newPlayerPositions) => {
+		socket.value.on("position", (newBallPosition: Coordinates, newPlayerPositions: PlayerPositions) => {
 			ballPosition.value.x = newBallPosition.x * windowWidth.value
 			ballPosition.value.y = newBallPosition.y * windowWidth.value
 			playerPositions.value.player1 = newPlayerPositions.player1 * windowWidth.value
@@ -62,7 +63,7 @@ export default defineComponent({
 			draw()
 		})
 	
-		socket.value.on("score", newScore => {
+		socket.value.on("score", (newScore: PlayerScores) => {
 			score.value = newScore
 			draw()
 		})
@@ -74,7 +75,7 @@ export default defineComponent({
 		
 		const winningPlayer = ref<string | string[]>('')
 		const gameIsOver = ref(false)
-		socket.value.on("gameOver", (player1Won) => {
+		socket.value.on("gameOver", (player1Won: boolean) => {
 			window.removeEventListener("keydown", onKeyDown)
 			gameHasStarted.value = true
 			gameIsOver.value = true
@@ -100,8 +101,6 @@ export default defineComponent({
 			else if (event.code === 'ArrowDown')
 				SendMoveMsg('down')
 		}
-
-		
 
 		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, canvas, SendMoveMsg }
 

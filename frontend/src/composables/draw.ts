@@ -1,4 +1,5 @@
 
+import { Coordinates, PlayerPositions, PlayerScores } from '@/types/PongGame'
 import { ref } from 'vue'
 
 var CANVAS_WIDTH_RATIO = process.env.VUE_APP_CANVAS_WIDTH
@@ -19,9 +20,9 @@ const getDraw = () => {
 	const windowWidth = ref(window.innerWidth)
 	const context = ref<CanvasRenderingContext2D | null>(null)
 	const canvas = ref<HTMLCanvasElement | null>(null)
-	const ballPosition = ref({x:0, y:0})
-	const playerPositions = ref({player1:0, player2:0})
-	const score = ref({player1: 0,player2: 0})
+	const ballPosition = ref<Coordinates>({x:0, y:0})
+	const playerPositions = ref<PlayerPositions>({player1:0, player2:0})
+	const score = ref<PlayerScores>({player1: 0,player2: 0})
 	
 	// helper variables
 
