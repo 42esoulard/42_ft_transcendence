@@ -7,7 +7,7 @@
   align-items: center;
   @media (max-width: 950px){
     align-items: flex-start;
-    grid-template: 30% 70% / 100%;
+    grid-template: 50% 50% / 100%;
     height: 70%;
   }
   @media (max-width: 800px) {
@@ -106,9 +106,6 @@
 .list-div {
   width: $list-div-width;
   height: $list-div-height;
-  @media (max-width: 950px) {
-    height: 40%;
-  }
   @media (max-width: 800px) {
     height: $list-div-height;
   }

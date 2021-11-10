@@ -5,52 +5,44 @@
         v-if="user.username == self.username"
         class="profile-left__avatar-img"
         :src="self.avatar"
-        alt=""
-      />
+        alt="" />
       <img v-else :src="user.avatar" class="profile-left__avatar-img" alt="" />
     </div>
     <span class="profile-left__name">{{ user.username }} </span>
     <span class="profile-left__since">member since {{ formatedDate }}</span>
     <span v-if="isOnline" class="profile-left__status"
-      ><i class="status status--online fas fa-circle" /> online</span
-    >
+      ><i class="status status--online fas fa-circle" /> online</span>
     <span v-else class="profile-left__status"
-      ><i class="status status--offline fas fa-circle" /> offline</span
-    >
+      ><i class="status status--offline fas fa-circle" /> offline</span>
   </div>
   <div v-if="isFriend(user) != -1" class="profile-left__social">
     <button
       v-show="isFriend(user) == 0"
       @click="addFriend(user)"
-      class="button button--second"
-    >
+      class="button button--second">
       <i class="upload-icon fas fa-user-plus" /> add friend
     </button>
     <button
       v-show="isFriend(user) == 1"
       @click="removeFriend(user)"
-      class="button button--second"
-    >
+      class="button button--second">
       <i class="upload-icon fas fa-user-minus" /> remove friend
     </button>
     <button
       v-show="isFriend(user) == 2"
       @click="acceptFriend(user)"
-      class="button button--second"
-    >
+      class="button button--second">
       <i class="upload-icon fas fa-user-plus" /> accept invitation
     </button>
     <button
       v-show="isFriend(user) == 3"
       @click="removeFriend(user)"
-      class="button button--second"
-    >
+      class="button button--second">
       <i class="upload-icon fas fa-user-times" /> cancel invitation
     </button>
     <button
       v-if="user.username != self.username"
-      class="button button--primary"
-    >
+      class="button button--primary">
       <i class="upload-icon fas fa-envelope" /> send message
     </button>
     <button v-if="user.username != self.username" class="button button--third">
@@ -67,8 +59,7 @@
     <button
       v-if="!self.two_fa_enabled"
       class="button button--third"
-      @click="toggleModal(1)"
-    >
+      @click="toggleModal(1)">
       Enable 2FA
     </button>
     <button v-else class="button button--second" @click="deactivateTwoFactor">
@@ -177,7 +168,6 @@ export default defineComponent({
     });
 
     const addFriend = async (user: User) => {
-      //console.log("SELF", store.state.user, "USER", user)
       await friendshipApi
         .saveFriendship({
           pending: true,

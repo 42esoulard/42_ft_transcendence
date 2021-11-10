@@ -4,7 +4,7 @@
       <ProfileLeft :user="user" />
     </div>
     <div class="profile-right">
-      <Stats :user="user"/>
+      <Stats :user="user" />
     </div>
   </div>
 </template>
@@ -40,6 +40,7 @@ export default defineComponent({
     const formatedDate = computed(() => {
       return moment(userRef.value.created_at as Date).format("MM-DD-YYYY");
     });
+
     return { user: computed(() => userRef.value), formatedDate };
   }
 });

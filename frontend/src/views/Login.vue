@@ -1,29 +1,51 @@
 <template>
-  <h1>Welcome to ft_transcendence</h1>
   <div v-if="isTwoFactorEnabled">
     <OtpInput :authApi="authApi" :codeSendToUrl="codeSendToUrl" />
   </div>
-  <div v-else class="log-in-div">
-    <button class="button button--log-in" @click="logInWith42">
-      <span>Login with </span>
-      <img
-        class="button-log-in__logo"
-        src="../assets/42_logo_white.png"
-        alt=""
-      />
-    </button>
-    <button class="button button--log-in" @click="$router.push('fake-login')">
-      Login with fake user
-    </button>
+  <div v-else class="log-in">
+    <div class="log-in-stat">
+      <span class="log-in-stat__text log-in-stat__text--number">{{ nbGames }}</span>
+      <span class="log-in-stat__text">games</span>
+    </div>
+    <div class="log-in-buttons">
+      <button class="button button--log-in" @click="logInWith42">
+        <span>Login with </span>
+        <img
+          class="button-log-in__logo"
+          src="../assets/42_logo_white.png"
+          alt=""
+        />
+      </button>
+      <button class="button button--log-in" @click="$router.push('fake-login')">
+        Fake login
+      </button>
+    </div>
+    <div class="log-in-stat">
+      <span class="log-in-stat__text log-in-stat__text--number">{{ nbUsers }}</span>
+      <span class="log-in-stat__text">users</span>
+    </div>
+    <div class="log-in-stat">
+      <span class="log-in-stat__text log-in-stat__text--number">{{ nbOngoing }}</span>
+      <span class="log-in-stat__text">ongoing</span>
+    </div>
+    <div class="log-in-stat">
+      <span class="log-in-stat__text log-in-stat__text--number">{{ nbOnline }}</span>
+      <span class="log-in-stat__text">online</span>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, reactive, ref } from "vue";
+import { defineComponent, onBeforeMount, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import OtpInput from "@/components/OtpInput.vue";
 import { useStore } from "vuex";
 import { useAuthApi } from "@/plugins/api.plugin";
+import { useUserApi } from "@/plugins/api.plugin";
+import { usePongApi } from "@/plugins/api.plugin";
+import { User } from "@/types/User";
+import { presenceSocket } from "@/App.vue";
+
 
 export default defineComponent({
   name: "Login",
@@ -33,11 +55,16 @@ export default defineComponent({
     const router = useRouter();
     const store = useStore();
     const authApi = useAuthApi();
+    const userApi = useUserApi();
+    const pongApi = usePongApi();
+    const nbUsers = ref();
+    const nbGames = ref();
+    const nbOngoing = ref();
+    const nbOnline = ref(store.state.onlineUsers.length);
 
     const isTwoFactorEnabled = ref(false);
     const qrcodeURL = ref("");
     const codeSendToUrl = ref("authenticate");
-    // const connected = ref(false);
 
     onBeforeMount(async () => {
       let redirectUrl = "account";
@@ -46,7 +73,6 @@ export default defineComponent({
       }
       if (route.query.code) {
         const code = route.query.code;
-        // router.replace("/login"); // to remove code from URL: DIRTY ?
 
         await authApi
           .login({ params: { code: code }, withCredentials: true })
@@ -64,6 +90,41 @@ export default defineComponent({
       }
     });
 
+    onMounted(() => {
+      userApi
+        .getUsers()
+        .then((res: any) => ( nbUsers.value = res.data.length ))
+        .catch((err: any) => console.log(err.message));
+      pongApi
+        .getAll()
+        .then((res: any) => ( nbGames.value = res.data.length ))
+        .catch((err: any) => console.log(err.message));
+      pongApi
+        .getOnGoingGames()
+        .then((res: any) => ( nbOngoing.value = res.data.length ))
+        .catch((err: any) => console.log(err.message));
+    });
+
+    const getProfile = async () => {
+      await authApi
+        .profile({withCredentials: true})
+        .then(response => {
+          store.state.user = response.data;
+        })
+        .catch( (err: Error) => {
+          console.log("ERROR GET PROFILE");
+        });
+    };
+
+    const sendConnection = () => {
+      presenceSocket.emit("connection", store.state.user);
+    };
+
+    presenceSocket.on("newUser", (user: User) => {
+      store.commit('addOnlineUser', user);
+      console.log("onlineUsers", store.state.onlineUsers);
+    });
+
     const logInWith42 = () => {
       if (route.query.from === "undefined") {
         route.query.from = "account";
@@ -71,12 +132,18 @@ export default defineComponent({
       window.location.href = `${process.env.VUE_APP_42_AUTH_URL}&state=${route.query.from}`;
     };
 
+
+
     return {
       logInWith42,
       isTwoFactorEnabled,
       qrcodeURL,
       codeSendToUrl,
-      authApi
+      authApi,
+      nbUsers,
+      nbOnline,
+      nbOngoing,
+      nbGames
     };
   }
 });

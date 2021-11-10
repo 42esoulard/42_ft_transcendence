@@ -1,0 +1,49 @@
+.log-in {
+  display: grid;
+  grid-template: 50% 50% / 33% 33% 33%;
+  margin: auto;
+  width: 1000px;
+  gap: 2rem;
+  padding-right: $sidebar-width;
+  @media (max-width: 1200px){
+    width: 800px;
+    grid-template: 50% 50% / 25% 50% 25%;
+  }
+  @media (max-width: 950px){
+    width: 100%;
+    height: 100%;
+  }
+  @media (max-width: 800px){
+    grid-template: 50% 50% / 20% 60% 20%;
+  }
+}
+
+.log-in-buttons {
+  align-self: center;
+  grid-row: 1 /3;
+  grid-column: 2 / 3;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.log-in-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem 0;
+}
+
+.log-in-stat__text {
+  font-family: 'Saira';
+  font-size: 2rem;
+  @media (max-width: 800px){
+    font-size: 1rem;
+  }
+  &--number {
+    font-size: 5rem;
+    @media (max-width: 800px){
+      font-size: 3rem;
+    }
+  }
+}

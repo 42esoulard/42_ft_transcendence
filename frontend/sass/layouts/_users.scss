@@ -1,13 +1,18 @@
 
 .users {
   display: grid;
-  grid-template: 8% 82% 10% / 100%;
+  grid-template: 8% 8% 74% 10% / 100%;
   width: $users-width;
   height: $users-height;
   background-color: $users-bg-color;
   border-radius: 20px;
   margin: auto;
   margin-top: 2rem;
+  @media (max-width: 600px){
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
 }
 
 .users__title {
@@ -22,25 +27,34 @@
   background-color: black;
 }
 
-.users__search {
+.users-search {
   background-color: black;
   border-radius: 0 0 20px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.users-search__bar {
+  border: none;
+  padding: 0.2rem 1rem;
+  font-family: 'Saira';
+  border-radius: 20px;
+  text-align: center;
 }
 
 .users-list {
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
-  padding-left: 5rem;
-  gap: 1rem;
+  padding: 0 6rem;
   overflow-y: scroll;
-  height: 95%;
 }
 
 .users-list__elt {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: space-between;
+  padding: 0.5rem;
 }
 
 .users-list__avatar {
@@ -48,4 +62,17 @@
   height: $users-avatar-width;
   border-radius: 50%;
   border: 2px solid white;
+}
+
+.users-list__interactions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.users-list-selectors {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
