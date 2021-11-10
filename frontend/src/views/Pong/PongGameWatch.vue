@@ -13,6 +13,7 @@ import { clientSocket } from '@/App.vue'
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import getDraw from '@/composables/draw'
+import { Coordinates, PlayerPositions, PlayerScores } from '@/types/PongGame'
 
 export default defineComponent({
 	setup() {
@@ -47,7 +48,7 @@ export default defineComponent({
 
 		// socket event listeners
 		const socket = ref(clientSocket)
-		socket.value.on("position", (newBallPosition, newPlayerPositions) => {
+		socket.value.on("position", (newBallPosition: Coordinates, newPlayerPositions: PlayerPositions) => {
 			ballPosition.value.x = newBallPosition.x * windowWidth.value
 			ballPosition.value.y = newBallPosition.y * windowWidth.value
 			playerPositions.value.player1 = newPlayerPositions.player1 * windowWidth.value
@@ -55,14 +56,14 @@ export default defineComponent({
 			draw()
 		})
 	
-		socket.value.on("score", new_score => {
+		socket.value.on("score", (new_score: PlayerScores) => {
 			score.value = new_score
 			draw()
 		})
 		
 		const winningPlayer = ref<string | string[]>('')
 		const gameIsOver = ref(false)
-		socket.value.on("gameOver", (player1Won) => {
+		socket.value.on("gameOver", (player1Won: boolean) => {
 			gameIsOver.value = true
 			if (player1Won)
 				winningPlayer.value = player1UserName.value
