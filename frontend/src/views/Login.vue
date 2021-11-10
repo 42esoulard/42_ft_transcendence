@@ -44,7 +44,6 @@ import { useAuthApi } from "@/plugins/api.plugin";
 import { useUserApi } from "@/plugins/api.plugin";
 import { usePongApi } from "@/plugins/api.plugin";
 import { User } from "@/types/User";
-import { presenceSocket } from "@/App.vue";
 
 
 export default defineComponent({
@@ -115,15 +114,6 @@ export default defineComponent({
           console.log("ERROR GET PROFILE");
         });
     };
-
-    const sendConnection = () => {
-      presenceSocket.emit("connection", store.state.user);
-    };
-
-    presenceSocket.on("newUser", (user: User) => {
-      store.commit('addOnlineUser', user);
-      console.log("onlineUsers", store.state.onlineUsers);
-    });
 
     const logInWith42 = () => {
       if (route.query.from === "undefined") {

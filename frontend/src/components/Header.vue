@@ -95,7 +95,6 @@ import { useStore } from "vuex";
 import { useAuthApi } from "@/plugins/api.plugin";
 import SideBarLink from './SideBarLink.vue';
 import { presenceSocket } from "@/views/UserAccount.vue";
-import SideBarLink from "./SideBarLink.vue";
 
 export default defineComponent({
   name: "UserAccount",
