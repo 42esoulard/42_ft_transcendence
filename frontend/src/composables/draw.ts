@@ -25,8 +25,8 @@ const getDraw = () => {
 	
 	// helper variables
 
-	var canvasWidth = windowWidth.value / CANVAS_WIDTH_RATIO
-	var canvasHeight = windowWidth.value / CANVAS_HEIGHT_RATIO
+	let canvasWidth = windowWidth.value / CANVAS_WIDTH_RATIO
+	let canvasHeight = windowWidth.value / CANVAS_HEIGHT_RATIO
 	
 
 	// returned functions
@@ -51,6 +51,7 @@ const getDraw = () => {
 			canvas.value.width = canvasWidth
 			canvas.value.height = canvasHeight
 		}
+		drawBackground()
 	}
 
 	const initCanvas = () => {
@@ -118,6 +119,7 @@ const getDraw = () => {
 	const drawScore = () => {
 		if (context.value)
 		{
+			context.value.fillStyle = 'white'
 			var font_size = windowWidth.value / SCORE_RATIO
 			context.value.font = `${font_size}px Arial`;
 			context.value.fillText(score.value.player1.toString(), canvasWidth / 4, canvasHeight / 5)

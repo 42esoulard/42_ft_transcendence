@@ -10,7 +10,7 @@
 	<div class="header__title" v-if="gameIsOver">
 		<h1> {{ winningPlayer }} won ! </h1>
 	</div>
-	<p>
+	<p v-if="!gameIsOver">
 		<button class="button" v-on:click="SendMoveMsg('up')"> Up </button>
 		<button class="button" v-on:click="SendMoveMsg('down')"> Down </button>
 	</p>
