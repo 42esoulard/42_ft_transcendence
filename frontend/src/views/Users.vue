@@ -67,7 +67,7 @@ export default defineComponent({
     const store = useStore();
     const userList = ref<User[]>([]);
     const friendList = ref<User[]>([]);
-    const onlineList = ref<User[]>([]);
+    const onlineList = store.state.onlineUsers;
     const userApi = useUserApi();
     const friendlist = ref(false);
     const onlinelist = ref(false);
@@ -79,8 +79,6 @@ export default defineComponent({
         .then((res: any) => {
           userList.value = res.data;
           userList.value.sort((a, b) => a.username.localeCompare(b.username));
-          onlineList.value = store.state.onlineUsers;
-          onlineList.value.sort((a, b) => a.username.localeCompare(b.username));
         })
         .catch((err: any) => console.log(err.message));
       userApi
@@ -108,11 +106,9 @@ export default defineComponent({
     const selectList = computed(() => {
       const list = ref();
       if (friendlist.value && onlinelist.value)
-        list.value = onlineList.value.filter(value =>
-          friendList.value.includes(value)
-        );
+        list.value = friendList.value.filter(user => (onlineList.find((u: User) => u.id === user.id)));
       else if (friendlist.value) list.value = friendList.value;
-      else if (onlinelist.value) list.value = onlineList.value;
+      else if (onlinelist.value) list.value = userList.value.filter(user => (onlineList.find((u: User) => u.id === user.id)));
       else list.value = userList.value;
       if (searchQuery.value.length) {
         list.value = list.value.filter((entity: User) =>
