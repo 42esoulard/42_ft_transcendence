@@ -94,7 +94,7 @@
 
     <teleport to="#modals">
       <transition name="fade--error">
-        <div v-if="newChannelForm || passwordPrompt || settingsModal" class="backdrop"></div>
+        <div v-if="newChannelForm || passwordPrompt" class="backdrop"></div>
       </transition>
       <transition-group name="zoomin">
         <Modal v-if="newChannelForm" @close="toggleModal(0)">

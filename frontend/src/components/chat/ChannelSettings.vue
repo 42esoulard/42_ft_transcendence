@@ -22,7 +22,7 @@
 
     </div>
 
-    <div >
+    <div>
 
       <div class='chat-admin-pannel__tabs'>
         <button class='chat-admin-pannel__tab' @click="selectedTab = 'all'">Members</button>
@@ -40,10 +40,10 @@
               <span v-if="cm.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
             </div>
             <div v-else>
-              <span v-if="cm.mute"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--mute" title="Unmute user" /></span>
-              <span v-else @click="toggleTimer = 'mute'"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--greyed" title="Mute user" /></span>
-              <span v-if="cm.ban"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--ban" title="Unban user" /></span>
-              <span v-else @click="toggleTimer = 'ban'"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--greyed" title="Ban user" /></span>
+              <span v-if="cm.mute" @click="toggleTimer = 'unmute'; targetCm = cm"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--mute" title="Unmute user" /></span>
+              <span v-else @click="toggleTimer = 'muted'; targetCm = cm"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--greyed" title="Mute user" /></span>
+              <span v-if="cm.ban" @click="toggleTimer = 'unban'; targetCm = cm">><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--ban" title="Unban user" /></span>
+              <span v-else @click="toggleTimer = 'banned'; targetCm = cm"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--greyed" title="Ban user" /></span>
             </div>
           </li>
         </div>
@@ -90,8 +90,8 @@
       </transition>
       <transition-group name="zoomin">
         <Modal v-if="toggleTimer && activeChannel" @close="toggleModal()">
-          <template v-slot:new-channel-form>
-            <NewChannelForm :channelMembers="activeChannel.channel.channel_members" @close="toggleModal()" />
+          <template v-slot:mute-ban-timer>
+            <MuteBanTimer :action="toggleTimer" :targetCm="targetCm" :activeChannel="activeChannel" @close="toggleModal()" />
           </template>
         </Modal>
       </transition-group>
@@ -104,19 +104,21 @@ import { ChatApi } from "@/../sdk/typescript-axios-client-generated";
 import { socket } from "./ChatComponent.vue"
 import { useStore } from 'vuex';
 import Modal from "@/components/Modal.vue";
-import NewChannelForm from "@/components/chat/NewChannelForm.vue";
+import MuteBanTimer from "@/components/chat/MuteBanTimer.vue";
+import { User } from "@/types/User"; 
  
 export default defineComponent({
   name: 'ChannelSettings',
   props: ['activeChannel'],
-  components: { Modal, NewChannelForm },
+  components: { Modal, MuteBanTimer },
   emits: ["close-settings"],
   setup(props, context) {
     const api = new ChatApi();
     // console.log("in settingsmodal", props.channelMembers)
 
-    const channelMembers = props.activeChannel.channel.channel_members;
+    const channelMembers = ref(props.activeChannel.channel.channel_members);
     const toggleTimer = ref('');
+    const targetCm = ref();
 
     const closeChannelSettings = () => {
       context.emit('close-settings')
@@ -224,6 +226,7 @@ export default defineComponent({
       toggleTimer,
       channelMembers,
       closeChannelSettings,
+      targetCm,
     }
   }
 });

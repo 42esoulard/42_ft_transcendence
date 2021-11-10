@@ -171,4 +171,8 @@ export class ChannelsService {
       true,
     );
   }
+
+  async muteBanMember(action: string, cm_id: number, end_date: number) {
+    return await this.channelMemberService.muteBanMember(action, cm_id, end_date);
+  }
 }

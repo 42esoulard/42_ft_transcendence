@@ -87,6 +87,28 @@ export class ChannelMembersService {
       .catch((err) => console.log(err));
   }
 
+  async muteBanMember(action: string, cm_id: number, end_date: number) {
+    await this.getChannelMemberById(cm_id)
+      .then(async (res) => {
+        switch (action) {
+          case 'unmute':
+            res.mute = null;
+            break;
+          case 'unban':
+            res.ban = null;
+            break;
+          case 'muted':
+            res.mute = end_date.toString();
+            break;
+          case 'banned':
+            res.ban = end_date.toString();
+            break;
+        }
+        return await this.channelMembersRepository.save(res);
+      })
+      .catch((err) => console.log(err));
+  }
+
   // /**
   //  * Lists all channelmembers in database
   //  * nb: find() is a function from the typeORM library

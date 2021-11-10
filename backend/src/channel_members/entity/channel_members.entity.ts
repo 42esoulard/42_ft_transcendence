@@ -26,11 +26,11 @@ export class ChannelMembers {
   @Column({ default: false })
   is_admin: boolean;
 
-  @Column({ type: 'timestamp', nullable: true, default: null })
-  ban: Date;
+  @Column({ nullable: true, default: null })
+  ban: string;
 
-  @Column({ type: 'timestamp', nullable: true, default: null })
-  mute: Date;
+  @Column({ nullable: true, default: null })
+  mute: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
   created_at: Date;
