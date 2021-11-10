@@ -167,15 +167,18 @@ router.beforeEach(async (to, from) => {
       await getProfile();
     }
     if (!store.state.user) {
-      return `/login`; // redirected to login
+      return '/login'; // redirected to login
     } else {
       return true; // the route is allowed
     }
   } else if (to.matched.some(record => record.meta.requiresVisitor)) {
     // Use local storage to store isLoggedIn boolean to block access to login page while user is logged in ?
     // localStorage.setItem('isLoggedIn', 'true');
+    if (!store.state.user) {
+      await getProfile();
+    }
     if (store.state.user) {
-      return '/';
+      return '/account';
     } else {
       return true;
     }

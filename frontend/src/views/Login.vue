@@ -66,10 +66,6 @@ export default defineComponent({
     const codeSendToUrl = ref("authenticate");
 
     onBeforeMount(async () => {
-      let redirectUrl = "account";
-      if (route.query.state != "undefined") {
-        redirectUrl = route.query.state as string;
-      }
       if (route.query.code) {
         const code = route.query.code;
 
@@ -82,7 +78,7 @@ export default defineComponent({
               if (res.data.newlyCreated == true) {
                 store.commit("setFirstTimeConnect", true);
               }
-              router.push(redirectUrl);
+              router.push("/account");
             }
           })
           .catch((err: any) => console.log(err.message));
@@ -116,10 +112,7 @@ export default defineComponent({
     };
 
     const logInWith42 = () => {
-      if (route.query.from === "undefined") {
-        route.query.from = "account";
-      }
-      window.location.href = `${process.env.VUE_APP_42_AUTH_URL}&state=${route.query.from}`;
+      window.location.href = process.env.VUE_APP_42_AUTH_URL;
     };
 
 
