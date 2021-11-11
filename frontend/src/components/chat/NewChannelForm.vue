@@ -39,14 +39,14 @@
 
 <script lang="ts">
 import { ref, defineComponent, computed, onMounted } from "vue";
-import { DefaultApi } from "@/../sdk/typescript-axios-client-generated";
+import { ChatApi } from "@/../sdk/typescript-axios-client-generated";
 import { socket } from "./ChatComponent.vue"
 import { useStore } from 'vuex'
  
 export default defineComponent({
   name: 'NewChannelForm',
   setup(props, context) {
-    const api = new DefaultApi();
+    const api = new ChatApi();
 
     const channelName = ref('');
     const channelType = ref('public');

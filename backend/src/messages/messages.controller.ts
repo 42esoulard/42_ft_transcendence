@@ -13,10 +13,12 @@ import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiTags,
 } from '@nestjs/swagger';
-import { Channel } from 'src/channels/interfaces/channel.interface';
+// import { Channel } from 'src/channels/interfaces/channel.interface';
 // import { UpdateMessageDto } from './dto/updateMessage.dto';
 
+@ApiTags('Chat')
 @Controller('messages')
 export class MessagesController {
   constructor(private readonly messageService: MessagesService) {}

@@ -62,6 +62,26 @@ export class ChannelsService {
     return await this.channelMemberService.getChannelMember(channel, user);
   }
 
+  async getChannelMembers(channel_id: number): Promise<ChannelMember> {
+    const channel: Channels = await this.getChannelById(channel_id);
+
+    return await this.channelMemberService.getChannelMembers(channel);
+  }
+
+  // async getChannelMutedMembers(channel_id: number): Promise<ChannelMember> {
+  //   const channel: Channels = await this.getChannelById(channel_id);
+
+  //   return await this.channelMemberService.getChannelMutedMembers(channel);
+  // }
+
+  // async getChannelBannedMembers(
+  //   channel_id: number,
+  // ): Promise<ChannelMember> {
+  //   const channel: Channels = await this.getChannelById(channel_id);
+
+  //   return await this.channelMemberService.getChannelMutedMembers(channel);
+  // }
+
   async getUserChannels(user_id: number): Promise<ChannelMember[]> {
     const user: Users = await this.userService.getUserbyId(user_id);
     return await this.channelMemberService.getUserChannels(user);
@@ -122,11 +142,8 @@ export class ChannelsService {
     return await this.channelMemberService.createChannelMember(channel, user);
   }
 
-  async leaveChannel(channel_id: number, user_id: number) {
-    const channel: Channels = await this.getChannelById(channel_id);
-    const user: Users = await this.userService.getUserbyId(user_id);
-
-    await this.channelMemberService.deleteChannelMember(channel, user);
+  async leaveChannel(cm_id: number) {
+    await this.channelMemberService.deleteChannelMember(cm_id);
   }
 
   /**
@@ -153,5 +170,9 @@ export class ChannelsService {
       true,
       true,
     );
+  }
+
+  async muteBanMember(action: string, cm_id: number, end_date: number) {
+    return await this.channelMemberService.muteBanMember(action, cm_id, end_date);
   }
 }

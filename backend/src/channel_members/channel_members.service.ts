@@ -16,7 +16,7 @@ export class ChannelMembersService {
   async getUserChannels(user: Users): Promise<ChannelMembers[]> {
     const res = await this.channelMembersRepository.find({
       where: { member: user },
-      relations: ['channel'],
+      relations: ['channel', 'member'],
       order: { id: 'ASC' },
     });
     // const res = await this.channelMembersRepository
@@ -37,6 +37,24 @@ export class ChannelMembersService {
     });
   }
 
+  async getChannelMembers(channel: Channels) {
+    return await this.channelMembersRepository.findOne({
+      where: {
+        channel: channel,
+      },
+      relations: ['channel', 'member'],
+    });
+  }
+
+  async getChannelMemberById(cm_id: number) {
+    return await this.channelMembersRepository.findOne({
+      where: {
+        id: cm_id,
+      },
+      relations: ['channel', 'member'],
+    });
+  }
+
   async createChannelMember(
     channel: Channels,
     user: Users,
@@ -51,11 +69,8 @@ export class ChannelMembersService {
     });
   }
 
-  async deleteChannelMember(channel: Channels, user: Users) {
-    this.channelMembersRepository.delete({
-      channel: channel,
-      member: user,
-    });
+  async deleteChannelMember(cm_id: number) {
+    this.channelMembersRepository.delete(cm_id);
   }
 
   async toggleAdmin(channel: Channels, user: Users) {
@@ -68,6 +83,28 @@ export class ChannelMembersService {
           res.is_admin = !res.is_admin;
           return this.channelMembersRepository.save(res);
         }
+      })
+      .catch((err) => console.log(err));
+  }
+
+  async muteBanMember(action: string, cm_id: number, end_date: number) {
+    await this.getChannelMemberById(cm_id)
+      .then(async (res) => {
+        switch (action) {
+          case 'unmute':
+            res.mute = null;
+            break;
+          case 'unban':
+            res.ban = null;
+            break;
+          case 'muted':
+            res.mute = end_date.toString();
+            break;
+          case 'banned':
+            res.ban = end_date.toString();
+            break;
+        }
+        return await this.channelMembersRepository.save(res);
       })
       .catch((err) => console.log(err));
   }
