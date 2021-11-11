@@ -11,7 +11,7 @@
           </p>
         </div> -->
   
-        <ChannelSettings @close-settings="channelSettings = false" v-if="channelSettings" :activeChannel="activeChannel" />
+        <ChannelSettings v-if="channelSettings"  @close-settings="channelSettings = false" @update-channel="getMessagesUpdate(activeChannel.channel.id)" :activeChannel="activeChannel" />
         <div v-else class="chat-box">
             <div v-if="activeChannel" class='chat-header'>
               <div class="chat-header__channel-name" :title="activeChannel.channel.name">{{ activeChannel.channel.name }}</div>
