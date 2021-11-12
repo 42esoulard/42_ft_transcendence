@@ -59,8 +59,7 @@
 <script lang="ts">
 import { defineComponent, inject, ref, computed, onMounted } from "vue";
 import moment from "moment";
-import { GameUser } from "@/types/GameUser";
-import { Game } from "@/types/Game";
+import { GameUser, Game } from 'sdk/typescript-axios-client-generated';
 import { useUserApi } from "@/plugins/api.plugin";
 
 export default defineComponent({

@@ -61,7 +61,7 @@
 
 <script lang="ts">
 import { defineComponent, inject, onMounted, ref, computed } from "vue";
-import { User } from "@/types/User";
+import { User } from 'sdk/typescript-axios-client-generated';
 import { useStore } from "@/store";
 import { useUserApi } from "@/plugins/api.plugin";
 
@@ -71,7 +71,6 @@ export default defineComponent({
     const store = useStore();
     const userList = ref<User[]>([]);
     const friendList = ref<User[]>([]);
-    const onlineList = store.state.onlineUsers;
     const userApi = useUserApi();
     const friendlist = ref(false);
     const onlinelist = ref(false);
@@ -114,13 +113,13 @@ export default defineComponent({
     const selectList = computed(() => {
       const list = ref();
       if (friendlist.value && onlinelist.value)
-        list.value = friendList.value.filter(user =>
-          onlineList.find((u: User) => u.id === user.id)
+        list.value = friendList.value.filter((user) =>
+          store.state.onlineUsers.find((u: User) => u.id === user.id)
         );
       else if (friendlist.value) list.value = friendList.value;
       else if (onlinelist.value)
-        list.value = userList.value.filter(user =>
-          onlineList.find((u: User) => u.id === user.id)
+        list.value = userList.value.filter((user) =>
+          store.state.onlineUsers.find((u: User) => u.id === user.id)
         );
       else list.value = userList.value;
       if (searchQuery.value.length) {
@@ -141,8 +140,8 @@ export default defineComponent({
       friendlist,
       onlinelist,
       selectList,
-      searchQuery
+      searchQuery,
     };
-  }
+  },
 });
 </script>

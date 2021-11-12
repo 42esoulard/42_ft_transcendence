@@ -52,6 +52,15 @@ export class UsersController {
     return users;
   }
 
+  @Get('banned')
+  async getBannedUsers(): Promise<User[]> {
+    const users: User[] = await this.userService.getBannedUsers();
+    if (users == undefined) {
+      throw new NotFoundException('No users in database');
+    }
+    return users;
+  }
+
 
 	/**
 	* Returns a user found in database by its id.

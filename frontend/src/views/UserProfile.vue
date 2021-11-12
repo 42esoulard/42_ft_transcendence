@@ -14,7 +14,7 @@ import { defineComponent, inject, ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import Stats from "../components/Stats.vue";
 import ProfileLeft from "../components/ProfileLeft.vue";
-import { User } from "@/types/User";
+import { User } from 'sdk/typescript-axios-client-generated';
 import moment from "moment";
 import { useRoute } from "vue-router";
 import { useUserApi } from "@/plugins/api.plugin";

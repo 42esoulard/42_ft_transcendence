@@ -1,5 +1,5 @@
 <template>
-  <!-- 
+  <!--
     - Name? [check it doesn't exist yet in db]
     - Type [radio buttons]: public? Private (newcomers must be invited by a member)?
     - If password-protected: [check regex OK, check password match]
@@ -32,7 +32,7 @@
       </div>
       <div>
         <div v-if="selectedTab === 'all'" class='chat-admin-pannel__users-list'>
-          <li v-for="cm in activeChannel.channel.channel_members" :key="cm.id" class='chat-admin-pannel__user'> 
+          <li v-for="cm in activeChannel.channel.channel_members" :key="cm.id" class='chat-admin-pannel__user'>
             <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: cm.member.username} }">
               {{ cm.member.username }}
             </router-link>
@@ -49,14 +49,14 @@
           </li>
         </div>
         <div v-if="selectedTab === 'muted'" class='chat-admin-pannel__users-list'>
-          <li v-for="cm in mutedMembers" :key="cm.id" class='chat-admin-pannel__user'> 
+          <li v-for="cm in mutedMembers" :key="cm.id" class='chat-admin-pannel__user'>
             <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: cm.member.username} }">
               {{ cm.member.username }}
             </router-link>
           </li>
         </div>
         <div v-if="selectedTab === 'banned'" class='chat-admin-pannel__users-list'>
-          <li v-for="cm in bannedMembers" :key="cm.id" class='chat-admin-pannel__user'> 
+          <li v-for="cm in bannedMembers" :key="cm.id" class='chat-admin-pannel__user'>
             <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: cm.member.username} }">
               {{ cm.member.username }}
             </router-link>
@@ -69,7 +69,7 @@
 
       <label class="chat-channel-form__subtitle" for='name'>Channel name:*</label>
       <input class="chat-channel-form__input" required type="text" name='name' id='chanName' placeholder='My Cool Channel' minlength="1" maxlength="200" v-model="channelName" @input="checkName()">
-      
+
       <div class="channelAccessContainer">
         <label class="chat-channel-form__subtitle">Channel access:*</label>
         <label class='chat-channel-form__radio-container'  title='A public channel is visible and accessible to any user' id='public'>
@@ -100,7 +100,7 @@
           </template>
         </Modal>
       </transition-group>
-    </teleport> 
+    </teleport>
 </template>
 
 <script lang="ts">
@@ -110,8 +110,8 @@ import { socket } from "./ChatComponent.vue"
 import { useStore } from 'vuex';
 import Modal from "@/components/Modal.vue";
 import MuteBanTimer from "@/components/chat/MuteBanTimer.vue";
-import { User } from "@/types/User"; 
- 
+import { User } from 'sdk/typescript-axios-client-generated';
+
 export default defineComponent({
   name: 'ChannelSettings',
   props: ['activeChannel'],
@@ -136,7 +136,7 @@ export default defineComponent({
     }
 
     const toggleModal = (action: string, cm: ChannelMember) => {
-      toggleTimer.value = action; 
+      toggleTimer.value = action;
       targetCm.value = cm;
     }
 
@@ -164,7 +164,7 @@ export default defineComponent({
       const nameInput =  <HTMLInputElement>document.querySelector('input[id=\'chanName\']')!;
 
       api.getChannelByName(channelName.value)
-      .then(() => { 
+      .then(() => {
         nameInput.setCustomValidity("A channel named [" + channelName.value + "] already exists")
         validName = false;
       })
@@ -200,14 +200,14 @@ export default defineComponent({
         validPasswordConf = true;
       }
     }
-  
+
     const submitInputs = () => {
       checkName();
       checkPassword();
       checkPasswordConf();
       if (!validPassword || !validPasswordConf)
         return;
-    
+
       if (!validName)
         return;
 
@@ -215,7 +215,7 @@ export default defineComponent({
       wasSubmitted.value = true;
       const newChannel = api.saveChannel({
         name: channelName.value,
-        owner_id: user.id, 
+        owner_id: user.id,
         type: channelType.value,
         password: channelPassword.value
       })

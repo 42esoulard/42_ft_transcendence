@@ -55,9 +55,9 @@
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, PropType } from "vue";
 import moment from "moment";
-import { Friendship } from "@/types/Friendship";
+import { Friendship } from 'sdk/typescript-axios-client-generated';
 import { useUserApi, useFriendshipApi } from "@/plugins/api.plugin";
-import { User } from "@/types/User";
+import { User } from 'sdk/typescript-axios-client-generated';
 import { useStore } from "vuex";
 
 export default defineComponent({

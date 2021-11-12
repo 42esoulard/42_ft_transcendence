@@ -90,9 +90,8 @@
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, PropType } from "vue";
 import moment from "moment";
-import { Friendship } from "@/types/Friendship";
+import { User, Friendship } from 'sdk/typescript-axios-client-generated';
 import { useUserApi, useFriendshipApi, useAuthApi } from "@/plugins/api.plugin";
-import { User } from "@/types/User";
 import { useStore } from "@/store";
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import EditUser from "@/components/EditUser.vue";
@@ -174,9 +173,8 @@ export default defineComponent({
       if (store.state.user) {
         await friendshipApi
           .saveFriendship({
-            pending: true,
             requester: store.state.user,
-            adressee_id: user.id
+            adressee: user
           })
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
@@ -187,8 +185,8 @@ export default defineComponent({
       if (store.state.user) {
         await friendshipApi
           .removeFriendship({
-            first_id: user.id,
-            second_id: store.state.user.id
+            user1: user,
+            user2: store.state.user
           })
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
@@ -199,8 +197,7 @@ export default defineComponent({
       if (store.state.user) {
         await friendshipApi
           .validateFriendship({
-            pending: true,
-            requester_id: user.id,
+            requester: user,
             adressee: store.state.user
           })
           .then((res: any) => window.location.reload())

@@ -10,7 +10,7 @@
             {{ user.username }} {{ user.action }}
           </p>
         </div> -->
-  
+
         <ChannelSettings v-if="channelSettings"  @close-settings="channelSettings = false" @update-channel="getMessagesUpdate(activeChannel.channel.id)" :activeChannel="activeChannel" />
         <div v-else class="chat-box">
             <div v-if="activeChannel" class='chat-header'>
@@ -51,7 +51,7 @@
                     <div>: </div>
                     <div class="chat-messages__content">{{ message.content }}</div>
                 </li>
-                
+
               </ul>
             </div>
           </div>
@@ -61,7 +61,7 @@
               <span v-else @click="applyForMembership(activeChannel.channel)"><img class="fa fa-unlock fa-10x chat-channels__lock-img chat-channels__lock-img--unlocked" title="This channel is password-protected" /></span>
             </div>
           </div>
-          
+
 
           <div>
             <form @submit.prevent="send">
@@ -88,7 +88,7 @@
                 </div>
               </div>
             </form>
-          </div>        
+          </div>
         </div>
     </div>
 
@@ -113,19 +113,16 @@
           </template>
         </Modal> -->
       </transition-group>
-    </teleport>  
+    </teleport>
 </template>
 
 <script lang="ts">
 import { io } from "socket.io-client";
 import { useStore } from 'vuex';
 import { defineComponent, reactive, ref, watch, computed } from "vue";
-import { ChatApi, User } from "@/../sdk/typescript-axios-client-generated";
 import { useUserApi } from "@/plugins/api.plugin";
 import { Info } from "@/types/Info";
-import { Message } from "@/types/Message";
-import { Channel } from "@/types/Channel"
-import { ChannelMember } from "@/types/ChannelMember"
+import { ChatApi, User, Message, Channel, ChannelMember } from '@/../sdk/typescript-axios-client-generated';
 import Modal from "@/components/Modal.vue";
 import Toast from "@/components/Toast.vue";
 import NewChannelForm from "@/components/chat/NewChannelForm.vue";
@@ -135,13 +132,13 @@ import ChannelsList from "@/components/chat/ChannelsList.vue";
 
 /*
 ** socket is defined here to be able to import it from other chat related components
-*/ 
+*/
 export const socket = io("http://localhost:3000/chat");
 
 export const ChatComponent = defineComponent({
   name: "ChatComponent",
   components: { NewChannelForm, LockedChannelForm, ChannelSettings, ChannelsList, Modal, Toast },
-  
+
   beforePageLeave() {
     this.socket.emit("leave", 'a user');
   },
@@ -205,7 +202,7 @@ export const ChatComponent = defineComponent({
 
     /*
     ** When the currently viewed channel gets a new message (either sent or received).
-    ** All channel info is refetched from the API to get the whole message info and 
+    ** All channel info is refetched from the API to get the whole message info and
     ** updated related infos (channel, user..)
     */
     const getMessagesUpdate = async (channelId: number) => {
@@ -223,7 +220,7 @@ export const ChatComponent = defineComponent({
     }
 
     const send = async () => {
-      
+
       if (!newMessage.value)
         return;
       const newContent = {
@@ -239,12 +236,12 @@ export const ChatComponent = defineComponent({
 
       await api.saveMessage({
           channel_id: newContent.channel.id,
-          author_id: newContent.author.id, 
+          author_id: newContent.author.id,
           content: newContent.content,
       })
-      .then(() => { 
-        getMessagesUpdate(newContent.channel.id); 
-        socket.emit("chat-message", newContent); 
+      .then(() => {
+        getMessagesUpdate(newContent.channel.id);
+        socket.emit("chat-message", newContent);
       })
       .catch((err: any) => console.log(err.message));
     }
@@ -315,7 +312,7 @@ export const ChatComponent = defineComponent({
     // const directMessage = (recipient: User) => {
     //   const newChannel = api.saveChannel({
     //     name: user.value.login + ' to ' + recipient.forty_two_login,
-    //     owner_id: user.value.id, 
+    //     owner_id: user.value.id,
     //     type: 'private',
     //     password: '',
     //   })
@@ -425,7 +422,7 @@ export const ChatComponent = defineComponent({
 
     return {
       socket,
-      
+
       send,
       newMessage,
       channelMessages,

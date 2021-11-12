@@ -25,7 +25,7 @@ export class Friendships {
   })
   adressee: Users;
 
-  @Column({ type: "boolean", nullable: true})
+  @Column({ default: true })
   pending: boolean;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })

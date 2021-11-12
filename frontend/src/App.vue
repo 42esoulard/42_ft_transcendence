@@ -5,7 +5,7 @@ import Toast from "@/components/Toast.vue";
 import { io } from "socket.io-client";
 import { useStore } from "@/store";
 import { computed, onActivated, onUpdated, reactive } from "vue";
-import { User } from "./types/User";
+import { User } from 'sdk/typescript-axios-client-generated';
 import { presenceSocket } from "@/views/UserAccount.vue";
 
 export const clientSocket = io("http://localhost:3000/pong");

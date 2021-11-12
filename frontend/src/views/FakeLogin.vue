@@ -18,10 +18,10 @@
 import { defineComponent, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
-import { User } from "@/types/User";
+import { User } from 'sdk/typescript-axios-client-generated';
 import { useAuthApi, useUserApi } from "@/plugins/api.plugin";
 import { io } from "socket.io-client";
-import { useStore } from "vuex";
+import { useStore } from "@/store";
 import { presenceSocket } from "@/views/UserAccount.vue";
 
 export default defineComponent({

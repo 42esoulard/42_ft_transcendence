@@ -4,7 +4,7 @@
     <div>
       <div class='chat-channels__title'>Joined channels</div>
       <ul class='chat-channels__list'>
-        <li v-for="(cm) in joinedChannels" :key="cm.channel.name"> 
+        <li v-for="(cm) in joinedChannels" :key="cm.channel.name">
           <button class='chat-channels__item' @click="switchChannel(cm)">
             <div class='chat-channels__name' :title="cm.channel.name">#{{ cm.channel.name }}</div>
             <div>
@@ -19,7 +19,7 @@
     <div>
       <div class='chat-channels__title'>More channels</div>
       <ul class='chat-channels__list'>
-        <li v-for="(chan) in availableChannels" :key="chan.name"> 
+        <li v-for="(chan) in availableChannels" :key="chan.name">
           <button class='chat-channels__item' @click="previewChannel(chan)">
           <div class='chat-channels__name' :title="chan.name">#{{ chan.name }}</div>
           <span v-if="chan.password"><img class="fas fa-lock chat-channels__tag chat-channels__tag--locked" title="Password-protected" /></span>
@@ -32,8 +32,7 @@
 
 <script>
 import { ref, defineComponent, computed, onMounted } from "vue";
-import { ChannelMember } from "@/types/ChannelMember"
- 
+
 export default defineComponent({
   name: 'ChannelsList',
   props: [ 'joinedChannels',
