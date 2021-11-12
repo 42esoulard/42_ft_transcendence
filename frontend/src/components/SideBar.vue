@@ -16,9 +16,9 @@
 </template>
 
 <script lang="ts">
-import { computed } from "vue";
-import SideBarLink from "./SideBarLink.vue";
-import { useStore } from "vuex";
+  import { computed } from "vue";
+  import SideBarLink from './SideBarLink.vue';
+  import { useStore } from "@/store";
 
 export default {
   props: {},

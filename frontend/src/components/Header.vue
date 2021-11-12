@@ -91,7 +91,7 @@
 <script lang="ts">
 import { computed, defineComponent, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { useStore } from "vuex";
+import { useStore } from "@/store";
 import { useAuthApi } from "@/plugins/api.plugin";
 import SideBarLink from './SideBarLink.vue';
 import { presenceSocket } from "@/views/UserAccount.vue";

@@ -93,7 +93,7 @@ import moment from "moment";
 import { Friendship } from "@/types/Friendship";
 import { useUserApi, useFriendshipApi, useAuthApi } from "@/plugins/api.plugin";
 import { User } from "@/types/User";
-import { useStore } from "vuex";
+import { useStore } from "@/store";
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import EditUser from "@/components/EditUser.vue";
 import Modal from "@/components/Modal.vue";
@@ -132,15 +132,17 @@ export default defineComponent({
 
     onMounted(() => {
       showModal2.value = store.state.firstTimeConnect;
-      userApi
-        .getUserFriendships(store.state.user.id)
-        .then((res: any) => {
-          for (const requested of res.data.friendships_requested)
-            userFriendships.value.push(requested);
-          for (const adressed of res.data.friendships_adressed)
-            userFriendships.value.push(adressed);
-        })
-        .catch((err: any) => console.log(err.message));
+      if (store.state.user) {
+        userApi
+          .getUserFriendships(store.state.user.id)
+          .then((res: any) => {
+            for (const requested of res.data.friendships_requested)
+              userFriendships.value.push(requested);
+            for (const adressed of res.data.friendships_adressed)
+              userFriendships.value.push(adressed);
+          })
+          .catch((err: any) => console.log(err.message));
+      }
     });
 
     const deactivateTwoFactor = async () => {
@@ -168,35 +170,42 @@ export default defineComponent({
     });
 
     const addFriend = async (user: User) => {
-      await friendshipApi
-        .saveFriendship({
-          pending: true,
-          requester: store.state.user,
-          adressee_id: user.id
-        })
-        .then((res: any) => window.location.reload())
-        .catch((err: any) => console.log(err));
+      //console.log("SELF", store.state.user, "USER", user)
+      if (store.state.user) {
+        await friendshipApi
+          .saveFriendship({
+            pending: true,
+            requester: store.state.user,
+            adressee_id: user.id
+          })
+          .then((res: any) => window.location.reload())
+          .catch((err: any) => console.log(err));
+      }
     };
 
     const removeFriend = async (user: User) => {
-      await friendshipApi
-        .removeFriendship({
-          first_id: user.id,
-          second_id: store.state.user.id
-        })
-        .then((res: any) => window.location.reload())
-        .catch((err: any) => console.log(err));
+      if (store.state.user) {
+        await friendshipApi
+          .removeFriendship({
+            first_id: user.id,
+            second_id: store.state.user.id
+          })
+          .then((res: any) => window.location.reload())
+          .catch((err: any) => console.log(err));
+      }
     };
 
     const acceptFriend = async (user: User) => {
-      await friendshipApi
-        .validateFriendship({
-          pending: true,
-          requester_id: user.id,
-          adressee: store.state.user
-        })
-        .then((res: any) => window.location.reload())
-        .catch((err: any) => console.log(err));
+      if (store.state.user) {
+        await friendshipApi
+          .validateFriendship({
+            pending: true,
+            requester_id: user.id,
+            adressee: store.state.user
+          })
+          .then((res: any) => window.location.reload())
+          .catch((err: any) => console.log(err));
+      }
     };
 
     // 1 == friends, 2 == self invited, 3 == other invited, 0 == no friendship
@@ -222,7 +231,7 @@ export default defineComponent({
       isFriend,
       isOnline,
       formatedDate,
-      self: computed(() => store.state.user),
+      self: computed(() => store.state.user!),
       firstTimeConnect: computed(() => store.state.firstTimeConnect),
       deactivateTwoFactor,
       showModal,

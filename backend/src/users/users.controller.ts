@@ -229,7 +229,7 @@ export class UsersController {
 		const ext = extname(filename).replace('.', '');
 		res.set({
 			'Content-Type': `image/${ext}`,
-			'Content-Disposition': 'attachment; filename="avatar.png"',
+			'Content-Disposition': `attachment; filename="${filename}"`,
 		});
 		return new StreamableFile(file);
 	}
