@@ -3,6 +3,6 @@
 import { User } from 'src/users/interfaces/user.interface';
 
 export class RemoveFriendshipDto {
-  readonly first_id: number;
-  readonly second_id: number;
+  readonly user1: User;
+  readonly user2: User;
 }

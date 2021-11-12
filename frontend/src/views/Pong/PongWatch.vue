@@ -16,7 +16,7 @@ import { defineComponent, onMounted, ref } from 'vue'
 import { clientSocket } from '@/App.vue'
 import { useRouter } from 'vue-router'
 import { usePongApi } from "@/plugins/api.plugin";
-import { Game } from '@/types/Game'
+import { Game } from 'sdk/typescript-axios-client-generated';
 
 export default defineComponent({
 	setup()
@@ -24,7 +24,7 @@ export default defineComponent({
 		const games = ref<Game[]>([])
 		const socket = ref(clientSocket)
 		const api = usePongApi()
-		
+
 		onMounted(() => {
 			api.
 				getOnGoingGames()
@@ -35,7 +35,7 @@ export default defineComponent({
 		const WatchGame = ((id: number) => {
 			socket.value.emit('watchGame', id.toString())
 		})
-		
+
 		const router = useRouter()
 		socket.value.on('GoToGame', (id, player1UserName, player2UserName) => {
 			router.push({ name: 'PongGameWatch', params: {id, player1UserName, player2UserName, authorized: 'ok'}})
@@ -45,7 +45,7 @@ export default defineComponent({
 			console.log('new game received ' + game.id)
 			games.value.push(game)
 		})
-		
+
 		socket.value.on('endGame', (game: Game) => {
 			console.log('game ended ' + game.id)
 			games.value = games.value.filter(elem => elem.id != game.id)
@@ -53,7 +53,7 @@ export default defineComponent({
 
 		return { games, WatchGame }
 	},
-	
+
 })
 </script>
 

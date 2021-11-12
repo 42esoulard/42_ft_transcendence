@@ -40,7 +40,7 @@
 
 <script lang="ts">
 import { useUserApi } from "@/plugins/api.plugin";
-import { User } from "@/types/User";
+import { User } from 'sdk/typescript-axios-client-generated';
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import { useStore } from "@/store";
 import { useRouter } from "vue-router";

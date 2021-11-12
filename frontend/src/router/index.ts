@@ -14,7 +14,7 @@ import { store } from "@/store";
 import axios from 'axios'
 import UserProfile from '../views/UserProfile.vue'
 import NotFound from '../views/NotFound.vue'
-import { User } from '@/types/User'
+import { User } from 'sdk/typescript-axios-client-generated'
 import { useAuthApi } from "@/plugins/api.plugin";
 
 const routes: Array<RouteRecordRaw> = [

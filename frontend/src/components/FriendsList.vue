@@ -17,7 +17,7 @@
   import { defineComponent, inject, ref, computed, onMounted } from "vue";
   import { useStore } from "vuex";
   import { useUserApi } from "@/plugins/api.plugin";
-  import { Friendship } from "@/types/Friendship";
+  import { Friendship } from 'sdk/typescript-axios-client-generated';
 
   export default defineComponent({
     name: "FriendsList",

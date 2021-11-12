@@ -61,7 +61,7 @@
 
 <script lang="ts">
 import { defineComponent, inject, onMounted, ref, computed } from "vue";
-import { User } from "@/types/User";
+import { User } from 'sdk/typescript-axios-client-generated';
 import { useStore } from "@/store";
 import { useUserApi } from "@/plugins/api.plugin";
 
@@ -113,15 +113,6 @@ export default defineComponent({
     const selectList = computed(() => {
       const list = ref();
       if (friendlist.value && onlinelist.value)
-<<<<<<< HEAD
-        list.value = friendList.value.filter(user =>
-          onlineList.find((u: User) => u.id === user.id)
-        );
-      else if (friendlist.value) list.value = friendList.value;
-      else if (onlinelist.value)
-        list.value = userList.value.filter(user =>
-          onlineList.find((u: User) => u.id === user.id)
-=======
         list.value = friendList.value.filter((user) =>
           store.state.onlineUsers.find((u: User) => u.id === user.id)
         );
@@ -129,7 +120,6 @@ export default defineComponent({
       else if (onlinelist.value)
         list.value = userList.value.filter((user) =>
           store.state.onlineUsers.find((u: User) => u.id === user.id)
->>>>>>> add banned bool
         );
       else list.value = userList.value;
       if (searchQuery.value.length) {

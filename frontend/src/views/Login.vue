@@ -43,7 +43,7 @@ import { useStore } from "@/store";
 import { useAuthApi } from "@/plugins/api.plugin";
 import { useUserApi } from "@/plugins/api.plugin";
 import { usePongApi } from "@/plugins/api.plugin";
-import { User } from "@/types/User";
+import { User } from 'sdk/typescript-axios-client-generated';
 
 
 export default defineComponent({

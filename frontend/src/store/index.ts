@@ -1,4 +1,4 @@
-import { User } from '@/types/User'
+import { User } from 'sdk/typescript-axios-client-generated'
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 
