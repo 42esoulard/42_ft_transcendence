@@ -8,18 +8,18 @@ import {
 } from 'typeorm';
 // import * as bcrypt from 'bcrypt';
 
-@Entity('friendships')
-export class Friendships {
+@Entity('relationships')
+export class Relationships {
   @PrimaryGeneratedColumn()
 	  id: number
 
-  @ManyToOne(() => Users, (requester) => requester.friendships_requested, {
+  @ManyToOne(() => Users, (requester) => requester.relationships_requested, {
     onDelete: 'CASCADE',
     eager: true,
   })
   requester: Users;
 
-  @ManyToOne(() => Users, (adressee) => adressee.friendships_adressed, {
+  @ManyToOne(() => Users, (adressee) => adressee.relationships_adressed, {
     onDelete: 'CASCADE',
     eager: true,
   })
@@ -27,6 +27,9 @@ export class Friendships {
 
   @Column({ default: true })
   pending: boolean;
+
+  @Column({ default: 'friendship' })
+  nature: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
   created_at: Date;

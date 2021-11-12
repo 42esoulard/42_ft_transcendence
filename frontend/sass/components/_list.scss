@@ -1,0 +1,31 @@
+.list-div {
+  width: $list-div-width;
+  min-height: 300px;
+  @media (max-width: 800px) {
+    height: $list-div-height;
+  }
+}
+
+.list-div__title {
+  display: inline-block;
+  background-color: $list-div-title-bg;
+  width: $list-div-title-width;
+  border-radius: $rainbow-border-radius;
+  align-self: center;
+  font-family: $list-div-title-font;
+  padding: $list-div-title-padding;
+  font-size: $list-div-title-size;
+  border: $list-div-title-border;
+}
+
+.list-div-panel {
+  display: flex;
+  justify-content: center;
+  min-height: $list-div-panel-height;
+  background-color: $list-div-panel-bg;
+}
+
+.list-div-panel__list {
+  text-align: left;
+  font-family: 'Saira';
+}

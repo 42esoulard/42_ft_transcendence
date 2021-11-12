@@ -14,7 +14,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Channels } from 'src/channels/entity/channels.entity';
-import { Friendships } from 'src/friendships/entity/friendships.entity';
+import { Relationships } from 'src/relationships/entity/relationships.entity';
 import { ChannelMembers } from 'src/channel_members/entity/channel_members.entity';
 // import * as bcrypt from 'bcrypt';
 
@@ -64,13 +64,13 @@ export class Users {
   })
   channel_members: ChannelMembers[];
 
-  @OneToMany(() => Friendships, (friendship) => friendship.requester)
+  @OneToMany(() => Relationships, (relationship) => relationship.requester)
   @JoinTable()
-  friendships_requested: Friendships[];
+  relationships_requested: Relationships[];
 
-  @OneToMany(() => Friendships, (friendship) => friendship.adressee)
+  @OneToMany(() => Relationships, (relationship) => relationship.adressee)
   @JoinTable()
-  friendships_adressed: Friendships[];
+  relationships_adressed: Relationships[];
 
 
   // @OneToMany()

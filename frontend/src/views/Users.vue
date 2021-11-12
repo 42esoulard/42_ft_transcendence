@@ -61,17 +61,18 @@
 
 <script lang="ts">
 import { defineComponent, inject, onMounted, ref, computed } from "vue";
-import { User } from 'sdk/typescript-axios-client-generated';
+import { User, Relationship } from 'sdk/typescript-axios-client-generated';
 import { useStore } from "@/store";
-import { useUserApi } from "@/plugins/api.plugin";
+import { useUserApi, useRelationshipApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
   name: "Users",
   setup() {
     const store = useStore();
     const userList = ref<User[]>([]);
-    const friendList = ref<User[]>([]);
+    const friendList = ref<Relationship[]>([]);
     const userApi = useUserApi();
+    const relationshipApi = useRelationshipApi();
     const friendlist = ref(false);
     const onlinelist = ref(false);
     const searchQuery = ref("");
@@ -85,16 +86,13 @@ export default defineComponent({
         })
         .catch((err: any) => console.log(err.message));
       if (store.state.user.id != 0) {
-        userApi
-          .getUserFriendships(store.state.user.id)
+        relationshipApi
+          .getUserFriendships({
+              user: store.state.user,
+              pending: false
+            })
           .then((res: any) => {
-            for (const requested of res.data.friendships_requested)
-              if (requested.pending == false)
-                friendList.value.push(requested.adressee);
-            for (const adressed of res.data.friendships_adressed)
-              if (adressed.pending == false)
-                friendList.value.push(adressed.requester);
-            friendList.value.sort((a, b) =>
+            friendList.value = res.data.sort((a: User, b: User) =>
               a.username.localeCompare(b.username)
             );
           })

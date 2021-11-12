@@ -1,4 +1,4 @@
-import { DefaultApi, UserApi, AuthApi, PongApi, ChatApi, FriendshipApi } from "@/../sdk/typescript-axios-client-generated"
+import { DefaultApi, UserApi, AuthApi, PongApi, ChatApi, RelationshipApi } from "@/../sdk/typescript-axios-client-generated"
 import { GamepadCircle } from "mdue";
 import { inject } from "vue";
 
@@ -9,19 +9,19 @@ export default {
     const authApi: AuthApi = new AuthApi();
     const pongApi: PongApi = new PongApi();
     const chatApi: ChatApi = new ChatApi();
-    const friendshipApi: FriendshipApi = new FriendshipApi();
+    const relationshipApi: RelationshipApi = new RelationshipApi();
     app.config.globalProperties.$defaultApi = defaultApi || {};
     app.config.globalProperties.$userApi = userApi || {};
     app.config.globalProperties.$authApi = authApi || {};
     app.config.globalProperties.$pongApi = pongApi || {};
     app.config.globalProperties.$chatApi = chatApi || {};
-    app.config.globalProperties.$friendshipApi = friendshipApi || {};
+    app.config.globalProperties.$relationshipApi = relationshipApi || {};
     app.provide('defaultApi', defaultApi);
     app.provide('userApi', userApi);
     app.provide('authApi', authApi);
     app.provide('pongApi', pongApi);
     app.provide('chatApi', chatApi);
-    app.provide('friendshipApi', friendshipApi);
+    app.provide('relationshipApi', relationshipApi);
   }
 }
 
@@ -43,8 +43,8 @@ export function useChatApi(): ChatApi {
 
   return api;
 }
-export function useFriendshipApi(): FriendshipApi {
-  const api = inject('friendshipApi') as FriendshipApi;
+export function useRelationshipApi(): RelationshipApi {
+  const api = inject('relationshipApi') as RelationshipApi;
   if (!api) throw new Error('No api provided!');
 
   return api;

@@ -1,10 +1,9 @@
 .user-account {
-  width: $profile-width;
-  height: $profile-height;
-  color: white;
-  background-color: $profile-div-bg-color;
+  display: grid;
+  width: $account-width;
+  height: $account-height;
   margin: auto;
-  margin-top: 2rem;
+  border-radius: 20px;
   @media (max-width: 1200px){
     width: 800px;
   }

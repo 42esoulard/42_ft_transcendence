@@ -4,22 +4,19 @@
   grid-template: $stats-grid;
   height: $stats-height;
   justify-content: center;
-  align-items: center;
+  align-items: start;
   @media (max-width: 950px){
-    align-items: flex-start;
-    grid-template: 50% 50% / 100%;
-    height: 70%;
-  }
-  @media (max-width: 800px) {
     width: 60%;
     gap: 0;
     border-radius: 0;
+    grid-template: 40% 60% / 100%;
   }
+  min-height: 100%;
 }
 
 .stats-info {
   width: 80%;
-  padding: 1rem;
+  padding: 0rem 1rem;
   display: grid;
   margin: auto;
   grid-template: $stats-info-grid;
@@ -43,7 +40,6 @@
   }
   &--rank {
     color: $stats-rank-color;
-    font-size: $stats-rank-size;
   }
   &--games {
   }
@@ -82,84 +78,4 @@
   width: 100%;
   font-family: $progress-bar-label-font;
   color: $progress-bar-label-color;
-}
-
-.rainbow-border {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: $rainbow-border-bg;
-  border-radius: $rainbow-border-border-radius;
-  height: $rainbow-border-height;
-  width: $rainbow-border-width;
-  padding: $rainbow-border-padding;
-}
-
-.rainbow-title {
-  background-color: $rainbow-title-bg;
-  width: $rainbow-title-width;
-  border-radius: $rainbow-border-radius;
-  align-self: center;
-  font-family: $rainbow-title-font;
-}
-
-.list-div {
-  width: $list-div-width;
-  height: $list-div-height;
-  @media (max-width: 800px) {
-    height: $list-div-height;
-  }
-}
-
-.list-div__title {
-  display: inline-block;
-  background-color: $list-div-title-bg;
-  width: $list-div-title-width;
-  border-radius: $rainbow-border-radius;
-  align-self: center;
-  font-family: $list-div-title-font;
-  padding: $list-div-title-padding;
-  font-size: $list-div-title-size;
-  border: $list-div-title-border;
-}
-
-.list-div-panel {
-  display: flex;
-  justify-content: center;
-  height: $list-div-panel-height;
-  background-color: $list-div-panel-bg;
-}
-
-.list-div-panel__list {
-  text-align: left;
-  font-family: 'Saira';
-}
-
-.table {
-  width: 100%;
-  max-height: 100%;
-  border: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.table__body {
-  max-height: 80%;
-  overflow-y: scroll;
-}
-
-.table-cell {
-  border: 0px solid transparent;
-  background-clip: padding-box;
-  font-family: 'Saira';
-  font-size: 1.1rem;
-  color: white;
-  &--win {
-    font-weight: bold;
-    color: $table-cell-win-color;
-  }
-  &--loss {
-    color: $table-cell-loss-color;
-  }
 }

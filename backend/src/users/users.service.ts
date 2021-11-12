@@ -33,13 +33,6 @@ export class UsersService {
     return res;
   }
 
-  async getUserFriendships(id: number): Promise<Users> {
-    const res = await this.usersRepository.findOne(id, {
-      relations: ['friendships_requested', 'friendships_adressed'],
-    });
-    return res;
-  }
-
   async getUserChannels(id: number): Promise<Users> {
     const res = await this.usersRepository.findOne(id, {
       relations: ['channels'],

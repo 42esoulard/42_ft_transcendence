@@ -65,6 +65,7 @@
     <button v-else class="button button--second" @click="deactivateTwoFactor">
       Disable 2FA
     </button>
+    <button class="button button--grey">Delete account</button>
     <teleport to="#modals">
       <transition name="fade--error">
         <div v-if="showBackdrop" class="backdrop"></div>
@@ -90,8 +91,8 @@
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, PropType } from "vue";
 import moment from "moment";
-import { User, Friendship } from 'sdk/typescript-axios-client-generated';
-import { useUserApi, useFriendshipApi, useAuthApi } from "@/plugins/api.plugin";
+import { User, Relationship } from 'sdk/typescript-axios-client-generated';
+import { useUserApi, useRelationshipApi, useAuthApi } from "@/plugins/api.plugin";
 import { useStore } from "@/store";
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import EditUser from "@/components/EditUser.vue";
@@ -109,9 +110,9 @@ export default defineComponent({
   setup(props) {
     const store = useStore();
     const user = props.user;
-    const userFriendships = ref<Friendship[]>([]);
+    const userFriendships = ref<Relationship[]>([]);
     const userApi = useUserApi();
-    const friendshipApi = useFriendshipApi();
+    const relationshipApi = useRelationshipApi();
     const authApi = useAuthApi();
     const showModal = ref(false);
     const showModal2 = ref(false);
@@ -131,14 +132,21 @@ export default defineComponent({
 
     onMounted(() => {
       showModal2.value = store.state.firstTimeConnect;
+<<<<<<< HEAD
       if (store.state.user.id != 0) {
         userApi
           .getUserFriendships(store.state.user.id)
+=======
+      if (store.state.user.id != 0) {
+        relationshipApi
+          .getUserFriendships({
+            user: store.state.user,
+            pending: true
+          })
+>>>>>>> relationships in progress
           .then((res: any) => {
-            for (const requested of res.data.friendships_requested)
-              userFriendships.value.push(requested);
-            for (const adressed of res.data.friendships_adressed)
-              userFriendships.value.push(adressed);
+            userFriendships.value = res.data;
+            console.log("RES", res.data)
           })
           .catch((err: any) => console.log(err.message));
       }
@@ -169,10 +177,9 @@ export default defineComponent({
     });
 
     const addFriend = async (user: User) => {
-      //console.log("SELF", store.state.user, "USER", user)
       if (store.state.user.id != 0) {
-        await friendshipApi
-          .saveFriendship({
+        await relationshipApi
+          .saveRelationship({
             requester: store.state.user,
             adressee: user
           })
@@ -183,8 +190,8 @@ export default defineComponent({
 
     const removeFriend = async (user: User) => {
       if (store.state.user.id != 0) {
-        await friendshipApi
-          .removeFriendship({
+        await relationshipApi
+          .removeRelationship({
             user1: user,
             user2: store.state.user
           })
@@ -195,8 +202,8 @@ export default defineComponent({
 
     const acceptFriend = async (user: User) => {
       if (store.state.user.id != 0) {
-        await friendshipApi
-          .validateFriendship({
+        await relationshipApi
+          .validateRelationship({
             requester: user,
             adressee: store.state.user
           })
@@ -205,16 +212,17 @@ export default defineComponent({
       }
     };
 
-    // 1 == friends, 2 == self invited, 3 == other invited, 0 == no friendship
+    // 1 == friends, 2 == self invited, 3 == other invited, 0 == no relationship
     const isFriend = (user: User) => {
       if (store.state.user.id === 0 || user.username == store.state.user.username)
         return -1;
-      for (const friendship of userFriendships.value) {
-        if (user.username == friendship.requester.username) {
-          if (friendship.pending) return 2;
+      for (const relationship of userFriendships.value) {
+        console.log("RS", relationship);
+        if (user.username == relationship.requester.username) {
+          if (relationship.pending) return 2;
           return 1;
-        } else if (user.username == friendship.adressee.username) {
-          if (friendship.pending) return 3;
+        } else if (user.username == relationship.adressee.username) {
+          if (relationship.pending) return 3;
           return 1;
         }
       }
