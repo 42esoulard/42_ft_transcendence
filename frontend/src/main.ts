@@ -2,14 +2,11 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import '@fortawesome/fontawesome-free/js/all'
-import { store } from '@/store'
+import { store, key } from '@/store'
 import api from "@/plugins/api.plugin";
-// import axios from "axios";
-
-// axios.defaults.withCredentials = true;
 
 const app = createApp(App);
-app.use(store);
+app.use(store, key); // should take the key as 2nd parameter to run correctly
 app.use(api);
 
 // Custom directive to handle 'autofocus' on an element

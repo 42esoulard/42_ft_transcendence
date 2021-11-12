@@ -42,7 +42,7 @@
 import { useUserApi } from "@/plugins/api.plugin";
 import { User } from "@/types/User";
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
-import { useStore } from "vuex";
+import { useStore } from "@/store";
 import { useRouter } from "vue-router";
 
 export default defineComponent({
@@ -55,7 +55,7 @@ export default defineComponent({
     const error_avatar = ref("");
     const avatar = ref(); // should be typed !?
     const avatarInput = ref(); // should be typed !?
-    const avatarUrl = ref(store.state.user.avatar);
+    const avatarUrl = ref(store.state.user!.avatar);
     const users = ref<User[]>([]);
     const error_username = ref("");
     const router = useRouter();
@@ -90,7 +90,7 @@ export default defineComponent({
         await userApi
           .updateUser(
             {
-              id: store.state.user.id,
+              id: store.state.user!.id,
               username: username.value
             },
             {
@@ -114,13 +114,11 @@ export default defineComponent({
       data.append("avatar", avatar.value);
       await userApi
         .uploadFile({ data, withCredentials: true })
-        .then(async (res: any) => {
-          store.commit("updateAvatar", res.data.filename);
+        .then((res: any) => {
+          store.commit("tagAvatar");
           ret = true;
-          // console.log(res);
-          // store.commit("tagAvatar", Date.now()); // --> needs a fixed img extension (chosen in bcknd)
         })
-        .catch(async err => {
+        .catch(err => {
           error_avatar.value = err.response.data.message;
           // setTimeout(() => (error_avatar.value = ""), 2000);
         });
@@ -154,7 +152,7 @@ export default defineComponent({
       if (usernameUpdated && avatarUpdated) {
         closeModal();
         if (usernameUpdated)
-          router.push({ path: `/profile/${store.state.user.username}` })
+          router.push({ path: `/profile/${store.state.user!.username}` })
         store.dispatch(
           "setMessage",
           "Your profile has been successfully updated"
@@ -170,7 +168,7 @@ export default defineComponent({
 
         fileReader.readAsDataURL(avatar);
         fileReader.addEventListener("load", () => {
-          avatarUrl.value = fileReader.result;
+          avatarUrl.value = fileReader.result as string;
         });
       }
     });
@@ -185,7 +183,7 @@ export default defineComponent({
       handleFile,
       error_avatar,
       error_username,
-      user: computed(() => store.state.user)
+      user: computed(() => store.state.user!)
     };
   }
 });

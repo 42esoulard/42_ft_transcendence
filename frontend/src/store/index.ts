@@ -34,12 +34,10 @@ export const store = createStore<State>({
       }
     },
 
-    updateAvatar(state: State, payload: string) {
+    tagAvatar(state: State) {
       if (state.user) {
         const tag = `?tag=${Date.now().toString()}`;
-        // This is dirty, better to save avatar with ONLY ONE extension in backend
-        const avatar = `http://localhost:3000/users/avatars/${payload}${tag}`;
-        state.user.avatar = avatar;
+        state.user.avatar = `${state.user.avatar}${tag}`;
       }
     },
 
@@ -82,11 +80,6 @@ export const store = createStore<State>({
       setTimeout(() => {
         context.commit('setMessage', '');
       }, 3000);
-    },
-    tagAvatar(context, payload: number) {
-      setTimeout(() => {
-        context.commit('tagAvatar', payload);
-      }, 2000);
     },
 
   },

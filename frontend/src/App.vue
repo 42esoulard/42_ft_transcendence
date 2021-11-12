@@ -3,7 +3,7 @@ import SideBar from "./components/SideBar.vue";
 import Header from "./components/Header.vue";
 import Toast from "@/components/Toast.vue";
 import { io } from "socket.io-client";
-import { useStore } from "vuex";
+import { useStore } from "@/store";
 import { computed, onActivated, onUpdated, reactive } from "vue";
 import { User } from "./types/User";
 import { presenceSocket } from "@/views/UserAccount.vue";
