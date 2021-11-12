@@ -22,7 +22,7 @@ export class PongService {
 
   async findonGoing(): Promise<Game[]> {
     const games = await this.gameRepo.find({relations: ['users', 'users.user']})
-    const ongoingGames = games.filter(elem => elem.users[0].won == null) // 'won' attribute is set when game ends
+    const ongoingGames = games.filter(elem => elem.users[0] && elem.users[0].won == null) // 'won' attribute is set when game ends
     return ongoingGames
   }
 
