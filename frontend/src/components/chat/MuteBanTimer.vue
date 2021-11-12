@@ -32,7 +32,7 @@
 import { ref, defineComponent, computed } from "vue";
 import { ChatApi } from "@/../sdk/typescript-axios-client-generated";
 import { socket } from "./ChatComponent.vue"
-import { useStore } from 'vuex'
+import { useStore } from '@/store'
  
 export default defineComponent({
   name: 'MuteBanTimer',

@@ -107,7 +107,7 @@
 import { ref, defineComponent, computed, onMounted } from "vue";
 import { ChannelMember, ChatApi } from "@/../sdk/typescript-axios-client-generated";
 import { socket } from "./ChatComponent.vue"
-import { useStore } from 'vuex';
+import { useStore } from '@/store';
 import Modal from "@/components/Modal.vue";
 import MuteBanTimer from "@/components/chat/MuteBanTimer.vue";
 import { User } from 'sdk/typescript-axios-client-generated';

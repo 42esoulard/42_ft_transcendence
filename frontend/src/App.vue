@@ -22,7 +22,7 @@ export default {
       // console.log("onUpdated", store.state.user);
       if (store.state.user.id != 0) {
         if (!store.state.isConnected) {
-          console.log("newConnection");
+          // console.log("newConnection");
           presenceSocket.emit("newConnection", store.state.user);
           store.state.isConnected = true;
         }
@@ -30,16 +30,16 @@ export default {
     });
     presenceSocket.on("newUser", (user: User) => {
       store.commit("addOnlineUser", user);
-      console.log("onlineUsers", store.state.onlineUsers);
+      // console.log("onlineUsers", store.state.onlineUsers);
     });
     presenceSocket.on("allConnectedUsers", (user: User[]) => {
       store.commit("allConnectedUsers", user);
-      console.log("onlineUsers", store.state.onlineUsers);
+      // console.log("onlineUsers", store.state.onlineUsers);
     });
     presenceSocket.on("leftUser", (id: number) => {
-      console.log("removedUser", id);
+      // console.log("removedUser", id);
       store.commit("removeOnlineUser", id);
-      console.log("OnlineUsers(afterRemoved)", store.state.onlineUsers);
+      // console.log("OnlineUsers(afterRemoved)", store.state.onlineUsers);
     });
 
     return {

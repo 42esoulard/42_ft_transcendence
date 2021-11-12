@@ -118,7 +118,7 @@
 
 <script lang="ts">
 import { io } from "socket.io-client";
-import { useStore } from 'vuex';
+import { useStore } from '@/store';
 import { defineComponent, reactive, ref, watch, computed } from "vue";
 import { useUserApi } from "@/plugins/api.plugin";
 import { Info } from "@/types/Info";

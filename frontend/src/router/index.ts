@@ -155,7 +155,6 @@ const getProfile = async () => {
   await axios
     .get<User>("http://localhost:3000/auth/profile")
     .then((response) => {
-      console.log('USER', store.state.user);
       store.state.user = response.data;
     })
     .catch(async (err: Error) => {
