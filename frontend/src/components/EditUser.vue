@@ -55,7 +55,7 @@ export default defineComponent({
     const error_avatar = ref("");
     const avatar = ref(); // should be typed !?
     const avatarInput = ref(); // should be typed !?
-    const avatarUrl = ref(store.state.user!.avatar);
+    const avatarUrl = ref(store.state.user.avatar);
     const users = ref<User[]>([]);
     const error_username = ref("");
     const router = useRouter();
@@ -90,7 +90,7 @@ export default defineComponent({
         await userApi
           .updateUser(
             {
-              id: store.state.user!.id,
+              id: store.state.user.id,
               username: username.value
             },
             {
@@ -152,7 +152,7 @@ export default defineComponent({
       if (usernameUpdated && avatarUpdated) {
         closeModal();
         if (usernameUpdated)
-          router.push({ path: `/profile/${store.state.user!.username}` })
+          router.push({ path: `/profile/${store.state.user.username}` })
         store.dispatch(
           "setMessage",
           "Your profile has been successfully updated"
@@ -183,7 +183,7 @@ export default defineComponent({
       handleFile,
       error_avatar,
       error_username,
-      user: computed(() => store.state.user!)
+      user: computed(() => store.state.user)
     };
   }
 });

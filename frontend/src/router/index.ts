@@ -16,6 +16,7 @@ import UserProfile from '../views/UserProfile.vue'
 import NotFound from '../views/NotFound.vue'
 import { User } from 'sdk/typescript-axios-client-generated'
 import { useAuthApi } from "@/plugins/api.plugin";
+import { EmoticonSadOutline } from 'mdue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -154,6 +155,7 @@ const getProfile = async () => {
   await axios
     .get<User>("http://localhost:3000/auth/profile")
     .then((response) => {
+      console.log('USER', store.state.user);
       store.state.user = response.data;
     })
     .catch(async (err: Error) => {
@@ -163,10 +165,10 @@ const getProfile = async () => {
 
 router.beforeEach(async (to, from) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!store.state.user) {
+    if (store.state.user.id === 0) {
       await getProfile();
     }
-    if (!store.state.user) {
+    if (store.state.user.id === 0) {
       return '/login'; // redirected to login
     } else {
       return true; // the route is allowed
@@ -174,10 +176,10 @@ router.beforeEach(async (to, from) => {
   } else if (to.matched.some(record => record.meta.requiresVisitor)) {
     // Use local storage to store isLoggedIn boolean to block access to login page while user is logged in ?
     // localStorage.setItem('isLoggedIn', 'true');
-    if (!store.state.user) {
+    if (store.state.user.id === 0) {
       await getProfile();
     }
-    if (store.state.user) {
+    if (store.state.user.id) {
       return '/account';
     } else {
       return true;

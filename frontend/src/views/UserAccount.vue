@@ -75,7 +75,7 @@ export default defineComponent({
     });
 
     const formatedDate = computed(() => {
-      return moment(store.state.user!.created_at).format(
+      return moment(store.state.user.created_at).format(
         "YYYY-MM-DD HH:mm:ss"
       );
     });

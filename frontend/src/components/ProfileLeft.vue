@@ -131,7 +131,7 @@ export default defineComponent({
 
     onMounted(() => {
       showModal2.value = store.state.firstTimeConnect;
-      if (store.state.user) {
+      if (store.state.user.id != 0) {
         userApi
           .getUserFriendships(store.state.user.id)
           .then((res: any) => {
@@ -170,7 +170,7 @@ export default defineComponent({
 
     const addFriend = async (user: User) => {
       //console.log("SELF", store.state.user, "USER", user)
-      if (store.state.user) {
+      if (store.state.user.id != 0) {
         await friendshipApi
           .saveFriendship({
             requester: store.state.user,
@@ -182,7 +182,7 @@ export default defineComponent({
     };
 
     const removeFriend = async (user: User) => {
-      if (store.state.user) {
+      if (store.state.user.id != 0) {
         await friendshipApi
           .removeFriendship({
             user1: user,
@@ -194,7 +194,7 @@ export default defineComponent({
     };
 
     const acceptFriend = async (user: User) => {
-      if (store.state.user) {
+      if (store.state.user.id != 0) {
         await friendshipApi
           .validateFriendship({
             requester: user,
@@ -207,7 +207,7 @@ export default defineComponent({
 
     // 1 == friends, 2 == self invited, 3 == other invited, 0 == no friendship
     const isFriend = (user: User) => {
-      if (!store.state.user || user.username == store.state.user.username)
+      if (store.state.user.id === 0 || user.username == store.state.user.username)
         return -1;
       for (const friendship of userFriendships.value) {
         if (user.username == friendship.requester.username) {
@@ -228,7 +228,7 @@ export default defineComponent({
       isFriend,
       isOnline,
       formatedDate,
-      self: computed(() => store.state.user!),
+      self: computed(() => store.state.user),
       firstTimeConnect: computed(() => store.state.firstTimeConnect),
       deactivateTwoFactor,
       showModal,

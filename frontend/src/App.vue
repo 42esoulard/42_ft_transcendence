@@ -20,7 +20,7 @@ export default {
 
     onUpdated(() => {
       // console.log("onUpdated", store.state.user);
-      if (store.state.user) {
+      if (store.state.user.id != 0) {
         if (!store.state.isConnected) {
           console.log("newConnection");
           presenceSocket.emit("newConnection", store.state.user);

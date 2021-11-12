@@ -84,7 +84,7 @@ export default defineComponent({
           userList.value.sort((a, b) => a.username.localeCompare(b.username));
         })
         .catch((err: any) => console.log(err.message));
-      if (store.state.user) {
+      if (store.state.user.id != 0) {
         userApi
           .getUserFriendships(store.state.user.id)
           .then((res: any) => {
@@ -128,7 +128,7 @@ export default defineComponent({
         );
       }
       list.value = list.value.filter(
-        (entity: User) => entity.username != store.state.user!.username
+        (entity: User) => entity.username != store.state.user.username
       );
       return list.value;
     });

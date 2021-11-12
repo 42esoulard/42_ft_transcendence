@@ -75,7 +75,7 @@
       <router-link to="/" class="header-link">
         <h1 class="header__title">Space Pong</h1>
       </router-link>
-      <div v-if="width >= 950 && user" :key="user.id" class="header-bloc">
+      <div v-if="width >= 950 && user.id != 0" :key="user.id" class="header-bloc">
         <router-link to="/account" class="user-bloc">
           <img class="user-bloc__avatar" :src="user.avatar" alt="" />
           <span class="user-bloc__username">{{ user.username }}</span>
@@ -122,14 +122,14 @@ export default defineComponent({
         .then(response => {
           console.log(response);
           presenceSocket.emit("closeConnection", store.state.user);
-          store.state.user = null;
+          store.commit("resetUser"); //store.state.user = null;
           router.push("/login");
         })
         .catch((err: any) => console.log(err.message));
     };
 
     const userProfile = computed(() => {
-      if (store.state.user) return `/profile/${store.state.user.username}`;
+      if (store.state.user.id) return `/profile/${store.state.user.username}`;
       else return `/profile/`;
     });
 

@@ -25,7 +25,7 @@ export default defineComponent ({
 		const store = useStore()
 		const JoinQueue = () => {
 			queuing.value = true
-			socket.value.emit('joinGame', {userId: store.state.user!.id, userName: store.state.user!.username})
+			socket.value.emit('joinGame', {userId: store.state.user.id, userName: store.state.user.username})
 		}
 
 		const router = useRouter()

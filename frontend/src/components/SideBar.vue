@@ -26,7 +26,7 @@ export default {
   setup() {
     const store = useStore();
     const userProfile = computed(() => {
-      if (store.state.user) return `/profile/${store.state.user.username}`;
+      if (store.state.user.id != 0) return `/profile/${store.state.user.username}`;
       else return `/profile/`;
     });
     return {

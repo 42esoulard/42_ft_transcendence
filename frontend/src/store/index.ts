@@ -4,7 +4,7 @@ import { createStore, useStore as baseUseStore, Store } from 'vuex'
 
 // define your typings for the store state
 export interface State {
-  user: User | null,
+  user: User,
   message: string,
   firstTimeConnect: boolean,
   isConnected: boolean,
@@ -19,7 +19,10 @@ export const key: InjectionKey<Store<State>> = Symbol()
  */
 export const store = createStore<State>({
   state: {
-    user: null,
+    user: {
+      id: 0,
+      username: "default",
+    },
     message: '',
     firstTimeConnect: false,
     isConnected: false,
@@ -27,6 +30,11 @@ export const store = createStore<State>({
   },
   getters: {},
   mutations: {
+
+    resetUser(state: State) {
+      state.user.id = 0;
+      state.user.username = "default";
+    },
 
     toggleTwoFactor(state: State, payload: boolean) {
       if (state.user) {
