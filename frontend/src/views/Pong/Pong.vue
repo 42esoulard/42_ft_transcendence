@@ -14,7 +14,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { clientSocket } from '@/App.vue'
-import { useStore } from 'vuex'
+import { useStore } from '@/store'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 
 export default defineComponent ({
@@ -25,7 +25,7 @@ export default defineComponent ({
 		const store = useStore()
 		const JoinQueue = () => {
 			queuing.value = true
-			socket.value.emit('joinGame', {userId: store.state.user.id, userName: store.state.user.username})
+			socket.value.emit('joinGame', {userId: store.state.user!.id, userName: store.state.user!.username})
 		}
 
 		const router = useRouter()
