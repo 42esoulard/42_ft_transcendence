@@ -19,7 +19,11 @@ export class UsersService {
    * nb: find() is a function from the typeORM library
    */
   async getUsers(): Promise<Users[]> {
-    return await this.usersRepository.find();
+    return await this.usersRepository.find({where: {banned: false}});
+  }
+
+  async getBannedUsers(): Promise<Users[]> {
+    return await this.usersRepository.find({where: {banned: true}});
   }
 
   async getUserGames(id: number): Promise<Users> {

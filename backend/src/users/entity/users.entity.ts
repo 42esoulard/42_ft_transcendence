@@ -38,6 +38,9 @@ export class Users {
   @Column({ default: false })
   two_fa_enabled: boolean;
 
+  @Column({ default: false })
+  banned: boolean;
+
   @Column({ type: 'varchar', length: 36, nullable: true })
   refresh_token: string;
 
@@ -68,7 +71,7 @@ export class Users {
   @OneToMany(() => Friendships, (friendship) => friendship.adressee)
   @JoinTable()
   friendships_adressed: Friendships[];
-  
+
 
   // @OneToMany()
   // channels:

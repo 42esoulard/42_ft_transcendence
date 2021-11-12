@@ -11,6 +11,7 @@ export class User {
   two_fa_secret: string;
   two_fa_enabled: boolean;
   refresh_token: string;
+  banned: boolean;
   expiry_date: Date;
   messages: Message[];
   channel_members: ChannelMember[];
