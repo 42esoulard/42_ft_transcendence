@@ -13,11 +13,13 @@ import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiTags,
 } from '@nestjs/swagger';
-import { User } from 'src/users/interfaces/user.interface';
-import { UsersModule } from 'src/users/users.module';
+import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
+import { ChannelMembersService } from 'src/channel_members/channel_members.service';
 // import { UpdateChannelDto } from './dto/updateChannel.dto';
 
+@ApiTags('Chat')
 @Controller('channels')
 export class ChannelsController {
   constructor(private readonly channelService: ChannelsService) {}
@@ -52,9 +54,7 @@ export class ChannelsController {
     const channel: Channel = await this.channelService.getChannelById(id);
     if (channel == undefined) {
       if (id == 1) {
-        return await this.channelService.seed()
-        //   return await this.channelService.getChannelById(id);
-        // });
+        return await this.channelService.seed();
       }
       throw new NotFoundException('Channel not found');
     }
@@ -87,45 +87,61 @@ export class ChannelsController {
    * Save a new channel to database from the POST body
    */
   @Post()
-  async saveChannel(@Body() newChannel: CreateChannelDto): Promise<Channel> {
+  async saveChannel(
+    @Body() newChannel: CreateChannelDto,
+  ): Promise<ChannelMember> {
     return await this.channelService.saveChannel(newChannel);
   }
 
-  @Get('/channel/:channel/user/:user')
+  @Get('/join-channel/:channel/:user')
   async joinChannel(
     @Param('channel') channel_id: number,
     @Param('user') user_id: number,
-  ) {
-    await this.channelService.joinChannel(channel_id, user_id);
+  ): Promise<ChannelMember> {
+    return await this.channelService.joinChannel(channel_id, user_id);
   }
 
-  // @Get('/user/:user')
-  // async getJoinedChannels(@Param('user') user_id: number): Promise<Channel[]> {
-  //   console.log('heree', await this.channelService.getJoinedChannels(user_id));
-  //   await this.channelService.getJoinedChannels(user_id).then((res) => {
-  //     console.log("res.channels", res.channels)
-  //     return res.channels;
-  //   });
-  //   return [];
-  //   // return await this.channelService.getJoinedChannels(user_id);
-  // }
+  @Get('/join-protected/:channel/:attempt')
+  async checkPasswordMatch(
+    @Param('channel') channel_id: number,
+    @Param('attempt') attempt: string,
+  ): Promise<boolean> {
+    console.log('in controller attempt', attempt);
+    console.log(
+      await this.channelService.checkPasswordMatch(channel_id, attempt),
+    );
+    return await this.channelService.checkPasswordMatch(channel_id, attempt);
+  }
 
-  @Post('/channel/:channel/user/:user')
-  async leaveChannel(
+  @Get('/user/:id')
+  async getUserChannels(@Param('id') id: number): Promise<ChannelMember[]> {
+    return await this.channelService.getUserChannels(id);
+  }
+
+  @Get('/avail/:id')
+  async getAvailableChannels(@Param('id') id: number): Promise<Channel[]> {
+    return await this.channelService.getAvailableChannels(id);
+  }
+
+  @Get('/channel-member/:channel/:user')
+  async getChannelMember(
     @Param('channel') channel_id: number,
     @Param('user') user_id: number,
-  ) {
-    // const channel = await this.getChannelById(channel_id);
-    // const user = await this.userService.getUserbyId(user_id);
-    // await this.channelService.leaveChannel(channel, user);
+  ): Promise<ChannelMember> {
+    return await this.channelService.getChannelMember(channel_id, user_id);
   }
 
-  // @Post()
-  // @ApiCreatedResponse({
-  // 	description: 'The channel has been successfully updated.',
-  // 	type: Channel,
-  //   })
-  // async updateChannel(@Body() updatedChannel : UpdateChannelDto) : Promise<Channel> {
-  // 	return await this.channelService.updateChannel(updatedChannel);
-  // }
+  @Post('/leave-channel/:cm_id')
+  async leaveChannel(@Param('cm_id') cm_id: number) {
+    await this.channelService.leaveChannel(cm_id);
+  }
+
+  @Get('/admin-action/:action/:cm_id/:end_date')
+  async muteBanMember(
+    @Param('action') action: string,
+    @Param('cm_id') cm_id: number,
+    @Param('end_date') end_date: number,
+  ) {
+    return await this.channelService.muteBanMember(action, cm_id, end_date);
+  }
 }

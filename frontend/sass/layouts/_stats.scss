@@ -4,52 +4,36 @@
   grid-template: $stats-grid;
   height: $stats-height;
   justify-content: center;
-  align-items: flex-start;
-  gap: $stats-gap;
-  @media (max-width: 900px) {
-    width: 50%;
-    height: 100%;
+  align-items: center;
+  @media (max-width: 950px){
+    align-items: flex-start;
+    grid-template: 50% 50% / 100%;
+    height: 70%;
+  }
+  @media (max-width: 800px) {
+    width: 60%;
     gap: 0;
+    border-radius: 0;
   }
 }
 
-.stats-bloc-border {
-  justify-self: center;
-  align-self: center;
+.stats-info {
+  width: 80%;
+  padding: 1rem;
+  display: grid;
+  margin: auto;
+  grid-template: $stats-info-grid;
+  justify-content: center;
+  align-items: center;
+}
+
+.stats-bloc {
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: $stats-bloc-margin;
-  background: $stats-bloc-border-bg;
-  border-radius: $stats-bloc-border-border-radius;
-  height: $stats-bloc-border-height;
-  width: $stats-bloc-border-width;
-  @media (max-width: 1100px) {
-    height: 6rem;
-    width: 6rem;
-  }
-  @media (max-width: 900px) {
-    height: 5rem;
-    width: 5rem;
-  }
-
-}
-.stats-bloc {
-  display: flex;
-  justify-content: center;
-  height: $stats-bloc-height;
-  width: $stats-bloc-width;
   flex-direction: column;
-  border-radius: $stats-bloc-border-radius;
-  background-color: $stats-bloc-bg;
-  @media (max-width: 1100px) {
-    height: 5.5rem;
-    width: 5.5rem;
-  }
-  @media (max-width: 900px) {
-    height: 4.5rem;
-    width: 4.5rem;
-  }
+  font-family: 'Saira';
 }
 
 .stats-bloc__number {
@@ -59,25 +43,21 @@
   }
   &--rank {
     color: $stats-rank-color;
+    font-size: $stats-rank-size;
   }
   &--games {
-    color: $stats-games-color;
-  }
-  @media (max-width: 1100px) {
-    font-size: 2rem;
-  }
-  @media (max-width: 900px) {
-    font-size: 1.5rem;
   }
 }
 
 .stats-bloc__text {
   font-family: $stats-text-font;
   font-size: $stats-text-size;
+  font-family: 'Saira';
 }
 
 .progress-bar {
-  grid-column: 1/4;
+  margin: 1.5rem 0 0 0;
+  grid-column: 1 / 5;
   width: $progress-bar-width;
   height: $progress-bar-height;
   padding: $progress-bar-padding;
@@ -104,12 +84,6 @@
   color: $progress-bar-label-color;
 }
 
-.list-div {
-  grid-column: 1/4;
-  width: $list-div-width;
-  height: $list-div-height;
-}
-
 .rainbow-border {
   display: flex;
   align-items: center;
@@ -129,6 +103,14 @@
   font-family: $rainbow-title-font;
 }
 
+.list-div {
+  width: $list-div-width;
+  height: $list-div-height;
+  @media (max-width: 800px) {
+    height: $list-div-height;
+  }
+}
+
 .list-div__title {
   display: inline-block;
   background-color: $list-div-title-bg;
@@ -136,17 +118,48 @@
   border-radius: $rainbow-border-radius;
   align-self: center;
   font-family: $list-div-title-font;
+  padding: $list-div-title-padding;
+  font-size: $list-div-title-size;
   border: $list-div-title-border;
 }
 
 .list-div-panel {
   display: flex;
-  overflow-y: scroll;
+  justify-content: center;
   height: $list-div-panel-height;
   background-color: $list-div-panel-bg;
 }
 
 .list-div-panel__list {
   text-align: left;
-  font-family: 'Roboto';
+  font-family: 'Saira';
+}
+
+.table {
+  width: 100%;
+  max-height: 100%;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.table__body {
+  max-height: 80%;
+  overflow-y: scroll;
+}
+
+.table-cell {
+  border: 0px solid transparent;
+  background-clip: padding-box;
+  font-family: 'Saira';
+  font-size: 1.1rem;
+  color: white;
+  &--win {
+    font-weight: bold;
+    color: $table-cell-win-color;
+  }
+  &--loss {
+    color: $table-cell-loss-color;
+  }
 }

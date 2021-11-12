@@ -1,11 +1,12 @@
 .button {
   background-color: $button-bg-color;
-  padding: $button-padding;
   border-radius: $button-border-radius;
   border: $button-border;
   font-family: $button-font;
   color: $button-color;
   text-decoration: none;
+  padding: $button-padding;
+  font-weight: $button-font-weight;
   &:hover {
     @include button-hover;
   }
@@ -26,6 +27,7 @@
     @include hover-modifier($button-grey-bg);
   }
   &--log-out {
+    padding: 5px 10px;
     background-color: rgba(0, 0, 0, 0.2);
   }
   &--log-in {
@@ -33,14 +35,22 @@
     padding: $button-log-in-padding;
     height: 4rem;
   }
-}
-
-.otp_submit > .button,
-.ua-twofa > .button {
-  padding: 10px 20px;
-  // margin-top: 20px;
-  width: auto;
-  font-weight: bold;
+  &--create-chan {
+    margin: 10px;
+  }
+  &--selector {
+    padding: 5px 20px;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    background-color: darken($button-grey-bg, 40);
+    @include hover-modifier(darken($button-grey-bg, 40));
+    &--on {
+      border: none;
+      background-color: $button-third-bg;
+      @include hover-modifier($button-third-bg);
+    }
+  }
 }
 
 .button-log-in__logo {
@@ -48,10 +58,3 @@
   height: auto;
 }
 
-.log-in-div {
-  display: flex;
-  flex-direction: column;
-  width: 350px;
-  gap: 10px;
-  margin: auto;
-}

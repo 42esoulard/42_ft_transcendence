@@ -4,89 +4,242 @@
       &times;
     </div>
     <h2>Update your informations</h2>
-    <p>
-      NB: deux boutons (submit username et submit avatar)<br />
-      ou un seul "submit" qui envoie les deux en meme temps ?
-    </p>
-    <h3>Update your username</h3>
+    <h3>Avatar</h3>
+    <div class="edit-user-img-container">
+      <img :src="avatarUrl" class="ua-img" alt="[Your avatar]" />
+      <input
+        @change="handleFile"
+        type="file"
+        accept=".png, .jpg, .jpeg, .gif"
+        ref="avatarInput"
+        id="avatar"
+      />
+      <div class="icon-wrapper">
+        <i class="fas fa-upload"></i>
+      </div>
+    </div>
+    <h3>Username</h3>
     <form @submit.prevent="updateUser">
       <input
-        v-model="username"
-        v-focus
         type="text"
-        maxlength="10"
+        v-focus
         name="username"
+        v-model="username"
+        maxlength="10"
+        :placeholder="user.username"
       />
-      <!-- <div class="otp_submit">
-        <button class="button button--third">Update username</button>
-      </div> -->
-      <transition name="fade--error">
-        <p v-if="error" class="error">{{ error }}</p>
-      </transition>
-      <h3>Update your avatar</h3>
-      <input @change="handleFile" type="file" ref="avatar" id="avatar" />
+      <transition-group name="fade--error">
+        <p v-if="error_username" class="error">{{ error_username }}</p>
+        <p v-if="error_avatar" class="error">{{ error_avatar }}</p>
+      </transition-group>
+      <hr />
       <button class="button button--primary">Update your info</button>
     </form>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { useUserApi } from "@/plugins/api.plugin";
+import { User } from "@/types/User";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
-  name: "UpdateUser",
-  props: ["avatar"],
+  name: "EditUser",
   setup(props, context) {
     const store = useStore();
-    const username = ref(store.state.user.username);
-    const error = ref("");
-    const avatar = ref(props.avatar); // use the store ???
+    const userApi = useUserApi();
+
+    const username = ref("");
+    const error_avatar = ref("");
+    const avatar = ref(); // should be typed !?
+    const avatarInput = ref(); // should be typed !?
+    const avatarUrl = ref(store.state.user.avatar);
+    const users = ref<User[]>([]);
+    const error_username = ref("");
+    const router = useRouter();
+
+    onMounted(() => {
+      // Should not be on mounted as users can change everytime
+      userApi
+        .getUsers()
+        .then((res: any) => (users.value = res.data))
+        .catch((err: any) => console.log(err.message));
+    });
 
     const closeModal = () => {
       context.emit("close");
     };
 
-    //this function is redundant, export it in a composable ??
-    const handleFile = (
-      event: Event & {
-        target: HTMLInputElement & {
-          files: FileList;
-        };
+    const handleFile = () => {
+      const files = avatarInput.value.files;
+      if (files.length !== 0) {
+        avatar.value = files[0];
+        console.log("avatar value", avatar.value);
       }
-    ) => {
-      const { target } = event;
-      const { files } = target;
-      if (files.length === 0) {
-        return;
-      }
-      avatar.value = files[0];
-      console.log("avatar value", avatar.value);
     };
 
-    const updateUser = () => {
+    const updateUsername = async (): Promise<boolean> => {
+      let ret = false;
+      if (!/^[a-zA-Z]+$/.test(username.value))
+        error_username.value = "Username should only contains letters";
+      else if (users.value.find(user => user.username == username.value))
+        error_username.value = "Username already taken";
+      else
+        await userApi
+          .updateUser(
+            {
+              id: store.state.user.id,
+              username: username.value
+            },
+            {
+              withCredentials: true
+            }
+          )
+          .then(res => {
+            console.log(res);
+            store.commit("updateUsername", username.value);
+            ret = true;
+          })
+          .catch(error_username => {
+            console.log(error_username);
+          });
+      return ret;
+    };
+
+    const postAvatar = async (): Promise<boolean> => {
+      let ret = false;
+      const data = new FormData();
+      data.append("avatar", avatar.value);
+      await userApi
+        .uploadFile({ data, withCredentials: true })
+        .then(async (res: any) => {
+          store.commit("updateAvatar", res.data.filename);
+          ret = true;
+          // console.log(res);
+          // store.commit("tagAvatar", Date.now()); // --> needs a fixed img extension (chosen in bcknd)
+        })
+        .catch(async err => {
+          error_avatar.value = err.response.data.message;
+          // setTimeout(() => (error_avatar.value = ""), 2000);
+        });
+      return ret;
+    };
+
+    const updateUser = async () => {
+      let usernameUpdated = true;
+      let avatarUpdated = true;
       if (username.value) {
+        usernameUpdated = await updateUsername();
         console.log("Update username to", username.value);
       } else {
         console.log("username is unchanged");
       }
       if (avatar.value) {
+        avatarUpdated = await postAvatar();
         console.log("Update avatar to", avatar.value.name);
         console.log("Update avatar to", avatar.value);
       } else {
         console.log("avatar is unchanged");
       }
+      if (usernameUpdated) {
+        username.value = "";
+        error_username.value = "";
+      }
+      if (avatarUpdated) {
+        avatar.value = null;
+        error_avatar.value = "";
+      }
+      if (usernameUpdated && avatarUpdated) {
+        closeModal();
+        if (usernameUpdated)
+          router.push({ path: `/profile/${store.state.user.username}` })
+        store.dispatch(
+          "setMessage",
+          "Your profile has been successfully updated"
+        );
+
+
+      }
     };
+
+    watch(avatar, avatar => {
+      if (avatar instanceof File) {
+        let fileReader = new FileReader();
+
+        fileReader.readAsDataURL(avatar);
+        fileReader.addEventListener("load", () => {
+          avatarUrl.value = fileReader.result;
+        });
+      }
+    });
 
     return {
       closeModal,
       username,
       updateUser,
       avatar,
+      avatarInput,
+      avatarUrl,
       handleFile,
-      error,
+      error_avatar,
+      error_username,
       user: computed(() => store.state.user)
     };
   }
 });
 </script>
+
+<style scoped>
+.ua-img {
+  width: 150px;
+  height: 150px;
+  border-radius: 150px;
+  transition: 0.3s ease;
+  opacity: 0.7;
+}
+
+.edit-user-img-container {
+  position: relative;
+  margin: auto;
+  margin-bottom: 30px;
+  width: 150px;
+  height: 150px;
+  border-radius: 150px;
+  overflow: hidden;
+}
+
+.icon-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  padding: 5px;
+  cursor: pointer;
+  font-size: 1.2em;
+  transition: 0.3s ease;
+}
+
+.edit-user-img-container:hover .icon-wrapper {
+  /* background: rgba(0, 0, 0, 0.7); */
+  display: none;
+}
+
+.edit-user-img-container:hover img {
+  opacity: 1;
+}
+
+input[type="file"] {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+</style>

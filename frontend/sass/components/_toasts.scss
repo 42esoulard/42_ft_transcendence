@@ -8,7 +8,8 @@
 .toast-content {
   padding: 20px;
   color: white;
-  background: rgb(7, 173, 7);
+  font-family: 'Saira';
+  background: darken($third-color, 15);
   border-radius: 10px;
   box-shadow: 1px 3px 5px rgba($color: #000000, $alpha: 0.2);
   min-width: 400px;

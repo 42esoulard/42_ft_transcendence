@@ -4,7 +4,7 @@
   <div class="list-div-panel">
     <ul class="list-div-panel__list">
       <li v-for="friendship in friendships" :key="friendship.created_at" class="friend-name">
-        <router-link :to="{ name: 'UserProfile', params: {username: friendName(friendship)} }">
+        <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: friendName(friendship)} }">
           {{ formatedFriend(friendship) }}
         </router-link>
       </li>

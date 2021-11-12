@@ -3,18 +3,23 @@
 @import "./utils/mixins";
 @import "./utils/functions";
 @import "./components/buttons";
+@import "./components/links";
 @import "./base/transitions";
 @import "./base/app";
 @import "./layouts/header";
 @import "./layouts/sidebar";
 @import "./layouts/profile";
+@import "./layouts/users";
 @import "./layouts/stats";
 @import "./layouts/otpForm";
 @import "./layouts/errors";
 @import "./layouts/account";
+@import "./layouts/menu";
 @import "./components/toasts";
 @import "./components/modal";
 @import "./layouts/editUser";
+@import "./layouts/chat";
+@import "./layouts/logIn";
 
 html {
   font-size: 100%;

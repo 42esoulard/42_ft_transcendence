@@ -9,7 +9,6 @@ import { JwtAuthGuard } from './guards/jwt.guard';
 import { JwtTwoFactorGuard } from './guards/jwtTwoFactor.guard';
 import { RefreshTwoFactorGuard } from './guards/refreshTwoFactor.guard';
 import { ApiCookieAuth, ApiOAuth2, ApiTags } from '@nestjs/swagger';
-import { timingSafeEqual } from 'crypto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -59,9 +58,9 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Body() { username }: { username: string }
   ) {
-    console.log(username);
+    // console.log(username);
     const user: User = await this.userService.getUserByUsername(username);
-    console.log('user', user);
+    // console.log('user', user);
     if (user == undefined) {
       throw new NotFoundException('User not found');
     }

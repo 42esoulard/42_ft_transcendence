@@ -33,8 +33,6 @@ export class PongService {
   //   })
   // }
 
-
-
   async getGamebyId(gameId: number): Promise<Game> {
     const res = await this.gameRepo.findOne(gameId, {
       relations: ['users'],

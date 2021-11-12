@@ -1,0 +1,78 @@
+
+.users {
+  display: grid;
+  grid-template: 8% 8% 74% 10% / 100%;
+  width: $users-width;
+  height: $users-height;
+  background-color: $users-bg-color;
+  border-radius: 20px;
+  margin: auto;
+  margin-top: 2rem;
+  @media (max-width: 600px){
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+.users__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px 20px 0 0;
+  font-family: 'Saira';
+  font-size: $users-title-size;
+  background-color: black;
+}
+
+.users-search {
+  background-color: black;
+  border-radius: 0 0 20px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.users-search__bar {
+  border: none;
+  padding: 0.2rem 1rem;
+  font-family: 'Saira';
+  border-radius: 20px;
+  text-align: center;
+}
+
+.users-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0 6rem;
+  overflow-y: scroll;
+}
+
+.users-list__elt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+}
+
+.users-list__avatar {
+  width: $users-avatar-width;
+  height: $users-avatar-width;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.users-list__interactions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.users-list-selectors {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}

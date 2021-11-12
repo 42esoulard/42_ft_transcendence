@@ -15,6 +15,7 @@ import {
 } from 'typeorm';
 import { Channels } from 'src/channels/entity/channels.entity';
 import { Friendships } from 'src/friendships/entity/friendships.entity';
+import { ChannelMembers } from 'src/channel_members/entity/channel_members.entity';
 // import * as bcrypt from 'bcrypt';
 
 @Entity('users')
@@ -55,6 +56,11 @@ export class Users {
   @OneToMany(() => Messages, (message) => message.author)
   messages: Messages[];
 
+  @OneToMany(() => ChannelMembers, (cm) => cm.member, {
+    cascade: true,
+  })
+  channel_members: ChannelMembers[];
+
   @OneToMany(() => Friendships, (friendship) => friendship.requester)
   @JoinTable()
   friendships_requested: Friendships[];
@@ -62,20 +68,7 @@ export class Users {
   @OneToMany(() => Friendships, (friendship) => friendship.adressee)
   @JoinTable()
   friendships_adressed: Friendships[];
-
-  @ManyToMany(() => Channels, (channel) => channel.members)
-  @JoinTable({
-    name: 'channel_members',
-    joinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'channel_id',
-      referencedColumnName: 'id',
-    },
-  })
-  channels: Channels[];
+  
 
   // @OneToMany()
   // channels:

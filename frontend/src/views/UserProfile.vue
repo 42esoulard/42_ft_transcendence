@@ -1,10 +1,10 @@
 <template>
   <div class="profile" v-if="user">
     <div class="profile-left">
-      <ProfileLeft :user="user"/>
+      <ProfileLeft :user="user" />
     </div>
-    <div class="profile-main">
-      <Stats :user="user"/>
+    <div class="profile-right">
+      <Stats :user="user" />
     </div>
   </div>
 </template>
@@ -15,8 +15,8 @@ import { useStore } from "vuex";
 import Stats from "../components/Stats.vue";
 import ProfileLeft from "../components/ProfileLeft.vue";
 import { User } from "@/types/User";
-  import moment from "moment";
-import { useRoute } from 'vue-router';
+import moment from "moment";
+import { useRoute } from "vue-router";
 import { useUserApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
@@ -38,16 +38,14 @@ export default defineComponent({
     });
 
     const formatedDate = computed(() => {
-        return moment(userRef.value.created_at as Date).format(
-          "MM-DD-YYYY"
-        );
-      });
-    return { user: computed(() => userRef.value), formatedDate };
-  },
-});
+      return moment(userRef.value.created_at as Date).format("MM-DD-YYYY");
+    });
 
+    return { user: computed(() => userRef.value), formatedDate };
+  }
+});
 </script>
 
 <style lang="scss">
-  @import "../../sass/main.scss";
+@import "../../sass/main.scss";
 </style>

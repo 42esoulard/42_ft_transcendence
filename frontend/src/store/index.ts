@@ -1,5 +1,4 @@
 import { User } from '@/types/User'
-import { Friendship } from '@/types/Friendship'
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 
@@ -8,6 +7,8 @@ export interface State {
   user: User | null,
   message: string,
   firstTimeConnect: boolean,
+  isConnected: boolean,
+  onlineUsers: User[];
 }
 
 // define injection key
@@ -21,6 +22,8 @@ export const store = createStore<State>({
     user: null,
     message: '',
     firstTimeConnect: false,
+    isConnected: false,
+    onlineUsers: [],
   },
   getters: {},
   mutations: {
@@ -30,6 +33,7 @@ export const store = createStore<State>({
         state.user.two_fa_enabled = payload;
       }
     },
+
     updateAvatar(state: State, payload: string) {
       if (state.user) {
         const tag = `?tag=${Date.now().toString()}`;
@@ -52,6 +56,25 @@ export const store = createStore<State>({
     setFirstTimeConnect(state: State, payload: boolean) {
       state.firstTimeConnect = payload;
     },
+
+    addOnlineUser(state: State, newUser: User) {
+      const user = state.onlineUsers.find(user => user.id === newUser.id);
+      if (!user)
+        state.onlineUsers.push(newUser);
+    },
+
+    allConnectedUsers(state: State, connectedUsers: User[]) {
+      if (connectedUsers.length)
+        state.onlineUsers = connectedUsers;
+    },
+
+    removeOnlineUser(state: State, id: number) {
+      if (id) {
+        state.onlineUsers = state.onlineUsers.filter(u => u.id !== id);
+      }
+    },
+
+
   },
   actions: {
     setMessage(context, payload: string) {

@@ -11,6 +11,7 @@ $header-height: 4rem;
 $header-font: "Saira";
 $header-font-size: 3rem;
 $header-bloc-gap: 7px;
+$header-bloc-bg: rgba(255, 255, 255, 0.1);
 $user-bloc-gap: 14px;
 $user-bloc-name-font: "Saira";
 $user-bloc-name-size: 1.5rem;
@@ -37,50 +38,122 @@ $sidebar-border-radius: 50px;
 //PROFILE
 $profile-width: 1000px;
 $profile-height: 700px;
-$profile-background-color: rgba(0, 0, 0, 50%);
+$profile-background-color: rgba(0, 0, 0, 30%);
 $profile-div-bg-color: rgba(0, 0, 0, 80%);
 $profile-avatar-width: 50%;
-$profile-left-gap: 0rem;
-$profile-left-margin: 2rem 0;
-$profile-left-padding: 2rem;
+$profile-left-gap: 1rem;
+$profile-left-margin: 0 0;
+$profile-left-padding: 1rem;
 $profile-left-name-font: "Saira";
-$profile-left-name-size: 4rem;
-$profile-main-margin: 2rem 0;
-$profile-main-padding: 2rem;
-$profile-main-width: 100%;
-$profile-social-width: 80%;
+$profile-left-name-size: 3rem;
+$profile-right-margin: 2rem 0;
+$profile-right-padding: 2rem;
+$profile-right-width: 100%;
+$profile-social-width: 60%;
 $profile-social-width-column: 50%;
 $profile-social-gap: 5px;
 $profile-social-margin: 1rem 0 0 0;
 
+//USERS
+$users-avatar-width: 3rem;
+$users-bg-color: rgba(0, 0, 0, 80%);
+$users-width: 500px;
+$users-height: 700px;
+$users-title-size: 1.5rem;
+
+//CHAT
+$chat-main-font: "Saira", Arial;
+$chat-font-light: white;
+$chat-font-dark: black;
+$chat-bg-light:rgba(240, 255, 255, 0.253);
+$chat-bg-dark:rgba(0, 0, 0, 0.808);
+$chat-height: 600px;
+$chat-width: 70%;
+$chat-border-radius: 10px;
+$chat-margin-left: 15%;
+$chat-bg: rgba(0, 0, 0, 0.705);
+$chat-box-width: 100%;
+$chat-min-width: 200px;
+$chat-input-width: 95%;
+$chat-input-height: 2rem;
+$chat-input-padding: 20px;
+$chat-input-margin-left: 10px;
+$chat-input-color: black;
+$chat-input-bg: white;
+$chat-input-border: 1px solid grey;
+$chat-input-border-radius: 10px;
+$chat-greyed-input: rgba(114, 114, 114, 0.822);
+$chat-header-width: 100%;
+$chat-header-padding: 48px 10px 10px 10px;
+$chat-header-bg: rgba(240, 255, 255, 0.253);
+$chat-header-font-size: 1.5rem;
+$chat-header-name-width: 60%;
+$chat-header-border-radius: 15%;
+$chat-header-margin: 0px 0px 5px 10px;
+$chat-msg-container-height: 70%;
+$chat-msg-container-margin: 0 0 0 -20px;
+$chat-msg-border-width: 1px;
+$chat-msg-border-color: grey;
+$chat-msg-padding: 10px;
+$chat-msg-author-width: 5em;
+$chat-msg-content-padding: 10px;
+$chans-padding: 30px 0;
+$chans-bg: rgba(12, 12, 12, 0.651);
+$chans-height: 100%;
+$chans-width: 35%;
+$chans-min-width: 170px;
+$chans-list-padding: 0;
+$chans-item-width: 100%;
+$chans-item-bg: rgba(0, 0, 0, 0.609);
+$chans-item-padding: 5px 10px;
+$chans-item-width: 100%;
+$chans-item-hover-bg: rgba(218, 218, 218, 0.384);
+$chans-item-name-width: 60%;
+$chans-createbtn-width: 100%;
+$chans-createbtn-padding: 20px;
+$chans-createbtn-bg: rgba(0, 0, 0, 0.609);
+$chans-title-padding: 20px;
+$channel-form-width: 300px;
+$channel-form-padding: 20px;
+$channel-form-position: 50%;
+$channel-form-margin: - ($channel-form-width * 0.5);
+$channel-form-border-radius: 15px;
+$channel-form-title-padding: 10px;
+$channel-form-title-margin: 10px;
+$channel-form-title-width: 85%;
+$channel-form-title-font-size: 1.2rem;
+$channel-form-title-border-radius: 15px;
+$channel-form-subtitle-font-size: 1.1rem;
+$channel-form-subtitle-margin: 10px;
+$channel-form-input-radius: 10px;
+$channel-form-radio-margin: 10px;
+
 //STATS
 $stats-width: 100%;
 $stats-height: 100%;
-$stats-grid: 30% 10% 60% / 33% 33% 33%;
+$stats-grid: 40% 60% / 100%;
 $stats-gap: 1rem;
-$stats-number-size: 2.5rem;
+$stats-number-size: 3rem;
+$stats-rank-size: 3rem;
+$stats-info-grid: 80% 20% / 33% 33% 33%;
 $stats-win-color: $third-color;
-$stats-rank-color: $second-color;
-$stats-games-color: $prim-color;
-$stats-text-font: "Roboto";
-$stats-text-size: 1rem;
+$stats-rank-color: $prim-color;
+$stats-text-font: "Saira";
+$stats-text-size: 1.5rem;
 $stats-bloc-margin: 0rem 0rem;
-$stats-bloc-border-height: 7rem;
-$stats-bloc-border-width: 7rem;
-$stats-bloc-border-border-radius: 50%;
-$stats-bloc-border-bg: linear-gradient($prim-color, $second-color);
-$stats-bloc-height: 6.5rem;
-$stats-bloc-width: 6.5rem;
-$stats-bloc-border-radius: 50%;
-$stats-bloc-bg: black;
+$stats-bloc-bg: rgb(153, 78, 78);
 $list-div-width: 100%;
-$list-div-height: 80%;
+$list-div-height: 100%;
 $list-div-panel-height: 100%;
-$list-div-panel-bg: rgba(0, 0, 0, 50%);
-$list-div-title-bg: rgba(0, 0, 0, 100%);
+$list-div-panel-bg: transparent;
+$list-div-title-bg: transparent;
 $list-div-title-width: 100%;
 $list-div-title-font: "Saira";
-$list-div-title-border: white solid;
+$list-div-title-border: none;
+$list-div-title-padding: 10px 20px;
+$list-div-title-size: 1.5rem;
+$table-cell-win-color: darken($third-color, 15);
+$table-cell-loss-color: white;
 
 
 //PROGRESS BAR
@@ -91,14 +164,13 @@ $progress-bar-bg: #313131;
 $progress-bar-border-radius: 16px;
 $progress-bar-box-shadow: inset 0 1px 2px #000;
 $progress-bar-border: 1px solid black;
-$progress-bar-inside-bg: linear-gradient(to right, $prim-color, $second-color);
+$progress-bar-inside-bg: linear-gradient(to right, darken($prim-color, 15), darken($third-color, 15));
 $progress-bar-label-font: "Saira";
 $progress-bar-inside-height: 80%;
 $progress-bar-inside-border-radius: 12px;
 $progress-bar-label-color: white;
 
 //RAINBOW TITLE
-
 $rainbow-border-bg: linear-gradient($prim-color, $second-color);
 $rainbow-border-border-radius: 25px;
 $rainbow-border-height: 1.8rem;
@@ -109,16 +181,15 @@ $rainbow-title-width: 100%;
 $rainbow-border-radius: 25px;
 $rainbow-title-font: "Saira";
 
-
-
 //BUTTONS
 $button-bg-color: rgba(0, 0, 0, 80%);
 $button-width: 100%;
 $button-font: "Saira";
 $button-color: white;
+$button-padding: 10px 20px;
+$button-font-weight: bold;
 $button-border-radius: 50px;
 $button-border: none;
-$button-padding: 5px 10px;
 $button-hover-bg-color: black;
 $button-hover-border: none;
 $button-primary-bg: darken($prim-color, 15);
@@ -128,6 +199,10 @@ $button-grey-bg: grey;
 $button-log-in-size: 1.5rem;
 $button-log-in-padding: 10px 50px;
 $button-log-in-logo-width: 3rem;
+
+//LINKS
+$link-color: white;
+$link-neutral-hover: darken($prim-color, 15);
 
 //OTHERS
 $status-online-color: rgb(0, 255, 0);

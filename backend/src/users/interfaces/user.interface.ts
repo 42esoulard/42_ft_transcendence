@@ -1,7 +1,7 @@
 import { Message } from 'src/messages/interfaces/message.interface';
-import { Channel } from 'src/channels/interfaces/channel.interface';
 import { GameUser } from 'src/pong/entity/gameUser.entity';
 import { Friendship } from 'src/friendships/interfaces/friendship.interface';
+import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
 
 export class User {
   id: number;
@@ -13,7 +13,7 @@ export class User {
   refresh_token: string;
   expiry_date: Date;
   messages: Message[];
-  channels: Channel[];
+  channel_members: ChannelMember[];
   games: GameUser[];
   friendships_requested: Friendship[];
   friendships_adressed: Friendship[];

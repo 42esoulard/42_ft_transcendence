@@ -31,7 +31,6 @@
     "start:dev:db:empty": "ts-node -r tsconfig-paths/register src/scripts/emptyUsersTable.ts"
   },
   "dependencies": {
-    "@nestjs/cli": "8.1.1",
     "@nestjs/common": "8.0.0",
     "@nestjs/core": "8.0.0",
     "@nestjs/jwt": "8.0.0",
@@ -46,6 +45,8 @@
     "cookie-parser": "1.4.5",
     "cors": "2.8.5",
     "express-session": "1.17.2",
+    "file-type": "^16.5.3",
+    "jimp": "^0.16.1",
     "otplib": "12.0.1",
     "passport-42": "1.2.6",
     "passport-jwt": "4.0.0",
@@ -58,7 +59,7 @@
     "typeorm": "0.2.37"
   },
   "devDependencies": {
-    "@nestjs/cli": "8.0.0",
+    "@nestjs/cli": "^8.1.4",
     "@nestjs/schematics": "8.0.0",
     "@nestjs/testing": "8.0.0",
     "@types/bcrypt": "5.0.0",
