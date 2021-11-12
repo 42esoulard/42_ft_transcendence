@@ -48,7 +48,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from "vue";
 import { useAuthApi} from "@/plugins/api.plugin";
-import { useStore } from "vuex";
+import { useStore } from "@/store";
 import moment from "moment"; // Should not be in this component
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import EditUser from "@/components/EditUser.vue";
@@ -75,7 +75,7 @@ export default defineComponent({
     });
 
     const formatedDate = computed(() => {
-      return moment(store.state.user.created_at as Date).format(
+      return moment(store.state.user!.created_at).format(
         "YYYY-MM-DD HH:mm:ss"
       );
     });

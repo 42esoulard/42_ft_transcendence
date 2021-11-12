@@ -9,7 +9,8 @@
             'button',
             'button--selector',
             onlinelist ? 'button--selector--on' : ''
-          ]">
+          ]"
+        >
           online
         </button>
         <button
@@ -18,7 +19,8 @@
             'button',
             'button--selector',
             friendlist ? 'button--selector--on' : ''
-          ]">
+          ]"
+        >
           friends
         </button>
       </div>
@@ -30,7 +32,8 @@
           <td>
             <router-link
               class="link link--user-list"
-              :to="{ name: 'UserProfile', params: { username: user.username } }">
+              :to="{ name: 'UserProfile', params: { username: user.username } }"
+            >
               {{ user.username }}
             </router-link>
           </td>
@@ -46,7 +49,8 @@
           class="users-search__bar"
           type="text"
           maxlength="10"
-          v-model="searchQuery" />
+          v-model="searchQuery"
+        />
       </div>
     </div>
   </div>
@@ -58,7 +62,7 @@
 <script lang="ts">
 import { defineComponent, inject, onMounted, ref, computed } from "vue";
 import { User } from "@/types/User";
-import { useStore } from "vuex";
+import { useStore } from "@/store";
 import { useUserApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
@@ -81,18 +85,22 @@ export default defineComponent({
           userList.value.sort((a, b) => a.username.localeCompare(b.username));
         })
         .catch((err: any) => console.log(err.message));
-      userApi
-        .getUserFriendships(store.state.user.id)
-        .then((res: any) => {
-          for (const requested of res.data.friendships_requested)
-            if (requested.pending == false)
-              friendList.value.push(requested.adressee);
-          for (const adressed of res.data.friendships_adressed)
-            if (adressed.pending == false)
-              friendList.value.push(adressed.requester);
-          friendList.value.sort((a, b) => a.username.localeCompare(b.username));
-        })
-        .catch((err: any) => console.log(err.message));
+      if (store.state.user) {
+        userApi
+          .getUserFriendships(store.state.user.id)
+          .then((res: any) => {
+            for (const requested of res.data.friendships_requested)
+              if (requested.pending == false)
+                friendList.value.push(requested.adressee);
+            for (const adressed of res.data.friendships_adressed)
+              if (adressed.pending == false)
+                friendList.value.push(adressed.requester);
+            friendList.value.sort((a, b) =>
+              a.username.localeCompare(b.username)
+            );
+          })
+          .catch((err: any) => console.log(err.message));
+      }
     });
 
     const toggleFriends = () => {
@@ -106,9 +114,14 @@ export default defineComponent({
     const selectList = computed(() => {
       const list = ref();
       if (friendlist.value && onlinelist.value)
-        list.value = friendList.value.filter(user => (onlineList.find((u: User) => u.id === user.id)));
+        list.value = friendList.value.filter(user =>
+          onlineList.find((u: User) => u.id === user.id)
+        );
       else if (friendlist.value) list.value = friendList.value;
-      else if (onlinelist.value) list.value = userList.value.filter(user => (onlineList.find((u: User) => u.id === user.id)));
+      else if (onlinelist.value)
+        list.value = userList.value.filter(user =>
+          onlineList.find((u: User) => u.id === user.id)
+        );
       else list.value = userList.value;
       if (searchQuery.value.length) {
         list.value = list.value.filter((entity: User) =>
@@ -116,7 +129,7 @@ export default defineComponent({
         );
       }
       list.value = list.value.filter(
-        (entity: User) => entity.username != store.state.user.username
+        (entity: User) => entity.username != store.state.user!.username
       );
       return list.value;
     });

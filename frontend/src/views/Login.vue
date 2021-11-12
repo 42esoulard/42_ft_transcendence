@@ -39,7 +39,7 @@
 import { defineComponent, onBeforeMount, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import OtpInput from "@/components/OtpInput.vue";
-import { useStore } from "vuex";
+import { useStore } from "@/store";
 import { useAuthApi } from "@/plugins/api.plugin";
 import { useUserApi } from "@/plugins/api.plugin";
 import { usePongApi } from "@/plugins/api.plugin";
