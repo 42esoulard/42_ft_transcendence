@@ -25,14 +25,43 @@
     <div>
 
       <div class='chat-admin-pannel__tabs'>
-        <button class='chat-admin-pannel__tab' @click="selectedTab = 'all'">Members</button>
-        <button class='chat-admin-pannel__tab' @click="selectedTab = 'banned'">Banned</button>
-        <button class='chat-admin-pannel__tab' @click="selectedTab = 'muted'">Muted</button>
+        <button
+          @click="toggleTab('banned')"
+          :class="[
+            'button',
+            'button--selector',
+            selectedTab === 'banned' ? 'button--selector--on' : ''
+          ]"
+        >
+          banned
+        </button>
+        <!-- <button class='chat-admin-pannel__tab' @click="">Banned</button> -->
+        <!-- <button class='chat-admin-pannel__tab' @click="selectedTab = 'muted'">Muted</button> -->
+        <button
+          @click="toggleTab('muted')"
+          :class="[
+            'button',
+            'button--selector',
+            selectedTab === 'muted' ? 'button--selector--on' : ''
+          ]"
+        >
+          muted
+        </button>
+        <button
+          @click="toggleTab('admins')"
+          :class="[
+            'button',
+            'button--selector',
+            selectedTab === 'admins' ? 'button--selector--on' : ''
+          ]"
+        >
+          admins
+        </button>
         <button v-if="activeChannel.is_owner" class='chat-admin-pannel__tab' @click="selectedTab = 'owner'">Owner Pannel</button>
       </div>
       <div>
-        <div v-if="selectedTab === 'all'" class='chat-admin-pannel__users-list'>
-          <li v-for="cm in activeChannel.channel.channel_members" :key="cm.id" class='chat-admin-pannel__user'>
+        <div class='chat-admin-pannel__users-list'>
+          <li v-for="cm in selectedMembers" :key="cm.id" class='chat-admin-pannel__user'>
             <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: cm.member.username} }">
               {{ cm.member.username }}
             </router-link>
@@ -46,20 +75,6 @@
               <span v-if="cm.ban" @click="toggleModal('unban', cm)"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--ban" title="Unban user" /></span>
               <span v-else @click="toggleModal('banned', cm)"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--greyed" title="Ban user" /></span>
             </div>
-          </li>
-        </div>
-        <div v-if="selectedTab === 'muted'" class='chat-admin-pannel__users-list'>
-          <li v-for="cm in mutedMembers" :key="cm.id" class='chat-admin-pannel__user'>
-            <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: cm.member.username} }">
-              {{ cm.member.username }}
-            </router-link>
-          </li>
-        </div>
-        <div v-if="selectedTab === 'banned'" class='chat-admin-pannel__users-list'>
-          <li v-for="cm in bannedMembers" :key="cm.id" class='chat-admin-pannel__user'>
-            <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: cm.member.username} }">
-              {{ cm.member.username }}
-            </router-link>
           </li>
         </div>
       </div>
@@ -121,14 +136,64 @@ export default defineComponent({
     const api = new ChatApi();
     const toggleTimer = ref('');
     const targetCm = ref();
-    const mutedMembers = ref(computed(() => props.activeChannel.channel.channel_members
-    .filter(function(cm: ChannelMember) {
-      return cm.mute;
-    })));
-    const bannedMembers = ref(computed(() => props.activeChannel.channel.channel_members
-    .filter(function(cm: ChannelMember) {
-      return cm.ban;
-    })));
+    const selectedTab = ref('all');
+    const allMembers = ref(computed(() => props.activeChannel.channel.channel_members));
+  
+    let selectedMembers = computed(() => {
+      const list = ref();
+      if (selectedTab.value === 'banned') {
+        list.value = allMembers.value.filter((cm: ChannelMember) => cm.ban)
+      } else if (selectedTab.value === 'muted') {
+        list.value = allMembers.value.filter((cm: ChannelMember) => cm.mute)
+      } else if (selectedTab.value === 'admins') {
+        list.value = allMembers.value.filter((cm: ChannelMember) => cm.is_admin)
+      } else {
+        list.value = allMembers.value;
+      }
+      return list.value;
+    });
+    
+    console.log(allMembers)
+
+    // const bannedList = ref(false);
+    // const mutedList = ref(false);
+
+    const toggleTab = (tab: string) => {
+      switch (tab) {
+        case 'banned':
+          if (selectedTab.value === 'banned') {
+            selectedTab.value = 'all';
+            // selectedMembers = allMembers;
+          } else {
+            selectedTab.value = 'banned';
+            // selectedMembers = bannedMembers;
+          }
+          break;
+        case 'muted':
+          console.log("bef", tab, selectedTab.value);
+          if (selectedTab.value === 'muted') {
+            selectedTab.value = 'all';
+            // selectedMembers = allMembers;
+          } else {
+            selectedTab.value = 'muted';
+            // selectedMembers = mutedMembers;
+          }
+          console.log("aft", tab, selectedTab.value);
+          break;
+        case 'admins':
+          console.log("bef", tab, selectedTab.value);
+          if (selectedTab.value === 'admins') {
+            selectedTab.value = 'all';
+            // selectedMembers = allMembers;
+          } else {
+            selectedTab.value = 'admins';
+            // selectedMembers = mutedMembers;
+          }
+          console.log("aft", tab, selectedTab.value);
+          break;
+      }
+
+    };
 
 
     const closeChannelSettings = () => {
@@ -237,14 +302,15 @@ export default defineComponent({
       submitInputs,
       wasSubmitted,
       closeModal,
-      selectedTab: ref('all'),
+
+      selectedTab,
+      selectedMembers,
 
       toggleTimer,
       toggleModal,
       closeChannelSettings,
       targetCm,
-      mutedMembers,
-      bannedMembers,
+      toggleTab,
     }
   }
 });

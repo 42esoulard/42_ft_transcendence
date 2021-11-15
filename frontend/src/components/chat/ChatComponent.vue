@@ -24,7 +24,7 @@
                 <span v-if="activeChannel.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
                 <span @click="channelSettings = true"><img class="fas fa-lg fa-cogs chat-channels__tag chat-channels__tag--settings" title="Channel Settings"  /></span>
               </div>
-              <span v-if="isMember && activeChannel.id !== 1" @click="leaveChannel()" ><img class="fas fa-lg fa-sign-out-alt chat-channels__tag chat-channels__tag--leave" title="Leave Channel" /></span>
+              <span v-if="isMember && activeChannel.channel.name !== 'General'" @click="leaveChannel()" ><img class="fas fa-lg fa-sign-out-alt chat-channels__tag chat-channels__tag--leave" title="Leave Channel" /></span>
             </div>
 
           <div v-if="isMember || (activeChannel && !activeChannel.channel.password)" class="chat-messages">
