@@ -1,4 +1,4 @@
-import { coordinates } from './pong.types'
+import { coordinates, gameMode } from './pong.types'
 import { player } from './pong.player'
 import { Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
@@ -29,7 +29,8 @@ export class pongGame {
   public player2: player,
   private readonly gameRepo: Repository<Game>,
   private readonly gameUserRepo: Repository<GameUser>,
-  public server: Server)
+  public server: Server,
+  public gameMode: gameMode)
   {}
   
   private logger: Logger = new Logger('PongGateway');
@@ -62,6 +63,7 @@ export class pongGame {
   async pushGameintoDB()
   {
     const game = this.gameRepo.create()
+    game.gameMode = this.gameMode
     await this.gameRepo.save(game)
     this.gameId = game.id
   }

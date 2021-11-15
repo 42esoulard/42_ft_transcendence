@@ -7,6 +7,7 @@ import { Game } from './entity/games.entity';
 import { GameUser } from './entity/gameUser.entity';
 import { pongGame } from './classes/pong.pongGame';
 import { player } from './classes/pong.player';
+import { gameMode } from './classes/pong.types';
 
 
 @WebSocketGateway( { namespace: '/pong'})
@@ -25,7 +26,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   private logger: Logger = new Logger('PongGateway');
 
   private games = new Map() // pongGame map. key = room id
-  private waitingPlayer: player = null
+  private waitingPlayerClassic: player = null
+  private waitingPlayerTranscendence: player = null
   
   
   afterInit(server: Server): void {
@@ -51,20 +53,38 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage('joinGame')
-  async handleJoinGameMessage(client: Socket, message: {userId: number, userName: string}): Promise<void>
+  async handleJoinGameMessage(client: Socket, message: {userId: number, userName: string, gameMode: gameMode}): Promise<void>
   {
-    this.logger.log('client joined game. userId: ' + message.userName)
-    if (!this.waitingPlayer)
+    this.logger.log('client joined game. userId: ' + message.userName + ' gameMode: ' + message.gameMode)
+    if (message.gameMode == 'classic')
     {
-      this.waitingPlayer = new player(message.userId, message.userName, client)
-      client.emit('waitingForOpponent')
+      if (!this.waitingPlayerClassic)
+      {
+        this.waitingPlayerClassic = new player(message.userId, message.userName, client)
+        client.emit('waitingForOpponent')
+      }
+      else
+      {
+        const player2 = new player(message.userId, message.userName, client)
+        const game = new pongGame(this.waitingPlayerClassic, player2, this.gameRepo, this.gameUserRepo, this.server, message.gameMode)
+        await game.createGame()
+        this.games.set(game.room, game)
+      }
     }
-    else
+    if (message.gameMode == 'transcendence')
     {
-      const player2 = new player(message.userId, message.userName, client)
-      const game = new pongGame(this.waitingPlayer, player2, this.gameRepo, this.gameUserRepo, this.server)
-      await game.createGame()
-      this.games.set(game.room, game)
+      if (!this.waitingPlayerTranscendence)
+      {
+        this.waitingPlayerTranscendence = new player(message.userId, message.userName, client)
+        client.emit('waitingForOpponent')
+      }
+      else
+      {
+        const player2 = new player(message.userId, message.userName, client)
+        const game = new pongGame(this.waitingPlayerTranscendence, player2, this.gameRepo, this.gameUserRepo, this.server, message.gameMode)
+        await game.createGame()
+        this.games.set(game.room, game)
+      }
     }
   }
 
@@ -126,12 +146,17 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   clearQueue(client: Socket)
   {
-    if (this.waitingPlayer && this.waitingPlayer.clientSocket == client)
+    if (this.waitingPlayerClassic && this.waitingPlayerClassic.clientSocket == client)
     {
       this.logger.log('deleting queue')
-      delete this.waitingPlayer
-      this.waitingPlayer = null
+      delete this.waitingPlayerClassic
+      this.waitingPlayerClassic = null
     }
-  }
-  
+    if (this.waitingPlayerTranscendence && this.waitingPlayerTranscendence.clientSocket == client)
+    {
+      this.logger.log('deleting queue')
+      delete this.waitingPlayerTranscendence
+      this.waitingPlayerTranscendence = null
+    }
+  }  
 }

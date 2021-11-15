@@ -2,6 +2,12 @@
 <template>
   <div v-if="!queuing">
     <h1 class="header__title">Click to play</h1>
+		<select v-model="gameMode">
+			<option disabled>Please select game mode</option>
+			<option>classic</option>
+			<option>transcendence</option>
+		</select>
+		{{ gameMode }}
 		<button class="button button--log-in" v-on:click="JoinQueue()"> Join Game </button>
   </div>
 
@@ -21,11 +27,12 @@ export default defineComponent ({
 	setup() {
 		const socket = ref(clientSocket)
 		const queuing = ref(false)
+		const gameMode = ref('classic')
 
 		const store = useStore()
 		const JoinQueue = () => {
 			queuing.value = true
-			socket.value.emit('joinGame', {userId: store.state.user.id, userName: store.state.user.username})
+			socket.value.emit('joinGame', {userId: store.state.user.id, userName: store.state.user.username, gameMode: gameMode.value})
 		}
 
 		const router = useRouter()
@@ -38,8 +45,8 @@ export default defineComponent ({
 				socket.value.emit('leaveQueue')
 		})
 
-		return {queuing, JoinQueue}
-	} // test
+		return {queuing, JoinQueue, gameMode}
+	}
 
 })
 </script>
