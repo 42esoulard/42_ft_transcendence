@@ -39,7 +39,7 @@ export default defineComponent ({
 		})
 
 		return {queuing, JoinQueue}
-	}
+	} // test
 
 })
 </script>
