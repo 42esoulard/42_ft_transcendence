@@ -1,5 +1,6 @@
 <template>
 	<p> Game # {{ room }} </p>
+	<p> Mode: {{ gameMode }} </p>
 	<h1 class="header__title"> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
 	<canvas ref="canvas"> </canvas>
 
@@ -30,6 +31,7 @@ export default defineComponent({
 		const room =  ref(route.params.id)
 		const player1UserName = ref(route.params.player1UserName)
 		const player2UserName = ref(route.params.player2UserName)
+		const gameMode = ref(route.params.gameMode)
 
 		const { context, canvas, ballPosition, playerPositions, score, windowWidth, 
 			onResize, initCanvas, draw } = getDraw()
@@ -102,7 +104,7 @@ export default defineComponent({
 				SendMoveMsg('down')
 		}
 
-		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, canvas, SendMoveMsg }
+		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, canvas, gameMode, SendMoveMsg }
 
 	},
 

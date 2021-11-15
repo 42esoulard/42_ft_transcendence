@@ -7,7 +7,6 @@
 			<option>classic</option>
 			<option>transcendence</option>
 		</select>
-		{{ gameMode }}
 		<button class="button button--log-in" v-on:click="JoinQueue()"> Join Game </button>
   </div>
 
@@ -36,8 +35,8 @@ export default defineComponent ({
 		}
 
 		const router = useRouter()
-		socket.value.on('gameReadyToStart', (id, player1UserName, player2UserName) => {
-			router.push({ name: 'PongGame', params: {id, player1UserName, player2UserName, authorized: 'ok'}})
+		socket.value.on('gameReadyToStart', (id: string, player1UserName: string, player2UserName: string) => {
+			router.push({ name: 'PongGame', params: {id, player1UserName, player2UserName, authorized: 'ok', gameMode: gameMode.value}})
 		})
 
 		onBeforeRouteLeave(() => {
