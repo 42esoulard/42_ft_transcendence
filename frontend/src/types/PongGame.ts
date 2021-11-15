@@ -12,3 +12,5 @@ export interface Coordinates {
     x: number,
     y: number,
 }
+
+export type gameMode = 'classic' | 'transcendence'

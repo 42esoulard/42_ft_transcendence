@@ -25,16 +25,18 @@ import getDraw from '@/composables/draw'
 import { Coordinates, PlayerPositions, PlayerScores } from '@/types/PongGame'
 
 export default defineComponent({
-	setup() {
-		
+	props: ['gameMode', 'id', 'player1UserName', 'player2UserName'],
+	inheritAttrs: false, // we dont need it, and not setting it to false a warning: "extraneous non prop attributes (authorized) were passed to component but could not be automatically inherited..."
+	
+	setup(props) {
+	
 		const route = useRoute()
 		const room =  ref(route.params.id)
 		const player1UserName = ref(route.params.player1UserName)
 		const player2UserName = ref(route.params.player2UserName)
-		const gameMode = ref(route.params.gameMode)
 
 		const { context, canvas, ballPosition, playerPositions, score, windowWidth, 
-			onResize, initCanvas, draw } = getDraw()
+			onResize, initCanvas, draw } = getDraw(props.gameMode)
 
 		// lifecycle hooks
 		onMounted(() => {
@@ -104,7 +106,7 @@ export default defineComponent({
 				SendMoveMsg('down')
 		}
 
-		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, canvas, gameMode, SendMoveMsg }
+		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, canvas, SendMoveMsg }
 
 	},
 

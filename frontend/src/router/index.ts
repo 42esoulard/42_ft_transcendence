@@ -89,6 +89,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/pong/play',
     name: 'PongGame',
+    props: true,
     component: PongGame,
     beforeEnter(to, from, next) {
       if (to.params.authorized)

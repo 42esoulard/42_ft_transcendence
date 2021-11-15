@@ -21,12 +21,13 @@ import { defineComponent, ref } from 'vue'
 import { clientSocket } from '@/App.vue'
 import { useStore } from '@/store'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
+import { gameMode } from '@/types/PongGame'
 
 export default defineComponent ({
 	setup() {
 		const socket = ref(clientSocket)
 		const queuing = ref(false)
-		const gameMode = ref('classic')
+		const gameMode = ref<gameMode>('classic')
 
 		const store = useStore()
 		const JoinQueue = () => {

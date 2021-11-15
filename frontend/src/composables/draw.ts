@@ -1,5 +1,5 @@
 
-import { Coordinates, PlayerPositions, PlayerScores } from '@/types/PongGame'
+import { Coordinates, gameMode, PlayerPositions, PlayerScores } from '@/types/PongGame'
 import { ref } from 'vue'
 
 var CANVAS_WIDTH_RATIO = process.env.VUE_APP_CANVAS_WIDTH
@@ -13,7 +13,7 @@ var NET_ELEM_LENGHT_RATIO = 32
 var NET_ELEM_GAP_RATIO = 200
 var NET_WIDTH_RATIO = 400
 
-const getDraw = () => {
+const getDraw = (mode: gameMode) => {
 
 	// returned variables
 
@@ -95,7 +95,11 @@ const getDraw = () => {
 	const drawBall = () => {
 		if (context.value)
 		{
-			context.value.fillStyle = 'white'
+			console.log(mode)
+			if (mode == 'transcendence')
+				context.value.fillStyle = 'red'
+			else
+				context.value.fillStyle = 'white'
 			context.value.beginPath()
 			context.value.arc(ballPosition.value.x, ballPosition.value.y, windowWidth.value / BALL_RATIO, 0, Math.PI*2, false);
 			context.value.fill()

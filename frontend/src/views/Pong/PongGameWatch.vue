@@ -16,7 +16,9 @@ import getDraw from '@/composables/draw'
 import { Coordinates, PlayerPositions, PlayerScores } from '@/types/PongGame'
 
 export default defineComponent({
-	setup() {
+	props: ['gameMode'],
+
+	setup(props) {
 		
 		const route = useRoute()
 		const room =  ref(route.params.id)
@@ -24,7 +26,7 @@ export default defineComponent({
 		const player2UserName = ref(route.params.player2UserName)
 
 		const { context, canvas, ballPosition, playerPositions, score, windowWidth,
-			onResize, initCanvas, draw } = getDraw()
+			onResize, initCanvas, draw } = getDraw(props.gameMode)
 
 		// lifecycle hooks
 		onMounted(() => {
