@@ -4,3 +4,5 @@ export type coordinates = {
 }
 
 export type gameMode = 'classic' | 'transcendence'
+
+export type joinGameMessage = {userId: number, userName: string, gameMode: gameMode}

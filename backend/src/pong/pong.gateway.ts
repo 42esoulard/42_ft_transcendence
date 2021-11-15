@@ -7,7 +7,7 @@ import { Game } from './entity/games.entity';
 import { GameUser } from './entity/gameUser.entity';
 import { pongGame } from './classes/pong.pongGame';
 import { player } from './classes/pong.player';
-import { gameMode } from './classes/pong.types';
+import { gameMode, joinGameMessage } from './classes/pong.types';
 
 
 @WebSocketGateway( { namespace: '/pong'})
@@ -53,7 +53,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage('joinGame')
-  async handleJoinGameMessage(client: Socket, message: {userId: number, userName: string, gameMode: gameMode}): Promise<void>
+  async handleJoinGameMessage(client: Socket, message: joinGameMessage): Promise<void>
   {
     this.logger.log('client joined game. userId: ' + message.userName + ' gameMode: ' + message.gameMode)
     if (message.gameMode == 'classic')
@@ -64,12 +64,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         client.emit('waitingForOpponent')
       }
       else
-      {
-        const player2 = new player(message.userId, message.userName, client)
-        const game = new pongGame(this.waitingPlayerClassic, player2, this.gameRepo, this.gameUserRepo, this.server, message.gameMode)
-        await game.createGame()
-        this.games.set(game.room, game)
-      }
+        this.createGame(this.waitingPlayerClassic, message, client)
     }
     if (message.gameMode == 'transcendence')
     {
@@ -79,13 +74,16 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         client.emit('waitingForOpponent')
       }
       else
-      {
-        const player2 = new player(message.userId, message.userName, client)
-        const game = new pongGame(this.waitingPlayerTranscendence, player2, this.gameRepo, this.gameUserRepo, this.server, message.gameMode)
-        await game.createGame()
-        this.games.set(game.room, game)
-      }
+        this.createGame(this.waitingPlayerTranscendence, message, client)
     }
+  }
+
+  async createGame(player1: player, message: joinGameMessage, client: Socket)
+  {
+    const player2 = new player(message.userId, message.userName, client)
+    const game = new pongGame(player1, player2, this.gameRepo, this.gameUserRepo, this.server, message.gameMode)
+    await game.createGame()
+    this.games.set(game.room, game)
   }
 
   @SubscribeMessage('watchGame')
