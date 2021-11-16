@@ -57,7 +57,17 @@
         >
           admins
         </button>
-        <button v-if="activeChannel.is_owner" class='chat-admin-pannel__tab' @click="selectedTab = 'owner'">Owner Pannel</button>
+        <button
+          @click="toggleTab('ownerOptions')"
+          v-if="activeChannel.is_owner"
+          :class="[
+            'button',
+            'button--selector',
+            selectedTab === 'admins' ? 'button--selector--on' : ''
+          ]"
+        >
+          ...
+        </button>
       </div>
       <div>
         <div class='chat-admin-pannel__users-list'>
@@ -65,11 +75,11 @@
             <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: cm.member.username} }">
               {{ cm.member.username }}
             </router-link>
-            <div v-if="(activeChannel.is_owner && activeChannel.id == cm.id) || (!activeChannel.is_owner && (cm.is_owner || cm.is_admin))" class="chat-channels__tag-container">
+            <div v-if="(activeChannel.is_owner && activeChannel.id == cm.id) || (!activeChannel.is_owner && (cm.is_owner || cm.is_admin) && activeChannel.id != cm.id)" class="chat-channels__tag-container">
               <span v-if="cm.is_owner"><img class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner" /></span>
               <span v-if="cm.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
             </div>
-            <div v-else-if="activeChannel.is_owner && cm.is_admin" class="chat-channels__tag-container">
+            <div v-else-if="(activeChannel.is_owner && cm.is_admin) || (activeChannel.is_admin && activeChannel.id == cm.id)" class="chat-channels__tag-container">
               <span @click="toggleAdmin(cm)"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin-togglable" title="Remove from Admins" /></span>
             </div>
             <div v-if="!cm.is_admin">
@@ -135,7 +145,7 @@ export default defineComponent({
   name: 'ChannelSettings',
   props: ['activeChannel'],
   components: { Modal, MuteBanTimer },
-  emits: ["close-settings", "update-channel"],
+  emits: ["close-settings", "update-channel", "update-channels-list"],
   setup(props, context) {
     const api = new ChatApi();
     const toggleTimer = ref('');
@@ -157,31 +167,22 @@ export default defineComponent({
       }
       return list.value;
     });
-    
-    console.log(allMembers)
-
-    // const bannedList = ref(false);
-    // const mutedList = ref(false);
 
     const toggleTab = (tab: string) => {
       switch (tab) {
         case 'banned':
           if (selectedTab.value === 'banned') {
             selectedTab.value = 'all';
-            // selectedMembers = allMembers;
           } else {
             selectedTab.value = 'banned';
-            // selectedMembers = bannedMembers;
           }
           break;
         case 'muted':
           console.log("bef", tab, selectedTab.value);
           if (selectedTab.value === 'muted') {
             selectedTab.value = 'all';
-            // selectedMembers = allMembers;
           } else {
             selectedTab.value = 'muted';
-            // selectedMembers = mutedMembers;
           }
           console.log("aft", tab, selectedTab.value);
           break;
@@ -189,12 +190,9 @@ export default defineComponent({
           console.log("bef", tab, selectedTab.value);
           if (selectedTab.value === 'admins') {
             selectedTab.value = 'all';
-            // selectedMembers = allMembers;
           } else {
             selectedTab.value = 'admins';
-            // selectedMembers = mutedMembers;
           }
-          console.log("aft", tab, selectedTab.value);
           break;
       }
 
@@ -219,7 +217,10 @@ export default defineComponent({
       await api.toggleAdmin(cm.id)
       .then(() => {
         targetCm.value = cm;
-        context.emit('update-channel');
+        context.emit('update-channels-list');
+        if (cm.id == props.activeChannel.id) {
+          closeChannelSettings();
+        }
       })
 
       // .then((res) => { 

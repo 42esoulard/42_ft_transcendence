@@ -11,7 +11,12 @@
           </p>
         </div> -->
 
-        <ChannelSettings v-if="channelSettings"  @close-settings="channelSettings = false" @update-channel="getMessagesUpdate(activeChannel.channel.id)" :activeChannel="activeChannel" />
+        <ChannelSettings v-if="channelSettings"  
+          @close-settings="channelSettings = false" 
+          @update-channel="getMessagesUpdate(activeChannel.channel.id)" 
+          @update-channels-list="updateChannelsList()" 
+          :activeChannel="activeChannel" 
+        />
         <div v-else class="chat-box">
             <div v-if="activeChannel" class='chat-header'>
               <div class="chat-header__channel-name" :title="activeChannel.channel.name">{{ activeChannel.channel.name }}</div>
@@ -75,12 +80,16 @@
                 />
                 <div v-else @mouseover="hoveringLock = true" @mouseout="hoveringLock = false">
                   <div v-if="hoveringLock">
-                  <button v-if="activeChannel" class="chat-box__input chat-box__input--blued" @click="applyForMembership(activeChannel.channel)">
+                  <button v-if="activeChannel" 
+                  class="chat-box__input chat-box__input--blued" 
+                  @click="applyForMembership(activeChannel.channel)">
                     <div>Join the channel to send messages</div>
                   </button>
                   </div>
                   <div v-else>
-                  <button v-if="activeChannel" class="chat-box__input chat-box__input--greyed" @click="applyForMembership(activeChannel.channel)">
+                  <button v-if="activeChannel" 
+                  class="chat-box__input chat-box__input--greyed" 
+                  @click="applyForMembership(activeChannel.channel)">
                     <div>Join the channel to send messages</div>
                   </button>
                   </div>
@@ -189,6 +198,11 @@ export const ChatComponent = defineComponent({
       .then(async (res) => {
         joinedChannels.value = res.data;
         console.log("in  channels list", joinedChannels.value)
+        await api.getChannelMember(activeChannel.value!.channel.id, activeChannel.value!.member.id)
+        .then((res) => {
+          activeChannel.value = res.data;
+        })
+        .catch((err) => console.log(err));
         await api.getAvailableChannels(user.value.id)
         .then((res) => {
           availableChannels.value = res.data;
@@ -433,6 +447,7 @@ export const ChatComponent = defineComponent({
       info,
       connections,
 
+      updateChannelsList,
       joinedChannels,
       availableChannels,
       activeChannel,
