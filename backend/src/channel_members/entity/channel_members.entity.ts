@@ -14,10 +14,15 @@ export class ChannelMembers {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Channels, (channel) => channel.channel_members)
+  @ManyToOne(() => Channels, (channel) => channel.channel_members, {
+    onDelete: 'CASCADE',
+  })
   channel: Channels;
 
-  @ManyToOne(() => Users, (user) => user.channel_members, { eager: true })
+  @ManyToOne(() => Users, (user) => user.channel_members, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   member: Users;
 
   @Column({ default: false })

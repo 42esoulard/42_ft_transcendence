@@ -132,7 +132,7 @@ export default defineComponent({
   name: 'ChannelSettings',
   props: ['activeChannel'],
   components: { Modal, MuteBanTimer },
-  emits: ["close-settings", "update-channel", "update-channels-list"],
+  emits: ["close-settings", "update-channel", "update-channels-list", "deleted-channel"],
   setup(props, context) {
     const api = new ChatApi();
     const toggleTimer = ref('');
@@ -142,6 +142,7 @@ export default defineComponent({
     .sort((a: ChannelMember, b: ChannelMember) => a.id - b.id )));
   
     let selectedMembers = computed(() => {
+      console.log("in selected", props.activeChannel)
       const list = ref();
       if (selectedTab.value === 'banned') {
         list.value = allMembers.value.filter((cm: ChannelMember) => cm.ban)
@@ -216,13 +217,14 @@ export default defineComponent({
           closeChannelSettings();
         }
       })
+      .catch((err) => console.log(err))
     }
 
     const deleteChannel = async () => {
       await api.deleteChannel(props.activeChannel.channel.id)
       .then(() => {
         // targetCm.value = cm;
-        context.emit('update-channels-list');
+        context.emit('deleted-channel');
         closeChannelSettings();
       })
     }

@@ -15,6 +15,7 @@
           @close-settings="channelSettings = false" 
           @update-channel="getMessagesUpdate(activeChannel.channel.id)" 
           @update-channels-list="updateChannelsList()" 
+          @deleted-channel="deletedChannel()"
           :activeChannel="activeChannel" 
         />
         <div v-else class="chat-box">
@@ -274,6 +275,7 @@ export const ChatComponent = defineComponent({
         mute: null,
       }
       isMember.value = false;
+      channelSettings.value = false;
       channelMessages.value = channel.messages;
     }
 
@@ -305,6 +307,13 @@ export const ChatComponent = defineComponent({
           return res;
         })
         .catch((err) => console.log(err));
+    }
+
+    const deletedChannel = async () => {
+
+      store.dispatch("setMessage", "Channel [" + activeChannel.value!.channel.name.substring(0, 15) + "] has been deleted");
+      updateChannelsList();
+      switchChannel(joinedChannels.value[0]);
     }
 
     const leaveChannel = async () => {
@@ -449,6 +458,7 @@ export const ChatComponent = defineComponent({
 
       updateChannelsList,
       joinedChannels,
+      deletedChannel,
       availableChannels,
       activeChannel,
       switchChannel,
