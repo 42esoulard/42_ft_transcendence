@@ -82,6 +82,8 @@ const getDraw = (mode: gameMode) => {
 		if (context.value)
 		{
 			context.value.fillStyle = 'white'
+			if (mode == 'transcendence')
+				context.value.fillStyle = 'yellow'
 			context.value.beginPath()
 			const racquetLenght = windowWidth.value / RACQUET_LENGTH_RATIO
 			const racquetWidth = windowWidth.value / RACQUET_WIDTH_RATIO
@@ -92,12 +94,19 @@ const getDraw = (mode: gameMode) => {
 		}
 	}
 
+	var changeColor = 0
 	const drawBall = () => {
 		if (context.value)
 		{
 			console.log(mode)
 			if (mode == 'transcendence')
-				context.value.fillStyle = 'red'
+			{
+				changeColor++
+				if (changeColor % 10 < 5)
+					context.value.fillStyle = 'red'
+				else
+					context.value.fillStyle = 'yellow'
+			}
 			else
 				context.value.fillStyle = 'white'
 			context.value.beginPath()
