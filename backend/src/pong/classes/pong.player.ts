@@ -10,4 +10,5 @@ export class player {
   position: number = 0
   score: number = 0
 	racquetLenght: number = 0
+	isEnlarged: boolean = false
 }

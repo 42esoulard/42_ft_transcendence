@@ -285,11 +285,16 @@ export class pongGame {
   enlargeRacquet(client: Socket)
   {
     const player = (client.id === this.player1.clientSocket.id) ? this.player1 : this.player2
-    player.racquetLenght *= 2
-    this.server.to(this.room).emit('enlarge', player.playerNum)
-    setTimeout(() => {
-      player.racquetLenght /= 2
-      this.server.to(this.room).emit('enlargeEnd', player.playerNum)
-    }, 4000)
+    if (player.isEnlarged == false)
+    {
+      player.isEnlarged = true
+      player.racquetLenght *= 2
+      this.server.to(this.room).emit('enlarge', player.playerNum)
+      setTimeout(() => {
+        player.isEnlarged = false
+        player.racquetLenght /= 2
+        this.server.to(this.room).emit('enlargeEnd', player.playerNum)
+      }, 4000)
+    }
   }
 }
