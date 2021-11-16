@@ -32,8 +32,6 @@ export class pongGame {
   public server: Server,
   public gameMode: gameMode)
   {
-    if (this.gameMode == 'transcendence')
-      RACQUET_LENGTH /= 2
     this.initRacquetLength()
   }
   
@@ -51,8 +49,8 @@ export class pongGame {
 
   initPositions()
   {
-    this.player1.position = CANVAS_HEIGHT / 2 - RACQUET_LENGTH / 2
-    this.player2.position = CANVAS_HEIGHT / 2 - RACQUET_LENGTH / 2
+    this.player1.position = CANVAS_HEIGHT / 2 - this.player1.racquetLenght / 2
+    this.player2.position = CANVAS_HEIGHT / 2 - this.player2.racquetLenght / 2
     this.ballPosition.x = CANVAS_WIDTH / 2
     this.ballPosition.y = CANVAS_HEIGHT / 2
   }
@@ -65,8 +63,16 @@ export class pongGame {
   }
   initRacquetLength()
   {
-    this.player1.racquetLenght = RACQUET_LENGTH
-    this.player2.racquetLenght = RACQUET_LENGTH
+    if (this.gameMode = 'classic')
+    {
+      this.player1.racquetLenght = RACQUET_LENGTH
+      this.player2.racquetLenght = RACQUET_LENGTH
+    }
+    if (this.gameMode = 'transcendence')
+    {
+      this.player1.racquetLenght = RACQUET_LENGTH / 2
+      this.player2.racquetLenght = RACQUET_LENGTH / 2
+    }
   }
 
   async pushGameintoDB()
