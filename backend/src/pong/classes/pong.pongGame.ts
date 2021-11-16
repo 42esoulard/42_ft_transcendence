@@ -31,7 +31,10 @@ export class pongGame {
   private readonly gameUserRepo: Repository<GameUser>,
   public server: Server,
   public gameMode: gameMode)
-  {}
+  {
+    if (gameMode == 'transcendence')
+      RACQUET_LENGTH /= 2
+  }
   
   private logger: Logger = new Logger('PongGateway');
   

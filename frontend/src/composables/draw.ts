@@ -15,8 +15,10 @@ var NET_WIDTH_RATIO = 400
 
 const getDraw = (mode: gameMode) => {
 
-	// returned variables
-
+	if (mode == 'transcendence')
+		RACQUET_LENGTH_RATIO *= 2
+	
+		// returned variables
 	const windowWidth = ref(window.innerWidth)
 	const context = ref<CanvasRenderingContext2D | null>(null)
 	const canvas = ref<HTMLCanvasElement | null>(null)
@@ -24,16 +26,16 @@ const getDraw = (mode: gameMode) => {
 	const playerPositions = ref<PlayerPositions>({player1:0, player2:0})
 	const score = ref<PlayerScores>({player1: 0,player2: 0})
 
+	// colors
 	const COLOR_CLASSIC = 'white'
 	const COLOR_RACQUET_TRANSCENDENCE = 'yellow'
 	const COLOR_BALL_TRANSCENDENCE_1 = 'yellow'
 	const COLOR_BALL_TRANSCENDENCE_2 = 'red'
-	// helper variables
 
+	// helper variables
 	let canvasWidth = windowWidth.value / CANVAS_WIDTH_RATIO
 	let canvasHeight = windowWidth.value / CANVAS_HEIGHT_RATIO
 	
-
 	// returned functions
 
 	const draw = () => {
