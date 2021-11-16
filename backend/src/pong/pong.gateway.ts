@@ -60,7 +60,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     {
       if (!this.waitingPlayerClassic)
       {
-        this.waitingPlayerClassic = new player(message.userId, message.userName, client)
+        this.waitingPlayerClassic = new player(message.userId, message.userName, client, 1)
         client.emit('waitingForOpponent')
       }
       else
@@ -70,7 +70,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     {
       if (!this.waitingPlayerTranscendence)
       {
-        this.waitingPlayerTranscendence = new player(message.userId, message.userName, client)
+        this.waitingPlayerTranscendence = new player(message.userId, message.userName, client, 1)
         client.emit('waitingForOpponent')
       }
       else
@@ -80,7 +80,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async createGame(player1: player, message: joinGameMessage, client: Socket)
   {
-    const player2 = new player(message.userId, message.userName, client)
+    const player2 = new player(message.userId, message.userName, client, 2)
     const game = new pongGame(player1, player2, this.gameRepo, this.gameUserRepo, this.server, message.gameMode)
     await game.createGame()
     this.games.set(game.room, game)
@@ -112,6 +112,18 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.leaveGame(client, room)
       // client.to(room).emit('opponentLeftRoom')
       // client.leave(room)
+  }
+
+  @SubscribeMessage('enlargeRacquet')
+  handleEnlargeRacquet(client: Socket, room: string)
+  {
+    const game: pongGame = this.games.get(room)
+    if (!game)
+    {
+      this.logger.error('moveRacquet: game doesnt exist')
+      return
+    }
+    game.enlargeRacquet(client)
   }
 
 

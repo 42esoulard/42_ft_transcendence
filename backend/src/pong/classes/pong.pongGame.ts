@@ -62,6 +62,11 @@ export class pongGame {
     var rand2:boolean = (Math.random() > 0.5)
     rand2 ? this.ballDirection.y = 1 : this.ballDirection.y = -1
   }
+  initRacquetLength()
+  {
+    this.player1.racquetLenght = RACQUET_LENGTH
+    this.player2.racquetLenght = RACQUET_LENGTH
+  }
 
   async pushGameintoDB()
   {
@@ -124,6 +129,7 @@ export class pongGame {
   {
     this.initPositions()
     this.initBallDirection()
+    this.initRacquetLength()
     this.ballSpeed = BALL_INITIAL_SPEED
     this.interval = setInterval(() => {
       this.sendPositions()
@@ -186,7 +192,7 @@ export class pongGame {
     this.ballPosition.x - BALL_RADIUS >= 0 &&
 
     // ball position y is "inside" racquet
-    this.ballPosition.y <= this.player1.position + RACQUET_LENGTH && 
+    this.ballPosition.y <= this.player1.position + this.player1.racquetLenght && 
     this.ballPosition.y >= this.player1.position
     )
       return true
@@ -204,7 +210,7 @@ export class pongGame {
     this.ballPosition.x + BALL_RADIUS >= CANVAS_WIDTH - RACQUET_WIDTH &&
 
     // ball position y is "inside" racquet
-    this.ballPosition.y <= this.player2.position + RACQUET_LENGTH && 
+    this.ballPosition.y <= this.player2.position + this.player2.racquetLenght && 
     this.ballPosition.y >= this.player2.position
     )
       return true
@@ -255,6 +261,7 @@ export class pongGame {
   {
     return {player1: this.player1.score, player2: this.player2.score}
   }
+
   moveRacquet(clientId: string, direction:string)
   {
     const player = (clientId === this.player1.clientSocket.id) ? this.player1 : this.player2
@@ -263,8 +270,15 @@ export class pongGame {
     if (direction === 'up' && topOfTheRacquet > 0)
       player.position -= Math.min(RACQUET_SPEED, topOfTheRacquet)
     
-    var bottomOfTheRacquet = player.position + RACQUET_LENGTH
+    var bottomOfTheRacquet = player.position + player.racquetLenght
     if (direction === 'down' && bottomOfTheRacquet < CANVAS_HEIGHT)
       player.position += Math.min(RACQUET_SPEED, bottomOfTheRacquet - player.position)
+  }
+
+  enlargeRacquet(client: Socket)
+  {
+    const player = (client.id === this.player1.clientSocket.id) ? this.player1 : this.player2
+    player.racquetLenght *= 2
+    this.server.to(this.room).emit('enlarge', player.playerNum)
   }
 }

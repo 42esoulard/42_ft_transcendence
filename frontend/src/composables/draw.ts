@@ -18,14 +18,15 @@ const getDraw = (mode: gameMode) => {
 	if (mode == 'transcendence')
 		RACQUET_LENGTH_RATIO *= 2
 	
-		// returned variables
+	// returned variables
 	const windowWidth = ref(window.innerWidth)
 	const context = ref<CanvasRenderingContext2D | null>(null)
 	const canvas = ref<HTMLCanvasElement | null>(null)
 	const ballPosition = ref<Coordinates>({x:0, y:0})
 	const playerPositions = ref<PlayerPositions>({player1:0, player2:0})
 	const score = ref<PlayerScores>({player1: 0,player2: 0})
-
+	const racquetLenghtRatio = ref<PlayerScores>({player1: RACQUET_LENGTH_RATIO, player2:RACQUET_LENGTH_RATIO})
+	
 	// colors
 	const COLOR_CLASSIC = 'white'
 	const COLOR_RACQUET_TRANSCENDENCE = 'yellow'
@@ -91,10 +92,11 @@ const getDraw = (mode: gameMode) => {
 			if (mode == 'transcendence')
 				context.value.fillStyle = COLOR_RACQUET_TRANSCENDENCE
 			context.value.beginPath()
-			const racquetLenght = windowWidth.value / RACQUET_LENGTH_RATIO
+			const racquetLenghtPlayer1 = windowWidth.value / racquetLenghtRatio.value.player1
+			const racquetLenghtPlayer2 = windowWidth.value / racquetLenghtRatio.value.player2
 			const racquetWidth = windowWidth.value / RACQUET_WIDTH_RATIO
-			context.value.rect(0, playerPositions.value.player1, racquetWidth, racquetLenght)
-			context.value.rect(canvasWidth - racquetWidth, playerPositions.value.player2, racquetWidth, racquetLenght)
+			context.value.rect(0, playerPositions.value.player1, racquetWidth, racquetLenghtPlayer1)
+			context.value.rect(canvasWidth - racquetWidth, playerPositions.value.player2, racquetWidth, racquetLenghtPlayer2)
 			context.value.fill()
 			context.value.closePath()
 		}
@@ -148,7 +150,7 @@ const getDraw = (mode: gameMode) => {
 	}
 
 
-	return { context, ballPosition, playerPositions, score, windowWidth, canvas, draw, onResize, initCanvas}
+	return { context, ballPosition, playerPositions, score, racquetLenghtRatio, windowWidth, canvas, draw, onResize, initCanvas}
 }
 
 export default getDraw

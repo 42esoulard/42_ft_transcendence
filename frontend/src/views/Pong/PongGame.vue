@@ -35,7 +35,7 @@ export default defineComponent({
 		const player1UserName = ref(route.params.player1UserName)
 		const player2UserName = ref(route.params.player2UserName)
 
-		const { context, canvas, ballPosition, playerPositions, score, windowWidth, 
+		const { context, canvas, ballPosition, playerPositions, racquetLenghtRatio, score, windowWidth, 
 			onResize, initCanvas, draw } = getDraw(props.gameMode)
 
 		// lifecycle hooks
@@ -71,6 +71,13 @@ export default defineComponent({
 			score.value = newScore
 			draw()
 		})
+
+		socket.value.on('enlarge', (playerToEnlargeNumber: number) => {
+			if (playerToEnlargeNumber === 1)
+				racquetLenghtRatio.value.player1 /= 2
+			else
+				racquetLenghtRatio.value.player2 /= 2
+		})
 		
 		const gameHasStarted = ref(false)
 		socket.value.on("gameStarting", () => {
@@ -96,14 +103,23 @@ export default defineComponent({
 				socket.value.emit('moveRacquet', {room: room.value, text: direction})
 		}
 		
+		const EnlargeRacquet = () => {
+			if (gameHasStarted.value)
+				socket.value.emit('enlargeRacquet', room.value)
+		}
+		
 		const onKeyDown = (event: KeyboardEvent) => {
 			const codes = ['ArrowUp', 'ArrowDown'];
+			if (props.gameMode === 'transcendence')
+				codes.push('Space')
 			if (!codes.includes(event.code))
 				return;
 			if (event.code === 'ArrowUp')
 				SendMoveMsg('up')
 			else if (event.code === 'ArrowDown')
 				SendMoveMsg('down')
+			else if (event.code === 'Space')
+				EnlargeRacquet()
 		}
 
 		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, canvas, SendMoveMsg }
