@@ -196,7 +196,7 @@ export class pongGame {
 
     // ball position x is "inside" racquet (ballPosition.x - BALL_RADIUS = left edge of the ball)
     this.ballPosition.x - BALL_RADIUS <= RACQUET_WIDTH && 
-    this.ballPosition.x - BALL_RADIUS >= 0 &&
+    this.ballPosition.x >= 0 &&
 
     // ball position y is "inside" racquet
     this.ballPosition.y <= this.player1.position + this.player1.racquetLenght && 
@@ -213,7 +213,7 @@ export class pongGame {
     this.ballDirection.x > 0 &&
 
     // ball position x is "inside" racquet (ballPosition.x + BALL_RADIUS = right edge of the ball)
-    this.ballPosition.x + BALL_RADIUS <= CANVAS_WIDTH && 
+    this.ballPosition.x <= CANVAS_WIDTH && 
     this.ballPosition.x + BALL_RADIUS >= CANVAS_WIDTH - RACQUET_WIDTH &&
 
     // ball position y is "inside" racquet
