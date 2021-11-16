@@ -32,7 +32,7 @@ export class pongGame {
   public server: Server,
   public gameMode: gameMode)
   {
-    if (gameMode == 'transcendence')
+    if (this.gameMode == 'transcendence')
       RACQUET_LENGTH /= 2
   }
   

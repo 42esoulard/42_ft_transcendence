@@ -109,7 +109,6 @@ const getDraw = (mode: gameMode) => {
 	const drawBall = () => {
 		if (context.value)
 		{
-			console.log(mode)
 			if (mode == 'transcendence')
 			{
 				changeColor++
