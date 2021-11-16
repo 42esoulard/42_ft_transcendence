@@ -184,7 +184,8 @@ export class pongGame {
     if (this.ballCollisionWithPlayer1() || this.ballCollisionWithPlayer2())
     {
       this.ballDirection.x = -this.ballDirection.x
-      this.ballSpeed += BALL_ACCELERATION
+      if (this.ballSpeed * 2 + BALL_ACCELERATION * 2 < RACQUET_WIDTH + BALL_RADIUS)
+        this.ballSpeed += BALL_ACCELERATION
     }
   }
 
