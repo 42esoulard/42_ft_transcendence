@@ -4,9 +4,14 @@
 	<h1 class="header__title"> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
 	<canvas ref="canvas"> </canvas>
 
+	<div class="header__title" v-if="!gameHasStarted && gameMode=='transcendence' ">
+		<h1> Press space for some transcendence magic ! </h1>
+	</div>
+	
 	<div class="header__title" v-if="!gameHasStarted">
 		<h1> Get ready, game is about to start ! </h1>
 	</div>
+	
 
 	<div class="header__title" v-if="gameIsOver">
 		<h1> {{ winningPlayer }} won ! </h1>
@@ -35,7 +40,7 @@ export default defineComponent({
 		const player1UserName = ref(route.params.player1UserName)
 		const player2UserName = ref(route.params.player2UserName)
 
-		const { context, canvas, ballPosition, playerPositions, racquetLenghtRatio, score, windowWidth, 
+		const { context, canvas, ballPosition, playerPositions, racquetLenghtRatio, score, windowWidth, player1EnlargeRemaining, player2EnlargeRemaining, 
 			onResize, initCanvas, draw } = getDraw(props.gameMode)
 
 		// lifecycle hooks
@@ -74,9 +79,15 @@ export default defineComponent({
 
 		socket.value.on('enlarge', (playerToEnlargeNumber: number) => {
 			if (playerToEnlargeNumber === 1)
+			{
 				racquetLenghtRatio.value.player1 /= 2
+				player1EnlargeRemaining.value--
+			}
 			else
+			{
 				racquetLenghtRatio.value.player2 /= 2
+				player2EnlargeRemaining.value--
+			}
 		})
 		
 		socket.value.on('enlargeEnd', (playerToEnlargeNumber: number) => {

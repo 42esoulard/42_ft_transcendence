@@ -27,7 +27,7 @@ export default defineComponent ({
 	setup() {
 		const socket = ref(clientSocket)
 		const queuing = ref(false)
-		const gameMode = ref<gameMode>('classic')
+		const gameMode = ref<gameMode>('transcendence')
 
 		const store = useStore()
 		const JoinQueue = () => {

@@ -27,6 +27,8 @@ const getDraw = (mode: gameMode) => {
 	const playerPositions = ref<PlayerPositions>({player1:0, player2:0})
 	const score = ref<PlayerScores>({player1: 0,player2: 0})
 	const racquetLenghtRatio = ref<PlayerRacquetRatios>({player1: 0, player2: 0})
+	const player1EnlargeRemaining = ref(3)
+	const player2EnlargeRemaining = ref(3)
 	
 	// colors
 	const COLOR_CLASSIC = 'white'
@@ -48,6 +50,8 @@ const getDraw = (mode: gameMode) => {
 		drawBall()
 		drawScore()
 		drawNet()
+		if (mode == 'transcendence')
+			drawEnlargeRemaining()
 	}
 	
 	const onResize = () => {
@@ -88,6 +92,21 @@ const getDraw = (mode: gameMode) => {
 			racquetLenghtRatio.value.player2 = RACQUET_LENGTH_RATIO_TRANSCENDENCE
 		}
 
+	}
+
+	const drawEnlargeRemaining = () => {
+		if (context.value)
+		{
+			context.value.fillStyle = COLOR_CLASSIC
+			var font_size = windowWidth.value / SCORE_RATIO / 4
+			context.value.font = `${font_size}px Arial`;
+			for (let index = 0; index < player1EnlargeRemaining.value; index++) {
+				context.value.fillText('X', canvasWidth / 4 + (canvasWidth / 30 * index), canvasHeight / 4)
+			}
+			for (let index = 0; index < player2EnlargeRemaining.value; index++) {
+				context.value.fillText('X', canvasWidth * 3 / 4 + (canvasWidth / 30 * index), canvasHeight / 4)
+			}
+		}
 	}
 
 	const drawBackground = () => {
@@ -165,7 +184,7 @@ const getDraw = (mode: gameMode) => {
 	}
 
 
-	return { context, ballPosition, playerPositions, score, racquetLenghtRatio, windowWidth, canvas, draw, onResize, initCanvas}
+	return { context, ballPosition, playerPositions, score, racquetLenghtRatio, windowWidth, canvas, player1EnlargeRemaining, player2EnlargeRemaining, draw, onResize, initCanvas}
 }
 
 export default getDraw
