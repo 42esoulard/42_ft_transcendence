@@ -34,6 +34,7 @@ export class pongGame {
   {
     if (this.gameMode == 'transcendence')
       RACQUET_LENGTH /= 2
+    this.initRacquetLength()
   }
   
   private logger: Logger = new Logger('PongGateway');
@@ -129,7 +130,6 @@ export class pongGame {
   {
     this.initPositions()
     this.initBallDirection()
-    this.initRacquetLength()
     this.ballSpeed = BALL_INITIAL_SPEED
     this.interval = setInterval(() => {
       this.sendPositions()
@@ -280,5 +280,9 @@ export class pongGame {
     const player = (client.id === this.player1.clientSocket.id) ? this.player1 : this.player2
     player.racquetLenght *= 2
     this.server.to(this.room).emit('enlarge', player.playerNum)
+    setTimeout(() => {
+      player.racquetLenght /= 2
+      this.server.to(this.room).emit('enlargeEnd', player.playerNum)
+    }, 4000)
   }
 }

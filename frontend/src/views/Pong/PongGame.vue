@@ -79,6 +79,13 @@ export default defineComponent({
 				racquetLenghtRatio.value.player2 /= 2
 		})
 		
+		socket.value.on('enlargeEnd', (playerToEnlargeNumber: number) => {
+			if (playerToEnlargeNumber === 1)
+				racquetLenghtRatio.value.player1 *= 2
+			else
+				racquetLenghtRatio.value.player2 *= 2
+		})
+		
 		const gameHasStarted = ref(false)
 		socket.value.on("gameStarting", () => {
 			gameHasStarted.value = true
