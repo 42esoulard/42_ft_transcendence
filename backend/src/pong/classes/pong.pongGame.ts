@@ -272,7 +272,7 @@ export class pongGame {
     
     var bottomOfTheRacquet = player.position + player.racquetLenght
     if (direction === 'down' && bottomOfTheRacquet < CANVAS_HEIGHT)
-      player.position += Math.min(RACQUET_SPEED, bottomOfTheRacquet - player.position)
+      player.position += Math.min(RACQUET_SPEED, CANVAS_HEIGHT - bottomOfTheRacquet)
   }
 
   enlargeRacquet(client: Socket)
