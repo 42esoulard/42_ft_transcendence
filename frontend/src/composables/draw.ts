@@ -1,17 +1,20 @@
 
-import { Coordinates, gameMode, PlayerPositions, PlayerScores } from '@/types/PongGame'
+import { Coordinates, gameMode, PlayerPositions, PlayerRacquetRatios, PlayerScores } from '@/types/PongGame'
 import { ref } from 'vue'
 
+// windowWidth ratios, shared with back
 var CANVAS_WIDTH_RATIO = process.env.VUE_APP_CANVAS_WIDTH
 var CANVAS_HEIGHT_RATIO = process.env.VUE_APP_CANVAS_HEIGHT
 var BALL_RATIO = process.env.VUE_APP_BALL_RADIUS
 var RACQUET_LENGTH_RATIO = process.env.VUE_APP_RACQUET_LENGTH
 var RACQUET_WIDTH_RATIO = process.env.VUE_APP_RACQUET_WIDTH
 
+// other windowWidth ratios
 var SCORE_RATIO = 16
 var NET_ELEM_LENGHT_RATIO = 32
 var NET_ELEM_GAP_RATIO = 200
 var NET_WIDTH_RATIO = 400
+
 
 const getDraw = (mode: gameMode) => {
 
@@ -25,7 +28,7 @@ const getDraw = (mode: gameMode) => {
 	const ballPosition = ref<Coordinates>({x:0, y:0})
 	const playerPositions = ref<PlayerPositions>({player1:0, player2:0})
 	const score = ref<PlayerScores>({player1: 0,player2: 0})
-	const racquetLenghtRatio = ref<PlayerScores>({player1: RACQUET_LENGTH_RATIO, player2:RACQUET_LENGTH_RATIO})
+	const racquetLenghtRatio = ref<PlayerRacquetRatios>({player1: RACQUET_LENGTH_RATIO, player2: RACQUET_LENGTH_RATIO})
 	
 	// colors
 	const COLOR_CLASSIC = 'white'
