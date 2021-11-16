@@ -175,4 +175,8 @@ export class ChannelsService {
   async muteBanMember(action: string, cm_id: number, end_date: number) {
     return await this.channelMemberService.muteBanMember(action, cm_id, end_date);
   }
+
+  async toggleAdmin(cm_id: number) {
+    return await this.channelMemberService.toggleAdmin(cm_id);
+  }
 }

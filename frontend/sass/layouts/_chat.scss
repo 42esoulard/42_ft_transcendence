@@ -190,6 +190,10 @@
   &--admin {
     color: $third-color;
   }
+  &--admin-togglable {
+    color: $third-color;
+    cursor: pointer;
+  }
   &--locked {
     color: $chat-font-light;
   }

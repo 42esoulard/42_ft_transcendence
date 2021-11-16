@@ -65,11 +65,15 @@
             <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: cm.member.username} }">
               {{ cm.member.username }}
             </router-link>
-            <div v-if="cm.is_admin || cm.is_owner" class="chat-channels__tag-container">
+            <div v-if="(activeChannel.is_owner && activeChannel.id == cm.id) || (!activeChannel.is_owner && (cm.is_owner || cm.is_admin))" class="chat-channels__tag-container">
               <span v-if="cm.is_owner"><img class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner" /></span>
               <span v-if="cm.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
             </div>
-            <div v-else>
+            <div v-else-if="activeChannel.is_owner && cm.is_admin" class="chat-channels__tag-container">
+              <span @click="toggleAdmin(cm)"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin-togglable" title="Remove from Admins" /></span>
+            </div>
+            <div v-if="!cm.is_admin">
+              <span v-if="activeChannel.is_owner" @click="toggleAdmin(cm)"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--greyed" title="Promote to Admin" /></span>
               <span v-if="cm.mute" @click="toggleModal('unmute', cm)"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--mute" title="Unmute user" /></span>
               <span v-else @click="toggleModal('muted', cm)"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--greyed" title="Mute user" /></span>
               <span v-if="cm.ban" @click="toggleModal('unban', cm)"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--ban" title="Unban user" /></span>
@@ -137,7 +141,8 @@ export default defineComponent({
     const toggleTimer = ref('');
     const targetCm = ref();
     const selectedTab = ref('all');
-    const allMembers = ref(computed(() => props.activeChannel.channel.channel_members));
+    const allMembers = ref(computed(() => props.activeChannel.channel.channel_members
+    .sort((a: ChannelMember, b: ChannelMember) => a.id - b.id )));
   
     let selectedMembers = computed(() => {
       const list = ref();
@@ -210,97 +215,116 @@ export default defineComponent({
       context.emit('update-channel');
     }
 
-    const channelName = ref('');
-    const channelType = ref('public');
-    const channelPassword = ref('');
-    const channelPasswordConf = ref('');
-    const user = useStore().state.user;
-    const wasSubmitted = ref(false);
-
-    let validName = true;
-    let validPassword = true;
-    let validPasswordConf = true;
-
-    // const closeModal = () => {
-    //   context.emit("close");
-    // };
-
-    const checkName = () => {
-      const nameInput =  <HTMLInputElement>document.querySelector('input[id=\'chanName\']')!;
-
-      api.getChannelByName(channelName.value)
+    const toggleAdmin = async (cm: ChannelMember) => {
+      await api.toggleAdmin(cm.id)
       .then(() => {
-        nameInput.setCustomValidity("A channel named [" + channelName.value + "] already exists")
-        validName = false;
+        targetCm.value = cm;
+        context.emit('update-channel');
       })
-      .catch(() => {
-        nameInput.setCustomValidity('');
-        validName = true;
-        console.log(channelName.value + "not found")
-      })
+
+      // .then((res) => { 
+      //   console.log("UPDATING")
+      //   context.emit('update-channel');
+      //   // targetCm.value = cm;
+      //   // selectedTab.value = 'all';
+      //   })
+      // .catch((err) => console.log(err));
+      
+      // context.emit('update-channel');
+
     }
 
-    const checkPassword = () => {
-      const passwordInput = <HTMLInputElement>document.querySelector('input#password')!;
+    // const channelName = ref('');
+    // const channelType = ref('public');
+    // const channelPassword = ref('');
+    // const channelPasswordConf = ref('');
+    // const user = useStore().state.user;
+    // const wasSubmitted = ref(false);
 
-      if (!/^[-_*-+/a-zA-Z0-9]*$/.test(channelPassword.value)) {
-        passwordInput.setCustomValidity("Channel password must be 8-20 characters long and only contain letters, numbers, or the following symbols -_*-+/");
-        validPassword = false;
-      } else if (!validPassword) {
-        passwordInput.setCustomValidity('');
-        validPassword = true;
-      }
-      if (channelPasswordConf.value)
-        checkPasswordConf();
-    }
+    // let validName = true;
+    // let validPassword = true;
+    // let validPasswordConf = true;
 
-    const checkPasswordConf = () => {
-      const passwordConfirmationInput = <HTMLInputElement>document.querySelector('input#passwordConfirmation')!;
+    // // const closeModal = () => {
+    // //   context.emit("close");
+    // // };
 
-      if (channelPasswordConf.value !== channelPassword.value) {
-        passwordConfirmationInput.setCustomValidity("Password and password confirmation don't match");
-        validPasswordConf = false;
-      } else if (!validPasswordConf) {
-        passwordConfirmationInput.setCustomValidity('');
-        validPasswordConf = true;
-      }
-    }
+    // const checkName = () => {
+    //   const nameInput =  <HTMLInputElement>document.querySelector('input[id=\'chanName\']')!;
 
-    const submitInputs = () => {
-      checkName();
-      checkPassword();
-      checkPasswordConf();
-      if (!validPassword || !validPasswordConf)
-        return;
+    //   api.getChannelByName(channelName.value)
+    //   .then(() => {
+    //     nameInput.setCustomValidity("A channel named [" + channelName.value + "] already exists")
+    //     validName = false;
+    //   })
+    //   .catch(() => {
+    //     nameInput.setCustomValidity('');
+    //     validName = true;
+    //     console.log(channelName.value + "not found")
+    //   })
+    // }
 
-      if (!validName)
-        return;
+    // const checkPassword = () => {
+    //   const passwordInput = <HTMLInputElement>document.querySelector('input#password')!;
 
-      console.log(channelName.value, channelType.value, channelPassword.value)
-      wasSubmitted.value = true;
-      const newChannel = api.saveChannel({
-        name: channelName.value,
-        owner_id: user.id,
-        type: channelType.value,
-        password: channelPassword.value
-      })
-      .then((res) => {
-        console.log("in createChannel res", res)
-        socket.emit('createChannel', res.data)
-      })
-      .catch((err) => console.log("Failed to create channel: ", err))
-    }
+    //   if (!/^[-_*-+/a-zA-Z0-9]*$/.test(channelPassword.value)) {
+    //     passwordInput.setCustomValidity("Channel password must be 8-20 characters long and only contain letters, numbers, or the following symbols -_*-+/");
+    //     validPassword = false;
+    //   } else if (!validPassword) {
+    //     passwordInput.setCustomValidity('');
+    //     validPassword = true;
+    //   }
+    //   if (channelPasswordConf.value)
+    //     checkPasswordConf();
+    // }
+
+    // const checkPasswordConf = () => {
+    //   const passwordConfirmationInput = <HTMLInputElement>document.querySelector('input#passwordConfirmation')!;
+
+    //   if (channelPasswordConf.value !== channelPassword.value) {
+    //     passwordConfirmationInput.setCustomValidity("Password and password confirmation don't match");
+    //     validPasswordConf = false;
+    //   } else if (!validPasswordConf) {
+    //     passwordConfirmationInput.setCustomValidity('');
+    //     validPasswordConf = true;
+    //   }
+    // }
+
+    // const submitInputs = () => {
+    //   checkName();
+    //   checkPassword();
+    //   checkPasswordConf();
+    //   if (!validPassword || !validPasswordConf)
+    //     return;
+
+    //   if (!validName)
+    //     return;
+
+    //   console.log(channelName.value, channelType.value, channelPassword.value)
+    //   wasSubmitted.value = true;
+    //   const newChannel = api.saveChannel({
+    //     name: channelName.value,
+    //     owner_id: user.id,
+    //     type: channelType.value,
+    //     password: channelPassword.value
+    //   })
+    //   .then((res) => {
+    //     console.log("in createChannel res", res)
+    //     socket.emit('createChannel', res.data)
+    //   })
+    //   .catch((err) => console.log("Failed to create channel: ", err))
+    // }
 
     return {
-      channelName,
-      channelType,
-      channelPassword,
-      channelPasswordConf,
-      checkName,
-      checkPassword,
-      checkPasswordConf,
-      submitInputs,
-      wasSubmitted,
+      // channelName,
+      // channelType,
+      // channelPassword,
+      // channelPasswordConf,
+      // checkName,
+      // checkPassword,
+      // checkPasswordConf,
+      // submitInputs,
+      // wasSubmitted,
       closeModal,
 
       selectedTab,
@@ -311,6 +335,7 @@ export default defineComponent({
       closeChannelSettings,
       targetCm,
       toggleTab,
+      toggleAdmin,
     }
   }
 });

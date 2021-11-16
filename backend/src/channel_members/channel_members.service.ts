@@ -73,14 +73,13 @@ export class ChannelMembersService {
     this.channelMembersRepository.delete(cm_id);
   }
 
-  async toggleAdmin(channel: Channels, user: Users) {
-    this.channelMembersRepository
-      .findOne({
-        where: { channel: channel, member: user },
-      })
+  async toggleAdmin(cm_id: number) {
+    await this.getChannelMemberById(cm_id)
       .then((res) => {
         if (res) {
           res.is_admin = !res.is_admin;
+          res.mute = '';
+          res.ban = '';
           return this.channelMembersRepository.save(res);
         }
       })

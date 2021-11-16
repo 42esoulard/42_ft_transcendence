@@ -144,4 +144,9 @@ export class ChannelsController {
   ) {
     return await this.channelService.muteBanMember(action, cm_id, end_date);
   }
+
+  @Get('/toggle-admin/:cm_id')
+  async toggleAdmin(@Param('cm_id') cm_id: number) {
+    return await this.channelService.toggleAdmin(cm_id);
+  }
 }
