@@ -37,6 +37,11 @@
   }
   &--create-chan {
     margin: 10px;
+    @include hover-modifier($button-grey-bg);
+  }
+  &--delete-chan {
+    background-color: rgb(163, 0, 0);
+    @include hover-modifier(red);
   }
   &--selector {
     padding: 5px 20px;

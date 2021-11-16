@@ -146,6 +146,10 @@ export class ChannelsService {
     await this.channelMemberService.deleteChannelMember(cm_id);
   }
 
+  async deleteChannel(chan_id: number) {
+    await this.channelsRepository.delete(chan_id);
+  }
+
   /**
    * Saves a new channel into db
    * nb: save(channel) is a function from the typeORM library
@@ -173,10 +177,27 @@ export class ChannelsService {
   }
 
   async muteBanMember(action: string, cm_id: number, end_date: number) {
-    return await this.channelMemberService.muteBanMember(action, cm_id, end_date);
+    return await this.channelMemberService.muteBanMember(
+      action,
+      cm_id,
+      end_date,
+    );
   }
 
   async toggleAdmin(cm_id: number) {
     return await this.channelMemberService.toggleAdmin(cm_id);
+  }
+
+  async updateChannelPassword(chan_id: number, pwd: string) {
+    const channel = await this.getChannelById(chan_id);
+
+    if (pwd != 'null') {
+      channel.salt = await bcrypt.genSalt();
+      channel.password = await bcrypt.hash(pwd, channel.salt); //must be crypted
+    } else {
+      channel.password = '';
+    }
+
+    return await this.channelsRepository.save(channel);
   }
 }

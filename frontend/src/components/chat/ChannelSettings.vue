@@ -63,14 +63,14 @@
           :class="[
             'button',
             'button--selector',
-            selectedTab === 'admins' ? 'button--selector--on' : ''
+            selectedTab === 'ownerOptions' ? 'button--selector--on' : ''
           ]"
         >
           ...
         </button>
       </div>
       <div>
-        <div class='chat-admin-pannel__users-list'>
+        <div v-if="selectedTab !== 'ownerOptions'" class='chat-admin-pannel__users-list'>
           <li v-for="cm in selectedMembers" :key="cm.id" class='chat-admin-pannel__user'>
             <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: cm.member.username} }">
               {{ cm.member.username }}
@@ -91,31 +91,18 @@
             </div>
           </li>
         </div>
+        <div v-else>
+          <form class="chat-channel-form__form" @submit.prevent='submitInputs()'>
+            <label class="chat-channel-form__subtitle" for='password'>New Channel Password (leave empty to for no password):</label>
+            <input class="chat-channel-form__input" type="text" name='password' id='password' placeholder="Password" minlength="8" maxlength="20" v-model="channelPassword" @input="checkPassword()">
+            <label class="chat-channel-form__subtitle" for='passwordConfirmation'>New Password confirmation:</label>
+            <input class="chat-channel-form__input" type="text" name='passwordConfirmation' id='passwordConfirmation' v-model="channelPasswordConf" @input="checkPasswordConf()">
+
+            <button class="button button--create-chan" type='submit'>Submit</button>
+          </form>
+          <button class="button button--delete-chan" type='submit' @click="deleteChannel()">Delete Channel</button>
+        </div>
       </div>
-
-    <!-- <form class="chat-channel-form__form" @submit.prevent='submitInputs()'>
-      <div class="chat-channel-form__title">Creating a new channel</div>
-
-      <label class="chat-channel-form__subtitle" for='name'>Channel name:*</label>
-      <input class="chat-channel-form__input" required type="text" name='name' id='chanName' placeholder='My Cool Channel' minlength="1" maxlength="200" v-model="channelName" @input="checkName()">
-
-      <div class="channelAccessContainer">
-        <label class="chat-channel-form__subtitle">Channel access:*</label>
-        <label class='chat-channel-form__radio-container'  title='A public channel is visible and accessible to any user' id='public'>
-          <input type='radio' class='chat-channel-form__radio-unit' id='chanPublic' name='unit' value='public' v-model="channelType">Public
-        </label>
-        <label class='chat-channel-form__radio-container'  title='An invite-only channel is only accessible to members who have been invited to join by a channel member' id='Private (invite-only)'>
-          <input type='radio' class='chat-channel-form__radio-unit' id='chanPrivate' name='unit' value='private' v-model="channelType">Private
-        </label>
-      </div>
-
-      <label class="chat-channel-form__subtitle" for='password'>Channel password (optional):</label>
-      <input class="chat-channel-form__input" type="text" name='password' id='password' placeholder="Password (optionnal)" minlength="8" maxlength="20" v-model="channelPassword" @input="checkPassword()">
-      <label class="chat-channel-form__subtitle" for='passwordConfirmation'>Password confirmation:</label>
-      <input class="chat-channel-form__input" type="text" name='passwordConfirmation' id='passwordConfirmation' v-model="channelPasswordConf" @input="checkPasswordConf()">
-
-      <button class="button button--create-chan" :disabled="wasSubmitted" type='submit'>Submit</button>
-    </form> -->
     </div>
   </div>
   <teleport to="#modals">
@@ -194,6 +181,13 @@ export default defineComponent({
             selectedTab.value = 'admins';
           }
           break;
+        case 'ownerOptions':
+          if (selectedTab.value === 'ownerOptions') {
+            selectedTab.value = 'all';
+          } else {
+            selectedTab.value = 'ownerOptions';
+          }
+          break;
       }
 
     };
@@ -222,29 +216,29 @@ export default defineComponent({
           closeChannelSettings();
         }
       })
-
-      // .then((res) => { 
-      //   console.log("UPDATING")
-      //   context.emit('update-channel');
-      //   // targetCm.value = cm;
-      //   // selectedTab.value = 'all';
-      //   })
-      // .catch((err) => console.log(err));
-      
-      // context.emit('update-channel');
-
     }
+
+    const deleteChannel = async () => {
+      await api.deleteChannel(props.activeChannel.channel.id)
+      .then(() => {
+        // targetCm.value = cm;
+        context.emit('update-channels-list');
+        closeChannelSettings();
+      })
+    }
+
+    
 
     // const channelName = ref('');
     // const channelType = ref('public');
-    // const channelPassword = ref('');
-    // const channelPasswordConf = ref('');
+    const channelPassword = ref('');
+    const channelPasswordConf = ref('');
     // const user = useStore().state.user;
-    // const wasSubmitted = ref(false);
+    const wasSubmitted = ref(false);
 
     // let validName = true;
-    // let validPassword = true;
-    // let validPasswordConf = true;
+    let validPassword = true;
+    let validPasswordConf = true;
 
     // // const closeModal = () => {
     // //   context.emit("close");
@@ -265,67 +259,64 @@ export default defineComponent({
     //   })
     // }
 
-    // const checkPassword = () => {
-    //   const passwordInput = <HTMLInputElement>document.querySelector('input#password')!;
+    const checkPassword = () => {
+      const passwordInput = <HTMLInputElement>document.querySelector('input#password')!;
 
-    //   if (!/^[-_*-+/a-zA-Z0-9]*$/.test(channelPassword.value)) {
-    //     passwordInput.setCustomValidity("Channel password must be 8-20 characters long and only contain letters, numbers, or the following symbols -_*-+/");
-    //     validPassword = false;
-    //   } else if (!validPassword) {
-    //     passwordInput.setCustomValidity('');
-    //     validPassword = true;
-    //   }
-    //   if (channelPasswordConf.value)
-    //     checkPasswordConf();
-    // }
+      if (!/^[-_*-+/a-zA-Z0-9]*$/.test(channelPassword.value)) {
+        passwordInput.setCustomValidity("Channel password must be 8-20 characters long and only contain letters, numbers, or the following symbols -_*-+/");
+        validPassword = false;
+      } else if (!validPassword) {
+        passwordInput.setCustomValidity('');
+        validPassword = true;
+      }
+      if (channelPasswordConf.value)
+        checkPasswordConf();
+    }
 
-    // const checkPasswordConf = () => {
-    //   const passwordConfirmationInput = <HTMLInputElement>document.querySelector('input#passwordConfirmation')!;
+    const checkPasswordConf = () => {
+      const passwordConfirmationInput = <HTMLInputElement>document.querySelector('input#passwordConfirmation')!;
 
-    //   if (channelPasswordConf.value !== channelPassword.value) {
-    //     passwordConfirmationInput.setCustomValidity("Password and password confirmation don't match");
-    //     validPasswordConf = false;
-    //   } else if (!validPasswordConf) {
-    //     passwordConfirmationInput.setCustomValidity('');
-    //     validPasswordConf = true;
-    //   }
-    // }
+      if (channelPasswordConf.value !== channelPassword.value) {
+        passwordConfirmationInput.setCustomValidity("Password and password confirmation don't match");
+        validPasswordConf = false;
+      } else if (!validPasswordConf) {
+        passwordConfirmationInput.setCustomValidity('');
+        validPasswordConf = true;
+      }
+    }
 
-    // const submitInputs = () => {
-    //   checkName();
-    //   checkPassword();
-    //   checkPasswordConf();
-    //   if (!validPassword || !validPasswordConf)
-    //     return;
+    const submitInputs = () => {
+      // checkName();
+      checkPassword();
+      checkPasswordConf();
+      if (!validPassword || !validPasswordConf)
+        return;
 
-    //   if (!validName)
-    //     return;
-
-    //   console.log(channelName.value, channelType.value, channelPassword.value)
-    //   wasSubmitted.value = true;
-    //   const newChannel = api.saveChannel({
-    //     name: channelName.value,
-    //     owner_id: user.id,
-    //     type: channelType.value,
-    //     password: channelPassword.value
-    //   })
-    //   .then((res) => {
-    //     console.log("in createChannel res", res)
-    //     socket.emit('createChannel', res.data)
-    //   })
-    //   .catch((err) => console.log("Failed to create channel: ", err))
-    // }
+      wasSubmitted.value = true;
+      const pwd = (channelPassword.value? channelPassword.value : 'null');
+      const newChannel = api.updateChannelPassword(
+        props.activeChannel.channel.id, pwd
+      )
+      .then((res) => {
+        console.log("in updateChannel res", res)
+        // socket.emit('createChannel', res.data)
+        context.emit('update-channels-list');
+        closeChannelSettings();
+      })
+      .catch((err) => console.log("Failed to update channel: ", err))
+    }
 
     return {
       // channelName,
       // channelType,
-      // channelPassword,
-      // channelPasswordConf,
+      deleteChannel,
+      channelPassword,
+      channelPasswordConf,
       // checkName,
-      // checkPassword,
-      // checkPasswordConf,
-      // submitInputs,
-      // wasSubmitted,
+      checkPassword,
+      checkPasswordConf,
+      submitInputs,
+      wasSubmitted,
       closeModal,
 
       selectedTab,

@@ -136,6 +136,11 @@ export class ChannelsController {
     await this.channelService.leaveChannel(cm_id);
   }
 
+  @Post('/delete-channel/:chan_id')
+  async deleteChannel(@Param('chan_id') chan_id: number) {
+    await this.channelService.deleteChannel(chan_id);
+  }
+
   @Get('/admin-action/:action/:cm_id/:end_date')
   async muteBanMember(
     @Param('action') action: string,
@@ -148,5 +153,13 @@ export class ChannelsController {
   @Get('/toggle-admin/:cm_id')
   async toggleAdmin(@Param('cm_id') cm_id: number) {
     return await this.channelService.toggleAdmin(cm_id);
+  }
+
+  @Get('/update-pwd/:chan_id/:pwd')
+  async updateChannelPassword(
+    @Param('chan_id') chan_id: number,
+    @Param('pwd') pwd: string,
+  ) {
+    return await this.channelService.updateChannelPassword(chan_id, pwd);
   }
 }
