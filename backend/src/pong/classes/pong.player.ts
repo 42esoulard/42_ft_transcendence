@@ -6,9 +6,7 @@ export class player {
 	public userName: string, 
 	public clientSocket: Socket,
 	public playerNum: number) {
-		this.userId = userId,
-		this.clientSocket = clientSocket
-  }
+	}
   position: number = 0
   score: number = 0
 	racquetLenght: number = 0
