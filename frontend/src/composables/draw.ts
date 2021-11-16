@@ -23,7 +23,11 @@ const getDraw = (mode: gameMode) => {
 	const ballPosition = ref<Coordinates>({x:0, y:0})
 	const playerPositions = ref<PlayerPositions>({player1:0, player2:0})
 	const score = ref<PlayerScores>({player1: 0,player2: 0})
-	
+
+	const COLOR_CLASSIC = 'white'
+	const COLOR_RACQUET_TRANSCENDENCE = 'yellow'
+	const COLOR_BALL_TRANSCENDENCE_1 = 'yellow'
+	const COLOR_BALL_TRANSCENDENCE_2 = 'red'
 	// helper variables
 
 	let canvasWidth = windowWidth.value / CANVAS_WIDTH_RATIO
@@ -81,9 +85,9 @@ const getDraw = (mode: gameMode) => {
 	const drawRacquets = () => {
 		if (context.value)
 		{
-			context.value.fillStyle = 'white'
+			context.value.fillStyle = COLOR_CLASSIC
 			if (mode == 'transcendence')
-				context.value.fillStyle = 'yellow'
+				context.value.fillStyle = COLOR_RACQUET_TRANSCENDENCE
 			context.value.beginPath()
 			const racquetLenght = windowWidth.value / RACQUET_LENGTH_RATIO
 			const racquetWidth = windowWidth.value / RACQUET_WIDTH_RATIO
@@ -103,12 +107,12 @@ const getDraw = (mode: gameMode) => {
 			{
 				changeColor++
 				if (changeColor % 10 < 5)
-					context.value.fillStyle = 'red'
+					context.value.fillStyle = COLOR_BALL_TRANSCENDENCE_1
 				else
-					context.value.fillStyle = 'yellow'
+					context.value.fillStyle = COLOR_BALL_TRANSCENDENCE_2
 			}
 			else
-				context.value.fillStyle = 'white'
+				context.value.fillStyle = COLOR_CLASSIC
 			context.value.beginPath()
 			context.value.arc(ballPosition.value.x, ballPosition.value.y, windowWidth.value / BALL_RATIO, 0, Math.PI*2, false);
 			context.value.fill()
@@ -120,7 +124,7 @@ const getDraw = (mode: gameMode) => {
 		if (context.value)
 		{
 			context.value.beginPath()
-			context.value.strokeStyle = 'white'
+			context.value.strokeStyle = COLOR_CLASSIC
 			context.value.lineWidth = windowWidth.value / NET_WIDTH_RATIO
 			context.value.setLineDash([windowWidth.value / NET_ELEM_LENGHT_RATIO, windowWidth.value / NET_ELEM_GAP_RATIO])
 			context.value.moveTo(canvasWidth / 2, 0);
@@ -133,7 +137,7 @@ const getDraw = (mode: gameMode) => {
 	const drawScore = () => {
 		if (context.value)
 		{
-			context.value.fillStyle = 'white'
+			context.value.fillStyle = COLOR_CLASSIC
 			var font_size = windowWidth.value / SCORE_RATIO
 			context.value.font = `${font_size}px Arial`;
 			context.value.fillText(score.value.player1.toString(), canvasWidth / 4, canvasHeight / 5)
