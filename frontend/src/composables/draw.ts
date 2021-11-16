@@ -6,7 +6,8 @@ import { ref } from 'vue'
 var CANVAS_WIDTH_RATIO = process.env.VUE_APP_CANVAS_WIDTH
 var CANVAS_HEIGHT_RATIO = process.env.VUE_APP_CANVAS_HEIGHT
 var BALL_RATIO = process.env.VUE_APP_BALL_RADIUS
-var RACQUET_LENGTH_RATIO = process.env.VUE_APP_RACQUET_LENGTH
+var RACQUET_LENGTH_RATIO_CLASSIC = process.env.VUE_APP_RACQUET_LENGTH_CLASSIC
+var RACQUET_LENGTH_RATIO_TRANSCENDENCE = process.env.VUE_APP_RACQUET_LENGTH_TRANSCENDENCE
 var RACQUET_WIDTH_RATIO = process.env.VUE_APP_RACQUET_WIDTH
 
 // other windowWidth ratios
@@ -18,9 +19,6 @@ var NET_WIDTH_RATIO = 400
 
 const getDraw = (mode: gameMode) => {
 
-	if (mode == 'transcendence')
-		RACQUET_LENGTH_RATIO *= 2
-	
 	// returned variables
 	const windowWidth = ref(window.innerWidth)
 	const context = ref<CanvasRenderingContext2D | null>(null)
@@ -28,7 +26,7 @@ const getDraw = (mode: gameMode) => {
 	const ballPosition = ref<Coordinates>({x:0, y:0})
 	const playerPositions = ref<PlayerPositions>({player1:0, player2:0})
 	const score = ref<PlayerScores>({player1: 0,player2: 0})
-	const racquetLenghtRatio = ref<PlayerRacquetRatios>({player1: RACQUET_LENGTH_RATIO, player2: RACQUET_LENGTH_RATIO})
+	const racquetLenghtRatio = ref<PlayerRacquetRatios>({player1: 0, player2: 0})
 	
 	// colors
 	const COLOR_CLASSIC = 'white'
@@ -71,11 +69,26 @@ const getDraw = (mode: gameMode) => {
 			canvas.value.width = windowWidth.value / CANVAS_WIDTH_RATIO
 			canvas.value.height = windowWidth.value / CANVAS_HEIGHT_RATIO
 			canvas.value.style.border = "1px solid white"
+			initRacquetLength()
 			drawBackground()
 		}
 	}
 
 	// helper functions
+
+	const initRacquetLength = () => {
+		if (mode == 'classic')
+		{
+			racquetLenghtRatio.value.player1 = RACQUET_LENGTH_RATIO_CLASSIC
+			racquetLenghtRatio.value.player2 = RACQUET_LENGTH_RATIO_CLASSIC
+		}
+		if (mode == 'transcendence')
+		{
+			racquetLenghtRatio.value.player1 = RACQUET_LENGTH_RATIO_TRANSCENDENCE
+			racquetLenghtRatio.value.player2 = RACQUET_LENGTH_RATIO_TRANSCENDENCE
+		}
+
+	}
 
 	const drawBackground = () => {
 		if (context.value)

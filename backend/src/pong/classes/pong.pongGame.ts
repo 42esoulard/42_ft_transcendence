@@ -10,7 +10,8 @@ import { Socket } from 'socket.io';
 var CANVAS_WIDTH = 1 / Number(process.env['CANVAS_WIDTH'])
 var CANVAS_HEIGHT = 1 / Number(process.env['CANVAS_HEIGHT'])
 var BALL_RADIUS = 1 / Number(process.env['BALL_RADIUS'])
-var RACQUET_LENGTH = 1 / Number(process.env['RACQUET_LENGTH'])
+var RACQUET_LENGTH_CLASSIC = 1 / Number(process.env['RACQUET_LENGTH_CLASSIC'])
+var RACQUET_LENGTH_TRANSCENDENCE = 1 / Number(process.env['RACQUET_LENGTH_TRANSCENDENCE'])
 var RACQUET_WIDTH = 1 / Number(process.env['RACQUET_WIDTH'])
 
 var BALL_INITIAL_SPEED = 1 / Number([process.env['BALL_INITIAL_SPEED']])
@@ -63,15 +64,15 @@ export class pongGame {
   }
   initRacquetLength()
   {
-    if (this.gameMode = 'classic')
+    if (this.gameMode == 'classic')
     {
-      this.player1.racquetLenght = RACQUET_LENGTH
-      this.player2.racquetLenght = RACQUET_LENGTH
+      this.player1.racquetLenght = RACQUET_LENGTH_CLASSIC
+      this.player2.racquetLenght = RACQUET_LENGTH_CLASSIC
     }
-    if (this.gameMode = 'transcendence')
+    if (this.gameMode == 'transcendence')
     {
-      this.player1.racquetLenght = RACQUET_LENGTH / 2
-      this.player2.racquetLenght = RACQUET_LENGTH / 2
+      this.player1.racquetLenght = RACQUET_LENGTH_TRANSCENDENCE
+      this.player2.racquetLenght = RACQUET_LENGTH_TRANSCENDENCE
     }
   }
 
