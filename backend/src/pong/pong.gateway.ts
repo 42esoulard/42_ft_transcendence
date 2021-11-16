@@ -137,7 +137,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.logger.error('moveRacquet: game doesnt exist')
       return
     }
-    game.moveRacquet(client.id, message.text)
+    game.moveRacquet(client, message.text)
   }
 
   async leaveGame(clientWhoLeft: Socket, room: string)

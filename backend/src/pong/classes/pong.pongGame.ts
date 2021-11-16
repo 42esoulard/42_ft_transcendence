@@ -262,9 +262,9 @@ export class pongGame {
     return {player1: this.player1.score, player2: this.player2.score}
   }
 
-  moveRacquet(clientId: string, direction:string)
+  moveRacquet(client: Socket, direction:string)
   {
-    const player = (clientId === this.player1.clientSocket.id) ? this.player1 : this.player2
+    const player = (client.id === this.player1.clientSocket.id) ? this.player1 : this.player2
   
     var topOfTheRacquet = player.position
     if (direction === 'up' && topOfTheRacquet > 0)
