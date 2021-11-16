@@ -34,6 +34,7 @@ export class Channels {
 
   @OneToMany(() => ChannelMembers, (cm) => cm.channel, {
     cascade: true,
+    eager: true,
     nullable: true,
   })
   channel_members: ChannelMembers[];

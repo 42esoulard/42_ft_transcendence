@@ -202,6 +202,7 @@ export const ChatComponent = defineComponent({
         await api.getChannelMember(activeChannel.value!.channel.id, activeChannel.value!.member.id)
         .then((res) => {
           activeChannel.value = res.data;
+          console.log(res.data)
         })
         .catch((err) => console.log(err));
         await api.getAvailableChannels(user.value.id)
