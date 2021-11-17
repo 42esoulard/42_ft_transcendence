@@ -56,11 +56,12 @@ export default defineComponent({
 		})
 
 		onBeforeRouteLeave(() => {
-			socket.value.emit('leaveGame', props.room)
+			if (props.userType === 'player')
+				socket.value.emit('leaveGame', props.room)
 			socket.value.off('position')
 			window.removeEventListener("resize", onResize)
-			window.removeEventListener("keydown", onKeyDown)
-			console.log('leaving')
+			if (props.userType === 'player')
+				window.removeEventListener("keydown", onKeyDown)
 		})
 
 
