@@ -1,6 +1,4 @@
 <template>
-	<p> Game # {{ room }} </p>
-	<p> Mode: {{ gameMode }} </p>
 	<h1 class="header__title"> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
 	<canvas ref="canvas"> </canvas>
 
@@ -8,7 +6,7 @@
 		<h1> Press space for some transcendence magic ! </h1>
 	</div>
 	
-	<div class="header__title" v-if="!gameHasStarted">
+	<div class="header__title" v-if="!gameHasStarted && gameMode=='classic' ">
 		<h1> Get ready, game is about to start ! </h1>
 	</div>
 	
