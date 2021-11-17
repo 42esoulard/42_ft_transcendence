@@ -20,8 +20,8 @@ export default defineComponent({
     };
 
     return {
-      closeModal
+      closeModal,
     };
-  }
+  },
 });
 </script>

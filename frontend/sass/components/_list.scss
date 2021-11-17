@@ -1,6 +1,7 @@
 .list-div {
   width: $list-div-width;
   min-height: 300px;
+  height: 100%;
   @media (max-width: 800px) {
     height: $list-div-height;
   }
@@ -21,8 +22,8 @@
 .list-div-panel {
   display: flex;
   justify-content: center;
-  min-height: $list-div-panel-height;
   background-color: $list-div-panel-bg;
+  height: 90%;
 }
 
 .list-div-panel__list {

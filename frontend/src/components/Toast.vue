@@ -11,6 +11,6 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "Toast",
-  props: ["message"]
+  props: ["message"],
 });
 </script>

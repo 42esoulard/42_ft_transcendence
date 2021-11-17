@@ -1,8 +1,6 @@
 <template>
   <div class="edit-user-grid tac br15">
-    <div @click="closeModal()" class="close-cross">
-      &times;
-    </div>
+    <div @click="closeModal()" class="close-cross">&times;</div>
     <h2>Update your informations</h2>
     <h3>Avatar</h3>
     <div class="edit-user-img-container">
@@ -40,7 +38,7 @@
 
 <script lang="ts">
 import { useUserApi } from "@/plugins/api.plugin";
-import { User } from 'sdk/typescript-axios-client-generated';
+import { User } from "sdk/typescript-axios-client-generated";
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import { useStore } from "@/store";
 import { useRouter } from "vue-router";
@@ -84,25 +82,25 @@ export default defineComponent({
       let ret = false;
       if (!/^[a-zA-Z]+$/.test(username.value))
         error_username.value = "Username should only contains letters";
-      else if (users.value.find(user => user.username == username.value))
+      else if (users.value.find((user) => user.username == username.value))
         error_username.value = "Username already taken";
       else
         await userApi
           .updateUser(
             {
               id: store.state.user.id,
-              username: username.value
+              username: username.value,
             },
             {
-              withCredentials: true
+              withCredentials: true,
             }
           )
-          .then(res => {
+          .then((res) => {
             console.log(res);
             store.commit("updateUsername", username.value);
             ret = true;
           })
-          .catch(error_username => {
+          .catch((error_username) => {
             console.log(error_username);
           });
       return ret;
@@ -118,7 +116,7 @@ export default defineComponent({
           store.commit("tagAvatar");
           ret = true;
         })
-        .catch(err => {
+        .catch((err) => {
           error_avatar.value = err.response.data.message;
           // setTimeout(() => (error_avatar.value = ""), 2000);
         });
@@ -152,17 +150,15 @@ export default defineComponent({
       if (usernameUpdated && avatarUpdated) {
         closeModal();
         if (usernameUpdated)
-          router.push({ path: `/profile/${store.state.user.username}` })
+          router.push({ path: `/profile/${store.state.user.username}` });
         store.dispatch(
           "setMessage",
           "Your profile has been successfully updated"
         );
-
-
       }
     };
 
-    watch(avatar, avatar => {
+    watch(avatar, (avatar) => {
       if (avatar instanceof File) {
         let fileReader = new FileReader();
 
@@ -183,9 +179,9 @@ export default defineComponent({
       handleFile,
       error_avatar,
       error_username,
-      user: computed(() => store.state.user)
+      user: computed(() => store.state.user),
     };
-  }
+  },
 });
 </script>
 

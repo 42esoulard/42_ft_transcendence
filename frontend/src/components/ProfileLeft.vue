@@ -1,71 +1,78 @@
 <template>
   <div class="profile-left-info">
     <div class="profile-left__avatar-div">
-      <img
-        v-if="user.username == self.username"
-        class="profile-left__avatar-img"
-        :src="self.avatar"
-        alt="" />
-      <img v-else :src="user.avatar" class="profile-left__avatar-img" alt="" />
+      <img :src="user.avatar" class="profile-left__avatar-img" alt="" />
     </div>
     <span class="profile-left__name">{{ user.username }} </span>
     <span class="profile-left__since">member since {{ formatedDate }}</span>
-    <span v-if="isOnline" class="profile-left__status"
-      ><i class="status status--online fas fa-circle" /> online</span>
-    <span v-else class="profile-left__status"
-      ><i class="status status--offline fas fa-circle" /> offline</span>
+    <span v-if="isOnline && relationState(user) >= -1" class="profile-left__status"
+      ><i class="status status--online fas fa-circle" /> online</span
+    >
+    <span v-else-if="relationState(user) >= -1" class="profile-left__status"
+      ><i class="status status--offline fas fa-circle" /> offline</span
+    >
   </div>
-  <div v-if="isFriend(user) != -1" class="profile-left__social">
+  <div v-if="relationState(user) >= 0" class="profile-left__social">
     <button
-      v-show="isFriend(user) == 0"
+      v-show="relationState(user) == 0"
       @click="addFriend(user)"
-      class="button button--second">
+      class="button button--second"
+    >
       <i class="upload-icon fas fa-user-plus" /> add friend
     </button>
     <button
-      v-show="isFriend(user) == 1"
+      v-show="relationState(user) == 1"
       @click="removeFriend(user)"
-      class="button button--second">
+      class="button button--second"
+    >
       <i class="upload-icon fas fa-user-minus" /> remove friend
     </button>
     <button
-      v-show="isFriend(user) == 2"
+      v-show="relationState(user) == 2"
       @click="acceptFriend(user)"
-      class="button button--second">
+      class="button button--second"
+    >
       <i class="upload-icon fas fa-user-plus" /> accept invitation
     </button>
     <button
-      v-show="isFriend(user) == 3"
+      v-show="relationState(user) == 3"
       @click="removeFriend(user)"
-      class="button button--second">
+      class="button button--second"
+    >
       <i class="upload-icon fas fa-user-times" /> cancel invitation
     </button>
-    <button
-      v-if="user.username != self.username"
-      class="button button--primary">
+    <button v-if="user.id != self.id" class="button button--primary">
       <i class="upload-icon fas fa-envelope" /> send message
     </button>
-    <button v-if="user.username != self.username" class="button button--third">
+    <button v-if="user.id != self.id" class="button button--third">
       <i class="upload-icon fas fa-table-tennis" /> invite game
     </button>
-    <button v-if="user.username != self.username" class="button button--grey">
+    <button
+      v-if="relationState(user) == 4"
+      @click="unblock(user)"
+      class="button button--grey"
+    >
+      <i class="upload-icon fas fa-ban" /> unblock
+    </button>
+    <button v-else @click="block(user)" class="button button--grey">
       <i class="upload-icon fas fa-ban" /> block
     </button>
   </div>
-  <div v-else-if="user" class="profile-left__social">
+  <div v-else-if="user.id == self.id" class="profile-left__social">
     <button @click="toggleModal(2)" class="button button--primary">
       Edit profile info
     </button>
     <button
       v-if="!self.two_fa_enabled"
       class="button button--third"
-      @click="toggleModal(1)">
+      @click="toggleModal(1)"
+    >
       Enable 2FA
     </button>
     <button v-else class="button button--second" @click="deactivateTwoFactor">
       Disable 2FA
     </button>
-    <button class="button button--grey">Delete account</button>
+    <button class="button button--grey" @click="deleteAccount()">Delete account</button>
     <teleport to="#modals">
       <transition name="fade--error">
         <div v-if="showBackdrop" class="backdrop"></div>
@@ -86,44 +93,53 @@
       </transition>
     </teleport>
   </div>
+  <div v-else-if="relationState(user) == -2" class="profile-left__blocked-msg">
+    {{ user.username }} blocked you
+  </div>
+  <div v-else-if="relationState(user) == -3" class="profile-left__blocked-msg">
+    {{ user.username }} has been banned
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, PropType } from "vue";
 import moment from "moment";
-import { User, Relationship } from 'sdk/typescript-axios-client-generated';
-import { useUserApi, useRelationshipApi, useAuthApi } from "@/plugins/api.plugin";
+import { User, Relationship } from "sdk/typescript-axios-client-generated";
+import { useRelationshipApi, useAuthApi, useUserApi } from "@/plugins/api.plugin";
 import { useStore } from "@/store";
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import EditUser from "@/components/EditUser.vue";
 import Modal from "@/components/Modal.vue";
+import { presenceSocket } from "@/views/UserAccount.vue";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "ProfileLeft",
   props: {
     user: {
       type: Object as PropType<User>,
-      required: true
-    }
+      required: true,
+    },
   },
   components: { Modal, InitTwoFactor, EditUser },
   setup(props) {
     const store = useStore();
+    const router = useRouter();
     const user = props.user;
     const userFriendships = ref<Relationship[]>([]);
-    const userApi = useUserApi();
+    const userBlocked = ref<Relationship[]>([]);
     const relationshipApi = useRelationshipApi();
     const authApi = useAuthApi();
+    const userApi = useUserApi();
     const showModal = ref(false);
     const showModal2 = ref(false);
-    const username = ref("");
     const formatedDate = computed(() => {
       return moment(user.created_at).format("MM-DD-YYYY");
     });
     const isOnline = computed((): boolean => {
       if (user != undefined) {
         const tmpUser: User[] = store.state.onlineUsers; // enlever cette ligne et utiliser un store typed !!!
-        const onlineUser = tmpUser.find(u => u.id === user.id);
+        const onlineUser = tmpUser.find((u) => u.id === user.id);
         console.log("isOnline", onlineUser);
         return onlineUser != undefined;
       }
@@ -132,22 +148,14 @@ export default defineComponent({
 
     onMounted(() => {
       showModal2.value = store.state.firstTimeConnect;
-<<<<<<< HEAD
-      if (store.state.user.id != 0) {
-        userApi
-          .getUserFriendships(store.state.user.id)
-=======
       if (store.state.user.id != 0) {
         relationshipApi
-          .getUserFriendships({
-            user: store.state.user,
-            pending: true
-          })
->>>>>>> relationships in progress
-          .then((res: any) => {
-            userFriendships.value = res.data;
-            console.log("RES", res.data)
-          })
+          .getAllUserFriendships(store.state.user.id)
+          .then((res: any) => (userFriendships.value = res.data))
+          .catch((err: any) => console.log(err.message));
+        relationshipApi
+          .getUserBlocked(store.state.user.id)
+          .then((res: any) => (userBlocked.value = res.data))
           .catch((err: any) => console.log(err.message));
       }
     });
@@ -159,7 +167,7 @@ export default defineComponent({
           store.commit("toggleTwoFactor", false);
           store.dispatch("setMessage", res.data.message);
         })
-        .catch(error => console.log(error));
+        .catch((error) => console.log(error));
     };
 
     const toggleModal = (nbr: number) => {
@@ -176,12 +184,34 @@ export default defineComponent({
       return showModal.value || showModal2.value;
     });
 
+    const deleteAccount = async() => {
+      if (store.state.user.id != 0) {
+        logOut();
+        await userApi
+          .removeUser(store.state.user.id)
+          .then((res: any) => console.log("account deleted"))
+          .catch((err: any) => console.log(err));
+      }
+    };
+
+    const logOut = () => {
+      authApi
+        .logout({ withCredentials: true })
+        .then((response) => {
+          console.log(response);
+          presenceSocket.emit("closeConnection", store.state.user);
+          store.commit("resetUser"); //store.state.user = null;
+          router.push("/login");
+        })
+        .catch((err: any) => console.log(err.message));
+    };
+
     const addFriend = async (user: User) => {
       if (store.state.user.id != 0) {
         await relationshipApi
           .saveRelationship({
-            requester: store.state.user,
-            adressee: user
+            requesterId: store.state.user.id,
+            adresseeId: user.id,
           })
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
@@ -192,8 +222,8 @@ export default defineComponent({
       if (store.state.user.id != 0) {
         await relationshipApi
           .removeRelationship({
-            user1: user,
-            user2: store.state.user
+            userId1: user.id,
+            userId2: store.state.user.id,
           })
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
@@ -204,8 +234,8 @@ export default defineComponent({
       if (store.state.user.id != 0) {
         await relationshipApi
           .validateRelationship({
-            requester: user,
-            adressee: store.state.user
+            requesterId: user.id,
+            adresseeId: store.state.user.id,
           })
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
@@ -213,27 +243,64 @@ export default defineComponent({
     };
 
     // 1 == friends, 2 == self invited, 3 == other invited, 0 == no relationship
-    const isFriend = (user: User) => {
-      if (store.state.user.id === 0 || user.username == store.state.user.username)
+    // 4 == blocked && self is requester, -2 == blocked && self is adressee
+    // -3 == banned
+    const relationState = (user: User) => {
+      if (store.state.user.id === 0 || user.id === store.state.user.id)
         return -1;
+
+      if (user.banned)
+        return -3;
+
       for (const relationship of userFriendships.value) {
-        console.log("RS", relationship);
-        if (user.username == relationship.requester.username) {
+        if (user.id == relationship.requesterId) {
           if (relationship.pending) return 2;
           return 1;
-        } else if (user.username == relationship.adressee.username) {
+        } else if (user.id == relationship.adresseeId) {
           if (relationship.pending) return 3;
           return 1;
         }
       }
+
+      for (const relationship of userBlocked.value) {
+        if (store.state.user.id == relationship.requesterId) return 4;
+        if (store.state.user.id == relationship.adresseeId) return -2;
+      }
+
       return 0;
     };
+
+    const block = async (user: User) => {
+      if (store.state.user.id != 0) {
+        await relationshipApi
+          .saveRelationship({
+            requesterId: store.state.user.id,
+            adresseeId: user.id,
+            nature: "blocked",
+          })
+          .then((res: any) => window.location.reload())
+          .catch((err: any) => console.log(err));
+      }
+    };
+
+    const unblock = async (user: User) => {
+      if (store.state.user.id != 0) {
+        await relationshipApi
+          .removeRelationship({
+            userId1: user.id,
+            userId2: store.state.user.id,
+          })
+          .then((res: any) => window.location.reload())
+          .catch((err: any) => console.log(err));
+      }
+    };
+
     return {
       user,
       addFriend,
       removeFriend,
       acceptFriend,
-      isFriend,
+      relationState,
       isOnline,
       formatedDate,
       self: computed(() => store.state.user),
@@ -243,8 +310,10 @@ export default defineComponent({
       showModal2,
       toggleModal,
       showBackdrop,
-      username
+      block,
+      unblock,
+      deleteAccount
     };
-  }
+  },
 });
 </script>

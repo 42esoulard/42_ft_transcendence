@@ -1,5 +1,4 @@
 import { DefaultApi, UserApi, AuthApi, PongApi, ChatApi, RelationshipApi } from "@/../sdk/typescript-axios-client-generated"
-import { GamepadCircle } from "mdue";
 import { inject } from "vue";
 
 export default {

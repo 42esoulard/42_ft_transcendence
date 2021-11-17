@@ -13,7 +13,7 @@ import {
   UseGuards,
   BadRequestException,
   Req,
-  HttpStatus,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './interfaces/user.interface';
@@ -41,7 +41,7 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   /**
-   * Lists all users in database.
+   * Lists all users in database, except banned;
    */
   @Get()
   async getUsers(): Promise<User[]> {
@@ -59,6 +59,12 @@ export class UsersController {
       throw new NotFoundException('No users in database');
     }
     return users;
+  }
+
+  @Delete()
+  async removeUser(@Body() id: number) {
+    console.log("HERE");
+    return await this.userService.removeUser(id);
   }
 
 
@@ -233,13 +239,4 @@ export class UsersController {
 		});
 		return new StreamableFile(file);
 	}
-
-  // @Post()
-  // @ApiCreatedResponse({
-  // 	description: 'The user has been successfully updated.',
-  // 	type: User,
-  //   })
-  // async updateUser(@Body() updatedUser : UpdateUserDto) : Promise<User> {
-  // 	return await this.userService.updateUser(updatedUser);
-  // }
 }

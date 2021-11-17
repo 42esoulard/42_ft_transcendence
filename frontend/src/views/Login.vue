@@ -4,7 +4,9 @@
   </div>
   <div v-else class="log-in">
     <div class="log-in-stat">
-      <span class="log-in-stat__text log-in-stat__text--number">{{ nbGames }}</span>
+      <span class="log-in-stat__text log-in-stat__text--number">{{
+        nbGames
+      }}</span>
       <span class="log-in-stat__text">games</span>
     </div>
     <div class="log-in-buttons">
@@ -21,15 +23,21 @@
       </button>
     </div>
     <div class="log-in-stat">
-      <span class="log-in-stat__text log-in-stat__text--number">{{ nbUsers }}</span>
+      <span class="log-in-stat__text log-in-stat__text--number">{{
+        nbUsers
+      }}</span>
       <span class="log-in-stat__text">users</span>
     </div>
     <div class="log-in-stat">
-      <span class="log-in-stat__text log-in-stat__text--number">{{ nbOngoing }}</span>
+      <span class="log-in-stat__text log-in-stat__text--number">{{
+        nbOngoing
+      }}</span>
       <span class="log-in-stat__text">ongoing</span>
     </div>
     <div class="log-in-stat">
-      <span class="log-in-stat__text log-in-stat__text--number">{{ nbOnline }}</span>
+      <span class="log-in-stat__text log-in-stat__text--number">{{
+        nbOnline
+      }}</span>
       <span class="log-in-stat__text">online</span>
     </div>
   </div>
@@ -43,8 +51,7 @@ import { useStore } from "@/store";
 import { useAuthApi } from "@/plugins/api.plugin";
 import { useUserApi } from "@/plugins/api.plugin";
 import { usePongApi } from "@/plugins/api.plugin";
-import { User } from 'sdk/typescript-axios-client-generated';
-
+import { User } from "sdk/typescript-axios-client-generated";
 
 export default defineComponent({
   name: "Login",
@@ -88,25 +95,25 @@ export default defineComponent({
     onMounted(() => {
       userApi
         .getUsers()
-        .then((res: any) => ( nbUsers.value = res.data.length ))
+        .then((res: any) => (nbUsers.value = res.data.length))
         .catch((err: any) => console.log(err.message));
       pongApi
         .getAll()
-        .then((res: any) => ( nbGames.value = res.data.length ))
+        .then((res: any) => (nbGames.value = res.data.length))
         .catch((err: any) => console.log(err.message));
       pongApi
         .getOnGoingGames()
-        .then((res: any) => ( nbOngoing.value = res.data.length ))
+        .then((res: any) => (nbOngoing.value = res.data.length))
         .catch((err: any) => console.log(err.message));
     });
 
     const getProfile = async () => {
       await authApi
-        .profile({withCredentials: true})
-        .then(response => {
+        .profile({ withCredentials: true })
+        .then((response) => {
           store.state.user = response.data;
         })
-        .catch( (err: Error) => {
+        .catch((err: Error) => {
           console.log("ERROR GET PROFILE");
         });
     };
@@ -114,8 +121,6 @@ export default defineComponent({
     const logInWith42 = () => {
       window.location.href = process.env.VUE_APP_42_AUTH_URL;
     };
-
-
 
     return {
       logInWith42,
@@ -126,8 +131,8 @@ export default defineComponent({
       nbUsers,
       nbOnline,
       nbOngoing,
-      nbGames
+      nbGames,
     };
-  }
+  },
 });
 </script>

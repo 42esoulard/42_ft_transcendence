@@ -3,6 +3,6 @@
 import { User } from 'src/users/interfaces/user.interface';
 
 export class ValidateRelationshipDto {
-  readonly adressee: User;
-  readonly requester: User;
+  readonly adresseeId: number;
+  readonly requesterId: number;
 }

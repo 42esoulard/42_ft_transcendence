@@ -89,6 +89,15 @@
   }
 }
 
+.profile-left__blocked-msg {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  font-family: 'Saira';
+  font-size: 1.2rem;
+  color: grey;
+}
+
 .profile-stats {
   background-color: $profile-div-bg-color;
   border-radius: 20px;

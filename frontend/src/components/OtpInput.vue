@@ -106,9 +106,9 @@ export default defineComponent({
     return {
       sendTwoFactorCode,
       otp,
-      error
+      error,
     };
-  }
+  },
 });
 </script>
 <style lang="scss">

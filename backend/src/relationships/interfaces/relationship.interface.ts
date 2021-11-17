@@ -4,7 +4,7 @@ export class Relationship {
   id: number;
   pending: boolean;
   created_at: Date;
-  requester: User;
-  adressee: User;
+  requesterId: number;
+  adresseeId: number;
   nature?: string;
 }

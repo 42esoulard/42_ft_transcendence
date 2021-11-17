@@ -6,14 +6,10 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  BeforeInsert,
   CreateDateColumn,
   OneToOne,
-  ManyToMany,
-  JoinTable,
   OneToMany,
 } from 'typeorm';
-import { Channels } from 'src/channels/entity/channels.entity';
 import { Relationships } from 'src/relationships/entity/relationships.entity';
 import { ChannelMembers } from 'src/channel_members/entity/channel_members.entity';
 // import * as bcrypt from 'bcrypt';
@@ -65,11 +61,9 @@ export class Users {
   channel_members: ChannelMembers[];
 
   @OneToMany(() => Relationships, (relationship) => relationship.requester)
-  @JoinTable()
   relationships_requested: Relationships[];
 
   @OneToMany(() => Relationships, (relationship) => relationship.adressee)
-  @JoinTable()
   relationships_adressed: Relationships[];
 
 

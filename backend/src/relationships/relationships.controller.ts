@@ -1,14 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param } from '@nestjs/common';
 import { RelationshipsService } from './relationships.service';
 import { Relationship } from './interfaces/relationship.interface';
-import { User } from 'src/users/interfaces/user.interface';
-import { GetFriendshipsDto } from './dto/getFriendships.dto';
 import { CreateRelationshipDto } from './dto/createRelationship.dto';
 import { ValidateRelationshipDto } from './dto/validateRelationship.dto';
 import { RemoveRelationshipDto } from './dto/removeRelationship.dto';
@@ -19,28 +11,45 @@ import { ApiTags } from '@nestjs/swagger';
 export class RelationshipsController {
   constructor(private readonly relationshipService: RelationshipsService) {}
 
-  @Get('friendships')
-  async getUserFriendships(@Body() friendshipsReq: GetFriendshipsDto): Promise<Relationship[]> {
-    return await this.relationshipService.getUserFriendships(friendshipsReq);
+  @Get('/friendships/:id')
+  async getUserFriendships(@Param('id') id: number): Promise<Relationship[]> {
+    return await this.relationshipService.getUserFriendships(id);
   }
 
-  @Get('blocked')
-  async getUserBlocked(user: User): Promise<Relationship[]> {
-    return await this.relationshipService.getUserBlocked(user);
+  @Get('/allfriendships/:id')
+  async getAllUserFriendships(
+    @Param('id') id: number,
+  ): Promise<Relationship[]> {
+    return await this.relationshipService.getAllUserFriendships(id);
+  }
+
+  @Get('/blocked/:id')
+  async getUserBlocked(@Param('id') id: number): Promise<Relationship[]> {
+    return await this.relationshipService.getUserBlocked(id);
   }
 
   @Post()
-  async saveRelationship(@Body() newRelationship: CreateRelationshipDto): Promise<Relationship> {
+  async saveRelationship(
+    @Body() newRelationship: CreateRelationshipDto,
+  ): Promise<Relationship> {
     return await this.relationshipService.saveRelationship(newRelationship);
   }
 
   @Post('validate-relationship')
-  async validateRelationship(@Body() toMajRelationship: ValidateRelationshipDto) {
-    return await this.relationshipService.validateRelationship(toMajRelationship);
+  async validateRelationship(
+    @Body() toMajRelationship: ValidateRelationshipDto,
+  ) {
+    return await this.relationshipService.validateRelationship(
+      toMajRelationship,
+    );
   }
 
   @Delete()
-  async removeRelationship(@Body() toRemoveRelationship: RemoveRelationshipDto) {
-    return await this.relationshipService.removeRelationship(toRemoveRelationship);
+  async removeRelationship(
+    @Body() toRemoveRelationship: RemoveRelationshipDto,
+  ) {
+    return await this.relationshipService.removeRelationship(
+      toRemoveRelationship,
+    );
   }
 }

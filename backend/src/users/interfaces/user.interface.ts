@@ -6,17 +6,17 @@ import { ChannelMember } from 'src/channel_members/interfaces/channel_member.int
 export class User {
   id: number;
   username: string;
-  created_at: Date;
-  forty_two_login: string;
-  avatar: string;
-  two_fa_secret: string;
-  two_fa_enabled: boolean;
-  refresh_token: string;
-  banned: boolean;
-  expiry_date: Date;
-  messages: Message[];
-  channel_members: ChannelMember[];
-  games: GameUser[];
-  relationships_requested: Relationship[];
-  relationships_adressed: Relationship[];
+  created_at?: Date;
+  forty_two_login?: string;
+  avatar?: string;
+  two_fa_secret?: string;
+  two_fa_enabled?: boolean;
+  refresh_token?: string;
+  banned?: boolean;
+  expiry_date?: Date;
+  messages?: Message[];
+  channel_members?: ChannelMember[];
+  games?: GameUser[];
+  relationships_requested?: Relationship[];
+  relationships_adressed?: Relationship[];
 }

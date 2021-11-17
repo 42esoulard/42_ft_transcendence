@@ -3,7 +3,6 @@ import { Relationship } from './interfaces/relationship.interface';
 import { Relationships } from './entity/relationships.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { GetFriendshipsDto } from './dto/getFriendships.dto';
 import { CreateRelationshipDto } from './dto/createRelationship.dto';
 import { ValidateRelationshipDto } from './dto/validateRelationship.dto';
 import { RemoveRelationshipDto } from './dto/removeRelationship.dto';
@@ -16,55 +15,79 @@ export class RelationshipsService {
     private readonly relationshipsRepository: Repository<Relationships>,
   ) {}
 
-  async getRelationship(user1: User, user2: User): Promise<Relationship> {
+  async getRelationship(user1: number, user2: number): Promise<Relationship> {
     return await this.relationshipsRepository.findOne({
       where: [
-        { requester: user1, adressee: user2 },
-        { requester: user2, adressee: user1 }
-      ]
+        { requesterId: user1, adresseeId: user2 },
+        { requesterId: user2, adresseeId: user1 },
+      ],
     });
   }
 
-  async getUserFriendships(friendshipsReq: GetFriendshipsDto): Promise<Relationship[]> {
-    if (friendshipsReq.pending === true){
-      return await this.relationshipsRepository.find({
-        where: [
-          { requester: friendshipsReq.user, nature: 'friendship' },
-          { adressee: friendshipsReq.user, nature: 'friendship' }
-        ]
-      });
+  async getUserFriendships(id: number): Promise<Relationship[]> {
+    return await this.relationshipsRepository.find({
+      where: [
+        { requesterId: id, pending: 'false', nature: 'friendship' },
+        { adresseeId: id, pending: 'false', nature: 'friendship' },
+      ],
+    });
+  }
+
+  async getAllUserFriendships(id: number): Promise<Relationship[]> {
+    const ret = await this.relationshipsRepository.find({
+      where: [
+        { requesterId: id, nature: 'friendship' },
+        { adresseeId: id, nature: 'friendship' },
+      ],
+    });
+    return ret;
+  }
+
+  async getUserBlocked(user: number): Promise<Relationship[]> {
+    return await this.relationshipsRepository.find({
+      where: [
+        { requesterId: user, nature: 'blocked' },
+        { adresseeId: user, nature: 'blocked' },
+      ],
+    });
+  }
+
+  async saveRelationship(
+    relationshipDto: CreateRelationshipDto,
+  ): Promise<Relationship> {
+    if (relationshipDto.nature == 'blocked') {
+      const relationship = await this.getRelationship(
+        relationshipDto.adresseeId,
+        relationshipDto.requesterId,
+      );
+      if (relationship)
+        this.removeRelationship({
+          userId1: relationshipDto.adresseeId,
+          userId2: relationshipDto.requesterId,
+        });
     }
-    return await this.relationshipsRepository.find({
-      where: [
-        { requester: friendshipsReq.user, pending: 'false', nature: 'friendship' },
-        { adressee: friendshipsReq.user, pending: 'false', nature: 'friendship' }
-      ]
-    });
-  }
-
-  async getUserBlocked(user: User): Promise<Relationship[]> {
-    return await this.relationshipsRepository.find({
-      where: [
-        { requester: user, nature: 'blocked' },
-        { adressee: user, nature: 'blocked' }
-      ]
-    });
-  }
-
-  async saveRelationship(relationshipDto: CreateRelationshipDto): Promise<Relationship> {
-    const newRelationship: Relationship = this.relationshipsRepository.create(relationshipDto);
-    newRelationship.pending = true;
+    const newRelationship: Relationship =
+      this.relationshipsRepository.create(relationshipDto);
+    if (relationshipDto.nature != 'blocked') newRelationship.pending = true;
     return await this.relationshipsRepository.save(newRelationship);
   }
 
   async validateRelationship(relationshipDto: ValidateRelationshipDto) {
-    const relationship = await this.getRelationship(relationshipDto.requester, relationshipDto.adressee);
+    const relationship = await this.getRelationship(
+      relationshipDto.requesterId,
+      relationshipDto.adresseeId,
+    );
     relationship.pending = false;
-    return await this.relationshipsRepository.update(relationship.id, { pending: false });
+    return await this.relationshipsRepository.update(relationship.id, {
+      pending: false,
+    });
   }
 
   async removeRelationship(relationshipDto: RemoveRelationshipDto) {
-    let   relationship = await this.getRelationship(relationshipDto.user1, relationshipDto.user2);
+    const relationship = await this.getRelationship(
+      relationshipDto.userId1,
+      relationshipDto.userId2,
+    );
     return await this.relationshipsRepository.delete(relationship.id);
   }
 }
