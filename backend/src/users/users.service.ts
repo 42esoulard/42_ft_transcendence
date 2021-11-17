@@ -22,13 +22,6 @@ export class UsersService {
     return await this.usersRepository.find({where: {banned: true}});
   }
 
-  async getUserGames(id: number): Promise<Users> {
-    const res = await this.usersRepository.findOne(id, {
-      relations: ['games', 'games.game'],
-    });
-    return res;
-  }
-
   async getUserChannels(id: number): Promise<Users> {
     const res = await this.usersRepository.findOne(id, {
       relations: ['channels'],

@@ -101,14 +101,6 @@ export class UsersController {
   // 	return user;
   // }
 
-	@Get('/user-games/:id')
-	async getUserGames(@Param('id') id: number): Promise<User> {
-		const user: User = await this.userService.getUserGames(id)
-		if (user == undefined) {
-			throw new NotFoundException('User not found');
-		}
-		return user;
-	}
 
 	/**
 	* Returns a user found in database by its username.

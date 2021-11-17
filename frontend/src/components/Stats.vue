@@ -62,7 +62,7 @@
 import { defineComponent, inject, ref, computed, onMounted } from "vue";
 import moment from "moment";
 import { GameUser, Game } from "sdk/typescript-axios-client-generated";
-import { useUserApi } from "@/plugins/api.plugin";
+import { useUserApi, usePongApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
   name: "Stats",
@@ -74,15 +74,16 @@ export default defineComponent({
   },
   setup(props) {
     const userApi = useUserApi();
+    const pongApi = usePongApi();
     const games = ref<GameUser[]>([]);
     const gameHistory = ref<Game[]>([]);
     const user = props.user;
 
     onMounted(() => {
-      userApi
-        .getUserGames(user.id)
+      pongApi
+        .getUserGameUser(user.id)
         .then((res: any) => {
-          games.value = res.data.games;
+          games.value = res.data;
           for (const gameUser of games.value) {
             gameHistory.value.push(gameUser.game);
           }

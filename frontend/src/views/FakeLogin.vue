@@ -67,7 +67,7 @@ export default defineComponent({
         .then(async (res) => {
           await getProfile();
           sendConnection();
-          router.push("account");
+          router.push(`/account`);
         })
         .catch((error) => console.log(error));
     };
