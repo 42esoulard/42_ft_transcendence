@@ -1,5 +1,5 @@
 <template>
-	<p> Game # {{ room }} </p>
+	<p> Game # {{ id }} </p>
 	<p> Mode: {{ gameMode }} </p>
 	<h1 class="header__title"> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
 	<canvas ref="canvas"> </canvas>
@@ -24,21 +24,25 @@
 
 <script lang="ts">
 import { clientSocket } from '@/App.vue'
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onMounted, PropType, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import getDraw from '@/composables/draw'
-import { Coordinates, PlayerPositions, PlayerScores } from '@/types/PongGame'
+import { Coordinates, gameMode, PlayerPositions, PlayerScores } from '@/types/PongGame'
 
 export default defineComponent({
-	props: ['gameMode', 'id', 'player1UserName', 'player2UserName'],
+	props: {
+		gameMode: {type: String as () => gameMode, required: true},
+		// ou {type: String as PropType<gameMode>}
+		// cf https://frontendsociety.com/using-a-typescript-interfaces-and-types-as-a-prop-type-in-vuejs-508ab3f83480
+		player1UserName: {type: String, required: true},
+		player2UserName: {type: String, required: true},
+		id: {type: String, required: true}
+	},
 	inheritAttrs: false, // we dont need it, and not setting it to false a warning: "extraneous non prop attributes (authorized) were passed to component but could not be automatically inherited..."
 	
 	setup(props) {
 	
-		const route = useRoute()
-		const room =  ref(route.params.id)
-		const player1UserName = ref(route.params.player1UserName)
-		const player2UserName = ref(route.params.player2UserName)
+		const room =  ref(props.id)
 
 		const { context, canvas, ballPosition, playerPositions, racquetLenghtRatio, score, windowWidth, player1EnlargeRemaining, player2EnlargeRemaining, 
 			onResize, initCanvas, draw } = getDraw(props.gameMode)
@@ -102,16 +106,16 @@ export default defineComponent({
 			gameHasStarted.value = true
 		})
 		
-		const winningPlayer = ref<string | string[]>('')
+		const winningPlayer = ref<string>('')
 		const gameIsOver = ref(false)
 		socket.value.on("gameOver", (player1Won: boolean) => {
 			window.removeEventListener("keydown", onKeyDown)
 			gameHasStarted.value = true
 			gameIsOver.value = true
 			if (player1Won)
-				winningPlayer.value = player1UserName.value
+				winningPlayer.value = props.player1UserName
 			else
-				winningPlayer.value = player2UserName.value
+				winningPlayer.value = props.player2UserName
 		})
 		
 
@@ -140,7 +144,7 @@ export default defineComponent({
 				EnlargeRacquet()
 		}
 
-		return { score, room, player1UserName, player2UserName, gameHasStarted, gameIsOver, winningPlayer, canvas, SendMoveMsg }
+		return { score, gameHasStarted, gameIsOver, winningPlayer, canvas, SendMoveMsg }
 
 	},
 

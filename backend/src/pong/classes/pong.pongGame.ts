@@ -186,6 +186,9 @@ export class pongGame {
       this.ballDirection.x = -this.ballDirection.x
       if (this.ballSpeed * 2 + BALL_ACCELERATION * 2 < RACQUET_WIDTH + BALL_RADIUS)
         this.ballSpeed += BALL_ACCELERATION
+      // RACQUET_WIDTH + BALL_RADIUS = collision surface
+      // ballSpeed * 2 = ball speed in x coordinates
+      // if speed is more than this limit, collision will not be detected
     }
   }
 
