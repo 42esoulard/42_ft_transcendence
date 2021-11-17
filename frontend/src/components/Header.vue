@@ -1,7 +1,7 @@
 <template>
   <transition name="fade--log">
     <div class="header">
-      <div class="menu" v-if="(width < 950 || height < 600) && user">
+      <div class="menu" v-if="(width < 950 || height < 600) && user.id != 0 && !user.banned">
         <button @click="isActive = !isActive" class="menu-button">
           <i class="menu__icon fas fa-bars" />
         </button>
@@ -10,63 +10,72 @@
             class="menu__link"
             @click="isActive = !isActive"
             to="/"
-            icon="fas fa-home">
+            icon="fas fa-home"
+          >
             home
           </SideBarLink>
           <SideBarLink
             class="menu__link"
             @click="isActive = !isActive"
             :to="userProfile"
-            icon="fas fa-user-circle">
+            icon="fas fa-user-circle"
+          >
             profile
           </SideBarLink>
           <SideBarLink
             class="menu__link"
             @click="isActive = !isActive"
             to="/chat"
-            icon="fas fa-comments">
+            icon="fas fa-comments"
+          >
             chat
           </SideBarLink>
           <SideBarLink
             class="menu__link"
             @click="isActive = !isActive"
             to=""
-            icon="fas fa-trophy">
+            icon="fas fa-trophy"
+          >
             ladder
           </SideBarLink>
           <SideBarLink
             class="menu__link"
             @click="isActive = !isActive"
             to="/users"
-            icon="fas fa-users">
+            icon="fas fa-users"
+          >
             users
           </SideBarLink>
           <SideBarLink
             class="menu__link"
             @click="isActive = !isActive"
             to="/pong"
-            icon="fas fa-table-tennis">
+            icon="fas fa-table-tennis"
+          >
             play
           </SideBarLink>
           <SideBarLink
             class="menu__link"
             @click="isActive = !isActive"
             to="/pong/watch"
-            icon="fas fa-play-circle">
+            icon="fas fa-play-circle"
+          >
             live
           </SideBarLink>
           <SideBarLink
             class="menu__link"
             @click="isActive = !isActive"
             to="/adduser"
-            icon="fas fa-toolbox">
+            icon="fas fa-toolbox"
+          >
             add
           </SideBarLink>
           <SideBarLink
             class="menu__link"
             @click="logOut"
             to="/log-out"
-            icon="fas fa-power-off">
+            icon="fas fa-power-off"
+          >
             log out
           </SideBarLink>
         </div>
@@ -75,7 +84,11 @@
       <router-link to="/" class="header-link">
         <h1 class="header__title">Space Pong</h1>
       </router-link>
-      <div v-if="width >= 950 && user.id != 0" :key="user.id" class="header-bloc">
+      <div
+        v-if="width >= 950 && user.id != 0 && !user.banned"
+        :key="user.id"
+        class="header-bloc"
+      >
         <router-link to="/account" class="user-bloc">
           <img class="user-bloc__avatar" :src="user.avatar" alt="" />
           <span class="user-bloc__username">{{ user.username }}</span>
@@ -93,7 +106,7 @@ import { computed, defineComponent, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
 import { useAuthApi } from "@/plugins/api.plugin";
-import SideBarLink from './SideBarLink.vue';
+import SideBarLink from "./SideBarLink.vue";
 import { presenceSocket } from "@/views/UserAccount.vue";
 
 export default defineComponent({
@@ -119,7 +132,7 @@ export default defineComponent({
     const logOut = () => {
       authApi
         .logout({ withCredentials: true })
-        .then(response => {
+        .then((response) => {
           console.log(response);
           presenceSocket.emit("closeConnection", store.state.user);
           store.commit("resetUser"); //store.state.user = null;
@@ -139,9 +152,9 @@ export default defineComponent({
       logOut,
       width: computed(() => windowWidth.value),
       height: computed(() => windowHeight.value),
-      isActive
+      isActive,
     };
-  }
+  },
 });
 </script>
 

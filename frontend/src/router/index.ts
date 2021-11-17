@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import AddUser from '../views/AddUser.vue'
 import Users from '../views/Users.vue'
 import Chat from '../views/Chat.vue'
+import Banned from '../views/Banned.vue';
 import UserAccount from '../views/UserAccount.vue'
 import Pong from '../views/Pong/Pong.vue'
 import PongGame from '../views/Pong/PongGame.vue'
@@ -31,6 +32,14 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'Login',
     component: Login,
+    meta: {
+      requiresVisitor: true,
+    }
+  },
+  {
+    path: '/banned',
+    name: 'Banned',
+    component: Banned,
     meta: {
       requiresVisitor: true,
     }
@@ -172,6 +181,9 @@ router.beforeEach(async (to, from) => {
     if (store.state.user.id === 0) {
       return '/login'; // redirected to login
     } else {
+      if (store.state.user.banned){
+        return '/banned';
+      }
       return true; // the route is allowed
     }
   } else if (to.matched.some(record => record.meta.requiresVisitor)) {
@@ -181,8 +193,6 @@ router.beforeEach(async (to, from) => {
       await getProfile();
     }
     if (store.state.user.id) {
-      return '/account';
-    } else {
       return true;
     }
   }

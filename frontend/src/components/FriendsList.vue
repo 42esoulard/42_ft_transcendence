@@ -1,61 +1,69 @@
 <template>
-<div class="list-div">
-  <span class="list-div__title">Friends List</span>
-  <div class="list-div-panel">
-    <ul class="list-div-panel__list">
-      <li v-for="friendship in friendships" :key="friendship.created_at" class="friend-name">
-        <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: friendName(friendship)} }">
-          {{ formatedFriend(friendship) }}
-        </router-link>
-      </li>
-    </ul>
+  <div class="list-div">
+    <span class="list-div__title">Friends List</span>
+    <div class="list-div-panel">
+      <ul class="list-div-panel__list">
+        <li
+          v-for="relationship in relationships"
+          :key="relationship.created_at"
+          class="friend-name"
+        >
+          <router-link
+            class="link link--neutral"
+            :to="{
+              name: 'UserProfile',
+              params: { username: friendName(relationship) },
+            }"
+          >
+            {{ formatedFriend(relationship) }}
+          </router-link>
+        </li>
+      </ul>
+    </div>
   </div>
-</div>
 </template>
 
 <script lang="ts">
-  import { defineComponent, inject, ref, computed, onMounted } from "vue";
-  import { useStore } from "vuex";
-  import { useUserApi } from "@/plugins/api.plugin";
-  import { Friendship } from 'sdk/typescript-axios-client-generated';
+import { defineComponent, inject, ref, computed, onMounted } from "vue";
+import { useStore } from "vuex";
+import { useUserApi } from "@/plugins/api.plugin";
+import { Relationship } from "sdk/typescript-axios-client-generated";
 
-  export default defineComponent({
-    name: "FriendsList",
-    setup() {
-      const store = useStore();
-      const user = computed(() => store.state.user);
-      const friendships = ref<Friendship[]>([]);
-      const userApi = useUserApi();
+export default defineComponent({
+  name: "FriendsList",
+  setup() {
+    const store = useStore();
+    const user = computed(() => store.state.user);
+    const relationships = ref<Relationship[]>([]);
+    const userApi = useUserApi();
 
-      onMounted(() => {
-        userApi
-          .getUserFriendships(store.state.user.id)
-          .then((res: any) => {
-            for (const requested of res.data.friendships_requested)
-              if (requested.pending == false)
-                friendships.value.push(requested);
-            for (const adressed of res.data.friendships_adressed)
-              if (adressed.pending == false)
-                friendships.value.push(adressed);
-            console.log(friendships.value);
-            //friendships.value.sort((a, b)=>a.created_at.getTime()-b.created_at.getTime());
-          })
-          .catch((err: any) => console.log(err.message));
-      });
+    onMounted(() => {
+      userApi
+        .getUserRelationships(store.state.user.id)
+        .then((res: any) => {
+          for (const requested of res.data.relationships_requested)
+            if (requested.pending == false) relationships.value.push(requested);
+          for (const adressed of res.data.relationships_adressed)
+            if (adressed.pending == false) relationships.value.push(adressed);
+          console.log(relationships.value);
+          //relationships.value.sort((a, b)=>a.created_at.getTime()-b.created_at.getTime());
+        })
+        .catch((err: any) => console.log(err.message));
+    });
 
-      const formatedFriend = (friendship: Friendship) => {
-        if (store.state.user.username == friendship.requester.username)
-          return friendship.adressee.username;
-        return friendship.requester.username;
-      }
+    const formatedFriend = (relationship: Relationship) => {
+      if (store.state.user.username == relationship.requester.username)
+        return relationship.adressee.username;
+      return relationship.requester.username;
+    };
 
-      const friendName = (friendship: Friendship) => {
-        if (store.state.user.username == friendship.requester.username)
-          return friendship.adressee.username;
-        return friendship.requester.username;
-      }
+    const friendName = (relationship: Relationship) => {
+      if (store.state.user.username == relationship.requester.username)
+        return relationship.adressee.username;
+      return relationship.requester.username;
+    };
 
-      return { friendships, formatedFriend, friendName }
-    }
-  })
+    return { relationships, formatedFriend, friendName };
+  },
+});
 </script>

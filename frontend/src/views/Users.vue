@@ -8,7 +8,7 @@
           :class="[
             'button',
             'button--selector',
-            onlinelist ? 'button--selector--on' : ''
+            onlinelist ? 'button--selector--on' : '',
           ]"
         >
           online
@@ -18,16 +18,27 @@
           :class="[
             'button',
             'button--selector',
-            friendlist ? 'button--selector--on' : ''
+            friendlist ? 'button--selector--on' : '',
           ]"
         >
           friends
+        </button>
+        <button
+          @click="toggleBlocked"
+          :class="[
+            'button',
+            'button--selector',
+            blockedlist ? 'button--selector--on' : '',
+          ]"
+        >
+          blocked
         </button>
       </div>
       <div class="users-list">
         <tr v-for="user in selectList" :key="user.id" class="users-list__elt">
           <td>
-            <img class="users-list__avatar" :src="user.avatar" />
+            <img v-if="isOnline(user)" class="users-list__avatar users-list__avatar--online" :src="user.avatar" />
+            <img v-else class="users-list__avatar users-list__avatar--offline" :src="user.avatar" />
           </td>
           <td>
             <router-link
@@ -61,20 +72,32 @@
 
 <script lang="ts">
 import { defineComponent, inject, onMounted, ref, computed } from "vue";
-import { User } from 'sdk/typescript-axios-client-generated';
+import { User, Relationship } from "sdk/typescript-axios-client-generated";
 import { useStore } from "@/store";
-import { useUserApi } from "@/plugins/api.plugin";
+import { useUserApi, useRelationshipApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
   name: "Users",
   setup() {
     const store = useStore();
     const userList = ref<User[]>([]);
-    const friendList = ref<User[]>([]);
+    const friendList = ref<number[]>([]);
+    const blockedList = ref<number[]>([]);
     const userApi = useUserApi();
+    const relationshipApi = useRelationshipApi();
     const friendlist = ref(false);
     const onlinelist = ref(false);
+    const blockedlist = ref(false);
     const searchQuery = ref("");
+
+    const isOnline = (user: User): boolean => {
+      if (user != undefined) {
+        const isonline = store.state.onlineUsers.find((u) => u.id === user.id);
+        console.log(isonline != undefined);
+        return isonline != undefined;
+      }
+      return false;
+    };
 
     onMounted(() => {
       userApi
@@ -85,17 +108,26 @@ export default defineComponent({
         })
         .catch((err: any) => console.log(err.message));
       if (store.state.user.id != 0) {
-        userApi
+        relationshipApi
           .getUserFriendships(store.state.user.id)
           .then((res: any) => {
-            for (const requested of res.data.friendships_requested)
-              if (requested.pending == false)
-                friendList.value.push(requested.adressee);
-            for (const adressed of res.data.friendships_adressed)
-              if (adressed.pending == false)
-                friendList.value.push(adressed.requester);
-            friendList.value.sort((a, b) =>
-              a.username.localeCompare(b.username)
+            for (const friendship of res.data) {
+              if (friendship.requesterId == store.state.user.id)
+                friendList.value.push(friendship.adresseeId);
+              else friendList.value.push(friendship.requesterId);
+            }
+          })
+          .catch((err: any) => console.log(err.message));
+        relationshipApi
+          .getUserBlocked(store.state.user.id)
+          .then((res: any) => {
+            for (const blocked of res.data) {
+              if (blocked.requesterId == store.state.user.id)
+                blockedList.value.push(blocked.adresseeId);
+            }
+            userList.value = userList.value.filter(
+              (user: User) =>
+                !res.data.find((rs: Relationship) => rs.requesterId === user.id)
             );
           })
           .catch((err: any) => console.log(err.message));
@@ -110,14 +142,26 @@ export default defineComponent({
       onlinelist.value = !onlinelist.value;
     };
 
+    const toggleBlocked = () => {
+      blockedlist.value = !blockedlist.value;
+    };
+
     const selectList = computed(() => {
       const list = ref();
-      if (friendlist.value && onlinelist.value)
-        list.value = friendList.value.filter((user) =>
-          store.state.onlineUsers.find((u: User) => u.id === user.id)
+      if (blockedlist.value) {
+        if (friendlist.value || onlinelist.value) return list.value;
+        list.value = userList.value.filter((user: User) =>
+          blockedList.value.find((id: number) => id === user.id)
         );
-      else if (friendlist.value) list.value = friendList.value;
-      else if (onlinelist.value)
+      } else if (friendlist.value) {
+        list.value = userList.value.filter((user: User) =>
+          friendList.value.find((id: number) => id === user.id)
+        );
+        if (onlinelist.value)
+          list.value = list.value.filter((user: User) =>
+            store.state.onlineUsers.find((u: User) => u.id === user.id)
+          );
+      } else if (onlinelist.value)
         list.value = userList.value.filter((user) =>
           store.state.onlineUsers.find((u: User) => u.id === user.id)
         );
@@ -128,8 +172,13 @@ export default defineComponent({
         );
       }
       list.value = list.value.filter(
-        (entity: User) => entity.username != store.state.user.username
+        (entity: User) => entity.id != store.state.user.id
       );
+      if (!blockedlist.value)
+        list.value = list.value.filter(
+          (user: User) =>
+            !blockedList.value.find((id: number) => id === user.id)
+        );
       return list.value;
     });
 
@@ -137,10 +186,13 @@ export default defineComponent({
       userList,
       toggleFriends,
       toggleOnline,
+      toggleBlocked,
       friendlist,
       onlinelist,
+      blockedlist,
       selectList,
       searchQuery,
+      isOnline,
     };
   },
 });

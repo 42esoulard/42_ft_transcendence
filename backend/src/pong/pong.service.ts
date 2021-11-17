@@ -26,17 +26,17 @@ export class PongService {
     return ongoingGames
   }
 
-  // async getUserbyId(id: number)
-  // {
-  //   return this.userRepo.findOne(id, {
-  //     relations: ['games', 'gameStats']
-  //   })
-  // }
-
   async getGamebyId(gameId: number): Promise<Game> {
     const res = await this.gameRepo.findOne(gameId, {
       relations: ['users'],
     });
     return res;
+  }
+
+  async getUserGameUser(id: number): Promise<GameUser[]> {
+    return await this.gameUserRepo.find({
+      where: [{userId: id}],
+      relations: ['game'],
+    });
   }
 }

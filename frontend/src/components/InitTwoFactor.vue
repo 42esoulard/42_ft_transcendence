@@ -1,8 +1,6 @@
 <template>
   <div class="twofa-grid tac br15">
-    <div @click="closeModal()" class="close-cross">
-      &times;
-    </div>
+    <div @click="closeModal()" class="close-cross">&times;</div>
     <h2 class="twofa-h2">Activate Two-Factor Authentication</h2>
     <div>
       <img
@@ -39,7 +37,11 @@
       <p>{{ key }}</p>
     </div>
     <hr class="twofa-hr" />
-    <OtpInput :authApi="authApi" :codeSendToUrl="codeSendToUrl" @close="closeModal()" />
+    <OtpInput
+      :authApi="authApi"
+      :codeSendToUrl="codeSendToUrl"
+      @close="closeModal()"
+    />
   </div>
 </template>
 
@@ -73,7 +75,7 @@ export default defineComponent({
         .then((res: any) => {
           key.value = res.data.key;
         })
-        .catch(error => console.log(error));
+        .catch((error) => console.log(error));
     };
 
     return {
@@ -81,8 +83,8 @@ export default defineComponent({
       codeSendToUrl,
       closeModal,
       key,
-      authApi
+      authApi,
     };
-  }
+  },
 });
 </script>

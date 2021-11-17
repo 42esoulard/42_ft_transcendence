@@ -12,12 +12,12 @@ import { useRoute } from "vue-router";
 export default {
   props: {
     to: { type: String, requited: true },
-    icon: { type: String, required: true }
+    icon: { type: String, required: true },
   },
   setup(props: any) {
     const route = useRoute();
     const isActive = computed(() => route.path === props.to);
     return { isActive };
-  }
+  },
 };
 </script>

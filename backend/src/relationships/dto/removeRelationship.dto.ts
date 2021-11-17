@@ -2,7 +2,8 @@
 
 import { User } from 'src/users/interfaces/user.interface';
 
-export class RemoveFriendshipDto {
-  readonly user1: User;
-  readonly user2: User;
+export class RemoveRelationshipDto {
+  readonly userId1: number;
+  readonly userId2: number;
+  readonly nature?: string;
 }

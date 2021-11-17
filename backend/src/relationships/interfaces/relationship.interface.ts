@@ -1,9 +1,10 @@
 import { User } from 'src/users/interfaces/user.interface';
 
-export class Friendship {
+export class Relationship {
   id: number;
   pending: boolean;
   created_at: Date;
-  requester: User;
-  adressee: User;
+  requesterId: number;
+  adresseeId: number;
+  nature?: string;
 }

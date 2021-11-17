@@ -1,9 +1,12 @@
 <template>
-  <div class="profile" v-if="user">
+  <div
+    :class="['profile', user.id === self ? 'profile--self' : '']"
+    v-if="user"
+  >
     <div class="profile-left">
       <ProfileLeft :user="user" />
     </div>
-    <div class="profile-right">
+    <div class="profile-stats">
       <Stats :user="user" />
     </div>
   </div>
@@ -11,10 +14,10 @@
 
 <script lang="ts">
 import { defineComponent, inject, ref, computed, onMounted } from "vue";
-import { useStore } from "vuex";
+import { useStore } from "@/store";
 import Stats from "../components/Stats.vue";
 import ProfileLeft from "../components/ProfileLeft.vue";
-import { User } from 'sdk/typescript-axios-client-generated';
+import { User } from "sdk/typescript-axios-client-generated";
 import moment from "moment";
 import { useRoute } from "vue-router";
 import { useUserApi } from "@/plugins/api.plugin";
@@ -25,6 +28,7 @@ export default defineComponent({
   setup() {
     const userApi = useUserApi();
     const route = useRoute();
+    const store = useStore();
     const userRef = ref();
     const username = route.params.username;
 
@@ -41,8 +45,14 @@ export default defineComponent({
       return moment(userRef.value.created_at as Date).format("MM-DD-YYYY");
     });
 
-    return { user: computed(() => userRef.value), formatedDate };
-  }
+    return {
+      user: computed(() => userRef.value),
+      formatedDate,
+      self: computed(() =>
+        store.state.user.id != 0 ? store.state.user.id : 0
+      ),
+    };
+  },
 });
 </script>
 

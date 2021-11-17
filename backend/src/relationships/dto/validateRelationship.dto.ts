@@ -2,7 +2,7 @@
 
 import { User } from 'src/users/interfaces/user.interface';
 
-export class ValidateFriendshipDto {
-  readonly adressee: User;
-  readonly requester: User;
+export class ValidateRelationshipDto {
+  readonly adresseeId: number;
+  readonly requesterId: number;
 }

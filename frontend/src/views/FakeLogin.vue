@@ -18,7 +18,7 @@
 import { defineComponent, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
-import { User } from 'sdk/typescript-axios-client-generated';
+import { User } from "sdk/typescript-axios-client-generated";
 import { useAuthApi, useUserApi } from "@/plugins/api.plugin";
 import { io } from "socket.io-client";
 import { useStore } from "@/store";
@@ -33,7 +33,7 @@ export default defineComponent({
     const authApi = useAuthApi();
     const userApi = useUserApi();
     const users = ref<User[]>([]);
-    const selectedUser = ref('');
+    const selectedUser = ref("");
 
     onMounted(() => {
       userApi
@@ -45,26 +45,37 @@ export default defineComponent({
           }
         })
         .catch((err: any) => console.log(err.message));
+      userApi
+        .getBannedUsers()
+        .then((res: any) => {
+          for (const banned of res.data){
+            users.value.push(banned);
+          }
+          if (users) {
+            selectedUser.value = users.value[0].username;
+          }
+        })
+        .catch((err: any) => console.log("ERR", err.message));
     });
 
     const Fakelogin = async () => {
       // console.log(selectedUser.value);
       await axios
         .post("http://localhost:3000/auth/fake-login", {
-          username: selectedUser.value
+          username: selectedUser.value,
         })
-        .then(async res => {
+        .then(async (res) => {
           await getProfile();
           sendConnection();
-          router.push("account");
+          router.push(`/account`);
         })
-        .catch(error => console.log(error));
+        .catch((error) => console.log(error));
     };
 
     const getProfile = async () => {
       await authApi
         .profile({ withCredentials: true })
-        .then(response => {
+        .then((response) => {
           store.state.user = response.data;
         })
         .catch((err: Error) => {
@@ -82,7 +93,7 @@ export default defineComponent({
     });
 
     return { Fakelogin, users, selectedUser };
-  }
+  },
 });
 </script>
 

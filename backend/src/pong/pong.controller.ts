@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Put, Body, Param, NotFoundException, UseInterceptors, UploadedFile, Res, StreamableFile, UseGuards, BadRequestException, Req, HttpStatus } from '@nestjs/common';
 import { Game } from './entity/games.entity';
+import { GameUser } from './entity/gameUser.entity';
 import { PongService } from './pong.service';
 import { ApiBadRequestResponse, ApiCookieAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
@@ -16,7 +17,13 @@ export class PongController {
 	@Get('onGoingGames')
 	GetOnGoingGames(): Promise<Game[]> {
 		return this.pongService.findonGoing()
-	}	
+	}
+
+  @Get('/user-games/:id')
+	async getUserGameUser(@Param('id') id: number): Promise<GameUser[]> {
+		return await this.pongService.getUserGameUser(id);
+	}
+
 
 
 	/**
