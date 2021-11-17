@@ -71,7 +71,7 @@ export default defineComponent({
         store.dispatch("setMessage", "[" + props.targetCm.member.username + "] is " + props.action + " from channel [" + props.activeChannel.channel.name.substring(0, 16) + "] until " + endDate.value);
         closeModal();
       })
-      .catch((err) => console.log(err)) 
+      .catch((err) => console.log("Caught error:", err.message)) 
     }
 
     const getEndDate = () => {
@@ -91,7 +91,7 @@ export default defineComponent({
         store.dispatch("setMessage", "[" + props.targetCm.member.username + "] has been " + newState + " from channel [" + props.activeChannel.channel.name.substring(0, 16) + "]");
         closeModal();
       })
-      .catch((err) => console.log(err)) 
+      .catch((err) => console.log("Caught error:", err.message)) 
     }
     // const reinitError = () => {
     //   passwordInput.value.setCustomValidity("");

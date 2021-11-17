@@ -181,7 +181,7 @@ export const ChatComponent = defineComponent({
       .then(async (chan) => {
         return await joinChannel(chan.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log("Caught error:", err.message));
     }
     getDefaultChannel();
 
@@ -199,15 +199,15 @@ export const ChatComponent = defineComponent({
           activeChannel.value = res.data;
           console.log(res.data)
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.log("Caught error:", err.message));
         await api.getAvailableChannels(user.value.id)
         .then((res) => {
           availableChannels.value = res.data;
           console.log("avail", availableChannels.value);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.log("Caught error:", err.message));
       })
-      .catch((err) => { console.log("not found")})
+      .catch((err) => { console.log("Caught error:", err.message)});
     }
     updateChannelsList();
 
@@ -226,7 +226,7 @@ export const ChatComponent = defineComponent({
           console.log("in get messages:", channelMessages.value);
           return res;
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.log("Caught error:", err.message));
         }
     }
 
@@ -254,7 +254,7 @@ export const ChatComponent = defineComponent({
         getMessagesUpdate(newContent.channel.id);
         socket.emit("chat-message", newContent);
       })
-      .catch((err: any) => console.log(err.message));
+      .catch((err: any) => console.log("Caught error:", err.message));
     }
 
     /*
@@ -302,7 +302,7 @@ export const ChatComponent = defineComponent({
             store.dispatch("setMessage", "You're now a member of channel [" + channel.name.substring(0, 15) + "]");
           return res;
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.log("Caught error:", err.message));
     }
 
     const deletedChannel = async () => {
@@ -321,7 +321,7 @@ export const ChatComponent = defineComponent({
         updateChannelsList();
         switchChannel(joinedChannels.value[0]);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log("Caught error:", err.message));
     }
 
     // const sendInvite = (channel: Channel, recipient: User) => {
@@ -393,7 +393,7 @@ export const ChatComponent = defineComponent({
       .then(() => {
         switchChannel(cm);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log("Caught error:", err.message));
     })
 
     socket.on('addChannel', (info: Channel) => {

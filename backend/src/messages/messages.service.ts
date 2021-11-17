@@ -9,6 +9,7 @@ import { User } from 'src/users/interfaces/user.interface';
 import { ChannelsService } from 'src/channels/channels.service';
 import { ChannelMembersService } from 'src/channel_members/channel_members.service';
 import { UsersService } from 'src/users/users.service';
+import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
 // import { timestamp } from 'rxjs';
 // import { UpdateMessageDto } from './dto/updateMessage.dto';
 // import * as bcrypt from 'bcrypt';
@@ -61,6 +62,10 @@ export class MessagesService {
     );
     newMessage.author = await this.userService.getUserbyId(
       messageDto.author_id,
+    );
+    const cm: ChannelMember = await this.channelMemberService.getChannelMember(
+      newMessage.channel,
+      newMessage.author,
     );
 
     return await this.messagesRepository.save(newMessage);

@@ -56,7 +56,7 @@ export default defineComponent({
           return ;
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log("Caught error:", err.message));
     }
 
     return {

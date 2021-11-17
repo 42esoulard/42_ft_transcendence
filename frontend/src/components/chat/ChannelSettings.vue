@@ -217,7 +217,7 @@ export default defineComponent({
           closeChannelSettings();
         }
       })
-      .catch((err) => console.log(err))
+      .catch((err) => console.log("Caught error:", err.message))
     }
 
     const deleteChannel = async () => {
@@ -227,6 +227,7 @@ export default defineComponent({
         context.emit('deleted-channel');
         closeChannelSettings();
       })
+      .catch((err) => console.log("Caught error:", err.message))
     }
 
     
@@ -305,7 +306,7 @@ export default defineComponent({
         context.emit('update-channels-list');
         closeChannelSettings();
       })
-      .catch((err) => console.log("Failed to update channel: ", err))
+      .catch((err) => console.log("Caught error:", err.message))
     }
 
     return {

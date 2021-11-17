@@ -62,7 +62,7 @@ export class ChannelMembersService {
   }
 
   async toggleAdmin(cm_id: number): Promise<ChannelMembers> {
-    await this.getChannelMemberById(cm_id).then((res) => {
+    return await this.getChannelMemberById(cm_id).then((res) => {
       if (res) {
         res.is_admin = !res.is_admin;
         res.mute = '';
@@ -70,7 +70,6 @@ export class ChannelMembersService {
         return this.channelMembersRepository.save(res);
       }
     });
-    return undefined;
   }
 
   async muteBanMember(
@@ -78,7 +77,7 @@ export class ChannelMembersService {
     cm_id: number,
     end_date: number,
   ): Promise<ChannelMembers> {
-    await this.getChannelMemberById(cm_id).then(async (res) => {
+    return await this.getChannelMemberById(cm_id).then(async (res) => {
       switch (action) {
         case 'unmute':
           res.mute = null;
@@ -95,7 +94,6 @@ export class ChannelMembersService {
       }
       return await this.channelMembersRepository.save(res);
     });
-    return undefined;
   }
 
   // /**

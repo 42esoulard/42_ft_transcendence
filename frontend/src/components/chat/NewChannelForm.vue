@@ -126,7 +126,7 @@ export default defineComponent({
         console.log("in createChannel res", res)
         socket.emit('createChannel', res.data)
       })
-      .catch((err) => console.log("Failed to create channel: ", err))
+      .catch((err) => console.log("Caught error:", err.message))
     }
 
     return {
