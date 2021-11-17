@@ -31,10 +31,10 @@ export class ChannelMembers {
   @Column({ default: false })
   is_admin: boolean;
 
-  @Column({ length: 11, nullable: true, default: null })
+  @Column({ length: 15, nullable: true, default: null })
   ban: string;
 
-  @Column({ length: 11, nullable: true, default: null })
+  @Column({ length: 15, nullable: true, default: null })
   mute: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })

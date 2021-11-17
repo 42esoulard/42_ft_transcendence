@@ -117,6 +117,11 @@
             <LockedChannelForm :channel="activeChannel.channel" @close="toggleModal(1)" @join-channel="joinChannel" />
           </template>
         </Modal>
+        <Modal v-if="isMuted && activeChannel" @close="toggleModal(3)">
+          <template v-slot:mute-ban-popup>
+            <MuteBanPopup :cm="activeChannel" @close="toggleModal(3)" />
+          </template>
+        </Modal>
       </transition-group>
     </teleport>
 </template>
@@ -134,6 +139,7 @@ import NewChannelForm from "@/components/chat/NewChannelForm.vue";
 import LockedChannelForm from "@/components/chat/LockedChannelForm.vue";
 import ChannelSettings from "@/components/chat/ChannelSettings.vue";
 import ChannelsList from "@/components/chat/ChannelsList.vue";
+import MuteBanPopup from "@/components/chat/MuteBanPopup.vue";
 
 /*
 ** socket is defined here to be able to import it from other chat related components
@@ -142,7 +148,7 @@ export const socket = io("http://localhost:3000/chat");
 
 export const ChatComponent = defineComponent({
   name: "ChatComponent",
-  components: { NewChannelForm, LockedChannelForm, ChannelSettings, ChannelsList, Modal, Toast },
+  components: { NewChannelForm, LockedChannelForm, ChannelSettings, ChannelsList, MuteBanPopup, Modal, Toast },
 
   beforePageLeave() {
     this.socket.emit("leave", 'a user');
@@ -172,6 +178,7 @@ export const ChatComponent = defineComponent({
     const passwordPrompt = ref(false);
     const channelSettings = ref(false);
     const isMember = ref(false);
+    const isMuted = ref(false);
 
     /*
     ** Default channel = id 1, "General". Automatically joined on connection, can't be left.
@@ -179,9 +186,10 @@ export const ChatComponent = defineComponent({
     const getDefaultChannel = async () => {
       await api.getChannelById(1)
       .then(async (chan) => {
-        return await joinChannel(chan.data);
+        await joinChannel(chan.data)
+        .then(() => updateChannelsList())
       })
-      .catch((err) => console.log("Caught error:", err.message));
+      .catch((err) => console.log("Caught error:", err.response.data.message));
     }
     getDefaultChannel();
 
@@ -199,17 +207,16 @@ export const ChatComponent = defineComponent({
           activeChannel.value = res.data;
           console.log(res.data)
         })
-        .catch((err) => console.log("Caught error:", err.message));
+        .catch((err) => console.log("Caught error:", err.response.data.message));
         await api.getAvailableChannels(user.value.id)
         .then((res) => {
           availableChannels.value = res.data;
           console.log("avail", availableChannels.value);
         })
-        .catch((err) => console.log("Caught error:", err.message));
+        .catch((err) => console.log("Caught error:", err.response.data.message));
       })
-      .catch((err) => { console.log("Caught error:", err.message)});
+      .catch((err) => console.log("Caught error:", err.response.data.message));
     }
-    updateChannelsList();
 
     /*
     ** When the currently viewed channel gets a new message (either sent or received).
@@ -226,7 +233,7 @@ export const ChatComponent = defineComponent({
           console.log("in get messages:", channelMessages.value);
           return res;
         })
-        .catch((err) => console.log("Caught error:", err.message));
+        .catch((err) => console.log("Caught error:", err.response.data.message));
         }
     }
 
@@ -254,7 +261,12 @@ export const ChatComponent = defineComponent({
         getMessagesUpdate(newContent.channel.id);
         socket.emit("chat-message", newContent);
       })
-      .catch((err: any) => console.log("Caught error:", err.message));
+      .catch((err: any) => {
+        console.log("Caught error:", err.response.data.message)
+        if (err.response.data.message == 'muted') {
+          isMuted.value = true;
+        }
+      });
     }
 
     /*
@@ -302,7 +314,7 @@ export const ChatComponent = defineComponent({
             store.dispatch("setMessage", "You're now a member of channel [" + channel.name.substring(0, 15) + "]");
           return res;
         })
-        .catch((err) => console.log("Caught error:", err.message));
+        .catch((err) => console.log("Caught error:", err.response.data.message));
     }
 
     const deletedChannel = async () => {
@@ -321,7 +333,7 @@ export const ChatComponent = defineComponent({
         updateChannelsList();
         switchChannel(joinedChannels.value[0]);
       })
-      .catch((err) => console.log("Caught error:", err.message));
+      .catch((err) => console.log("Caught error:", err.response.data.message));
     }
 
     // const sendInvite = (channel: Channel, recipient: User) => {
@@ -352,6 +364,9 @@ export const ChatComponent = defineComponent({
           break;
         case 2:
           channelSettings.value = !channelSettings.value;
+          break;
+        case 3:
+          isMuted.value = !isMuted.value;
           break;
       }
       console.log("channelSettings", channelSettings)
@@ -393,7 +408,7 @@ export const ChatComponent = defineComponent({
       .then(() => {
         switchChannel(cm);
       })
-      .catch((err) => console.log("Caught error:", err.message));
+      .catch((err) => console.log("Caught error:", err.response.data.message));
     })
 
     socket.on('addChannel', (info: Channel) => {
@@ -463,6 +478,7 @@ export const ChatComponent = defineComponent({
       joinChannel,
       leaveChannel,
       isMember,
+      isMuted,
 
       newChannelForm,
       passwordPrompt,

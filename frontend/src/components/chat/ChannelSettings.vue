@@ -217,7 +217,7 @@ export default defineComponent({
           closeChannelSettings();
         }
       })
-      .catch((err) => console.log("Caught error:", err.message))
+      .catch((err) => console.log("Caught error:", err.response.data.message))
     }
 
     const deleteChannel = async () => {
@@ -227,7 +227,7 @@ export default defineComponent({
         context.emit('deleted-channel');
         closeChannelSettings();
       })
-      .catch((err) => console.log("Caught error:", err.message))
+      .catch((err) => console.log("Caught error:", err.response.data.message))
     }
 
     
@@ -306,7 +306,7 @@ export default defineComponent({
         context.emit('update-channels-list');
         closeChannelSettings();
       })
-      .catch((err) => console.log("Caught error:", err.message))
+      .catch((err) => console.log("Caught error:", err.response.data.message))
     }
 
     return {

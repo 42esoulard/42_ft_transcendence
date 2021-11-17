@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Message } from './interfaces/message.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -63,10 +63,16 @@ export class MessagesService {
     newMessage.author = await this.userService.getUserbyId(
       messageDto.author_id,
     );
-    const cm: ChannelMember = await this.channelMemberService.getChannelMember(
-      newMessage.channel,
-      newMessage.author,
-    );
+    await this.channelMemberService
+      .getChannelMember(newMessage.channel, newMessage.author)
+      .then((res) => {
+        if (this.channelMemberService.checkMute(res)) {
+          throw new ForbiddenException('muted');
+        }
+        if (res.ban) {
+          throw new ForbiddenException('banned');
+        }
+      });
 
     return await this.messagesRepository.save(newMessage);
   }

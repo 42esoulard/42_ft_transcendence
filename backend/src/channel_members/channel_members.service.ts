@@ -96,6 +96,16 @@ export class ChannelMembersService {
     });
   }
 
+  checkMute(cm: ChannelMembers): boolean {
+    if (cm.mute && Number(cm.mute) - Date.now() <= 0) {
+      cm.mute = null;
+      this.channelMembersRepository.save(cm);
+    }
+    if (!cm.mute) {
+      return false;
+    }
+    return true;
+  }
   // /**
   //  * Lists all channelmembers in database
   //  * nb: find() is a function from the typeORM library

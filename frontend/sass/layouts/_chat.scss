@@ -251,6 +251,10 @@
   margin-left: $channel-form-margin;
   border-radius: $channel-form-border-radius;
   font-family: $chat-main-font;
+  &--popup {
+    width: 10rem;
+    text-align: center;
+  }
 }
 
 .chat-channel-form__title {
