@@ -1,23 +1,27 @@
 <template>
+	
 	<h1 class="header__title"> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
+	
 	<canvas ref="canvas"> </canvas>
 
-	<div class="header__title" v-if="!gameHasStarted && gameMode=='transcendence' && userType==='player' ">
-		<h1> Press space for some transcendence magic ! </h1>
+	<div class="header__title" v-if="!gameHasStarted && userType==='player' ">
+		<div v-if="gameMode=='transcendence' ">
+			<h1> Press space for some transcendence magic ! </h1>
+		</div>
+		<div v-if="gameMode=='classic' ">
+			<h1> Get ready, game is about to start ! </h1>
+		</div>
 	</div>
-	
-	<div class="header__title" v-if="!gameHasStarted && gameMode=='classic' && userType==='player' ">
-		<h1> Get ready, game is about to start ! </h1>
-	</div>
-	
 
 	<div class="header__title" v-if="gameIsOver">
 		<h1> {{ winningPlayer }} won ! </h1>
 	</div>
+
 	<p v-if="!gameIsOver && userType==='player'">
 		<button class="button" v-on:click="SendMoveMsg('up')"> Up </button>
 		<button class="button" v-on:click="SendMoveMsg('down')"> Down </button>
 	</p>
+
 </template>
 
 <script lang="ts">
@@ -57,11 +61,12 @@ export default defineComponent({
 
 		onBeforeRouteLeave(() => {
 			if (props.userType === 'player')
+			{
 				socket.value.emit('leaveGame', props.room)
+				window.removeEventListener("keydown", onKeyDown)
+			}
 			socket.value.off('position')
 			window.removeEventListener("resize", onResize)
-			if (props.userType === 'player')
-				window.removeEventListener("keydown", onKeyDown)
 		})
 
 
