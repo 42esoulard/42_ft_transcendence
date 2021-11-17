@@ -117,11 +117,6 @@
             <LockedChannelForm :channel="activeChannel.channel" @close="toggleModal(1)" @join-channel="joinChannel" />
           </template>
         </Modal>
-        <!-- <Modal v-if="settingsModal && activeChannel" @close="toggleModal(2)">
-          <template v-slot:settings-modal>
-            <SettingsModal :channelMembers="activeChannel.channel.channel_members" @close="toggleModal(2)" />
-          </template>
-        </Modal> -->
       </transition-group>
     </teleport>
 </template>
@@ -158,11 +153,11 @@ export const ChatComponent = defineComponent({
   setup() {
 
     const api = new ChatApi();
-    const userApi = useUserApi();
+    // const userApi = useUserApi();
     const store = useStore();
     const user = computed(() => store.state.user);
-    const firstTimeConnect = computed(() => store.state.firstTimeConnect);
-    const connections = ref(1);
+    // const firstTimeConnect = computed(() => store.state.firstTimeConnect);
+    // const connections = ref(1);
 
     const newMessage = ref("");
     const messageId = ref(0);
@@ -376,7 +371,7 @@ export const ChatComponent = defineComponent({
     }
 
     socket.on("chat-message", (data: any) => {
-      console.log("RECEIVED CHAT MESSAGE, data:", data)
+      console.log("0RECEIVED CHAT MESSAGE, data:", data)
       if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
         channelMessages.value.push(data);
         console.log("in get messages:", channelMessages.value);
@@ -430,9 +425,9 @@ export const ChatComponent = defineComponent({
       }, 5000);
     });
 
-    socket.on("connections", (data: number) => {
-      connections.value = data;
-    });
+    // socket.on("connections", (data: number) => {
+    //   connections.value = data;
+    // });
 
     watch(newMessage, (newMessage) => {
       newMessage
@@ -455,7 +450,7 @@ export const ChatComponent = defineComponent({
 
       user,
       info,
-      connections,
+      // connections,
 
       updateChannelsList,
       joinedChannels,

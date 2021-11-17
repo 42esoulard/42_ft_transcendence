@@ -97,7 +97,11 @@ export class ChannelsService {
             .includes(channels.id),
       );
       channels = channels.filter((channels) => channels.type === 'public');
-
+      channels.forEach((channel) => {
+        if (channel.password) {
+          channel.messages = [];
+        }
+      });
       return await channels;
     });
   }
