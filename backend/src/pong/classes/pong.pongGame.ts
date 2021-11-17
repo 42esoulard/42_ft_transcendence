@@ -127,7 +127,7 @@ export class pongGame {
   async addSpectator(client: Socket)
   {
     client.join(this.room)
-    client.emit('GoToGame', this.room, this.player1.userName, this.player2.userName)
+    client.emit('GoToGame', this.room, this.player1.userName, this.player2.userName, this.gameMode)
     // update score for spectator if score is not 0-0 (else spectator will need to wait for next score)
     if (this.player1.score || this.player2.score)
       client.emit('score', this.getPlayerScores())

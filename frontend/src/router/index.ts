@@ -112,6 +112,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/pong/watch/live',
     name: 'PongGameWatch',
     component: PongGameWatch,
+    props: true,
     beforeEnter(to, from, next) {
       if (to.params.authorized)
       {

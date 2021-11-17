@@ -1,5 +1,4 @@
 <template>
-	<p> Watching Game # {{ room }} </p>
 	<h1 class="header__title"> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
 	<canvas ref="canvas"> </canvas>
 
@@ -10,22 +9,25 @@
 
 <script lang="ts">
 import { clientSocket } from '@/App.vue'
-import { defineComponent, onMounted, onUnmounted, ref } from 'vue'
-import { onBeforeRouteLeave, useRoute } from 'vue-router'
+import { defineComponent, onMounted, PropType, ref } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 import getDraw from '@/composables/draw'
-import { Coordinates, PlayerPositions, PlayerScores } from '@/types/PongGame'
+import { Coordinates, gameMode, PlayerPositions, PlayerScores } from '@/types/PongGame'
 
 export default defineComponent({
-	props: ['gameMode'],
-
+	props: {
+		gameMode: {type: String as () => gameMode, required: true},
+		// ou {type: String as PropType<gameMode>}
+		// cf https://frontendsociety.com/using-a-typescript-interfaces-and-types-as-a-prop-type-in-vuejs-508ab3f83480
+		player1UserName: {type: String, required: true},
+		player2UserName: {type: String, required: true},
+		room: {type: String, required: true}
+	},
+	inheritAttrs: false, // we dont need it, and not setting it to false a warning: "extraneous non prop attributes (authorized) were passed to component but could not be automatically inherited..."
+	
 	setup(props) {
-		
-		const route = useRoute()
-		const room =  ref(route.params.id)
-		const player1UserName = ref(route.params.player1UserName)
-		const player2UserName = ref(route.params.player2UserName)
-
-		const { context, canvas, ballPosition, playerPositions, score, windowWidth,
+	
+		const { context, canvas, ballPosition, playerPositions, racquetLenghtRatio, score, windowWidth, player1EnlargeRemaining, player2EnlargeRemaining, 
 			onResize, initCanvas, draw } = getDraw(props.gameMode)
 
 		// lifecycle hooks
@@ -43,10 +45,6 @@ export default defineComponent({
 			console.log('leaving')
 		})
 
-		onUnmounted(() => {
-			console.log('unmounted')
-		})
-
 
 		// socket event listeners
 		const socket = ref(clientSocket)
@@ -58,26 +56,55 @@ export default defineComponent({
 			draw()
 		})
 	
-		socket.value.on("score", (new_score: PlayerScores) => {
-			score.value = new_score
+		socket.value.on("score", (newScore: PlayerScores) => {
+			score.value = newScore
 			draw()
 		})
+
+		socket.value.on('enlarge', (playerToEnlargeNumber: number) => {
+			if (playerToEnlargeNumber === 1)
+			{
+				racquetLenghtRatio.value.player1 /= 2
+				player1EnlargeRemaining.value--
+			}
+			else
+			{
+				racquetLenghtRatio.value.player2 /= 2
+				player2EnlargeRemaining.value--
+			}
+		})
 		
-		const winningPlayer = ref<string | string[]>('')
+		socket.value.on('enlargeEnd', (playerToEnlargeNumber: number) => {
+			if (playerToEnlargeNumber === 1)
+				racquetLenghtRatio.value.player1 *= 2
+			else
+				racquetLenghtRatio.value.player2 *= 2
+		})
+		
+		const gameHasStarted = ref(false)
+		socket.value.on("gameStarting", () => {
+			gameHasStarted.value = true
+		})
+		
+		const winningPlayer = ref<string>('')
 		const gameIsOver = ref(false)
 		socket.value.on("gameOver", (player1Won: boolean) => {
+			gameHasStarted.value = true
 			gameIsOver.value = true
 			if (player1Won)
-				winningPlayer.value = player1UserName.value
+				winningPlayer.value = props.player1UserName
 			else
-				winningPlayer.value = player2UserName.value
+				winningPlayer.value = props.player2UserName
 		})
 		
 
-
-		return { score, room, player1UserName, player2UserName, gameIsOver, winningPlayer, canvas }
+		return { score, gameHasStarted, gameIsOver, winningPlayer, canvas }
 
 	},
 
 })
 </script>
+
+<style lang="scss">
+@import "../../../sass/main.scss";
+</style>
