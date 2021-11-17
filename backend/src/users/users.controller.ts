@@ -61,9 +61,8 @@ export class UsersController {
     return users;
   }
 
-  @Delete()
-  async removeUser(@Body() id: number) {
-    console.log("HERE");
+  @Get('delete/:id')
+  async removeUser(@Param('id') id: number) {
     return await this.userService.removeUser(id);
   }
 

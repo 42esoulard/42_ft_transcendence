@@ -186,11 +186,13 @@ export default defineComponent({
 
     const deleteAccount = async() => {
       if (store.state.user.id != 0) {
-        logOut();
-        await userApi
-          .removeUser(store.state.user.id)
-          .then((res: any) => console.log("account deleted"))
-          .catch((err: any) => console.log(err));
+        if(confirm("Do you really want to delete?")){
+          logOut();
+          await userApi
+            .removeUser(store.state.user.id)
+            .then((res: any) => console.log("account deleted"))
+            .catch((err: any) => console.log(err));
+        }
       }
     };
 

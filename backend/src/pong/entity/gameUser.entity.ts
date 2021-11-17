@@ -13,6 +13,7 @@ export class GameUser {
 	userId: number
 
 	@ManyToOne(() => Users, user => user.games, {
+    onDelete: 'CASCADE',
     eager: true,
   })
 	@JoinColumn(({name: 'userId'}))
