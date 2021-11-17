@@ -1,5 +1,5 @@
 <template>
-	<p> Game # {{ id }} </p>
+	<p> Game # {{ room }} </p>
 	<p> Mode: {{ gameMode }} </p>
 	<h1 class="header__title"> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
 	<canvas ref="canvas"> </canvas>
@@ -36,14 +36,12 @@ export default defineComponent({
 		// cf https://frontendsociety.com/using-a-typescript-interfaces-and-types-as-a-prop-type-in-vuejs-508ab3f83480
 		player1UserName: {type: String, required: true},
 		player2UserName: {type: String, required: true},
-		id: {type: String, required: true}
+		room: {type: String, required: true}
 	},
 	inheritAttrs: false, // we dont need it, and not setting it to false a warning: "extraneous non prop attributes (authorized) were passed to component but could not be automatically inherited..."
 	
 	setup(props) {
 	
-		const room =  ref(props.id)
-
 		const { context, canvas, ballPosition, playerPositions, racquetLenghtRatio, score, windowWidth, player1EnlargeRemaining, player2EnlargeRemaining, 
 			onResize, initCanvas, draw } = getDraw(props.gameMode)
 
@@ -58,7 +56,7 @@ export default defineComponent({
 		})
 
 		onBeforeRouteLeave(() => {
-			socket.value.emit('leaveGame', room.value)
+			socket.value.emit('leaveGame', props.room)
 			socket.value.off('position')
 			window.removeEventListener("resize", onResize)
 			window.removeEventListener("keydown", onKeyDown)
@@ -122,12 +120,12 @@ export default defineComponent({
 		// socket emit
 		const SendMoveMsg = (direction: string) => {
 			if (gameHasStarted.value)
-				socket.value.emit('moveRacquet', {room: room.value, text: direction})
+				socket.value.emit('moveRacquet', {room: props.room, text: direction})
 		}
 		
 		const EnlargeRacquet = () => {
 			if (gameHasStarted.value)
-				socket.value.emit('enlargeRacquet', room.value)
+				socket.value.emit('enlargeRacquet', props.room)
 		}
 		
 		const onKeyDown = (event: KeyboardEvent) => {
