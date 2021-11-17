@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Channel } from './interfaces/channel.interface';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { Channels } from './entity/channels.entity';
 import { CreateChannelDto } from './dto/createChannel.dto';
 import { UsersService } from '../users/users.module';
@@ -25,7 +25,6 @@ export class ChannelsService {
     return await this.channelsRepository.save({
       id: 1,
       name: 'General',
-      owner: null,
       password: null,
       type: 'public',
     });
@@ -62,11 +61,11 @@ export class ChannelsService {
     return await this.channelMemberService.getChannelMember(channel, user);
   }
 
-  async getChannelMembers(channel_id: number): Promise<ChannelMember> {
-    const channel: Channels = await this.getChannelById(channel_id);
+  // async getChannelMembers(channel_id: number): Promise<ChannelMember> {
+  //   const channel: Channels = await this.getChannelById(channel_id);
 
-    return await this.channelMemberService.getChannelMembers(channel);
-  }
+  //   return await this.channelMemberService.getChannelMembers(channel);
+  // }
 
   // async getChannelMutedMembers(channel_id: number): Promise<ChannelMember> {
   //   const channel: Channels = await this.getChannelById(channel_id);
@@ -89,21 +88,18 @@ export class ChannelsService {
 
   async getAvailableChannels(user_id: number): Promise<Channel[]> {
     let channels = await this.getChannels();
-    await this.getUserChannels(user_id)
-      .then(async (res) => {
-        const userChannels = res.map((cm) => cm.channel);
-        channels = channels.filter(
-          (channels) =>
-            !userChannels
-              .map((userChannels) => userChannels.id)
-              .includes(channels.id),
-        );
-        channels = channels.filter((channels) => channels.type === 'public');
+    return await this.getUserChannels(user_id).then(async (res) => {
+      const userChannels = res.map((cm) => cm.channel);
+      channels = channels.filter(
+        (channels) =>
+          !userChannels
+            .map((userChannels) => userChannels.id)
+            .includes(channels.id),
+      );
+      channels = channels.filter((channels) => channels.type === 'public');
 
-        return await channels;
-      })
-      .catch((err) => console.log(err));
-    return await channels;
+      return await channels;
+    });
   }
 
   /**
@@ -122,7 +118,6 @@ export class ChannelsService {
     attempt: string,
   ): Promise<boolean> {
     const channel: Channels = await this.getChannelById(channel_id);
-    console.log(attempt);
     const ret = await bcrypt.compare(attempt, channel.password);
     return await ret;
   }
@@ -142,12 +137,12 @@ export class ChannelsService {
     return await this.channelMemberService.createChannelMember(channel, user);
   }
 
-  async leaveChannel(cm_id: number) {
-    await this.channelMemberService.deleteChannelMember(cm_id);
+  async leaveChannel(cm_id: number): Promise<DeleteResult> {
+    return await this.channelMemberService.deleteChannelMember(cm_id);
   }
 
-  async deleteChannel(chan_id: number) {
-    await this.channelsRepository.delete(chan_id);
+  async deleteChannel(chan_id: number): Promise<DeleteResult> {
+    return await this.channelsRepository.delete(chan_id);
   }
 
   /**
@@ -155,28 +150,28 @@ export class ChannelsService {
    * nb: save(channel) is a function from the typeORM library
    */
   async saveChannel(channelDto: CreateChannelDto): Promise<ChannelMember> {
-    console.log('IN SAVE CHANNEL', channelDto);
     const newChannel = this.channelsRepository.create(channelDto);
-    newChannel.owner = await this.userService.getUserbyId(channelDto.owner_id);
+    const owner = await this.userService.getUserbyId(channelDto.owner_id);
 
     if (newChannel.password) {
-      (newChannel.salt = await bcrypt.genSalt()),
-        (newChannel.password = await bcrypt.hash(
-          channelDto.password,
-          newChannel.salt,
-        )); //must be crypted
+      const salt = await bcrypt.genSalt();
+      newChannel.password = await bcrypt.hash(channelDto.password, salt); //must be crypted
     }
 
     await this.channelsRepository.save(newChannel);
     return await this.channelMemberService.createChannelMember(
       newChannel,
-      newChannel.owner,
+      owner,
       true,
       true,
     );
   }
 
-  async muteBanMember(action: string, cm_id: number, end_date: number) {
+  async muteBanMember(
+    action: string,
+    cm_id: number,
+    end_date: number,
+  ): Promise<ChannelMember> {
     return await this.channelMemberService.muteBanMember(
       action,
       cm_id,
@@ -184,16 +179,16 @@ export class ChannelsService {
     );
   }
 
-  async toggleAdmin(cm_id: number) {
+  async toggleAdmin(cm_id: number): Promise<ChannelMember> {
     return await this.channelMemberService.toggleAdmin(cm_id);
   }
 
-  async updateChannelPassword(chan_id: number, pwd: string) {
+  async updateChannelPassword(chan_id: number, pwd: string): Promise<Channel> {
     const channel = await this.getChannelById(chan_id);
 
     if (pwd != 'null') {
-      channel.salt = await bcrypt.genSalt();
-      channel.password = await bcrypt.hash(pwd, channel.salt); //must be crypted
+      const salt = await bcrypt.genSalt();
+      channel.password = await bcrypt.hash(pwd, salt); //must be crypted
     } else {
       channel.password = '';
     }

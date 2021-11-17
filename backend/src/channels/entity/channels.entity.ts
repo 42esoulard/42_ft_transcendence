@@ -23,14 +23,8 @@ export class Channels {
   @Column()
   type: string;
 
-  @Column({ nullable: true })
-  salt: string;
-
   @Column({ type: 'varchar', length: 255, nullable: true })
   password: string;
-
-  @ManyToOne(() => Users, { onDelete: 'SET NULL' })
-  owner: Users;
 
   @OneToMany(() => ChannelMembers, (cm) => cm.channel, {
     cascade: true,

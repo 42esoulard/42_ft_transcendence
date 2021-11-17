@@ -26,36 +26,36 @@ export class MessagesController {
   /**
    * Lists all messages in database.
    */
-  @Get()
-  async getMessages(): Promise<Message[]> {
-    const messages: Message[] = await this.messageService.getMessages();
-    if (messages == undefined) {
-      throw new NotFoundException('No messages in database');
-    }
-    return messages;
-  }
+  // @Get()
+  // async getMessages(): Promise<Message[]> {
+  //   const messages: Message[] = await this.messageService.getMessages();
+  //   if (messages == undefined) {
+  //     throw new NotFoundException('No messages in database');
+  //   }
+  //   return messages;
+  // }
 
   /**
    * Returns a message found in database by its id.
    */
-  @Get(':id')
-  @ApiOkResponse({
-    description: 'The message has been found in database',
-    type: Message,
-  })
-  @ApiNotFoundResponse({
-    description: 'Message not found',
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid ID supplied',
-  })
-  async getMessageById(@Param('id') id: number): Promise<Message> {
-    const message: Message = await this.messageService.getMessageById(id);
-    if (message == undefined) {
-      throw new NotFoundException('Message not found');
-    }
-    return message;
-  }
+  // @Get(':id')
+  // @ApiOkResponse({
+  //   description: 'The message has been found in database',
+  //   type: Message,
+  // })
+  // @ApiNotFoundResponse({
+  //   description: 'Message not found',
+  // })
+  // @ApiBadRequestResponse({
+  //   description: 'Invalid ID supplied',
+  // })
+  // async getMessageById(@Param('id') id: number): Promise<Message> {
+  //   const message: Message = await this.messageService.getMessageById(id);
+  //   if (message == undefined) {
+  //     throw new NotFoundException('Message not found');
+  //   }
+  //   return message;
+  // }
 
   /**
    * Returns a message found in database by its id.
@@ -88,7 +88,11 @@ export class MessagesController {
    */
   @Post()
   async saveMessage(@Body() newMessage: CreateMessageDto): Promise<Message> {
-    return await this.messageService.saveMessage(newMessage);
+    const msg: Message = await this.messageService.saveMessage(newMessage);
+    if (msg == undefined) {
+      throw new NotFoundException('Failed to save message');
+    }
+    return msg;
   }
 
   // @Post()

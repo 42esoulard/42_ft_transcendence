@@ -7,6 +7,7 @@ import { CreateMessageDto } from './dto/createMessage.dto';
 import { Channel } from 'src/channels/interfaces/channel.interface';
 import { User } from 'src/users/interfaces/user.interface';
 import { ChannelsService } from 'src/channels/channels.service';
+import { ChannelMembersService } from 'src/channel_members/channel_members.service';
 import { UsersService } from 'src/users/users.service';
 // import { timestamp } from 'rxjs';
 // import { UpdateMessageDto } from './dto/updateMessage.dto';
@@ -18,6 +19,7 @@ export class MessagesService {
     @InjectRepository(Messages)
     private readonly messagesRepository: Repository<Messages>,
     private readonly channelService: ChannelsService,
+    private readonly channelMemberService: ChannelMembersService,
     private readonly userService: UsersService,
   ) {}
 

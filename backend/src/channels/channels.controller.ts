@@ -17,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
 import { ChannelMembersService } from 'src/channel_members/channel_members.service';
+import { DeleteResult } from 'typeorm';
 // import { UpdateChannelDto } from './dto/updateChannel.dto';
 
 @ApiTags('Chat')
@@ -54,7 +55,11 @@ export class ChannelsController {
     const channel: Channel = await this.channelService.getChannelById(id);
     if (channel == undefined) {
       if (id == 1) {
-        return await this.channelService.seed();
+        const generalChan: Channel = await this.channelService.seed();
+        if (generalChan == undefined) {
+          throw new NotFoundException("Couldn't initialize general channel");
+        }
+        return generalChan;
       }
       throw new NotFoundException('Channel not found');
     }
@@ -90,7 +95,13 @@ export class ChannelsController {
   async saveChannel(
     @Body() newChannel: CreateChannelDto,
   ): Promise<ChannelMember> {
-    return await this.channelService.saveChannel(newChannel);
+    const owner: ChannelMember = await this.channelService.saveChannel(
+      newChannel,
+    );
+    if (owner == undefined) {
+      throw new NotFoundException('Failed to create channel');
+    }
+    return owner;
   }
 
   @Get('/join-channel/:channel/:user')
@@ -98,7 +109,14 @@ export class ChannelsController {
     @Param('channel') channel_id: number,
     @Param('user') user_id: number,
   ): Promise<ChannelMember> {
-    return await this.channelService.joinChannel(channel_id, user_id);
+    const cm: ChannelMember = await this.channelService.joinChannel(
+      channel_id,
+      user_id,
+    );
+    if (cm == undefined) {
+      throw new NotFoundException('Failed to join channel');
+    }
+    return cm;
   }
 
   @Get('/join-protected/:channel/:attempt')
@@ -106,21 +124,35 @@ export class ChannelsController {
     @Param('channel') channel_id: number,
     @Param('attempt') attempt: string,
   ): Promise<boolean> {
-    console.log('in controller attempt', attempt);
-    console.log(
-      await this.channelService.checkPasswordMatch(channel_id, attempt),
+    const match: boolean = await this.channelService.checkPasswordMatch(
+      channel_id,
+      attempt,
     );
-    return await this.channelService.checkPasswordMatch(channel_id, attempt);
+    if (match == undefined) {
+      throw new NotFoundException("Couldn't attempt to match password");
+    }
+    return match;
   }
 
   @Get('/user/:id')
   async getUserChannels(@Param('id') id: number): Promise<ChannelMember[]> {
-    return await this.channelService.getUserChannels(id);
+    const cm: ChannelMember[] = await this.channelService.getUserChannels(id);
+    if (cm == undefined) {
+      throw new NotFoundException('No user channels found');
+    }
+    return cm;
   }
 
   @Get('/avail/:id')
   async getAvailableChannels(@Param('id') id: number): Promise<Channel[]> {
-    return await this.channelService.getAvailableChannels(id);
+    const channels: Channel[] = await this.channelService.getAvailableChannels(
+      id,
+    );
+    console.log("HEREEEEE", channels)
+    if (channels == undefined) {
+      throw new NotFoundException('No available channels found');
+    }
+    return channels;
   }
 
   @Get('/channel-member/:channel/:user')
@@ -128,17 +160,34 @@ export class ChannelsController {
     @Param('channel') channel_id: number,
     @Param('user') user_id: number,
   ): Promise<ChannelMember> {
-    return await this.channelService.getChannelMember(channel_id, user_id);
+    const cm: ChannelMember = await this.channelService.getChannelMember(
+      channel_id,
+      user_id,
+    );
+    if (cm == undefined) {
+      throw new NotFoundException('Channel Member not found');
+    }
+    return cm;
   }
 
   @Post('/leave-channel/:cm_id')
-  async leaveChannel(@Param('cm_id') cm_id: number) {
-    await this.channelService.leaveChannel(cm_id);
+  async leaveChannel(@Param('cm_id') cm_id: number): Promise<DeleteResult> {
+    const dr: DeleteResult = await this.channelService.leaveChannel(cm_id);
+    if (dr == undefined) {
+      throw new NotFoundException('Failed to leave channel');
+    }
+    return dr;
   }
 
   @Post('/delete-channel/:chan_id')
-  async deleteChannel(@Param('chan_id') chan_id: number) {
-    await this.channelService.deleteChannel(chan_id);
+  async deleteChannel(
+    @Param('chan_id') chan_id: number,
+  ): Promise<DeleteResult> {
+    const dr: DeleteResult = await this.channelService.deleteChannel(chan_id);
+    if (dr == undefined) {
+      throw new NotFoundException('Failed to leave channel');
+    }
+    return dr;
   }
 
   @Get('/admin-action/:action/:cm_id/:end_date')
@@ -146,20 +195,39 @@ export class ChannelsController {
     @Param('action') action: string,
     @Param('cm_id') cm_id: number,
     @Param('end_date') end_date: number,
-  ) {
-    return await this.channelService.muteBanMember(action, cm_id, end_date);
+  ): Promise<ChannelMember> {
+    const cm: ChannelMember = await this.channelService.muteBanMember(
+      action,
+      cm_id,
+      end_date,
+    );
+    if (cm == undefined) {
+      throw new NotFoundException("Failed to edit member's mute/ban status");
+    }
+    return cm;
   }
 
   @Get('/toggle-admin/:cm_id')
-  async toggleAdmin(@Param('cm_id') cm_id: number) {
-    return await this.channelService.toggleAdmin(cm_id);
+  async toggleAdmin(@Param('cm_id') cm_id: number): Promise<ChannelMember> {
+    const cm: ChannelMember = await this.channelService.toggleAdmin(cm_id);
+    if (cm == undefined) {
+      throw new NotFoundException("Failed to edit member's admin status");
+    }
+    return cm;
   }
 
   @Get('/update-pwd/:chan_id/:pwd')
   async updateChannelPassword(
     @Param('chan_id') chan_id: number,
     @Param('pwd') pwd: string,
-  ) {
-    return await this.channelService.updateChannelPassword(chan_id, pwd);
+  ): Promise<Channel> {
+    const channel: Channel = await this.channelService.updateChannelPassword(
+      chan_id,
+      pwd,
+    );
+    if (channel == undefined) {
+      throw new NotFoundException('Failed to edit channel password');
+    }
+    return channel;
   }
 }
