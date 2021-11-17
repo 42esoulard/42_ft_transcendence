@@ -7,7 +7,7 @@ import { Game } from './entity/games.entity';
 import { GameUser } from './entity/gameUser.entity';
 import { pongGame } from './classes/pong.pongGame';
 import { player } from './classes/pong.player';
-import { gameMode, joinGameMessage } from './classes/pong.types';
+import { joinGameMessage } from './classes/pong.types';
 
 
 @WebSocketGateway( { namespace: '/pong'})
@@ -37,11 +37,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleDisconnect(client: Socket): void {
     this.logger.log('Client disconected ' + client.id);
     this.clearQueue(client)
-    // if (this.waitingPlayer && this.waitingPlayer.clientSocket == client)
-    // {
-    //   delete this.waitingPlayer
-    //   this.waitingPlayer = null
-    // }
     this.games.forEach((value: pongGame, key: string) => {
       if (value.player1.clientSocket.id === client.id || value.player2.clientSocket.id === client.id)
         this.leaveGame(client, key)
@@ -110,8 +105,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleLeaveGame(client: Socket, room:string): void
   {
     this.leaveGame(client, room)
-      // client.to(room).emit('opponentLeftRoom')
-      // client.leave(room)
   }
 
   @SubscribeMessage('enlargeRacquet')
@@ -130,7 +123,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('moveRacquet')
   handleMoveRacquet(client: Socket, message: {room: string, text: string}): void {
 
-    // this.logger.log('msg received: ' + message.room)
     const game: pongGame = this.games.get(message.room)
     if (!game)
     {
