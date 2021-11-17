@@ -2,11 +2,11 @@
 	<h1 class="header__title"> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
 	<canvas ref="canvas"> </canvas>
 
-	<div class="header__title" v-if="!gameHasStarted && gameMode=='transcendence' ">
+	<div class="header__title" v-if="!gameHasStarted && gameMode=='transcendence' && userType==='player' ">
 		<h1> Press space for some transcendence magic ! </h1>
 	</div>
 	
-	<div class="header__title" v-if="!gameHasStarted && gameMode=='classic' ">
+	<div class="header__title" v-if="!gameHasStarted && gameMode=='classic' && userType==='player' ">
 		<h1> Get ready, game is about to start ! </h1>
 	</div>
 	
@@ -14,7 +14,7 @@
 	<div class="header__title" v-if="gameIsOver">
 		<h1> {{ winningPlayer }} won ! </h1>
 	</div>
-	<p v-if="!gameIsOver">
+	<p v-if="!gameIsOver && userType==='player'">
 		<button class="button" v-on:click="SendMoveMsg('up')"> Up </button>
 		<button class="button" v-on:click="SendMoveMsg('down')"> Down </button>
 	</p>
@@ -23,15 +23,16 @@
 <script lang="ts">
 import { clientSocket } from '@/App.vue'
 import { defineComponent, onMounted, PropType, ref } from 'vue'
-import { onBeforeRouteLeave, useRoute } from 'vue-router'
+import { onBeforeRouteLeave } from 'vue-router'
 import getDraw from '@/composables/draw'
-import { Coordinates, gameMode, PlayerPositions, PlayerScores } from '@/types/PongGame'
+import { Coordinates, gameMode, PlayerPositions, PlayerScores, userType } from '@/types/PongGame'
 
 export default defineComponent({
 	props: {
 		gameMode: {type: String as () => gameMode, required: true},
 		// ou {type: String as PropType<gameMode>}
 		// cf https://frontendsociety.com/using-a-typescript-interfaces-and-types-as-a-prop-type-in-vuejs-508ab3f83480
+		userType: {type: String as () => userType, required: true},
 		player1UserName: {type: String, required: true},
 		player2UserName: {type: String, required: true},
 		room: {type: String, required: true}
@@ -45,7 +46,8 @@ export default defineComponent({
 
 		// lifecycle hooks
 		onMounted(() => {
-			window.addEventListener("keydown", onKeyDown)
+			if (props.userType === 'player')
+				window.addEventListener("keydown", onKeyDown)
 			window.addEventListener("resize", onResize)
 			console.log('mounted')
 			if (canvas.value)
@@ -105,7 +107,8 @@ export default defineComponent({
 		const winningPlayer = ref<string>('')
 		const gameIsOver = ref(false)
 		socket.value.on("gameOver", (player1Won: boolean) => {
-			window.removeEventListener("keydown", onKeyDown)
+			if (props.userType === 'player')
+				window.removeEventListener("keydown", onKeyDown)
 			gameHasStarted.value = true
 			gameIsOver.value = true
 			if (player1Won)

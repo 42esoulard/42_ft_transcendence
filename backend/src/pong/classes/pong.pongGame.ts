@@ -111,7 +111,7 @@ export class pongGame {
     this.room = this.gameId.toString()
     await this.player1.clientSocket.join(this.room)
     await this.player2.clientSocket.join(this.room)
-    this.server.to(this.room).emit('gameReadyToStart', this.room, this.player1.userName, this.player2.userName)
+    this.server.to(this.room).emit('gameReadyToStart', this.room, this.player1.userName, this.player2.userName, this.gameMode)
     this.spectatorWarnNewGame()
     this.timeout = setTimeout(() => {
       this.server.to(this.room).emit('gameStarting')

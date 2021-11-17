@@ -19,3 +19,5 @@ export interface Coordinates {
 }
 
 export type gameMode = 'classic' | 'transcendence'
+
+export type userType = 'player' | 'spectator'
