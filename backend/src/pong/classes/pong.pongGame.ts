@@ -104,6 +104,7 @@ export class pongGame {
   {
     this.logger.log('game created')
 
+    // push Game and GameUsers intoDB
     await this.pushGameintoDB()
     await this.pushGameUsersintoDB()
 
@@ -111,11 +112,17 @@ export class pongGame {
     this.room = this.gameId.toString()
     await this.player1.clientSocket.join(this.room)
     await this.player2.clientSocket.join(this.room)
+
+    // Warn players
     this.server.to(this.room).emit('gameReadyToStart', this.room, this.player1.userName, this.player2.userName, this.gameMode)
+
+    // Warn Spectators
     this.spectatorWarnNewGame()
+    
+    // Launch timeout
     this.timeout = setTimeout(() => {
       this.server.to(this.room).emit('gameStarting')
-      this.startMoving()
+      this.startFromCenter()
     }, INITAL_DELAY_IN_MS)
   }
   
@@ -133,19 +140,18 @@ export class pongGame {
       client.emit('score', this.getPlayerScores())
   }
 
-  startMoving()
+  startFromCenter()
   {
     this.initPositions()
     this.initBallDirection()
     this.ballSpeed = BALL_INITIAL_SPEED
     this.interval = setInterval(() => {
-      this.sendPositions()
+      this.updateGame()
     }, INTERVAL_IN_MS)
   }
   
   async endGame(player1Won: boolean): Promise<void>
   {
-    this.logger.log('interval cleared: ' + this.room )
     clearTimeout(this.timeout)
     clearInterval(this.interval)
     this.spectatorWarnEndGame()
@@ -160,36 +166,46 @@ export class pongGame {
     this.server.emit('endGame', game)
   }
 
- 
-  sendPositions(): void
+  updateGame(): void
   {
     this.server.to(this.room).emit('position', this.ballPosition, this.getPlayerPositions())
-    this.changeBallDirectionIfNeeded()
-    this.computeNewBallPosition()
+    this.updateScore()
+    this.updateBallDirection()
+    this.updateBallPosition()
   }
 
-  changeBallDirectionIfNeeded(): void
+  updateScore(): void
   {
-    // hits top or bottom walls
+    // ball disapears from canvas left edge
+    if (this.ballPosition.x + BALL_RADIUS < 0)
+      this.handleScore(false)
+
+    // ball disapears from canvas right edge
+    if (this.ballPosition.x - BALL_RADIUS > CANVAS_WIDTH)
+      this.handleScore(true)
+  }
+
+  updateBallDirection(): void
+  {
+    // change direction if ball hits top or bottom walls
     if (this.ballPosition.y <= BALL_RADIUS || this.ballPosition.y >= CANVAS_HEIGHT - BALL_RADIUS)
       this.ballDirection.y = -this.ballDirection.y
     
-    // score
-    if (this.ballPosition.x + BALL_RADIUS < 0)
-      this.handleScore(false)
-    if (this.ballPosition.x - BALL_RADIUS > CANVAS_WIDTH)
-      this.handleScore(true)
-    
-    // collision with player
+    // change direction and accelerate ball if collision with player
     if (this.ballCollisionWithPlayer1() || this.ballCollisionWithPlayer2())
     {
       this.ballDirection.x = -this.ballDirection.x
-      if (this.ballSpeed * 2 + BALL_ACCELERATION * 2 < RACQUET_WIDTH + BALL_RADIUS)
-        this.ballSpeed += BALL_ACCELERATION
+      this.accelerateBall()
+    }
+  }
+
+  accelerateBall(): void
+  {
       // RACQUET_WIDTH + BALL_RADIUS = collision surface
       // ballSpeed * 2 = ball speed in x coordinates
       // if speed is more than this limit, collision will not be detected
-    }
+      if (this.ballSpeed * 2 + BALL_ACCELERATION * 2 < RACQUET_WIDTH + BALL_RADIUS)
+        this.ballSpeed += BALL_ACCELERATION
   }
 
   ballCollisionWithPlayer1(): boolean
@@ -228,7 +244,7 @@ export class pongGame {
     return false
   }
 
-  computeNewBallPosition()
+  updateBallPosition()
   {
     this.ballPosition.x += this.ballDirection.x * this.ballSpeed
     this.ballPosition.y += this.ballDirection.y * this.ballSpeed
@@ -253,14 +269,14 @@ export class pongGame {
       this.endGame(false)
       return
     }
-    this.restartMoving()
+    this.restartFromCenter()
   }
 
-  restartMoving()
+  restartFromCenter()
   {
     clearInterval(this.interval)
     this.timeout = setTimeout(() => {
-      this.startMoving()
+      this.startFromCenter()
     }, DELAY_AFTER_SCORE_IN_MS)
   }
 
