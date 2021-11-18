@@ -40,7 +40,7 @@
                 <li class="chat-messages__item" v-for="(message) in channelMessages" :key="message.id">
                     <div class="chat-messages__author-container">
                       <div class='chat-messages__author'>{{ message.author.username }}</div>
-                      <div class="chat-user__card">
+                      <div v-if="message.author.id !== activeChannel.member.id" class="chat-user__card">
                           <!-- <div class="chat-user__username"> {{ message.author.username }} </div>
                           <div class="chat-user__login"> {{ message.author.forty_two_login }} </div>
                           <img class="chat-user__avatar" :src="message.author.avatar"> -->
@@ -207,7 +207,10 @@ export const ChatComponent = defineComponent({
           activeChannel.value = res.data;
           console.log(res.data)
         })
-        .catch((err) => console.log("Caught error:", err.response.data.message));
+        .catch((err) => {
+          console.log("Caught error:", err.response.data.message);
+          getDefaultChannel();
+        });
         await api.getAvailableChannels(user.value.id)
         .then((res) => {
           availableChannels.value = res.data;
@@ -322,6 +325,7 @@ export const ChatComponent = defineComponent({
       store.dispatch("setMessage", "Channel [" + activeChannel.value!.channel.name.substring(0, 15) + "] has been deleted");
       updateChannelsList();
       switchChannel(joinedChannels.value[0]);
+      socket.emit('deletedChannel')
     }
 
     const leaveChannel = async () => {
@@ -340,19 +344,31 @@ export const ChatComponent = defineComponent({
 
     // }
 
-    // const directMessage = (recipient: User) => {
-    //   const newChannel = api.saveChannel({
-    //     name: user.value.login + ' to ' + recipient.forty_two_login,
-    //     owner_id: user.value.id,
-    //     type: 'private',
-    //     password: '',
-    //   })
-    //   .then((res) => {
-    //     console.log("in createChannel res", res)
-    //     socket.emit('createChannel', res.data)
-    //   })
-    //   .catch((err) => console.log("Failed to create channel: ", err))
-    // }
+    const directMessage = (recipient: User) => {
+      const newChannel = api.saveChannel({
+        name: user.value.forty_two_login + ' to ' + recipient.forty_two_login,
+        owner_id: user.value.id,
+        type: 'private',
+        password: '',
+      })
+      .then(async (cm) => {
+        updateChannelsList();
+        activeChannel.value = cm.data;
+        isMember.value = true;
+        console.log("ACTIVECHANNEL", activeChannel)
+        getMessagesUpdate(cm.data.channel.id);
+        store.dispatch("setMessage", "You're now a member of channel [" + cm.data.channel.name.substring(0, 15) + "]");
+        await api.joinChannel(cm.data.channel.id, recipient.id)
+        .then((res)=> {
+          console.log(res)
+          socket.emit('createDM', cm.data)
+          return res;
+        })
+        .catch((err) => console.log("Caught error:", err.response.data.message));
+        // console.log("in createChannel res", res)
+      })
+      .catch((err) => console.log("Caught error:", err.response.data.message))
+    }
 
     const toggleModal = (idx: number) => {
       switch(idx) {
@@ -411,7 +427,7 @@ export const ChatComponent = defineComponent({
       .catch((err) => console.log("Caught error:", err.response.data.message));
     })
 
-    socket.on('addChannel', (info: Channel) => {
+    socket.on('addChannel', () => {
       updateChannelsList();
     })
 
@@ -489,6 +505,7 @@ export const ChatComponent = defineComponent({
       toastMessage: computed(() => store.state.message),
       hoveringLock: ref(false),
       userInfo: ref(false),
+      directMessage,
     };
   },
 });
