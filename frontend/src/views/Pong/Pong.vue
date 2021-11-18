@@ -17,21 +17,29 @@
 	<div v-if="alreadyInQueue" class="header__title">
 		<p> You are already in queue ! You will be redirected to Homepage shortly... </p>
   </div>
+
+	<div v-for="user in users" :key="user.id">
+		<button v-on:click="challenge(user.id, user.username)"> {{user.forty_two_login}} </button>
+	</div>
 </template>
 
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
 import { pongSocket } from '@/App.vue'
 import { useStore } from '@/store'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
-import { gameMode } from '@/types/PongGame'
+import { challengeMessage, gameMode } from '@/types/PongGame'
+import { useUserApi } from "@/plugins/api.plugin";
+import { User } from 'sdk/typescript-axios-client-generated'
 
 export default defineComponent ({
 	setup() {
 		const socket = ref(pongSocket)
 		const queuing = ref(false)
 		const gameMode = ref<gameMode>('transcendence')
+		const api = useUserApi()
+		const users = ref<User[]>([])
 
 		const store = useStore()
 		const JoinQueue = () => {
@@ -61,7 +69,23 @@ export default defineComponent ({
 				socket.value.emit('leaveQueue')
 		})
 
-		return {queuing, JoinQueue, gameMode, alreadyInQueue}
+		onMounted(() => {
+			api.
+				getUsers()
+				.then((res: any) => users.value = res.data)
+				.catch((err) => console.log(err))
+
+		})
+
+		const challenge = (id: number, name: string) => {
+			socket.value.emit('challengeRequest', {challengerId: store.state.user.id, challengerName: store.state.user.username, challengeeId: id, challengeeName: name})
+		}
+
+		socket.value.on('challengeRequest', (message: challengeMessage) => {
+			console.log('challenge received from ' + message.challengerName + ' to ' + message.challengeeName)
+		})
+
+		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenge}
 	}
 
 })

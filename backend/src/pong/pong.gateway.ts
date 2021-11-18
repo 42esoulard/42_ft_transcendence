@@ -7,7 +7,7 @@ import { Game } from './entity/games.entity';
 import { GameUser } from './entity/gameUser.entity';
 import { pongGame } from './classes/pong.pongGame';
 import { player } from './classes/pong.player';
-import { joinGameMessage } from './classes/pong.types';
+import { challengeMessage, joinGameMessage } from './classes/pong.types';
 
 
 @WebSocketGateway( { namespace: '/pong'})
@@ -47,6 +47,14 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.logger.log('Client connected ' + client.id);
   }
 
+  @SubscribeMessage('challengeRequest')
+  async handleAskToPlay(client: Socket, message: challengeMessage)
+  {
+    this.logger.log(message.challengeeName)
+    this.server.emit('challengeRequest', message)
+  }
+  
+  
   @SubscribeMessage('joinGame')
   async handleJoinGameMessage(client: Socket, message: joinGameMessage): Promise<void>
   {

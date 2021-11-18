@@ -21,3 +21,5 @@ export interface Coordinates {
 export type gameMode = 'classic' | 'transcendence'
 
 export type userType = 'player' | 'spectator'
+
+export type challengeMessage = {challengerId: number, challengerName: string, gameMode: gameMode, challengeeId: number, challengeeName: string}
