@@ -75,24 +75,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
-  userIsAlreadyInQueue(client: Socket, userId: number): boolean
-  {
-    if ((this.waitingPlayerClassic && userId === this.waitingPlayerClassic.userId) ||
-      (this.waitingPlayerTranscendence && userId === this.waitingPlayerTranscendence.userId))
-    {
-      client.emit('alreadyInQueue')
-      return true
-    }
-    return false
-  }
-
-  async createGame(player1: player, message: joinGameMessage, client: Socket)
-  {
-    const player2 = new player(message.userId, message.userName, client, 2)
-    const game = new pongGame(player1, player2, this.gameRepo, this.gameUserRepo, this.server, message.gameMode)
-    await game.createGame()
-    this.games.set(game.room, game)
-  }
 
   @SubscribeMessage('watchGame')
   async handleWatchGame(client: Socket, gameId: string)
@@ -132,7 +114,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     game.enlargeRacquet(client)
   }
 
-
   @SubscribeMessage('moveRacquet')
   handleMoveRacquet(client: Socket, message: {room: string, text: string}): void {
 
@@ -143,6 +124,25 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       return
     }
     game.moveRacquet(client, message.text)
+  }
+
+  userIsAlreadyInQueue(client: Socket, userId: number): boolean
+  {
+    if ((this.waitingPlayerClassic && userId === this.waitingPlayerClassic.userId) ||
+      (this.waitingPlayerTranscendence && userId === this.waitingPlayerTranscendence.userId))
+    {
+      client.emit('alreadyInQueue')
+      return true
+    }
+    return false
+  }
+
+  async createGame(player1: player, message: joinGameMessage, client: Socket)
+  {
+    const player2 = new player(message.userId, message.userName, client, 2)
+    const game = new pongGame(player1, player2, this.gameRepo, this.gameUserRepo, this.server, message.gameMode)
+    await game.createGame()
+    this.games.set(game.room, game)
   }
 
   async leaveGame(clientWhoLeft: Socket, room: string)
