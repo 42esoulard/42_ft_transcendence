@@ -53,20 +53,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.emit('createdChannel', info);
     
     //Notify other users of chatroom creation
-    client.broadcast.emit('addChannel', info);
+    client.broadcast.emit('updateChannels', info);
   }
 
-  @SubscribeMessage('createDM')
-  handleCreateDM(@ConnectedSocket() client: Socket, @MessageBody() info) {
+  @SubscribeMessage('updateChannels')
+  handleUpdateChannels(@ConnectedSocket() client: Socket, @MessageBody() info) {
     
     //Notify other users of chatroom creation
-    client.broadcast.emit('addChannel', info);
-  }
-
-  @SubscribeMessage('deletedChannel')
-  handleDeletedChannel(@ConnectedSocket() client: Socket) {
-    //Notify other users of chatroom creation
-    client.broadcast.emit('addChannel');
+    client.broadcast.emit('updateChannels', info);
   }
 
   @SubscribeMessage('joinChannel')

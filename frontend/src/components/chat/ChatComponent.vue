@@ -325,7 +325,7 @@ export const ChatComponent = defineComponent({
       store.dispatch("setMessage", "Channel [" + activeChannel.value!.channel.name.substring(0, 15) + "] has been deleted");
       updateChannelsList();
       switchChannel(joinedChannels.value[0]);
-      socket.emit('deletedChannel')
+      socket.emit('updateChannels')
     }
 
     const leaveChannel = async () => {
@@ -361,7 +361,7 @@ export const ChatComponent = defineComponent({
         await api.joinChannel(cm.data.channel.id, recipient.id)
         .then((res)=> {
           console.log(res)
-          socket.emit('createDM', cm.data)
+          socket.emit('updateChannels', cm.data)
           return res;
         })
         .catch((err) => console.log("Caught error:", err.response.data.message));
@@ -427,7 +427,7 @@ export const ChatComponent = defineComponent({
       .catch((err) => console.log("Caught error:", err.response.data.message));
     })
 
-    socket.on('addChannel', () => {
+    socket.on('updateChannels', () => {
       updateChannelsList();
     })
 

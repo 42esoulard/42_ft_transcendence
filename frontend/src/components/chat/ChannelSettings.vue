@@ -213,6 +213,7 @@ export default defineComponent({
       .then(() => {
         targetCm.value = cm;
         context.emit('update-channels-list');
+        socket.emit('updateChannels');
         if (cm.id == props.activeChannel.id) {
           closeChannelSettings();
         }
@@ -304,6 +305,7 @@ export default defineComponent({
         console.log("in updateChannel res", res)
         // socket.emit('createChannel', res.data)
         context.emit('update-channels-list');
+        socket.emit('updateChannels');
         closeChannelSettings();
       })
       .catch((err) => console.log("Caught error:", err.response.data.message))
