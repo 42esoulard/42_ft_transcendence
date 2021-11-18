@@ -13,6 +13,10 @@
   <div v-else>
 		<p> Waiting for opponent... </p>
   </div>
+  
+	<div v-if="alreadyInQueue" class="header__title">
+		<p> You are already in queue ! You will be redirected to Homepage shortly... </p>
+  </div>
 </template>
 
 
@@ -38,8 +42,13 @@ export default defineComponent ({
 			queuing.value = true
 		})
 		
+		const alreadyInQueue = ref(false)
 		socket.value.on('alreadyInQueue', () => {
 			console.log('already in queue !')
+			alreadyInQueue.value = true
+			setTimeout(() => {
+				router.push({name: 'Home'})
+			}, 3000)
 		})
 
 		const router = useRouter()
@@ -52,7 +61,7 @@ export default defineComponent ({
 				socket.value.emit('leaveQueue')
 		})
 
-		return {queuing, JoinQueue, gameMode}
+		return {queuing, JoinQueue, gameMode, alreadyInQueue}
 	}
 
 })
