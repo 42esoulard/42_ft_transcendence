@@ -31,9 +31,16 @@ export default defineComponent ({
 
 		const store = useStore()
 		const JoinQueue = () => {
-			queuing.value = true
 			socket.value.emit('joinGame', {userId: store.state.user.id, userName: store.state.user.username, gameMode: gameMode.value})
 		}
+
+		socket.value.on('addedToQueue', () => {
+			queuing.value = true
+		})
+		
+		socket.value.on('alreadyInQueue', () => {
+			console.log('already in queue !')
+		})
 
 		const router = useRouter()
 		socket.value.on('gameReadyToStart', (id: string, player1UserName: string, player2UserName: string, gameMode: gameMode) => {

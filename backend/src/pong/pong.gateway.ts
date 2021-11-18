@@ -50,13 +50,15 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('joinGame')
   async handleJoinGameMessage(client: Socket, message: joinGameMessage): Promise<void>
   {
-    this.logger.log('client joined game. userId: ' + message.userName + ' gameMode: ' + message.gameMode)
+    this.logger.log('client joined game. userID: ' + message.userId + ' gameMode: ' + message.gameMode)
+    if (this.userIsAlreadyInQueue(client, message.userId))
+      return
     if (message.gameMode == 'classic')
     {
       if (!this.waitingPlayerClassic)
       {
         this.waitingPlayerClassic = new player(message.userId, message.userName, client, 1)
-        client.emit('waitingForOpponent')
+        client.emit('addedToQueue')
       }
       else
         this.createGame(this.waitingPlayerClassic, message, client)
@@ -66,11 +68,22 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       if (!this.waitingPlayerTranscendence)
       {
         this.waitingPlayerTranscendence = new player(message.userId, message.userName, client, 1)
-        client.emit('waitingForOpponent')
+        client.emit('addedToQueue')
       }
       else
         this.createGame(this.waitingPlayerTranscendence, message, client)
     }
+  }
+
+  userIsAlreadyInQueue(client: Socket, userId: number): boolean
+  {
+    if ((this.waitingPlayerClassic && userId === this.waitingPlayerClassic.userId) ||
+      (this.waitingPlayerTranscendence && userId === this.waitingPlayerTranscendence.userId))
+    {
+      client.emit('alreadyInQueue')
+      return true
+    }
+    return false
   }
 
   async createGame(player1: player, message: joinGameMessage, client: Socket)
