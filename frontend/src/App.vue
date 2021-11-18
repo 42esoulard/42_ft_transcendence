@@ -8,7 +8,7 @@ import { computed, onActivated, onUpdated, reactive } from "vue";
 import { User } from "sdk/typescript-axios-client-generated";
 import { presenceSocket } from "@/views/UserAccount.vue";
 
-export const clientSocket = io("http://localhost:3000/pong");
+export const pongSocket = io("http://localhost:3000/pong");
 // export const presenceSocket = io("http://localhost:3000/presence", {
 //   withCredentials: true
 // });

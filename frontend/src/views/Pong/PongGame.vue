@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import { clientSocket } from '@/App.vue'
+import { pongSocket } from '@/App.vue'
 import { defineComponent, onMounted, PropType, ref } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import getDraw from '@/composables/draw'
@@ -71,7 +71,7 @@ export default defineComponent({
 
 
 		// socket event listeners
-		const socket = ref(clientSocket)
+		const socket = ref(pongSocket)
 		socket.value.on("position", (newBallPosition: Coordinates, newPlayerPositions: PlayerPositions) => {
 			ballPosition.value.x = newBallPosition.x * windowWidth.value
 			ballPosition.value.y = newBallPosition.y * windowWidth.value

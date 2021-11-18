@@ -22,14 +22,14 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { clientSocket } from '@/App.vue'
+import { pongSocket } from '@/App.vue'
 import { useStore } from '@/store'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { gameMode } from '@/types/PongGame'
 
 export default defineComponent ({
 	setup() {
-		const socket = ref(clientSocket)
+		const socket = ref(pongSocket)
 		const queuing = ref(false)
 		const gameMode = ref<gameMode>('transcendence')
 

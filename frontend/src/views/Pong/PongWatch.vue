@@ -13,7 +13,7 @@
 <script lang="ts">
 
 import { defineComponent, onMounted, ref } from 'vue'
-import { clientSocket } from '@/App.vue'
+import { pongSocket } from '@/App.vue'
 import { useRouter } from 'vue-router'
 import { usePongApi } from "@/plugins/api.plugin";
 import { Game } from 'sdk/typescript-axios-client-generated';
@@ -22,7 +22,7 @@ export default defineComponent({
 	setup()
 	{
 		const games = ref<Game[]>([])
-		const socket = ref(clientSocket)
+		const socket = ref(pongSocket)
 		const api = usePongApi()
 
 		onMounted(() => {
