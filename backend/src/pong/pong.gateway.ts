@@ -51,30 +51,35 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleJoinGameMessage(client: Socket, message: joinGameMessage): Promise<void>
   {
     this.logger.log('client joined game. userID: ' + message.userId + ' gameMode: ' + message.gameMode)
+
     if (this.userIsAlreadyInQueue(client, message.userId))
       return
-    if (message.gameMode == 'classic')
+
+    if (message.gameMode === 'classic')
     {
       if (!this.waitingPlayerClassic)
-      {
-        this.waitingPlayerClassic = new player(message.userId, message.userName, client, 1)
-        client.emit('addedToQueue')
-      }
+        this.addPlayerToQueue(client, message)
       else
         this.createGame(this.waitingPlayerClassic, message, client)
     }
-    if (message.gameMode == 'transcendence')
+    if (message.gameMode === 'transcendence')
     {
       if (!this.waitingPlayerTranscendence)
-      {
-        this.waitingPlayerTranscendence = new player(message.userId, message.userName, client, 1)
-        client.emit('addedToQueue')
-      }
+        this.addPlayerToQueue(client, message)
       else
         this.createGame(this.waitingPlayerTranscendence, message, client)
     }
   }
 
+  addPlayerToQueue(client: Socket, message: joinGameMessage)
+  {
+    if (message.gameMode === 'classic')
+      this.waitingPlayerClassic = new player(message.userId, message.userName, client, 1)
+    if (message.gameMode === 'transcendence')
+      this.waitingPlayerTranscendence = new player(message.userId, message.userName, client, 1)
+  
+    client.emit('addedToQueue')
+  }
 
   @SubscribeMessage('watchGame')
   async handleWatchGame(client: Socket, gameId: string)
@@ -149,10 +154,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   {
     const game: pongGame = this.games.get(room)
     if (!game)
-    {
-      this.logger.error('endGame: game doesnt exist')
       return
-    }
 
     const player1Won: boolean = clientWhoLeft === game.player2.clientSocket
     await game.endGame(player1Won)
