@@ -38,24 +38,30 @@ $sidebar-border-radius: 50px;
 //PROFILE
 $profile-width: 1000px;
 $profile-height: 700px;
-$profile-background-color: rgba(0, 0, 0, 30%);
+$profile-background-color: rgba(0, 0, 0, 80%);
 $profile-div-bg-color: rgba(0, 0, 0, 80%);
 $profile-avatar-width: 50%;
 $profile-left-gap: 1rem;
 $profile-left-margin: 0 0;
-$profile-left-padding: 1rem;
+$profile-left-padding: 0;
 $profile-left-name-font: "Saira";
 $profile-left-name-size: 3rem;
-$profile-right-margin: 2rem 0;
-$profile-right-padding: 2rem;
-$profile-right-width: 100%;
+$profile-stats-margin: 2rem 0;
+$profile-stats-padding: 2rem;
+$profile-stats-width: 100%;
 $profile-social-width: 60%;
 $profile-social-width-column: 50%;
 $profile-social-gap: 5px;
 $profile-social-margin: 1rem 0 0 0;
 
+//ACCOUNT
+$account-width: 1000px;
+$account-height: 700px;
+
+
 //USERS
 $users-avatar-width: 3rem;
+$users-wrap-width: 3.5rem;
 $users-bg-color: rgba(0, 0, 0, 80%);
 $users-width: 500px;
 $users-height: 700px;
@@ -142,6 +148,8 @@ $stats-text-font: "Saira";
 $stats-text-size: 1.5rem;
 $stats-bloc-margin: 0rem 0rem;
 $stats-bloc-bg: rgb(153, 78, 78);
+
+//LIST - TABLE
 $list-div-width: 100%;
 $list-div-height: 100%;
 $list-div-panel-height: 100%;

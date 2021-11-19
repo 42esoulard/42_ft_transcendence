@@ -31,7 +31,8 @@
               <td class="table-cell">{{ historyObject(game).date }}</td>
               <td
                 class="table-cell table-cell--win"
-                v-if="historyObject(game).result == 'win'">
+                v-if="historyObject(game).result == 'win'"
+              >
                 {{ historyObject(game).result }}
               </td>
               <td class="table-cell table-cell--loss" v-else>
@@ -43,8 +44,9 @@
                   class="link link--neutral"
                   :to="{
                     name: 'UserProfile',
-                    params: { username: historyObject(game).opponent }
-                  }">
+                    params: { username: historyObject(game).opponent },
+                  }"
+                >
                   {{ historyObject(game).opponent }}
                 </router-link>
               </td>
@@ -59,28 +61,29 @@
 <script lang="ts">
 import { defineComponent, inject, ref, computed, onMounted } from "vue";
 import moment from "moment";
-import { GameUser, Game } from 'sdk/typescript-axios-client-generated';
-import { useUserApi } from "@/plugins/api.plugin";
+import { GameUser, Game } from "sdk/typescript-axios-client-generated";
+import { useUserApi, usePongApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
   name: "Stats",
   props: {
     user: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   setup(props) {
     const userApi = useUserApi();
+    const pongApi = usePongApi();
     const games = ref<GameUser[]>([]);
     const gameHistory = ref<Game[]>([]);
     const user = props.user;
 
     onMounted(() => {
-      userApi
-        .getUserGames(user.id)
+      pongApi
+        .getUserGameUser(user.id)
         .then((res: any) => {
-          games.value = res.data.games;
+          games.value = res.data;
           for (const gameUser of games.value) {
             gameHistory.value.push(gameUser.game);
           }
@@ -90,32 +93,33 @@ export default defineComponent({
         });
     });
 
-    const historyObject = function(game: Game) {
+    const historyObject = function (game: Game) {
       const opponent =
         game.users[0].userId == user.id ? game.users[1] : game.users[0];
       const result = opponent.won === true ? "loss" : "win";
       return {
         date: moment(game.startedAt).format("MM-DD-YYYY"),
         result: result,
-        opponent: opponent.user.username
+        opponent: opponent.user.username,
       };
     };
 
     const numberOfGames = computed(() => games.value.length);
 
     const numberOfWin = computed(
-      () => games.value.filter(game => game.won == true).length
+      () => games.value.filter((game) => game.won == true).length
     );
     const numberOfLoss = computed(
       () =>
-        games.value.length - games.value.filter(game => game.won == true).length
+        games.value.length -
+        games.value.filter((game) => game.won == true).length
     );
 
     const winRate = computed(() => {
       if (games.value.length == 0) return "0%";
       return (
         Math.round(
-          (games.value.filter(game => game.won == true).length * 100) /
+          (games.value.filter((game) => game.won == true).length * 100) /
             games.value.length
         ) + "%"
       );
@@ -128,8 +132,8 @@ export default defineComponent({
       numberOfLoss,
       winRate,
       gameHistory,
-      historyObject
+      historyObject,
     };
-  }
+  },
 });
 </script>

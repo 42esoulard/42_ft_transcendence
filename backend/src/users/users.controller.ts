@@ -13,7 +13,7 @@ import {
   UseGuards,
   BadRequestException,
   Req,
-  HttpStatus,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './interfaces/user.interface';
@@ -41,7 +41,7 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   /**
-   * Lists all users in database.
+   * Lists all users in database, except banned;
    */
   @Get()
   async getUsers(): Promise<User[]> {
@@ -59,6 +59,11 @@ export class UsersController {
       throw new NotFoundException('No users in database');
     }
     return users;
+  }
+
+  @Get('delete/:id')
+  async removeUser(@Param('id') id: number) {
+    return await this.userService.removeUser(id);
   }
 
 
@@ -96,23 +101,6 @@ export class UsersController {
   // 	return user;
   // }
 
-	@Get('/user-games/:id')
-	async getUserGames(@Param('id') id: number): Promise<User> {
-		const user: User = await this.userService.getUserGames(id)
-		if (user == undefined) {
-			throw new NotFoundException('User not found');
-		}
-		return user;
-	}
-
-  @Get('/friendships/:id')
-	async getUserFriendships(@Param('id') id: number): Promise<User> {
-		const user: User = await this.userService.getUserFriendships(id)
-		if (user == undefined) {
-			throw new NotFoundException('User not found');
-		}
-		return user;
-	}
 
 	/**
 	* Returns a user found in database by its username.
@@ -242,13 +230,4 @@ export class UsersController {
 		});
 		return new StreamableFile(file);
 	}
-
-  // @Post()
-  // @ApiCreatedResponse({
-  // 	description: 'The user has been successfully updated.',
-  // 	type: User,
-  //   })
-  // async updateUser(@Body() updatedUser : UpdateUserDto) : Promise<User> {
-  // 	return await this.userService.updateUser(updatedUser);
-  // }
 }

@@ -1,6 +1,6 @@
 import { Message } from 'src/messages/interfaces/message.interface';
 import { GameUser } from 'src/pong/entity/gameUser.entity';
-import { Friendship } from 'src/friendships/interfaces/friendship.interface';
+import { Relationship } from 'src/relationships/interfaces/relationship.interface';
 import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
 
 export class User {
@@ -17,6 +17,6 @@ export class User {
   messages?: Message[];
   channel_members?: ChannelMember[];
   games?: GameUser[];
-  friendships_requested?: Friendship[];
-  friendships_adressed?: Friendship[];
+  relationships_requested?: Relationship[];
+  relationships_adressed?: Relationship[];
 }

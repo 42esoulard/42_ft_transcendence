@@ -37,8 +37,8 @@ export default defineComponent({
 		})
 
 		const router = useRouter()
-		socket.value.on('GoToGame', (id, player1UserName, player2UserName) => {
-			router.push({ name: 'PongGameWatch', params: {id, player1UserName, player2UserName, authorized: 'ok'}})
+		socket.value.on('GoToGame', (id, player1UserName, player2UserName, gameMode) => {
+			router.push({ name: 'PongGameWatch', params: {room: id, player1UserName, player2UserName, authorized: 'ok', gameMode, userType: 'spectator'}})
 		})
 
 		socket.value.on('newGame', (game: Game) => {

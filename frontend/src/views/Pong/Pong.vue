@@ -2,6 +2,11 @@
 <template>
   <div v-if="!queuing">
     <h1 class="header__title">Click to play</h1>
+		<select v-model="gameMode">
+			<option disabled>Please select game mode</option>
+			<option>classic</option>
+			<option>transcendence</option>
+		</select>
 		<button class="button button--log-in" v-on:click="JoinQueue()"> Join Game </button>
   </div>
 
@@ -16,21 +21,23 @@ import { defineComponent, ref } from 'vue'
 import { clientSocket } from '@/App.vue'
 import { useStore } from '@/store'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
+import { gameMode } from '@/types/PongGame'
 
 export default defineComponent ({
 	setup() {
 		const socket = ref(clientSocket)
 		const queuing = ref(false)
+		const gameMode = ref<gameMode>('transcendence')
 
 		const store = useStore()
 		const JoinQueue = () => {
 			queuing.value = true
-			socket.value.emit('joinGame', {userId: store.state.user.id, userName: store.state.user.username})
+			socket.value.emit('joinGame', {userId: store.state.user.id, userName: store.state.user.username, gameMode: gameMode.value})
 		}
 
 		const router = useRouter()
-		socket.value.on('gameReadyToStart', (id, player1UserName, player2UserName) => {
-			router.push({ name: 'PongGame', params: {id, player1UserName, player2UserName, authorized: 'ok'}})
+		socket.value.on('gameReadyToStart', (id: string, player1UserName: string, player2UserName: string, gameMode: gameMode) => {
+			router.push({ name: 'PongGame', params: {room: id, player1UserName, player2UserName, authorized: 'ok', gameMode, userType: 'player'} })
 		})
 
 		onBeforeRouteLeave(() => {
@@ -38,7 +45,7 @@ export default defineComponent ({
 				socket.value.emit('leaveQueue')
 		})
 
-		return {queuing, JoinQueue}
+		return {queuing, JoinQueue, gameMode}
 	}
 
 })

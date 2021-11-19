@@ -61,7 +61,12 @@
   width: $users-avatar-width;
   height: $users-avatar-width;
   border-radius: 50%;
-  border: 2px solid white;
+  &--online {
+    border: 2px solid darken($third-color, 10%);
+  }
+  &--offline {
+    border: 2px solid $status-offline-color;
+  }
 }
 
 .users-list__interactions {

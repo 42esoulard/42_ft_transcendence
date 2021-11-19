@@ -8,7 +8,16 @@ export interface PlayerScores {
     player2: number,
 }
 
+export interface PlayerRacquetRatios {
+    player1: number,
+    player2: number,
+}
+
 export interface Coordinates {
     x: number,
     y: number,
 }
+
+export type gameMode = 'classic' | 'transcendence'
+
+export type userType = 'player' | 'spectator'

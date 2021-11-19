@@ -5,28 +5,40 @@ import {
   Column,
   CreateDateColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 // import * as bcrypt from 'bcrypt';
 
-@Entity('friendships')
-export class Friendships {
+@Entity('relationships')
+export class Relationships {
   @PrimaryGeneratedColumn()
-	  id: number
+  id: number;
 
-  @ManyToOne(() => Users, (requester) => requester.friendships_requested, {
+  @Column({ type: 'number' })
+  requesterId: number;
+
+  @ManyToOne(() => Users, (requester) => requester.relationships_requested, {
     onDelete: 'CASCADE',
     eager: true,
   })
+  @JoinColumn({ name: 'requesterId' })
   requester: Users;
 
-  @ManyToOne(() => Users, (adressee) => adressee.friendships_adressed, {
+  @Column({ type: 'number' })
+  adresseeId: number;
+
+  @ManyToOne(() => Users, (adressee) => adressee.relationships_adressed, {
     onDelete: 'CASCADE',
     eager: true,
   })
+  @JoinColumn({ name: 'adresseeId' })
   adressee: Users;
 
   @Column({ default: true })
   pending: boolean;
+
+  @Column({ default: 'friendship' })
+  nature: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
   created_at: Date;

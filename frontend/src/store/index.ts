@@ -1,3 +1,4 @@
+import { Null } from 'mdue'
 import { User } from 'sdk/typescript-axios-client-generated'
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
@@ -21,7 +22,7 @@ export const store = createStore<State>({
   state: {
     user: {
       id: 0,
-      username: "default",
+      username: "0",
     },
     message: '',
     firstTimeConnect: false,
@@ -33,7 +34,7 @@ export const store = createStore<State>({
 
     resetUser(state: State) {
       state.user.id = 0;
-      state.user.username = "default";
+      state.user.username = "0";
     },
 
     toggleTwoFactor(state: State, payload: boolean) {

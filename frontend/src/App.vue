@@ -5,7 +5,7 @@ import Toast from "@/components/Toast.vue";
 import { io } from "socket.io-client";
 import { useStore } from "@/store";
 import { computed, onActivated, onUpdated, reactive } from "vue";
-import { User } from 'sdk/typescript-axios-client-generated';
+import { User } from "sdk/typescript-axios-client-generated";
 import { presenceSocket } from "@/views/UserAccount.vue";
 
 export const clientSocket = io("http://localhost:3000/pong");
@@ -19,7 +19,7 @@ export default {
     const store = useStore();
 
     onUpdated(() => {
-      // console.log("onUpdated", store.state.user);
+      console.log("onUpdated", store.state.user);
       if (store.state.user.id != 0) {
         if (!store.state.isConnected) {
           // console.log("newConnection");
@@ -44,9 +44,9 @@ export default {
 
     return {
       user: computed(() => store.state.user),
-      message: computed(() => store.state.message)
+      message: computed(() => store.state.message),
     };
-  }
+  },
 };
 </script>
 
