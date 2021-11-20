@@ -117,7 +117,7 @@
             <LockedChannelForm :channel="activeChannel.channel" @close="toggleModal(1)" @join-channel="joinChannel" />
           </template>
         </Modal>
-        <Modal v-if="isMuted && activeChannel" @close="toggleModal(3)">
+        <Modal v-if="mutePopup && activeChannel" @close="toggleModal(3)">
           <template v-slot:mute-ban-popup>
             <MuteBanPopup :cm="activeChannel" @close="toggleModal(3)" />
           </template>
@@ -179,6 +179,7 @@ export const ChatComponent = defineComponent({
     const channelSettings = ref(false);
     const isMember = ref(false);
     const isMuted = ref(false);
+    const mutePopup = ref(false);
 
     /*
     ** Default channel = id 1, "General". Automatically joined on connection, can't be left.
@@ -254,6 +255,8 @@ export const ChatComponent = defineComponent({
 
       newMessage.value = "";
       messageId.value++;
+      const wasMuted = isMuted.value;
+      console.log('before', wasMuted);
 
       await api.saveMessage({
           channel_id: newContent.channel.id,
@@ -262,12 +265,28 @@ export const ChatComponent = defineComponent({
       })
       .then(() => {
         getMessagesUpdate(newContent.channel.id);
+        console.log('after', wasMuted);
+        if (wasMuted) {
+          socket.emit('updateChannels');
+          isMuted.value = false;
+        }
         socket.emit("chat-message", newContent);
       })
-      .catch((err: any) => {
+      .catch(async (err: any) => {
         console.log("Caught error:", err.response.data.message)
+        if (!wasMuted) {
+          await updateChannelsList()
+          .then(() => {
+            if (err.response.data.message == 'muted') {
+              isMuted.value = true;
+              mutePopup.value = true;
+            }
+            return;
+          })
+        }
         if (err.response.data.message == 'muted') {
           isMuted.value = true;
+          mutePopup.value = true;
         }
       });
     }
@@ -380,9 +399,12 @@ export const ChatComponent = defineComponent({
           break;
         case 2:
           channelSettings.value = !channelSettings.value;
+          if (channelSettings.value == true) {
+            updateChannelsList();
+          }
           break;
         case 3:
-          isMuted.value = !isMuted.value;
+          mutePopup.value = !mutePopup.value;
           break;
       }
       console.log("channelSettings", channelSettings)
