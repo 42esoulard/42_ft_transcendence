@@ -20,7 +20,7 @@ async function run() {
         {
           username: 'Owner',
           forty_two_login: 'Owner', //should not be necessary as owner is not a 42 user
-          avatar: defaultAvatar,
+          avatar: 'http://localhost:3000/users/avatars/owner.jpg',
         },
         {
           username: 'user1',
@@ -28,6 +28,7 @@ async function run() {
           avatar: defaultAvatar,
         },
       ])
+      .orIgnore()
       .execute();
 
     createQueryBuilder()
