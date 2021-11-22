@@ -27,13 +27,13 @@ export class AuthService implements AuthProvider {
     }
   }
 
-  async validateJwtUser(login: string): Promise<User> {
-    const user: User = await this.usersService.getUserByLogin(login);
+  async validateJwtUser(username: string): Promise<User> {
+    const user: User = await this.usersService.getUserByUsername(username);
     return user;
   }
 
   async generateAccessToken(user: User, isTwoFAauthenticated = false) {
-    const payload: JwtPayload = { username: user.forty_two_login, sub: user.id, isTwoFAauthenticated };
+    const payload: JwtPayload = { username: user.username, sub: user.id, isTwoFAauthenticated };
     return this.jwtService.sign(payload)
   }
 
