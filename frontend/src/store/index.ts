@@ -1,4 +1,3 @@
-import { Null } from 'mdue'
 import { User } from 'sdk/typescript-axios-client-generated'
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
@@ -10,6 +9,7 @@ export interface State {
   firstTimeConnect: boolean,
   isConnected: boolean,
   onlineUsers: User[];
+  inGameUsers: string[];
 }
 
 // define injection key
@@ -28,6 +28,7 @@ export const store = createStore<State>({
     firstTimeConnect: false,
     isConnected: false,
     onlineUsers: [],
+    inGameUsers: [],
   },
   getters: {},
   mutations: {
@@ -78,6 +79,24 @@ export const store = createStore<State>({
     removeOnlineUser(state: State, id: number) {
       if (id) {
         state.onlineUsers = state.onlineUsers.filter(u => u.id !== id);
+      }
+    },
+    
+    addInGameUsers(state: State, players: string[]) {
+      const user1 = state.inGameUsers.find(user => user === players[0]);
+      if (!user1)
+      state.inGameUsers.push(players[0]);
+      const user2 = state.inGameUsers.find(user => user === players[1]);
+      if (!user2)
+      state.inGameUsers.push(players[1]);
+    },
+    
+    removeInGameUsers(state: State, players: string[]) {
+      if (players[0]) {
+        state.inGameUsers = state.inGameUsers.filter(user => user !== players[0]);
+      }
+      if (players[1]) {
+        state.inGameUsers = state.inGameUsers.filter(user => user !== players[1]);
       }
     },
 

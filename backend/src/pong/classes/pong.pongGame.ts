@@ -159,6 +159,8 @@ export class pongGame {
     await this.gameUserRepo.update({userId: this.player2.userId, gameId: this.gameId}, { won: !player1Won})
     await this.gameRepo.update(this.gameId, {score1: this.player1.score, score2: this.player2.score})
     this.server.to(this.room).emit('gameOver', player1Won)
+    this.server.emit("removeInGameUsers", [this.player1.userName, this.player2.userName]);
+
   }
   
   async spectatorWarnEndGame() {

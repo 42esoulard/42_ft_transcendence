@@ -19,10 +19,12 @@ async function run() {
       .values([
         {
           username: 'Owner',
+          forty_two_login: 'Owner', //should not be necessary as owner is not a 42 user
           avatar: defaultAvatar,
         },
         {
-          username: 'User1',
+          username: 'user1',
+          forty_two_login: 'user1',
           avatar: defaultAvatar,
         },
       ])
