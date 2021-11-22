@@ -37,15 +37,23 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleDisconnect(client: Socket): void {
     this.logger.log('Client disconected ' + client.id);
     this.clearQueue(client)
-    this.games.forEach((value: pongGame, key: string) => {
-      if (value.player1.clientSocket.id === client.id || value.player2.clientSocket.id === client.id)
-        this.leaveGame(client, key)
+    this.games.forEach((game: pongGame) => {
+      if (game.player1.clientSocket.id === client.id || game.player2.clientSocket.id === client.id)
+        this.leaveGame(client, game.room)
     })
   }
   
   handleConnection(client: Socket, ...args: any[]): void {
     this.logger.log('Client connected ' + client.id);
+    // this.sendOnlinePlayers(client)
   }
+
+  // sendOnlinePlayers(client: Socket)
+  // {
+  //   this.games.forEach((value: pongGame, key: string) => {
+
+  //     return 
+  // }
 
   @SubscribeMessage('challengeRequest')
   async handleAskToPlay(client: Socket, message: challengeMessage)
@@ -58,7 +66,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('joinGame')
   async handleJoinGameMessage(client: Socket, message: joinGameMessage): Promise<void>
   {
-    this.logger.log('client joined game. userID: ' + message.userId + ' gameMode: ' + message.gameMode)
+    // this.logger.log('client joined game. userID: ' + message.userId + ' gameMode: ' + message.gameMode)
 
     if (this.userIsAlreadyInQueue(client, message.userId))
       return
