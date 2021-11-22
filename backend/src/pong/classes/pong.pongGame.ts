@@ -38,6 +38,7 @@ export class pongGame {
   
   private logger: Logger = new Logger('PongGateway');
   
+  public isOver: boolean = false
   public room: string
   public gameId: number
   
@@ -152,6 +153,8 @@ export class pongGame {
   
   async endGame(player1Won: boolean): Promise<void>
   {
+    this.logger.log('endgame')
+    this.isOver = true
     clearTimeout(this.timeout)
     clearInterval(this.interval)
     this.spectatorWarnEndGame()

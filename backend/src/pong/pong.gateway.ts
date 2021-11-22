@@ -164,7 +164,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const game: pongGame = this.games.get(room)
     if (!game)
       return
-
+    if (game.isOver === true)
+    {
+      this.games.delete(room)
+      return
+    }
     const player1Won: boolean = clientWhoLeft === game.player2.clientSocket
     await game.endGame(player1Won)
     this.games.delete(room)
@@ -175,13 +179,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   {
     if (this.waitingPlayerClassic && this.waitingPlayerClassic.clientSocket == client)
     {
-      this.logger.log('deleting queue')
       delete this.waitingPlayerClassic
       this.waitingPlayerClassic = null
     }
     if (this.waitingPlayerTranscendence && this.waitingPlayerTranscendence.clientSocket == client)
     {
-      this.logger.log('deleting queue')
       delete this.waitingPlayerTranscendence
       this.waitingPlayerTranscendence = null
     }
