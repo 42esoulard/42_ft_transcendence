@@ -78,11 +78,14 @@ export default defineComponent ({
 		})
 
 		const challenge = (id: number, name: string) => {
+			// utiliser le store.state.onlineuser
 			socket.value.emit('challengeRequest', {challengerId: store.state.user.id, challengerName: store.state.user.username, challengeeId: id, challengeeName: name})
 		}
 
 		socket.value.on('challengeRequest', (message: challengeMessage) => {
 			console.log('challenge received from ' + message.challengerName + ' to ' + message.challengeeName)
+			if (message.challengeeId === store.state.user.id)
+				console.log('You have been challenged !')
 		})
 
 		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenge}
