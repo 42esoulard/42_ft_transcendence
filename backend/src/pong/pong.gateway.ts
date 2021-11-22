@@ -156,6 +156,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const game = new pongGame(player1, player2, this.gameRepo, this.gameUserRepo, this.server, message.gameMode)
     await game.createGame()
     this.games.set(game.room, game)
+    this.server.emit("newInGameUsers", [player1.userName, player2.userName]);
   }
 
   async leaveGame(clientWhoLeft: Socket, room: string)
@@ -167,6 +168,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const player1Won: boolean = clientWhoLeft === game.player2.clientSocket
     await game.endGame(player1Won)
     this.games.delete(room)
+    // this.server.emit("removeInGameUsers", [game.player1.userName, game.player2.userName]);
   }
 
   clearQueue(client: Socket)

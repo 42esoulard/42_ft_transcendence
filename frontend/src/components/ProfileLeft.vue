@@ -5,11 +5,16 @@
     </div>
     <span class="profile-left__name">{{ user.username }} </span>
     <span class="profile-left__since">member since {{ formatedDate }}</span>
-    <span v-if="isOnline && relationState(user) >= -1" class="profile-left__status"
+    <span
+      v-if="userStatus == 'online' && relationState(user) >= -1"
+      class="profile-left__status"
       ><i class="status status--online fas fa-circle" /> online</span
     >
-    <span v-else-if="relationState(user) >= -1" class="profile-left__status"
+    <span v-else-if="userStatus == 'offline' && relationState(user) >= -1" class="profile-left__status"
       ><i class="status status--offline fas fa-circle" /> offline</span
+    >
+    <span v-else-if="userStatus == 'ingame' && relationState(user) >= -1" class="profile-left__status"
+      ><i class="status status--in-game fas fa-circle" /> in game</span
     >
   </div>
   <div v-if="relationState(user) >= 0" class="profile-left__social">
@@ -72,7 +77,9 @@
     <button v-else class="button button--second" @click="deactivateTwoFactor">
       Disable 2FA
     </button>
-    <button class="button button--grey" @click="deleteAccount()">Delete account</button>
+    <button class="button button--grey" @click="deleteAccount()">
+      Delete account
+    </button>
     <teleport to="#modals">
       <transition name="fade--error">
         <div v-if="showBackdrop" class="backdrop"></div>
@@ -105,7 +112,11 @@
 import { defineComponent, ref, computed, onMounted, PropType } from "vue";
 import moment from "moment";
 import { User, Relationship } from "sdk/typescript-axios-client-generated";
-import { useRelationshipApi, useAuthApi, useUserApi } from "@/plugins/api.plugin";
+import {
+  useRelationshipApi,
+  useAuthApi,
+  useUserApi
+} from "@/plugins/api.plugin";
 import { useStore } from "@/store";
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import EditUser from "@/components/EditUser.vue";
@@ -118,8 +129,8 @@ export default defineComponent({
   props: {
     user: {
       type: Object as PropType<User>,
-      required: true,
-    },
+      required: true
+    }
   },
   components: { Modal, InitTwoFactor, EditUser },
   setup(props) {
@@ -136,14 +147,20 @@ export default defineComponent({
     const formatedDate = computed(() => {
       return moment(user.created_at).format("MM-DD-YYYY");
     });
-    const isOnline = computed((): boolean => {
+    const userStatus = computed((): "online" | "offline" | "ingame" => {
       if (user != undefined) {
-        const tmpUser: User[] = store.state.onlineUsers; // enlever cette ligne et utiliser un store typed !!!
-        const onlineUser = tmpUser.find((u) => u.id === user.id);
-        console.log("isOnline", onlineUser);
-        return onlineUser != undefined;
+        const inGameUser = store.state.inGameUsers.find(
+          u => u === user.username
+        );
+        const onlineUser = store.state.onlineUsers.find(u => u.id === user.id);
+        if (inGameUser) {
+          return "ingame";
+        } else if (onlineUser) {
+          console.log("isOnline", onlineUser);
+          return "online";
+        }
       }
-      return false;
+      return "offline";
     });
 
     onMounted(() => {
@@ -167,7 +184,7 @@ export default defineComponent({
           store.commit("toggleTwoFactor", false);
           store.dispatch("setMessage", res.data.message);
         })
-        .catch((error) => console.log(error));
+        .catch(error => console.log(error));
     };
 
     const toggleModal = (nbr: number) => {
@@ -184,9 +201,9 @@ export default defineComponent({
       return showModal.value || showModal2.value;
     });
 
-    const deleteAccount = async() => {
+    const deleteAccount = async () => {
       if (store.state.user.id != 0) {
-        if(confirm("Do you really want to delete?")){
+        if (confirm("Do you really want to delete?")) {
           logOut();
           await userApi
             .removeUser(store.state.user.id)
@@ -199,7 +216,7 @@ export default defineComponent({
     const logOut = () => {
       authApi
         .logout({ withCredentials: true })
-        .then((response) => {
+        .then(response => {
           console.log(response);
           presenceSocket.emit("closeConnection", store.state.user);
           store.commit("resetUser"); //store.state.user = null;
@@ -213,7 +230,7 @@ export default defineComponent({
         await relationshipApi
           .saveRelationship({
             requesterId: store.state.user.id,
-            adresseeId: user.id,
+            adresseeId: user.id
           })
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
@@ -225,7 +242,7 @@ export default defineComponent({
         await relationshipApi
           .removeRelationship({
             userId1: user.id,
-            userId2: store.state.user.id,
+            userId2: store.state.user.id
           })
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
@@ -237,7 +254,7 @@ export default defineComponent({
         await relationshipApi
           .validateRelationship({
             requesterId: user.id,
-            adresseeId: store.state.user.id,
+            adresseeId: store.state.user.id
           })
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
@@ -251,8 +268,7 @@ export default defineComponent({
       if (store.state.user.id === 0 || user.id === store.state.user.id)
         return -1;
 
-      if (user.banned)
-        return -3;
+      if (user.banned) return -3;
 
       for (const relationship of userFriendships.value) {
         if (user.id == relationship.requesterId) {
@@ -278,7 +294,7 @@ export default defineComponent({
           .saveRelationship({
             requesterId: store.state.user.id,
             adresseeId: user.id,
-            nature: "blocked",
+            nature: "blocked"
           })
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
@@ -290,7 +306,7 @@ export default defineComponent({
         await relationshipApi
           .removeRelationship({
             userId1: user.id,
-            userId2: store.state.user.id,
+            userId2: store.state.user.id
           })
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
@@ -303,7 +319,7 @@ export default defineComponent({
       removeFriend,
       acceptFriend,
       relationState,
-      isOnline,
+      userStatus,
       formatedDate,
       self: computed(() => store.state.user),
       firstTimeConnect: computed(() => store.state.firstTimeConnect),
@@ -316,6 +332,6 @@ export default defineComponent({
       unblock,
       deleteAccount
     };
-  },
+  }
 });
 </script>

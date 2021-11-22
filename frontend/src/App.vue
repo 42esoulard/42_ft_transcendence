@@ -42,6 +42,18 @@ export default {
       // console.log("OnlineUsers(afterRemoved)", store.state.onlineUsers);
     });
 
+    clientSocket.on("newInGameUsers", (players: string[]) => {
+      store.commit("addInGameUsers", players);
+      console.log("new Ingame Users", players);
+      console.log("inGameUsers", store.state.inGameUsers);
+    })
+
+    clientSocket.on("removeInGameUsers", (players: string[]) => {
+      store.commit("removeInGameUsers", players);
+      console.log("removed Ingame Users", players);
+      console.log("inGameUsers", store.state.inGameUsers);
+    })
+
     return {
       user: computed(() => store.state.user),
       message: computed(() => store.state.message),

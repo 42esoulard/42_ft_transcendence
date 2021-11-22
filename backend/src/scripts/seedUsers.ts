@@ -7,6 +7,8 @@ import { Users } from '../users/entity/users.entity';
 import { configService } from '../config/config.service';
 import { Channels } from 'src/channels/entity/channels.entity';
 
+const defaultAvatar = 'http://localhost:3000/users/avatars/default.jpg';
+
 async function run() {
   await createConnection(
     configService.getTypeOrmConfig() as ConnectionOptions,
@@ -16,20 +18,14 @@ async function run() {
       .into(Users)
       .values([
         {
-          username: 'Harry',
-          avatar: 'http://localhost:3000/users/avatars/default.jpg',
+          username: 'Owner',
+          forty_two_login: 'Owner', //should not be necessary as owner is not a 42 user
+          avatar: defaultAvatar,
         },
         {
-          username: 'Ron',
-          avatar: 'http://localhost:3000/users/avatars/default.jpg',
-        },
-        {
-          username: 'Hermione',
-          avatar: 'http://localhost:3000/users/avatars/default.jpg',
-        },
-        {
-          username: 'Severus',
-          avatar: 'http://localhost:3000/users/avatars/default.jpg',
+          username: 'user1',
+          forty_two_login: 'user1',
+          avatar: defaultAvatar,
         },
       ])
       .execute();
