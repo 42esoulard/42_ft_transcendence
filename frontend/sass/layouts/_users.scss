@@ -64,6 +64,9 @@
   &--online {
     border: 2px solid darken($third-color, 10%);
   }
+  &--in-game {
+    border: 2px solid $status-in-game-color;
+  }
   &--offline {
     border: 2px solid $status-offline-color;
   }

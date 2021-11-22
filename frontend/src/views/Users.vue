@@ -37,7 +37,8 @@
       <div class="users-list">
         <tr v-for="user in selectList" :key="user.id" class="users-list__elt">
           <td>
-            <img v-if="isOnline(user)" class="users-list__avatar users-list__avatar--online" :src="user.avatar" />
+            <img v-if="userStatus(user) == 'online'" class="users-list__avatar users-list__avatar--online" :src="user.avatar" />
+            <img v-else-if="userStatus(user) == 'ingame'" class="users-list__avatar users-list__avatar--in-game" :src="user.avatar" />
             <img v-else class="users-list__avatar users-list__avatar--offline" :src="user.avatar" />
           </td>
           <td>
@@ -90,13 +91,28 @@ export default defineComponent({
     const blockedlist = ref(false);
     const searchQuery = ref("");
 
-    const isOnline = (user: User): boolean => {
+    // const isOnline = (user: User): boolean => {
+    //   if (user != undefined) {
+    //     const isonline = store.state.onlineUsers.find((u) => u.id === user.id);
+    //     console.log(isonline != undefined);
+    //     return isonline != undefined;
+    //   }
+    //   return false;
+    // };
+
+    const userStatus = (user: User): "online" | "offline" | "ingame" => {
       if (user != undefined) {
-        const isonline = store.state.onlineUsers.find((u) => u.id === user.id);
-        console.log(isonline != undefined);
-        return isonline != undefined;
+        const inGameUser = store.state.inGameUsers.find(
+          u => u === user.username
+        );
+        const onlineUser = store.state.onlineUsers.find(u => u.id === user.id);
+        if (inGameUser) {
+          return "ingame";
+        } else if (onlineUser) {
+          return "online";
+        }
       }
-      return false;
+      return "offline";
     };
 
     onMounted(() => {
@@ -147,7 +163,7 @@ export default defineComponent({
     };
 
     const selectList = computed(() => {
-      const list = ref();
+      const list = ref<User[]>([]);
       if (blockedlist.value) {
         if (friendlist.value || onlinelist.value) return list.value;
         list.value = userList.value.filter((user: User) =>
@@ -192,7 +208,7 @@ export default defineComponent({
       blockedlist,
       selectList,
       searchQuery,
-      isOnline,
+      userStatus,
     };
   },
 });
