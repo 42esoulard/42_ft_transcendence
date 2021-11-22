@@ -45,15 +45,19 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   handleConnection(client: Socket, ...args: any[]): void {
     this.logger.log('Client connected ' + client.id);
-    // this.sendOnlinePlayers(client)
+    this.sendPlayingUsers(client)
   }
 
-  // sendOnlinePlayers(client: Socket)
-  // {
-  //   this.games.forEach((value: pongGame, key: string) => {
-
-  //     return 
-  // }
+  sendPlayingUsers(client: Socket)
+  {
+    var playingUsers: string[] = [] // userNames
+    this.games.forEach((game: pongGame) => {
+      playingUsers.push(game.player1.userName, game.player2.userName)
+    })
+    this.logger.log(playingUsers)
+    if (playingUsers.length)
+      client.emit('allPlayingUsers', playingUsers)
+  }
 
   @SubscribeMessage('challengeRequest')
   async handleAskToPlay(client: Socket, message: challengeMessage)

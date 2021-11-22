@@ -100,6 +100,11 @@ export const store = createStore<State>({
       }
     },
 
+    allPlayingUsers(state: State, players: string[])
+    {
+      if (players.length)
+        state.inGameUsers = players
+    }
 
   },
   actions: {

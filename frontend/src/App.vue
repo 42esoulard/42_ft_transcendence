@@ -54,6 +54,11 @@ export default {
       console.log("inGameUsers", store.state.inGameUsers);
     })
 
+    pongSocket.on("allPlayingUsers", (playersUserNames: string[]) => {
+      store.commit("allPlayingUsers", playersUserNames);
+      console.log("allPlayingUsers", store.state.inGameUsers);
+    })
+
     return {
       user: computed(() => store.state.user),
       message: computed(() => store.state.message),
