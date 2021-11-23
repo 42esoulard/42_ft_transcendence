@@ -101,14 +101,12 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
     component: PongGame,
     beforeEnter(to, from, next) {
-      if (to.params.authorized)
-      {
+      if (to.params.authorized) {
         next()
       }
-      else
-      {
+      else {
         console.log('redirected to Pong')
-        next({name: 'Pong'})
+        next({ name: 'Pong' })
       }
     }
   },
@@ -123,14 +121,12 @@ const routes: Array<RouteRecordRaw> = [
     component: PongGame,
     props: true,
     beforeEnter(to, from, next) {
-      if (to.params.authorized)
-      {
+      if (to.params.authorized) {
         next()
       }
-      else
-      {
+      else {
         console.log('redirected to PongWatch')
-        next({name: 'PongWatch'})
+        next({ name: 'PongWatch' })
       }
     }
   },
@@ -181,7 +177,7 @@ router.beforeEach(async (to, from) => {
     if (store.state.user.id === 0) {
       return '/login'; // redirected to login
     } else {
-      if (store.state.user.banned){
+      if (store.state.user.banned) {
         return '/banned';
       }
       return true; // the route is allowed

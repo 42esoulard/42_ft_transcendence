@@ -19,7 +19,7 @@
   </div>
 
 	<div v-for="user in users" :key="user.id">
-		<button v-on:click="challenge(user.id, user.username)"> {{user.forty_two_login}} </button>
+		<button v-on:click="challenge(user.id, user.username)"> {{user.username}} </button>
 	</div>
 </template>
 
