@@ -113,15 +113,18 @@ export default defineComponent ({
 			{
 				console.log('You have been challenged !')
 				challenged.value = true
-
 			}
+		})
+
+		socket.value.on('challengeDeclined', () => {
+			console.log('challenge has been declined')
 		})
 
 		const accept = () => {
 			socket.value.emit('challengeAccepted', challengeMessage.value)
 		}
 		const refuse = () => {
-			socket.value.emit('challengeDeclined')
+			socket.value.emit('challengeDeclined', challengeMessage.value)
 		}
 
 		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenge, challenged, accept, refuse}
