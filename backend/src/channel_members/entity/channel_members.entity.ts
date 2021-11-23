@@ -14,10 +14,15 @@ export class ChannelMembers {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Channels, (channel) => channel.channel_members)
+  @ManyToOne(() => Channels, (channel) => channel.channel_members, {
+    onDelete: 'CASCADE',
+  })
   channel: Channels;
 
-  @ManyToOne(() => Users, (user) => user.channel_members, { eager: true })
+  @ManyToOne(() => Users, (user) => user.channel_members, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   member: Users;
 
   @Column({ default: false })
@@ -26,10 +31,10 @@ export class ChannelMembers {
   @Column({ default: false })
   is_admin: boolean;
 
-  @Column({ nullable: true, default: null })
+  @Column({ length: 15, nullable: true, default: null })
   ban: string;
 
-  @Column({ nullable: true, default: null })
+  @Column({ length: 15, nullable: true, default: null })
   mute: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })

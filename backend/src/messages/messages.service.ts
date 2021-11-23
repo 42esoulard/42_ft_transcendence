@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { Message } from './interfaces/message.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Messages } from './entity/messages.entity';
 import { CreateMessageDto } from './dto/createMessage.dto';
-import { Channel } from 'src/channels/interfaces/channel.interface';
-import { User } from 'src/users/interfaces/user.interface';
 import { ChannelsService } from 'src/channels/channels.service';
+import { ChannelMembersService } from 'src/channel_members/channel_members.service';
 import { UsersService } from 'src/users/users.service';
 // import { timestamp } from 'rxjs';
 // import { UpdateMessageDto } from './dto/updateMessage.dto';
@@ -18,6 +21,7 @@ export class MessagesService {
     @InjectRepository(Messages)
     private readonly messagesRepository: Repository<Messages>,
     private readonly channelService: ChannelsService,
+    private readonly channelMemberService: ChannelMembersService,
     private readonly userService: UsersService,
   ) {}
 
@@ -60,16 +64,26 @@ export class MessagesService {
     newMessage.author = await this.userService.getUserbyId(
       messageDto.author_id,
     );
+    await this.channelMemberService
+      .getChannelMember(newMessage.channel, newMessage.author)
+      .then((res) => {
+        if (this.channelMemberService.checkMute(res)) {
+          throw new ForbiddenException('muted');
+        }
+        if (res.ban) {
+          throw new ForbiddenException('banned');
+        }
+      });
 
-    return await this.messagesRepository.save(newMessage);
+    return await this.messagesRepository
+      .save(newMessage)
+      .then((res) => {
+        return res;
+      })
+      .catch(() => {
+        throw new BadRequestException(
+          'Message did not comply database requirements',
+        );
+      });
   }
-
-  /**
-   * We probably don't need to make messages editable
-   * Updates a message into db
-   * nb: save(message) is a function from the typeORM library
-   */
-  // async updateMessage(updatedMessage: UpdateMessageDto): Promise<Message> {
-  // 	return await this.MessagesRepository.save(updatedMessage);
-  // }
 }

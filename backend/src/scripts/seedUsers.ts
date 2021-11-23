@@ -30,12 +30,6 @@ async function run() {
       ])
       .orIgnore()
       .execute();
-
-    createQueryBuilder()
-      .insert()
-      .into(Channels)
-      .values([{ name: 'General', type: 'Public', owner: null }])
-      .execute();
   });
 }
 

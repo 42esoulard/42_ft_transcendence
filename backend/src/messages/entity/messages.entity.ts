@@ -28,7 +28,7 @@ export class Messages {
   })
   author: Users;
 
-  @Column()
+  @Column({ type: 'varchar', length: 100000 })
   content: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
