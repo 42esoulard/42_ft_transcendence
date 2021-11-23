@@ -105,17 +105,20 @@ export default defineComponent ({
 		}
 
 		const challenged = ref(false)
+		const challengeMessage = ref<challengeMessage>()
 		socket.value.on('challengeRequest', (message: challengeMessage) => {
 			console.log('challenge received from ' + message.challengerName + ' to ' + message.challengeeName)
+			challengeMessage.value = message
 			if (message.challengeeId === store.state.user.id)
 			{
 				console.log('You have been challenged !')
 				challenged.value = true
+
 			}
 		})
 
 		const accept = () => {
-			socket.value.emit('challengeAccepted')
+			socket.value.emit('challengeAccepted', challengeMessage.value)
 		}
 		const refuse = () => {
 			socket.value.emit('challengeDeclined')
