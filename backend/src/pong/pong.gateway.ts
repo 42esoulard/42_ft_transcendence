@@ -7,7 +7,7 @@ import { Game } from './entity/games.entity';
 import { GameUser } from './entity/gameUser.entity';
 import { pongGame } from './classes/pong.pongGame';
 import { player } from './classes/pong.player';
-import { challengeMessage, joinGameMessage } from './classes/pong.types';
+import { challengeMessage, gameMode, joinGameMessage } from './classes/pong.types';
 
 
 @WebSocketGateway( { namespace: '/pong'})
@@ -66,6 +66,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.server.emit('challengeRequest', message)
   }
   
+  // @SubscribeMessage('acceptChallenge')
+  // async handleAcceptChallenge(client: Socket, message: challengeMessage)
+  // {
+  //   this.server.emit('challengeRequest', message)
+  // }
   
   @SubscribeMessage('joinGame')
   async handleJoinGameMessage(client: Socket, message: joinGameMessage): Promise<void>
@@ -80,14 +85,21 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       if (!this.waitingPlayerClassic)
         this.addPlayerToQueue(client, message)
       else
-        this.createGame(this.waitingPlayerClassic, message, client)
+      {
+        const player2 = new player(message.userId, message.userName, client, 2)
+        this.createGame(this.waitingPlayerClassic, player2, message.gameMode)
+      }
     }
     if (message.gameMode === 'transcendence')
     {
       if (!this.waitingPlayerTranscendence)
         this.addPlayerToQueue(client, message)
       else
-        this.createGame(this.waitingPlayerTranscendence, message, client)
+      {
+        const player2 = new player(message.userId, message.userName, client, 2)
+        this.createGame(this.waitingPlayerTranscendence, player2, message.gameMode)
+
+      }
     }
   }
 
@@ -162,10 +174,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return false
   }
 
-  async createGame(player1: player, message: joinGameMessage, client: Socket)
+  async createGame(player1: player, player2: player, gameMode: gameMode)
   {
-    const player2 = new player(message.userId, message.userName, client, 2)
-    const game = new pongGame(player1, player2, this.gameRepo, this.gameUserRepo, this.server, message.gameMode)
+    const game = new pongGame(player1, player2, this.gameRepo, this.gameUserRepo, this.server, gameMode)
     await game.createGame()
     this.games.set(game.room, game)
     this.server.emit("newInGameUsers", [player1.userName, player2.userName]);
