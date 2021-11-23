@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { ChannelMembers } from './entity/channel_members.entity';
@@ -49,16 +49,34 @@ export class ChannelMembersService {
     is_owner = false,
     is_admin = false,
   ): Promise<ChannelMembers> {
-    return await this.channelMembersRepository.save({
-      channel: channel,
-      member: user,
-      is_owner: is_owner,
-      is_admin: is_admin,
-    });
+    return await this.channelMembersRepository
+      .save({
+        channel: channel,
+        member: user,
+        is_owner: is_owner,
+        is_admin: is_admin,
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch(() => {
+        throw new BadRequestException(
+          'Channel Member did not comply database requirements',
+        );
+      });
   }
 
   async deleteChannelMember(cm_id: number): Promise<DeleteResult> {
-    return this.channelMembersRepository.delete(cm_id);
+    return this.channelMembersRepository
+      .delete(cm_id)
+      .then((res) => {
+        return res;
+      })
+      .catch(() => {
+        throw new BadRequestException(
+          'Channel Member did not comply database requirements',
+        );
+      });
   }
 
   async toggleAdmin(cm_id: number): Promise<ChannelMembers> {
@@ -67,7 +85,16 @@ export class ChannelMembersService {
         res.is_admin = !res.is_admin;
         res.mute = '';
         res.ban = '';
-        return this.channelMembersRepository.save(res);
+        return this.channelMembersRepository
+          .save(res)
+          .then((result) => {
+            return result;
+          })
+          .catch(() => {
+            throw new BadRequestException(
+              'Channel Member did not comply database requirements',
+            );
+          });
       }
     });
   }
@@ -92,14 +119,27 @@ export class ChannelMembersService {
           res.ban = end_date.toString();
           break;
       }
-      return await this.channelMembersRepository.save(res);
+      return await this.channelMembersRepository
+        .save(res)
+        .then((result) => {
+          return result;
+        })
+        .catch(() => {
+          throw new BadRequestException(
+            'Channel Member did not comply database requirements',
+          );
+        });
     });
   }
 
   checkMute(cm: ChannelMembers): boolean {
     if (cm.mute && Number(cm.mute) - Date.now() <= 0) {
       cm.mute = null;
-      this.channelMembersRepository.save(cm);
+      this.channelMembersRepository.save(cm).catch(() => {
+        throw new BadRequestException(
+          'Channel Member did not comply database requirements',
+        );
+      });
     }
     if (!cm.mute) {
       return false;
@@ -110,7 +150,11 @@ export class ChannelMembersService {
   checkBan(cm: ChannelMembers): boolean {
     if (cm.ban && Number(cm.ban) - Date.now() <= 0) {
       cm.ban = null;
-      this.channelMembersRepository.save(cm);
+      this.channelMembersRepository.save(cm).catch(() => {
+        throw new BadRequestException(
+          'Channel Member did not comply database requirements',
+        );
+      });
     }
     if (!cm.ban) {
       return false;

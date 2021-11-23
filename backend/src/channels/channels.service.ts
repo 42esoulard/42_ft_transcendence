@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Channel } from './interfaces/channel.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
@@ -22,12 +22,21 @@ export class ChannelsService {
 
   async seed(): Promise<Channel> {
     console.log('Initializing default channel...');
-    return await this.channelsRepository.save({
-      id: 1,
-      name: 'General',
-      password: null,
-      type: 'public',
-    });
+    return await this.channelsRepository
+      .save({
+        id: 1,
+        name: 'General',
+        password: null,
+        type: 'public',
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch(() => {
+        throw new BadRequestException(
+          'Channel did not comply database requirements',
+        );
+      });
     // .then(() => console.log('Channels seed complete!'))
     // .catch(() => console.log('Channels seed failed :('));
   }
@@ -150,7 +159,16 @@ export class ChannelsService {
   }
 
   async deleteChannel(chan_id: number): Promise<DeleteResult> {
-    return await this.channelsRepository.delete(chan_id);
+    return await this.channelsRepository
+      .delete(chan_id)
+      .then((res) => {
+        return res;
+      })
+      .catch(() => {
+        throw new BadRequestException(
+          'Channel did not comply database requirements',
+        );
+      });
   }
 
   /**
@@ -166,7 +184,16 @@ export class ChannelsService {
       newChannel.password = await bcrypt.hash(channelDto.password, salt); //must be crypted
     }
 
-    await this.channelsRepository.save(newChannel);
+    await this.channelsRepository
+      .save(newChannel)
+      .then((res) => {
+        return res;
+      })
+      .catch(() => {
+        throw new BadRequestException(
+          'Channel did not comply database requirements',
+        );
+      });
     return await this.channelMemberService.createChannelMember(
       newChannel,
       owner,
@@ -201,6 +228,15 @@ export class ChannelsService {
       channel.password = '';
     }
 
-    return await this.channelsRepository.save(channel);
+    return await this.channelsRepository
+      .save(channel)
+      .then((res) => {
+        return res;
+      })
+      .catch(() => {
+        throw new BadRequestException(
+          'Channel did not comply database requirements',
+        );
+      });
   }
 }

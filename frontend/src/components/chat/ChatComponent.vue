@@ -77,6 +77,7 @@
                   type="text"
                   class="chat-box__input"
                   v-model="newMessage"
+                  maxlength=100000
                   placeholder="Enter message here"
                 />
                 <div v-else @mouseover="hoveringLock = true" @mouseout="hoveringLock = false">

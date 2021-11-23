@@ -158,7 +158,6 @@ export class ChannelsController {
     const channels: Channel[] = await this.channelService.getAvailableChannels(
       id,
     );
-    console.log("HEREEEEE", channels)
     if (channels == undefined) {
       throw new NotFoundException('No available channels found');
     }
