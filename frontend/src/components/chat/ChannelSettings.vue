@@ -91,7 +91,7 @@
             </div>
           </li>
           <form v-if="selectedTab == 'all'" @submit.prevent='addMember()'>
-            <input class="chat-channel-form__input" required type="text" name='name' id='addedLogin' placeholder="Enter the user/'s 42 login" minlength="1" maxlength="200" v-model="username" @input="checkLogin()">
+            <input class="chat-channel-form__input" required type="text" name='name' id='addedLogin' placeholder="Enter the user's 42 login" minlength="1" maxlength="200" v-model="login" @input="checkLogin()">
             <button class="button button--create-chan" for='name'>+</button>
           </form>
         </div>
