@@ -178,7 +178,6 @@ export const ChatComponent = defineComponent({
     const passwordPrompt = ref(false);
     const channelSettings = ref(false);
     const isMember = ref(false);
-    const isMuted = ref(false);
     const mutePopup = ref(false);
 
     /*
@@ -199,6 +198,7 @@ export const ChatComponent = defineComponent({
     ** ie: a channel is created/deleted. Re-fetches all channel infos from API.
     */
     const updateChannelsList = async () => {
+      mutePopup.value = false;
       await api.getUserChannels(user.value.id)
       .then(async (res) => {
         joinedChannels.value = res.data;
@@ -255,8 +255,6 @@ export const ChatComponent = defineComponent({
 
       newMessage.value = "";
       messageId.value++;
-      const wasMuted = isMuted.value;
-      console.log('before', wasMuted);
 
       await api.saveMessage({
           channel_id: newContent.channel.id,
@@ -265,29 +263,18 @@ export const ChatComponent = defineComponent({
       })
       .then(() => {
         getMessagesUpdate(newContent.channel.id);
-        console.log('after', wasMuted);
-        if (wasMuted) {
-          socket.emit('updateChannels');
-          isMuted.value = false;
-        }
+          // socket.emit('updateChannels');        
         socket.emit("chat-message", newContent);
       })
       .catch(async (err: any) => {
         console.log("Caught error:", err.response.data.message)
-        if (!wasMuted) {
-          await updateChannelsList()
-          .then(() => {
-            if (err.response.data.message == 'muted') {
-              isMuted.value = true;
-              mutePopup.value = true;
-            }
-            return;
-          })
-        }
-        if (err.response.data.message == 'muted') {
-          isMuted.value = true;
-          mutePopup.value = true;
-        }
+        // await updateChannelsList()
+        // .then(() => {
+          if (err.response.data.message == 'muted') {
+            mutePopup.value = true;
+          }
+          return;
+        // })
       });
     }
 
@@ -516,7 +503,7 @@ export const ChatComponent = defineComponent({
       joinChannel,
       leaveChannel,
       isMember,
-      isMuted,
+      mutePopup,
 
       newChannelForm,
       passwordPrompt,

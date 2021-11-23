@@ -37,7 +37,7 @@ import { useStore } from '@/store'
 export default defineComponent({
   name: 'MuteBanTimer',
   props: [ 'action', 'targetCm', 'activeChannel' ],
-
+  emits: ['close', 'update-mute-ban'],
   setup(props, context) {
     const api = new ChatApi();
     const store = useStore();
@@ -55,23 +55,12 @@ export default defineComponent({
 
     const checkEndDate = async () => {
       const parsedDate = Date.parse(endDate.value);
-      console.log("parsed date ", parsedDate)
       if (parsedDate - Date.now() <= 0) {
         dateInput.value.setCustomValidity("Please select a future date!");
         dateInput.value.reportValidity();
         return;
       }
-
-      console.log("enddate ", endDate.value, typeof(endDate.value), Date.parse(endDate.value))
-
-      await api.muteBanMember(props.action, props.targetCm.id, Date.parse(endDate.value)) //endDate.value
-      .then((res) => {
-        // console.log("targetcm", props.targetCm)
-        // console.log("mutebanmember ret", res)
-        store.dispatch("setMessage", "[" + props.targetCm.member.username + "] is " + props.action + " from channel [" + props.activeChannel.channel.name.substring(0, 16) + "] until " + endDate.value);
-        closeModal();
-      })
-      .catch((err) => console.log("Caught error:", err.response.data.message)) 
+      context.emit("update-mute-ban", props.action, props.targetCm.id, Date.parse(endDate.value));
     }
 
     const getEndDate = () => {
@@ -82,50 +71,16 @@ export default defineComponent({
     }
 
     const unmuteUnban = async () => {
-      const newState = (props.action === 'unmute'? 'unmuted': 'unbanned');
-
-      await api.muteBanMember(props.action, props.targetCm.id, 0) //endDate.value
-      .then((res) => {
-        // console.log("targetcm", props.targetCm)
-        // console.log("mutebanmember ret", res)
-        store.dispatch("setMessage", "[" + props.targetCm.member.username + "] has been " + newState + " from channel [" + props.activeChannel.channel.name.substring(0, 16) + "]");
-        closeModal();
-      })
-      .catch((err) => console.log("Caught error:", err.response.data.message)) 
+      context.emit("update-mute-ban", props.action, props.targetCm.id, 0);
     }
-    // const reinitError = () => {
-    //   passwordInput.value.setCustomValidity("");
-    // }
-
-    // const checkPassword = () => {
-
-    //   api.checkPasswordMatch(props.channel.id, passwordAttempt.value)
-    //   .then((res) => {
-    //     console.log("password match res", res)
-    //     if (res.data) {
-    //       context.emit('join-channel', props.channel);
-    //       closeModal();
-    //     }
-    //     else {
-    //       passwordInput.value.setCustomValidity("Wrong channel password.");
-    //       passwordInput.value.reportValidity();
-    //       return ;
-    //     }
-    //   })
-    //   .catch((err) => console.log(err));
-    // }
 
     return {
-      // passwordAttempt,
-      // checkPassword,
-      // reinitError,
       closeModal,
       endDate,
       checkEndDate,
       getEndDate,
       unmuteUnban,
       state,
-      
     }
   }
 });

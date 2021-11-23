@@ -112,7 +112,7 @@
       <transition-group name="zoomin">
         <Modal v-if="toggleTimer && activeChannel" @close="closeModal()">
           <template v-slot:mute-ban-timer>
-            <MuteBanTimer :action="toggleTimer" :targetCm="targetCm" :activeChannel="activeChannel" @close="closeModal()" />
+            <MuteBanTimer :action="toggleTimer" :targetCm="targetCm" :activeChannel="activeChannel" @close="closeModal()" @update-mute-ban="updateMuteBan" />
           </template>
         </Modal>
       </transition-group>
@@ -190,9 +190,7 @@ export default defineComponent({
           }
           break;
       }
-
     };
-
 
     const closeChannelSettings = () => {
       context.emit('close-settings')
@@ -205,7 +203,23 @@ export default defineComponent({
 
     const closeModal = () => {
       toggleTimer.value = '';
-      context.emit('update-channel');
+    }
+
+    const updateMuteBan = async (action: string, cmId: number, endDate: number) => {
+      await api.muteBanMember(action, cmId, endDate)
+      .then((res) => {
+        targetCm.value = res.data;
+        context.emit('update-channels-list');
+        socket.emit('updateChannels');
+
+        if (action === 'muted') {
+          setTimeout(() => updateMuteBan("unmute", cmId, 0), endDate - Date.now())
+        } else if (action === 'banned') {
+          setTimeout(() => updateMuteBan("unban", cmId, 0), endDate - Date.now())
+        }
+        closeModal();
+      })
+      .catch((err) => console.log("Caught error:", err.response.data.message))
     }
 
     const toggleAdmin = async (cm: ChannelMember) => {
@@ -231,37 +245,12 @@ export default defineComponent({
       .catch((err) => console.log("Caught error:", err.response.data.message))
     }
 
-    
-
-    // const channelName = ref('');
-    // const channelType = ref('public');
     const channelPassword = ref('');
     const channelPasswordConf = ref('');
-    // const user = useStore().state.user;
     const wasSubmitted = ref(false);
 
-    // let validName = true;
     let validPassword = true;
     let validPasswordConf = true;
-
-    // // const closeModal = () => {
-    // //   context.emit("close");
-    // // };
-
-    // const checkName = () => {
-    //   const nameInput =  <HTMLInputElement>document.querySelector('input[id=\'chanName\']')!;
-
-    //   api.getChannelByName(channelName.value)
-    //   .then(() => {
-    //     nameInput.setCustomValidity("A channel named [" + channelName.value + "] already exists")
-    //     validName = false;
-    //   })
-    //   .catch(() => {
-    //     nameInput.setCustomValidity('');
-    //     validName = true;
-    //     console.log(channelName.value + "not found")
-    //   })
-    // }
 
     const checkPassword = () => {
       const passwordInput = <HTMLInputElement>document.querySelector('input#password')!;
@@ -290,7 +279,6 @@ export default defineComponent({
     }
 
     const submitInputs = () => {
-      // checkName();
       checkPassword();
       checkPasswordConf();
       if (!validPassword || !validPasswordConf)
@@ -303,7 +291,6 @@ export default defineComponent({
       )
       .then((res) => {
         console.log("in updateChannel res", res)
-        // socket.emit('createChannel', res.data)
         context.emit('update-channels-list');
         socket.emit('updateChannels');
         closeChannelSettings();
@@ -312,12 +299,10 @@ export default defineComponent({
     }
 
     return {
-      // channelName,
-      // channelType,
+
       deleteChannel,
       channelPassword,
       channelPasswordConf,
-      // checkName,
       checkPassword,
       checkPasswordConf,
       submitInputs,
@@ -333,6 +318,7 @@ export default defineComponent({
       targetCm,
       toggleTab,
       toggleAdmin,
+      updateMuteBan,
     }
   }
 });
