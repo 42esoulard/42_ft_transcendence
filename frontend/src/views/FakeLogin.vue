@@ -22,7 +22,7 @@ import { User } from "sdk/typescript-axios-client-generated";
 import { useAuthApi, useUserApi } from "@/plugins/api.plugin";
 import { io } from "socket.io-client";
 import { useStore } from "@/store";
-import { presenceSocket } from "@/views/UserAccount.vue";
+import { presenceSocket } from "@/App.vue";
 
 export default defineComponent({
   name: "Login",

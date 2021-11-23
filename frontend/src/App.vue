@@ -4,14 +4,11 @@ import Header from "./components/Header.vue";
 import Toast from "@/components/Toast.vue";
 import { io } from "socket.io-client";
 import { useStore } from "@/store";
-import { computed, onActivated, onUpdated, reactive } from "vue";
+import { computed, onUpdated } from "vue";
 import { User } from "sdk/typescript-axios-client-generated";
-import { presenceSocket } from "@/views/UserAccount.vue";
 
 export const pongSocket = io("http://localhost:3000/pong");
-// export const presenceSocket = io("http://localhost:3000/presence", {
-//   withCredentials: true
-// });
+export const presenceSocket = io("http://localhost:3000/presence");
 
 export default {
   components: { SideBar, Header, Toast },
@@ -46,24 +43,24 @@ export default {
       store.commit("addInGameUsers", players);
       console.log("new Ingame Users", players);
       console.log("inGameUsers", store.state.inGameUsers);
-    })
+    });
 
     pongSocket.on("removeInGameUsers", (players: string[]) => {
       store.commit("removeInGameUsers", players);
       console.log("removed Ingame Users", players);
       console.log("inGameUsers", store.state.inGameUsers);
-    })
+    });
 
     pongSocket.on("allPlayingUsers", (playersUserNames: string[]) => {
       store.commit("allPlayingUsers", playersUserNames);
       console.log("allPlayingUsers", store.state.inGameUsers);
-    })
+    });
 
     return {
       user: computed(() => store.state.user),
-      message: computed(() => store.state.message),
+      message: computed(() => store.state.message)
     };
-  },
+  }
 };
 </script>
 

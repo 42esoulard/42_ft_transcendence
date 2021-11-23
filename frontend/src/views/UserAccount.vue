@@ -11,10 +11,6 @@ import EditUser from "@/components/EditUser.vue";
 import Modal from "@/components/Modal.vue";
 import { io } from "socket.io-client";
 
-export const presenceSocket = io("http://localhost:3000/presence", {
-  withCredentials: true,
-});
-
 export default defineComponent({
   name: "UserAccount",
   components: {},
