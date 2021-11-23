@@ -199,6 +199,7 @@ export const ChatComponent = defineComponent({
     */
     const updateChannelsList = async () => {
       mutePopup.value = false;
+      passwordPrompt.value = false;
       await api.getUserChannels(user.value.id)
       .then(async (res) => {
         joinedChannels.value = res.data;
@@ -206,6 +207,8 @@ export const ChatComponent = defineComponent({
         await api.getChannelMember(activeChannel.value!.channel.id, activeChannel.value!.member.id)
         .then((res) => {
           activeChannel.value = res.data;
+          if (!activeChannel.value.is_admin)
+            channelSettings.value = false;
           console.log(res.data)
         })
         .catch((err) => {
@@ -319,8 +322,10 @@ export const ChatComponent = defineComponent({
           isMember.value = true;
           console.log("ACTIVECHANNEL", activeChannel)
           getMessagesUpdate(res.data.channel.id);
-          if (channel.id !== 1)
+          if (channel.id !== 1) {
             store.dispatch("setMessage", "You're now a member of channel [" + channel.name.substring(0, 15) + "]");
+            socket.emit('updateChannels');
+          }
           return res;
         })
         .catch((err) => console.log("Caught error:", err.response.data.message));
@@ -342,6 +347,7 @@ export const ChatComponent = defineComponent({
         store.dispatch("setMessage", "You're no longer a member of channel [" + name.substring(0, 15) + "]");
         updateChannelsList();
         switchChannel(joinedChannels.value[0]);
+        socket.emit('updateChannels');
       })
       .catch((err) => console.log("Caught error:", err.response.data.message));
     }

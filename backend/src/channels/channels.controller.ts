@@ -140,7 +140,7 @@ export class ChannelsController {
     if (cm == undefined) {
       throw new NotFoundException('No user channels found');
     }
-    return cm;
+    return this.channelService.filterBanned(cm);
   }
 
   @Get('/avail/:id')
@@ -166,6 +166,8 @@ export class ChannelsController {
     );
     if (cm == undefined) {
       throw new NotFoundException('Channel Member not found');
+    } else if (cm.ban) {
+      throw new NotFoundException('banned');
     }
     return cm;
   }

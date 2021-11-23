@@ -81,6 +81,10 @@ export class ChannelsService {
   //   return await this.channelMemberService.getChannelMutedMembers(channel);
   // }
 
+  async filterBanned(userChannels: ChannelMember[]): Promise<ChannelMember[]> {
+    return userChannels.filter((userChannels) => !userChannels.ban);
+  }
+
   async getUserChannels(user_id: number): Promise<ChannelMember[]> {
     const user: Users = await this.userService.getUserbyId(user_id);
     return await this.channelMemberService.getUserChannels(user);

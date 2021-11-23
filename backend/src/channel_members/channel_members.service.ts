@@ -106,6 +106,17 @@ export class ChannelMembersService {
     }
     return true;
   }
+
+  checkBan(cm: ChannelMembers): boolean {
+    if (cm.ban && Number(cm.ban) - Date.now() <= 0) {
+      cm.ban = null;
+      this.channelMembersRepository.save(cm);
+    }
+    if (!cm.ban) {
+      return false;
+    }
+    return true;
+  }
   // /**
   //  * Lists all channelmembers in database
   //  * nb: find() is a function from the typeORM library
