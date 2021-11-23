@@ -5,6 +5,7 @@ import {
   Body,
   Param,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { ChannelsService } from './channels.service';
 import { Channel } from './interfaces/channel.interface';
@@ -18,6 +19,7 @@ import {
 import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
 import { ChannelMembersService } from 'src/channel_members/channel_members.service';
 import { DeleteResult } from 'typeorm';
+import { JwtTwoFactorGuard } from 'src/auth/guards/jwtTwoFactor.guard';
 // import { UpdateChannelDto } from './dto/updateChannel.dto';
 
 @ApiTags('Chat')
@@ -29,6 +31,7 @@ export class ChannelsController {
    * Lists all channels in database.
    */
   @Get()
+  @UseGuards(JwtTwoFactorGuard)
   async getChannels(): Promise<Channel[]> {
     const channels: Channel[] = await this.channelService.getChannels();
     if (channels == undefined) {
@@ -41,6 +44,7 @@ export class ChannelsController {
    * Returns a channel found in database by its id.
    */
   @Get(':id')
+  @UseGuards(JwtTwoFactorGuard)
   @ApiOkResponse({
     description: 'The channel has been found in database',
     type: Channel,
@@ -70,6 +74,7 @@ export class ChannelsController {
    * Returns a channel found in database by its id.
    */
   @Get('/name/:name')
+  @UseGuards(JwtTwoFactorGuard)
   @ApiOkResponse({
     description: 'The channel has been found in database',
     type: Channel,
@@ -92,6 +97,7 @@ export class ChannelsController {
    * Save a new channel to database from the POST body
    */
   @Post()
+  @UseGuards(JwtTwoFactorGuard)
   async saveChannel(
     @Body() newChannel: CreateChannelDto,
   ): Promise<ChannelMember> {
@@ -105,6 +111,7 @@ export class ChannelsController {
   }
 
   @Get('/join-channel/:channel/:user')
+  @UseGuards(JwtTwoFactorGuard)
   async joinChannel(
     @Param('channel') channel_id: number,
     @Param('user') user_id: number,
@@ -120,6 +127,7 @@ export class ChannelsController {
   }
 
   @Get('/join-protected/:channel/:attempt')
+  @UseGuards(JwtTwoFactorGuard)
   async checkPasswordMatch(
     @Param('channel') channel_id: number,
     @Param('attempt') attempt: string,
@@ -135,6 +143,7 @@ export class ChannelsController {
   }
 
   @Get('/user/:id')
+  @UseGuards(JwtTwoFactorGuard)
   async getUserChannels(@Param('id') id: number): Promise<ChannelMember[]> {
     const cm: ChannelMember[] = await this.channelService.getUserChannels(id);
     if (cm == undefined) {
@@ -144,6 +153,7 @@ export class ChannelsController {
   }
 
   @Get('/avail/:id')
+  @UseGuards(JwtTwoFactorGuard)
   async getAvailableChannels(@Param('id') id: number): Promise<Channel[]> {
     const channels: Channel[] = await this.channelService.getAvailableChannels(
       id,
@@ -156,6 +166,7 @@ export class ChannelsController {
   }
 
   @Get('/channel-member/:channel/:user')
+  @UseGuards(JwtTwoFactorGuard)
   async getChannelMember(
     @Param('channel') channel_id: number,
     @Param('user') user_id: number,
@@ -173,6 +184,7 @@ export class ChannelsController {
   }
 
   @Post('/leave-channel/:cm_id')
+  @UseGuards(JwtTwoFactorGuard)
   async leaveChannel(@Param('cm_id') cm_id: number): Promise<DeleteResult> {
     const dr: DeleteResult = await this.channelService.leaveChannel(cm_id);
     if (dr == undefined) {
@@ -182,6 +194,7 @@ export class ChannelsController {
   }
 
   @Post('/delete-channel/:chan_id')
+  @UseGuards(JwtTwoFactorGuard)
   async deleteChannel(
     @Param('chan_id') chan_id: number,
   ): Promise<DeleteResult> {
@@ -193,6 +206,7 @@ export class ChannelsController {
   }
 
   @Get('/admin-action/:action/:cm_id/:end_date')
+  @UseGuards(JwtTwoFactorGuard)
   async muteBanMember(
     @Param('action') action: string,
     @Param('cm_id') cm_id: number,
@@ -210,6 +224,7 @@ export class ChannelsController {
   }
 
   @Get('/toggle-admin/:cm_id')
+  @UseGuards(JwtTwoFactorGuard)
   async toggleAdmin(@Param('cm_id') cm_id: number): Promise<ChannelMember> {
     const cm: ChannelMember = await this.channelService.toggleAdmin(cm_id);
     if (cm == undefined) {
@@ -219,6 +234,7 @@ export class ChannelsController {
   }
 
   @Get('/update-pwd/:chan_id/:pwd')
+  @UseGuards(JwtTwoFactorGuard)
   async updateChannelPassword(
     @Param('chan_id') chan_id: number,
     @Param('pwd') pwd: string,

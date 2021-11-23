@@ -5,6 +5,7 @@ import {
   Body,
   Param,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { Message } from './interfaces/message.interface';
@@ -15,6 +16,7 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { JwtTwoFactorGuard } from 'src/auth/guards/jwtTwoFactor.guard';
 // import { Channel } from 'src/channels/interfaces/channel.interface';
 // import { UpdateMessageDto } from './dto/updateMessage.dto';
 
@@ -87,6 +89,7 @@ export class MessagesController {
    * Save a new message to database from the POST body
    */
   @Post()
+  @UseGuards(JwtTwoFactorGuard)
   async saveMessage(@Body() newMessage: CreateMessageDto): Promise<Message> {
     const msg: Message = await this.messageService.saveMessage(newMessage);
     if (msg == undefined) {

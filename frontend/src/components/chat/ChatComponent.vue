@@ -130,7 +130,6 @@
 import { io } from "socket.io-client";
 import { useStore } from '@/store';
 import { defineComponent, reactive, ref, watch, computed } from "vue";
-import { useUserApi } from "@/plugins/api.plugin";
 import { Info } from "@/types/Info";
 import { ChatApi, User, Message, Channel, ChannelMember } from '@/../sdk/typescript-axios-client-generated';
 import Modal from "@/components/Modal.vue";
@@ -184,7 +183,7 @@ export const ChatComponent = defineComponent({
     ** Default channel = id 1, "General". Automatically joined on connection, can't be left.
     */
     const getDefaultChannel = async () => {
-      await api.getChannelById(1)
+      await api.getChannelById(1, { withCredentials: true })
       .then(async (chan) => {
         await joinChannel(chan.data)
         .then(() => updateChannelsList())
@@ -200,11 +199,11 @@ export const ChatComponent = defineComponent({
     const updateChannelsList = async () => {
       mutePopup.value = false;
       passwordPrompt.value = false;
-      await api.getUserChannels(user.value.id)
+      await api.getUserChannels(user.value.id, { withCredentials: true })
       .then(async (res) => {
         joinedChannels.value = res.data;
         console.log("in  channels list", joinedChannels.value)
-        await api.getChannelMember(activeChannel.value!.channel.id, activeChannel.value!.member.id)
+        await api.getChannelMember(activeChannel.value!.channel.id, activeChannel.value!.member.id, { withCredentials: true })
         .then((res) => {
           activeChannel.value = res.data;
           if (!activeChannel.value.is_admin)
@@ -215,7 +214,7 @@ export const ChatComponent = defineComponent({
           console.log("Caught error:", err.response.data.message);
           getDefaultChannel();
         });
-        await api.getAvailableChannels(user.value.id)
+        await api.getAvailableChannels(user.value.id, { withCredentials: true })
         .then((res) => {
           availableChannels.value = res.data;
           console.log("avail", availableChannels.value);
@@ -233,11 +232,11 @@ export const ChatComponent = defineComponent({
     const getMessagesUpdate = async (channelId: number) => {
       console.log("in get messages channel", channelId)
       if (activeChannel.value!.channel && activeChannel.value!.channel.id === channelId) {
-        await api.getChannelById(channelId)
+        await api.getChannelById(channelId, { withCredentials: true })
         .then((res) => {
           activeChannel.value!.channel = res.data;
           channelMessages.value = res.data.messages;
-          console.log("in get messages:", channelMessages.value);
+          // console.log("in get messages:", channelMessages.value);
           return res;
         })
         .catch((err) => console.log("Caught error:", err.response.data.message));
@@ -263,7 +262,7 @@ export const ChatComponent = defineComponent({
           channel_id: newContent.channel.id,
           author_id: newContent.author.id,
           content: newContent.content,
-      })
+      }, { withCredentials: true })
       .then(() => {
         getMessagesUpdate(newContent.channel.id);
           // socket.emit('updateChannels');        
@@ -314,7 +313,7 @@ export const ChatComponent = defineComponent({
 
     const joinChannel = async (channel: Channel) => {
 
-      await api.joinChannel(channel.id, user.value.id)
+      await api.joinChannel(channel.id, user.value.id, { withCredentials: true })
         .then((res)=> {
           console.log(res)
           updateChannelsList();
@@ -342,7 +341,7 @@ export const ChatComponent = defineComponent({
     const leaveChannel = async () => {
 
       const name = activeChannel.value!.channel.name;
-      await api.leaveChannel(activeChannel.value!.id)
+      await api.leaveChannel(activeChannel.value!.id, { withCredentials: true })
       .then((res) => {
         store.dispatch("setMessage", "You're no longer a member of channel [" + name.substring(0, 15) + "]");
         updateChannelsList();
@@ -362,7 +361,7 @@ export const ChatComponent = defineComponent({
         owner_id: user.value.id,
         type: 'private',
         password: '',
-      })
+      }, { withCredentials: true })
       .then(async (cm) => {
         updateChannelsList();
         activeChannel.value = cm.data;
@@ -370,7 +369,7 @@ export const ChatComponent = defineComponent({
         console.log("ACTIVECHANNEL", activeChannel)
         getMessagesUpdate(cm.data.channel.id);
         store.dispatch("setMessage", "You're now a member of channel [" + cm.data.channel.name.substring(0, 15) + "]");
-        await api.joinChannel(cm.data.channel.id, recipient.id)
+        await api.joinChannel(cm.data.channel.id, recipient.id, { withCredentials: true })
         .then((res)=> {
           console.log(res)
           socket.emit('updateChannels', cm.data)
@@ -434,7 +433,7 @@ export const ChatComponent = defineComponent({
     });
 
     socket.on('createdChannel', async (cm: ChannelMember) => {
-      toggleModal(0);
+      // toggleModal(0);
       await updateChannelsList()
       .then(() => {
         switchChannel(cm);

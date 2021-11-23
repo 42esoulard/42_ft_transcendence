@@ -66,7 +66,7 @@ export default defineComponent({
     const checkName = () => {
       const nameInput =  <HTMLInputElement>document.querySelector('input[id=\'chanName\']')!;
 
-      api.getChannelByName(channelName.value)
+      api.getChannelByName(channelName.value, { withCredentials: true })
       .then(() => { 
         nameInput.setCustomValidity("A channel named [" + channelName.value + "] already exists")
         validName = false;
@@ -121,10 +121,11 @@ export default defineComponent({
         owner_id: user.id, 
         type: channelType.value,
         password: channelPassword.value
-      })
+      }, { withCredentials: true })
       .then((res) => {
         console.log("in createChannel res", res)
-        socket.emit('createChannel', res.data)
+        socket.emit('createChannel', res.data);
+        closeModal();
       })
       .catch((err) => console.log("Caught error:", err.response.data.message))
     }

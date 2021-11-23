@@ -213,7 +213,7 @@ export default defineComponent({
     }
 
     const updateMuteBan = async (action: string, cmId: number, endDate: number) => {
-      await api.muteBanMember(action, cmId, endDate)
+      await api.muteBanMember(action, cmId, endDate, { withCredentials: true })
       .then((res) => {
         targetCm.value = res.data;
         context.emit('update-channels-list');
@@ -230,7 +230,7 @@ export default defineComponent({
     }
 
     const toggleAdmin = async (cm: ChannelMember) => {
-      await api.toggleAdmin(cm.id)
+      await api.toggleAdmin(cm.id, { withCredentials: true })
       .then(() => {
         targetCm.value = cm;
         context.emit('update-channels-list');
@@ -243,7 +243,7 @@ export default defineComponent({
     }
 
     const deleteChannel = async () => {
-      await api.deleteChannel(props.activeChannel.channel.id)
+      await api.deleteChannel(props.activeChannel.channel.id, { withCredentials: true })
       .then(() => {
         // targetCm.value = cm;
         context.emit('deleted-channel');
@@ -257,7 +257,7 @@ export default defineComponent({
     const checkLogin = () => {
       const loginInput =  <HTMLInputElement>document.querySelector('input[id=\'addedLogin\']')!;
 
-      return userApi.getUserByLogin(login.value)
+      return userApi.getUserByLogin(login.value, { withCredentials: true })
       .then((res) => { 
         loginInput.setCustomValidity('');
         validLogin = true;
@@ -279,7 +279,7 @@ export default defineComponent({
       // const pwd = (channelPassword.value? channelPassword.value : 'null');
       const newMember = api.joinChannel(
         props.activeChannel.channel.id, userId
-      )
+      , { withCredentials: true })
       .then((res) => {
         context.emit('update-channels-list');
         socket.emit('updateChannels');
@@ -298,8 +298,8 @@ export default defineComponent({
       wasSubmitted.value = true;
       // const pwd = (channelPassword.value? channelPassword.value : 'null');
       const newMember = api.leaveChannel(
-        cm.id
-      )
+        cm.id,
+        { withCredentials: true })
       .then((res) => {
         context.emit('update-channels-list');
         socket.emit('updateChannels');
@@ -354,7 +354,8 @@ export default defineComponent({
       wasSubmitted.value = true;
       const pwd = (channelPassword.value? channelPassword.value : 'null');
       const newChannel = api.updateChannelPassword(
-        props.activeChannel.channel.id, pwd
+        props.activeChannel.channel.id, pwd,
+        { withCredentials: true }
       )
       .then((res) => {
         console.log("in updateChannel res", res)
