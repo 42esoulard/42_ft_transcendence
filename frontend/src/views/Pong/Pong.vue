@@ -21,6 +21,11 @@
 	<div v-for="user in users" :key="user.id">
 		<button v-on:click="challenge(user.id, user.username)"> {{user.forty_two_login}} </button>
 	</div>
+
+	<div v-if="challenged">
+		<button v-on:click="accept()"> accept </button>
+		<button v-on:click="refuse()"> refuse </button>
+	</div>
 </template>
 
 
@@ -95,16 +100,28 @@ export default defineComponent ({
 				challengerId: store.state.user.id, 
 				challengerName: store.state.user.username, 
 				challengeeId: id, 
-				challengeeName: name})
+				challengeeName: name,
+				gameMode: 'transcendence'})
 		}
 
+		const challenged = ref(false)
 		socket.value.on('challengeRequest', (message: challengeMessage) => {
 			console.log('challenge received from ' + message.challengerName + ' to ' + message.challengeeName)
 			if (message.challengeeId === store.state.user.id)
+			{
 				console.log('You have been challenged !')
+				challenged.value = true
+			}
 		})
 
-		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenge}
+		const accept = () => {
+			socket.value.emit('challengeAccepted')
+		}
+		const refuse = () => {
+			socket.value.emit('challengeDeclined')
+		}
+
+		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenge, challenged, accept, refuse}
 	}
 
 })

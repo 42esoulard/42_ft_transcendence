@@ -8,6 +8,7 @@ import { GameUser } from './entity/gameUser.entity';
 import { pongGame } from './classes/pong.pongGame';
 import { player } from './classes/pong.player';
 import { challengeMessage, gameMode, joinGameMessage } from './classes/pong.types';
+import { challenge } from './classes/pong.challenge';
 
 
 @WebSocketGateway( { namespace: '/pong'})
@@ -25,9 +26,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   private logger: Logger = new Logger('PongGateway');
 
-  private games = new Map() // pongGame map. key = room id
+  private games = new Map<string, pongGame>() // pongGame map. key = room id
   private waitingPlayerClassic: player = null
   private waitingPlayerTranscendence: player = null
+
+  private pendingChallenges = new Map<number, challenge>() // key = challenger id
   
   
   afterInit(server: Server): void {
@@ -62,15 +65,28 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('challengeRequest')
   async handleAskToPlay(client: Socket, message: challengeMessage)
   {
-    this.logger.log(message.challengeeName)
+    this.logger.log('challengeRequest received from ' + message.challengerName)
+    const newChallenge = new challenge(message.challengerId, message.challengerName, message.challengeeId, message.challengeeName, message.gameMode)
+    newChallenge.challengeeSocket = client
+    this.pendingChallenges.set(message.challengerId, newChallenge)
     this.server.emit('challengeRequest', message)
   }
-  
-  // @SubscribeMessage('acceptChallenge')
-  // async handleAcceptChallenge(client: Socket, message: challengeMessage)
-  // {
-  //   this.server.emit('challengeRequest', message)
-  // }
+
+  @SubscribeMessage('challengeAccepted')
+  async handleAcceptChallenge(client: Socket, message: challengeMessage)
+  {
+    const challenge = this.pendingChallenges.get(message.challengerId)
+    challenge.challengerSocket = client
+    if (!challenge)
+    {
+      this.logger.error('challenge does not exist')
+      return
+    }
+    // this.logger.log('challenge accepted ', message)
+    const player1 = new player(message.challengeeId, message.challengeeName, challenge.challengeeSocket, 1)
+    const player2 = new player(message.challengerId, message.challengerName, challenge.challengerSocket, 2)
+    this.createGame(player1, player2, message.gameMode)
+  }
   
   @SubscribeMessage('joinGame')
   async handleJoinGameMessage(client: Socket, message: joinGameMessage): Promise<void>
