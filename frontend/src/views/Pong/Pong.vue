@@ -43,7 +43,10 @@ export default defineComponent ({
 
 		const store = useStore()
 		const JoinQueue = () => {
-			socket.value.emit('joinGame', {userId: store.state.user.id, userName: store.state.user.username, gameMode: gameMode.value})
+			socket.value.emit('joinGame', {
+				userId: store.state.user.id, 
+				userName: store.state.user.username, 
+				gameMode: gameMode.value})
 		}
 
 		socket.value.on('addedToQueue', () => {
@@ -60,8 +63,17 @@ export default defineComponent ({
 		})
 
 		const router = useRouter()
-		socket.value.on('gameReadyToStart', (id: string, player1UserName: string, player2UserName: string, gameMode: gameMode) => {
-			router.push({ name: 'PongGame', params: {room: id, player1UserName, player2UserName, authorized: 'ok', gameMode, userType: 'player'} })
+		socket.value.on('gameReadyToStart', (room: string, player1UserName: string, player2UserName: string, gameMode: gameMode) => {
+			router.push({ name: 'PongGame', 
+			params: {
+				room,
+				player1UserName, 
+				player2UserName,
+				gameMode,
+				authorized: 'ok',
+				userType: 'player'
+				} 
+			})
 		})
 
 		onBeforeRouteLeave(() => {
@@ -79,7 +91,11 @@ export default defineComponent ({
 
 		const challenge = (id: number, name: string) => {
 			// utiliser le store.state.onlineuser
-			socket.value.emit('challengeRequest', {challengerId: store.state.user.id, challengerName: store.state.user.username, challengeeId: id, challengeeName: name})
+			socket.value.emit('challengeRequest', {
+				challengerId: store.state.user.id, 
+				challengerName: store.state.user.username, 
+				challengeeId: id, 
+				challengeeName: name})
 		}
 
 		socket.value.on('challengeRequest', (message: challengeMessage) => {
