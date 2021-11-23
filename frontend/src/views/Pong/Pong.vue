@@ -26,6 +26,10 @@
 		<button v-on:click="accept()"> accept </button>
 		<button v-on:click="refuse()"> refuse </button>
 	</div>
+
+	<div v-if="challenging">
+		{{ challengeStatus }}
+	</div>
 </template>
 
 
@@ -94,8 +98,12 @@ export default defineComponent ({
 
 		})
 
+		const challenging = ref(false)
+		const challengeStatus = ref('')
 		const challenge = (id: number, name: string) => {
 			// utiliser le store.state.onlineuser
+			challenging.value = true
+			challengeStatus.value = 'challenge sent to ' + name
 			socket.value.emit('challengeRequest', {
 				challengerId: store.state.user.id, 
 				challengerName: store.state.user.username, 
@@ -117,6 +125,7 @@ export default defineComponent ({
 		})
 
 		socket.value.on('challengeDeclined', () => {
+			challengeStatus.value = 'challenge has been declined'
 			console.log('challenge has been declined')
 		})
 
@@ -127,7 +136,7 @@ export default defineComponent ({
 			socket.value.emit('challengeDeclined', challengeMessage.value)
 		}
 
-		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenge, challenged, accept, refuse}
+		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenging, challengeStatus, challenged, challenge, accept, refuse}
 	}
 
 })
