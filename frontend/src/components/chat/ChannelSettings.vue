@@ -88,11 +88,12 @@
               <span v-else @click="toggleModal('muted', cm)"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--greyed" title="Mute user" /></span>
               <span v-if="cm.ban" @click="toggleModal('unban', cm)"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--ban" title="Unban user" /></span>
               <span v-else @click="toggleModal('banned', cm)"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--greyed" title="Ban user" /></span>
+              <span @click="kickMember(cm)"><img class="fas fa-user-times chat-channels__tag chat-channels__tag--greyed" title="Kick user" /></span>
             </div>
           </li>
           <form v-if="selectedTab == 'all'" @submit.prevent='addMember()'>
             <input class="chat-channel-form__input" required type="text" name='name' id='addedLogin' placeholder="Enter the user's 42 login" minlength="1" maxlength="200" v-model="login" @input="checkLogin()">
-            <button class="button button--create-chan" for='name'>+</button>
+            <button class="button button--create-chan" for='name'><i class="fa fa-user-plus"></i></button>
           </form>
         </div>
         <div v-else>
@@ -292,6 +293,25 @@ export default defineComponent({
       })
     }
 
+    const kickMember = async (cm: ChannelMember) => {
+
+      wasSubmitted.value = true;
+      // const pwd = (channelPassword.value? channelPassword.value : 'null');
+      const newMember = api.leaveChannel(
+        cm.id
+      )
+      .then((res) => {
+        context.emit('update-channels-list');
+        socket.emit('updateChannels');
+        wasSubmitted.value = false;
+        // closeChannelSettings();
+      })
+      .catch((err) => {
+        console.log("Caught error:", err.response.data.message);
+        wasSubmitted.value = false;
+      })
+    }
+
     const channelPassword = ref('');
     const channelPasswordConf = ref('');
     const wasSubmitted = ref(false);
@@ -370,6 +390,7 @@ export default defineComponent({
       login,
       checkLogin,
       addMember,
+      kickMember,
     }
   }
 });
