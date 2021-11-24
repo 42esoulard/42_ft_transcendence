@@ -9,7 +9,7 @@ ENV PATH /usr/src/app/node_modules/.bin:$PATH
 
 COPY package.json ./
 
-RUN npm install -g npm@7
+# RUN npm install -g npm@7
 USER node
 
 ## Ressource pour installer un nouveau projet vue.js
