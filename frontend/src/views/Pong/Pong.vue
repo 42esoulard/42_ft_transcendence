@@ -78,6 +78,9 @@ export default defineComponent ({
 		})
 
 		onBeforeRouteLeave(() => {
+			socket.value.off('addedToQueue')
+			socket.value.off('alreadyInQueue')
+			socket.value.off('gameReadyToStart')
 			if (queuing.value)
 				socket.value.emit('leaveQueue')
 		})

@@ -14,7 +14,7 @@
 
 import { defineComponent, onMounted, ref } from 'vue'
 import { pongSocket } from '@/App.vue'
-import { useRouter } from 'vue-router'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { usePongApi } from "@/plugins/api.plugin";
 import { Game } from 'sdk/typescript-axios-client-generated';
 
@@ -49,6 +49,12 @@ export default defineComponent({
 		socket.value.on('endGame', (game: Game) => {
 			console.log('game ended ' + game.id)
 			games.value = games.value.filter(elem => elem.id != game.id)
+		})
+
+		onBeforeRouteLeave(() => {
+			socket.value.off('endGame')
+			socket.value.off('newGame')
+			socket.value.off('GoToGame')
 		})
 
 		return { games, WatchGame }

@@ -65,7 +65,13 @@ export default defineComponent({
 				socket.value.emit('leaveGame', props.room)
 				window.removeEventListener("keydown", onKeyDown)
 			}
+			// remove event listener, else it will be registered as many times as we entered the component
 			socket.value.off('position')
+			socket.value.off('score')
+			socket.value.off('enlarge')
+			socket.value.off('enlargeEnd')
+			socket.value.off('gameStarting')
+			socket.value.off('gameOver')
 			window.removeEventListener("resize", onResize)
 		})
 
