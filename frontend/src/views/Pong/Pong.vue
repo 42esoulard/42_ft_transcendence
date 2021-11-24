@@ -63,23 +63,10 @@ export default defineComponent ({
 		})
 
 		const router = useRouter()
-		pongSocket.on('gameReadyToStart', (room: string, player1UserName: string, player2UserName: string, gameMode: gameMode) => {
-			router.push({ name: 'PongGame', 
-			params: {
-				room,
-				player1UserName, 
-				player2UserName,
-				gameMode,
-				authorized: 'ok',
-				userType: 'player'
-				} 
-			})
-		})
 
 		onBeforeRouteLeave(() => {
 			pongSocket.off('addedToQueue')
 			pongSocket.off('alreadyInQueue')
-			pongSocket.off('gameReadyToStart')
 			if (queuing.value)
 				pongSocket.emit('leaveQueue')
 		})

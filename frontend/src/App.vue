@@ -7,7 +7,7 @@ import { useStore } from "@/store";
 import { computed, onActivated, onUpdated, reactive } from "vue";
 import { User } from "sdk/typescript-axios-client-generated";
 import { presenceSocket } from "@/views/UserAccount.vue";
-import { challengeMessage } from './types/PongGame';
+import { challengeMessage, gameMode } from './types/PongGame';
 import { useRouter } from 'vue-router';
 import ReceiveChallengeVue from './views/Pong/ReceiveChallenge.vue';
 
@@ -61,6 +61,19 @@ export default {
       store.commit("allPlayingUsers", playersUserNames);
       console.log("allPlayingUsers", store.state.inGameUsers);
     })
+		
+    pongSocket.on('gameReadyToStart', (room: string, player1UserName: string, player2UserName: string, gameMode: gameMode) => {
+			router.push({ name: 'PongGame', 
+			params: {
+				room,
+				player1UserName, 
+				player2UserName,
+				gameMode,
+				authorized: 'ok',
+				userType: 'player'
+				} 
+			})
+		})
 
     const router = useRouter()
     pongSocket.on('challengeRequest', (message: challengeMessage) => {
