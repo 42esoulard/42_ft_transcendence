@@ -11,7 +11,7 @@
 import { defineComponent, onMounted, ref } from "vue";
 import { pongSocket } from '@/App.vue'
 import { useStore } from '@/store'
-import { useRouter } from "vue-router";
+import { onBeforeRouteLeave, useRouter } from "vue-router";
 
 export default defineComponent ({
 	props: {
@@ -45,10 +45,15 @@ export default defineComponent ({
 		}
 		
 		pongSocket.on('challengeDeclined', () => {
+			console.log('declined')
 			challengeStatus.value = 'challenge has been declined, you will be redirected in a few seconds'
 			setTimeout(() => {
 				router.push({name: 'Pong'})
-			}, 3000)
+			}, 2000)
+		})
+
+		onBeforeRouteLeave(() => {
+			pongSocket.off('challengeDeclined')
 		})
 
 		return { challengeStatus, cancelChallenge }

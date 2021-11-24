@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { pongSocket } from '@/App.vue'
-import { useRouter } from "vue-router";
+import { onBeforeRouteLeave, useRouter } from "vue-router";
 
 export default defineComponent ({
 	props: {
@@ -35,8 +35,13 @@ export default defineComponent ({
 		}
 		
 		pongSocket.on('challengeCancelled', (challengerId: number) => {
+			console.log('cancel')
 			if (challengerId === Number(props.challengerId))
 				router.push({name: 'Pong'})
+		})
+
+		onBeforeRouteLeave(() => {
+			pongSocket.off('challengeCancelled')
 		})
 
 		return {accept, refuse}
