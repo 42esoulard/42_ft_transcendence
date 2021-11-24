@@ -8,7 +8,7 @@ import UserAccount from '../views/UserAccount.vue'
 import Pong from '../views/Pong/Pong.vue'
 import PongGame from '../views/Pong/PongGame.vue'
 import PongWatch from '../views/Pong/PongWatch.vue'
-import PongGameWatch from '../views/Pong/PongGameWatch.vue'
+import ReceiveChallenge from '../views/Pong/ReceiveChallenge.vue'
 import FakeLogin from '../views/FakeLogin.vue'
 import Login from '../views/Login.vue';
 import { store } from "@/store";
@@ -133,6 +133,12 @@ const routes: Array<RouteRecordRaw> = [
         next({name: 'PongWatch'})
       }
     }
+  },
+  {
+    path: '/pong/challenge/received',
+    name: 'ChallengeReceived',
+    component: ReceiveChallenge,
+    props: true
   },
   {
     path: '/:catchAll(.*)',

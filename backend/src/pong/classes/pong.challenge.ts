@@ -3,11 +3,11 @@ import { gameMode } from './pong.types';
 
 export class challenge {
   constructor(
-	private challengerId : number, 
-	private challengerName: string, 
-	private challengeeId : number, 
-	private challengeeName: string, 
-	private gameMode: gameMode) {
+	public challengerId : number, 
+	public challengerName: string, 
+	public challengeeId : number, 
+	public challengeeName: string, 
+	public gameMode: gameMode) {
 	}
 	challengerSocket: Socket
 	challengeeSocket: Socket

@@ -65,15 +65,14 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('challengeRequest')
   async handleAskToPlay(client: Socket, message: challengeMessage)
   {
-    this.logger.log('challengeRequest received from ' + message.challengerName)
     const newChallenge = new challenge(message.challengerId, message.challengerName, message.challengeeId, message.challengeeName, message.gameMode)
     newChallenge.challengerSocket = client
     this.pendingChallenges.set(message.challengerId, newChallenge)
     this.server.emit('challengeRequest', message)
-    setTimeout(() => {
-    this.pendingChallenges.delete(message.challengerId)
-    this.server.emit('challengeCancelled', message.challengerId)
-    }, 5000)
+    // setTimeout(() => {
+    // this.pendingChallenges.delete(message.challengerId)
+    // this.server.emit('challengeCancelled', message.challengerId)
+    // }, 5000)
   }
 
   @SubscribeMessage('cancelChallenge')
@@ -84,9 +83,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage('challengeAccepted')
-  async handleAcceptChallenge(client: Socket, message: challengeMessage)
+  async handleAcceptChallenge(client: Socket, challengerId: number)
   {
-    const challenge = this.pendingChallenges.get(message.challengerId)
+    const challenge = this.pendingChallenges.get(challengerId)
     if (!challenge)
     {
       this.logger.error('challenge does not exist')
@@ -94,22 +93,22 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
     challenge.challengeeSocket = client
     // this.logger.log('challenge accepted ', message)
-    const player1 = new player(message.challengeeId, message.challengeeName, challenge.challengeeSocket, 1)
-    const player2 = new player(message.challengerId, message.challengerName, challenge.challengerSocket, 2)
-    this.createGame(player1, player2, message.gameMode)
+    const player1 = new player(challenge.challengerId, challenge.challengeeName, challenge.challengeeSocket, 1)
+    const player2 = new player(challenge.challengerId, challenge.challengerName, challenge.challengerSocket, 2)
+    this.createGame(player1, player2, challenge.gameMode)
   }
   
   @SubscribeMessage('challengeDeclined')
-  async handleDeclineChallenge(client: Socket, message: challengeMessage)
+  async handleDeclineChallenge(client: Socket, challengerId: number)
   {
-    const challenge = this.pendingChallenges.get(message.challengerId)
+    const challenge = this.pendingChallenges.get(challengerId)
     if (!challenge)
     {
       this.logger.error('challenge does not exist')
       return
     }
     challenge.challengerSocket.emit('challengeDeclined')
-    this.pendingChallenges.delete(message.challengerId)
+    this.pendingChallenges.delete(challengerId)
   }
   
   @SubscribeMessage('joinGame')
