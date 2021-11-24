@@ -21,6 +21,7 @@ export class Game {
   startedAt: Date;
 
   @OneToMany(() => GameUser, gameuser => gameuser.game, {
+    onDelete: 'CASCADE',
     eager: true,
   })
   users: GameUser[]

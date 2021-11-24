@@ -1,35 +1,46 @@
 <template>
-	
-	<h1 class="header__title"> {{ player1UserName }} --- vs --- {{ player2UserName }} </h1>
-	
-	<canvas ref="canvas"> </canvas>
+  <h1 class="header__title">
+    {{ player1UserName }} --- vs --- {{ player2UserName }}
+  </h1>
 
-	<div class="header__title" v-if="!gameHasStarted && userType==='player' ">
-		<div v-if="gameMode=='transcendence' ">
-			<h1> Press space for some transcendence magic ! </h1>
-		</div>
-		<div v-if="gameMode=='classic' ">
-			<h1> Get ready, game is about to start ! </h1>
-		</div>
-	</div>
+  <div class="header__title" v-if="!gameHasStarted && userType === 'player'">
+    <div v-if="gameMode == 'transcendence'">
+      <h1>Press space for some transcendence magic !</h1>
+    </div>
+    <div v-if="gameMode == 'classic'">
+      <h1>Get ready, game is about to start !</h1>
+    </div>
+  </div>
 
-	<div class="header__title" v-if="gameIsOver">
-		<h1> {{ winningPlayer }} won ! </h1>
-	</div>
+  <canvas v-if="!gameIsOver" ref="canvas"> </canvas>
 
-	<p v-if="!gameIsOver && userType==='player'">
-		<button class="button" v-on:click="SendMoveMsg('up')"> Up </button>
-		<button class="button" v-on:click="SendMoveMsg('down')"> Down </button>
-	</p>
+  <div v-else class="header__title">
+    <h2>{{ winningPlayer }} won !</h2>
+    <div v-if="userType === 'player'">
+      <button class="button" @click="$router.push('/pong')">Play Again</button>
+      <p>OR</p>
+      <button class="button" @click="$router.push('/pong')">Start New Game</button>
+    </div>
+  </div>
 
+  <p v-if="!gameIsOver && userType === 'player'">
+    <button class="button" v-on:click="SendMoveMsg('up')">Up</button>
+    <button class="button" v-on:click="SendMoveMsg('down')">Down</button>
+  </p>
 </template>
 
 <script lang="ts">
-import { pongSocket } from '@/App.vue'
-import { defineComponent, onMounted, PropType, ref } from 'vue'
-import { onBeforeRouteLeave } from 'vue-router'
-import getDraw from '@/composables/draw'
-import { Coordinates, gameMode, PlayerPositions, PlayerScores, userType } from '@/types/PongGame'
+import { pongSocket } from "@/App.vue";
+import { defineComponent, onMounted, PropType, ref } from "vue";
+import { onBeforeRouteLeave } from "vue-router";
+import getDraw from "@/composables/draw";
+import {
+  Coordinates,
+  gameMode,
+  PlayerPositions,
+  PlayerScores,
+  userType
+} from "@/types/PongGame";
 
 export default defineComponent({
 	props: {

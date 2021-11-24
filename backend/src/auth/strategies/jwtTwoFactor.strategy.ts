@@ -6,10 +6,11 @@ import { AuthService } from '../auth.service';
 import { Request } from 'express';
 
 @Injectable()
-export class JwtTwoFactorStrategy extends PassportStrategy(Strategy, 'jwt-two-factor') {
-  constructor(
-    private authService: AuthService,
-  ) {
+export class JwtTwoFactorStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-two-factor',
+) {
+  constructor(private authService: AuthService) {
     super({
       jwtFromRequest: (req: Request) => {
         if (!req || !req.cookies || !req.cookies.tokens) {

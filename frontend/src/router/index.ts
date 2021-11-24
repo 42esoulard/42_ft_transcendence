@@ -4,7 +4,7 @@ import AddUser from '../views/AddUser.vue'
 import Users from '../views/Users.vue'
 import Chat from '../views/Chat.vue'
 import Banned from '../views/Banned.vue';
-import UserAccount from '../views/UserAccount.vue'
+import Admin from '../views/Admin.vue'
 import Pong from '../views/Pong/Pong.vue'
 import PongGame from '../views/Pong/PongGame.vue'
 import PongWatch from '../views/Pong/PongWatch.vue'
@@ -72,11 +72,11 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
-    path: '/account',
-    name: 'UserAccount',
-    component: UserAccount,
+    path: '/admin',
+    name: 'Admin',
+    component: Admin,
     meta: {
-      requiresAuth: true,
+      requiresAdmin: true,
     }
   },
   {
@@ -102,14 +102,12 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
     component: PongGame,
     beforeEnter(to, from, next) {
-      if (to.params.authorized)
-      {
+      if (to.params.authorized) {
         next()
       }
-      else
-      {
+      else {
         console.log('redirected to Pong')
-        next({name: 'Pong'})
+        next({ name: 'Pong' })
       }
     }
   },
@@ -124,14 +122,12 @@ const routes: Array<RouteRecordRaw> = [
     component: PongGame,
     props: true,
     beforeEnter(to, from, next) {
-      if (to.params.authorized)
-      {
+      if (to.params.authorized) {
         next()
       }
-      else
-      {
+      else {
         console.log('redirected to PongWatch')
-        next({name: 'PongWatch'})
+        next({ name: 'PongWatch' })
       }
     }
   },
@@ -193,7 +189,7 @@ const refreshToken = async () => {
     .then(async (response) => {
       await getProfile();
     })
-    .catch((err: any) => console.log(err.message));
+    .catch((err: any) => console.log(err.response.data.message));
 };
 
 const getProfile = async () => {
@@ -216,7 +212,7 @@ router.beforeEach(async (to, from) => {
     if (store.state.user.id === 0) {
       return '/login'; // redirected to login
     } else {
-      if (store.state.user.banned){
+      if (store.state.user.banned) {
         return '/banned';
       }
       return true; // the route is allowed
@@ -230,6 +226,17 @@ router.beforeEach(async (to, from) => {
     if (store.state.user.id) {
       return true;
     }
+  } else if (to.matched.some(record => record.meta.requiresAdmin)) {
+    if (store.state.user.id === 0) {
+      await getProfile();
+    }
+    if (store.state.user.id === 0) {
+      return '/login'; // redirected to login
+    }
+    if (store.state.user.role == 'user') {
+      return '/';
+    }
+    return true;
   }
 });
 

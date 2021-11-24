@@ -25,68 +25,89 @@
     <div>
 
       <div class='chat-admin-pannel__tabs'>
-        <button class='chat-admin-pannel__tab' @click="selectedTab = 'all'">Members</button>
-        <button class='chat-admin-pannel__tab' @click="selectedTab = 'banned'">Banned</button>
-        <button class='chat-admin-pannel__tab' @click="selectedTab = 'muted'">Muted</button>
-        <button v-if="activeChannel.is_owner" class='chat-admin-pannel__tab' @click="selectedTab = 'owner'">Owner Pannel</button>
+        <button
+          @click="toggleTab('banned')"
+          :class="[
+            'button',
+            'button--selector',
+            selectedTab === 'banned' ? 'button--selector--on' : ''
+          ]"
+        >
+          banned
+        </button>
+        <!-- <button class='chat-admin-pannel__tab' @click="">Banned</button> -->
+        <!-- <button class='chat-admin-pannel__tab' @click="selectedTab = 'muted'">Muted</button> -->
+        <button
+          @click="toggleTab('muted')"
+          :class="[
+            'button',
+            'button--selector',
+            selectedTab === 'muted' ? 'button--selector--on' : ''
+          ]"
+        >
+          muted
+        </button>
+        <button
+          @click="toggleTab('admins')"
+          :class="[
+            'button',
+            'button--selector',
+            selectedTab === 'admins' ? 'button--selector--on' : ''
+          ]"
+        >
+          admins
+        </button>
+        <button
+          @click="toggleTab('ownerOptions')"
+          v-if="activeChannel.is_owner"
+          :class="[
+            'button',
+            'button--selector',
+            selectedTab === 'ownerOptions' ? 'button--selector--on' : ''
+          ]"
+        >
+          ...
+        </button>
       </div>
       <div>
-        <div v-if="selectedTab === 'all'" class='chat-admin-pannel__users-list'>
-          <li v-for="cm in activeChannel.channel.channel_members" :key="cm.id" class='chat-admin-pannel__user'>
+        <div v-if="selectedTab !== 'ownerOptions'" class='chat-admin-pannel__users-list'>
+          <li v-for="cm in selectedMembers" :key="cm.id" class='chat-admin-pannel__user'>
             <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: cm.member.username} }">
               {{ cm.member.username }}
             </router-link>
-            <div v-if="cm.is_admin || cm.is_owner" class="chat-channels__tag-container">
+            <div v-if="(activeChannel.is_owner && activeChannel.id == cm.id) || (!activeChannel.is_owner && (cm.is_owner || cm.is_admin) && activeChannel.id != cm.id)" class="chat-channels__tag-container">
               <span v-if="cm.is_owner"><img class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner" /></span>
               <span v-if="cm.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
             </div>
-            <div v-else>
+            <div v-else-if="(activeChannel.is_owner && cm.is_admin) || (activeChannel.is_admin && activeChannel.id == cm.id)" class="chat-channels__tag-container">
+              <span @click="toggleAdmin(cm)"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin-togglable" title="Remove from Admins" /></span>
+            </div>
+            <div v-if="!cm.is_admin">
+              <span v-if="activeChannel.is_owner" @click="toggleAdmin(cm)"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--greyed" title="Promote to Admin" /></span>
               <span v-if="cm.mute" @click="toggleModal('unmute', cm)"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--mute" title="Unmute user" /></span>
               <span v-else @click="toggleModal('muted', cm)"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--greyed" title="Mute user" /></span>
               <span v-if="cm.ban" @click="toggleModal('unban', cm)"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--ban" title="Unban user" /></span>
               <span v-else @click="toggleModal('banned', cm)"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--greyed" title="Ban user" /></span>
+              <span @click="kickMember(cm)"><img class="fas fa-user-times chat-channels__tag chat-channels__tag--greyed" title="Kick user" /></span>
             </div>
           </li>
+          <form v-if="selectedTab == 'all'" @submit.prevent='addMember()'>
+            <input class="chat-channel-form__input" required type="text" name='name' id='addedLogin' placeholder="Enter the user's 42 login" minlength="1" maxlength="200" v-model="login" @input="checkLogin()">
+            <button class="button button--create-chan" for='name'><i class="fa fa-user-plus"></i></button>
+          </form>
         </div>
-        <div v-if="selectedTab === 'muted'" class='chat-admin-pannel__users-list'>
-          <li v-for="cm in mutedMembers" :key="cm.id" class='chat-admin-pannel__user'>
-            <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: cm.member.username} }">
-              {{ cm.member.username }}
-            </router-link>
-          </li>
-        </div>
-        <div v-if="selectedTab === 'banned'" class='chat-admin-pannel__users-list'>
-          <li v-for="cm in bannedMembers" :key="cm.id" class='chat-admin-pannel__user'>
-            <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: cm.member.username} }">
-              {{ cm.member.username }}
-            </router-link>
-          </li>
+        <div v-else>
+          <form class="chat-channel-form__form" @submit.prevent='submitInputs()'>
+            <label class="chat-channel-form__subtitle" for='password'>New Channel Password (leave empty to for no password):</label>
+            <input class="chat-channel-form__input" type="text" name='password' id='password' placeholder="Password" minlength="8" maxlength="20" v-model="channelPassword" @input="checkPassword()">
+            <label class="chat-channel-form__subtitle" for='passwordConfirmation'>New Password confirmation:</label>
+            <input class="chat-channel-form__input" type="text" name='passwordConfirmation' id='passwordConfirmation' v-model="channelPasswordConf" @input="checkPasswordConf()">
+
+            <button class="button button--create-chan" type='submit'>Submit</button>
+          </form>
+          <button class="button button--delete-chan" type='submit' @click="deleteChannel()">Delete Channel</button>
         </div>
       </div>
-
-    <!-- <form class="chat-channel-form__form" @submit.prevent='submitInputs()'>
-      <div class="chat-channel-form__title">Creating a new channel</div>
-
-      <label class="chat-channel-form__subtitle" for='name'>Channel name:*</label>
-      <input class="chat-channel-form__input" required type="text" name='name' id='chanName' placeholder='My Cool Channel' minlength="1" maxlength="200" v-model="channelName" @input="checkName()">
-
-      <div class="channelAccessContainer">
-        <label class="chat-channel-form__subtitle">Channel access:*</label>
-        <label class='chat-channel-form__radio-container'  title='A public channel is visible and accessible to any user' id='public'>
-          <input type='radio' class='chat-channel-form__radio-unit' id='chanPublic' name='unit' value='public' v-model="channelType">Public
-        </label>
-        <label class='chat-channel-form__radio-container'  title='An invite-only channel is only accessible to members who have been invited to join by a channel member' id='Private (invite-only)'>
-          <input type='radio' class='chat-channel-form__radio-unit' id='chanPrivate' name='unit' value='private' v-model="channelType">Private
-        </label>
-      </div>
-
-      <label class="chat-channel-form__subtitle" for='password'>Channel password (optional):</label>
-      <input class="chat-channel-form__input" type="text" name='password' id='password' placeholder="Password (optionnal)" minlength="8" maxlength="20" v-model="channelPassword" @input="checkPassword()">
-      <label class="chat-channel-form__subtitle" for='passwordConfirmation'>Password confirmation:</label>
-      <input class="chat-channel-form__input" type="text" name='passwordConfirmation' id='passwordConfirmation' v-model="channelPasswordConf" @input="checkPasswordConf()">
-
-      <button class="button button--create-chan" :disabled="wasSubmitted" type='submit'>Submit</button>
-    </form> -->
     </div>
   </div>
   <teleport to="#modals">
@@ -96,7 +117,7 @@
       <transition-group name="zoomin">
         <Modal v-if="toggleTimer && activeChannel" @close="closeModal()">
           <template v-slot:mute-ban-timer>
-            <MuteBanTimer :action="toggleTimer" :targetCm="targetCm" :activeChannel="activeChannel" @close="closeModal()" />
+            <MuteBanTimer :action="toggleTimer" :targetCm="targetCm" :activeChannel="activeChannel" @close="closeModal()" @update-mute-ban="updateMuteBan" />
           </template>
         </Modal>
       </transition-group>
@@ -105,7 +126,7 @@
 
 <script lang="ts">
 import { ref, defineComponent, computed, onMounted } from "vue";
-import { ChannelMember, ChatApi } from "@/../sdk/typescript-axios-client-generated";
+import { ChannelMember, ChatApi, UserApi } from "@/../sdk/typescript-axios-client-generated";
 import { socket } from "./ChatComponent.vue"
 import { useStore } from '@/store';
 import Modal from "@/components/Modal.vue";
@@ -116,20 +137,67 @@ export default defineComponent({
   name: 'ChannelSettings',
   props: ['activeChannel'],
   components: { Modal, MuteBanTimer },
-  emits: ["close-settings", "update-channel"],
+  emits: ["close-settings", "update-channel", "update-channels-list", "deleted-channel"],
   setup(props, context) {
     const api = new ChatApi();
+    const userApi = new UserApi();
     const toggleTimer = ref('');
+    const login = ref('');
     const targetCm = ref();
-    const mutedMembers = ref(computed(() => props.activeChannel.channel.channel_members
-    .filter(function(cm: ChannelMember) {
-      return cm.mute;
-    })));
-    const bannedMembers = ref(computed(() => props.activeChannel.channel.channel_members
-    .filter(function(cm: ChannelMember) {
-      return cm.ban;
-    })));
+    const selectedTab = ref('all');
+    const allMembers = ref(computed(() => props.activeChannel.channel.channel_members
+    .sort((a: ChannelMember, b: ChannelMember) => a.id - b.id )));
+  
+    let selectedMembers = computed(() => {
+      console.log("in selected", props.activeChannel)
+      const list = ref();
+      if (selectedTab.value === 'banned') {
+        list.value = allMembers.value.filter((cm: ChannelMember) => cm.ban)
+      } else if (selectedTab.value === 'muted') {
+        list.value = allMembers.value.filter((cm: ChannelMember) => cm.mute)
+      } else if (selectedTab.value === 'admins') {
+        list.value = allMembers.value.filter((cm: ChannelMember) => cm.is_admin)
+      } else {
+        list.value = allMembers.value;
+      }
+      return list.value;
+    });
 
+    const toggleTab = (tab: string) => {
+      switch (tab) {
+        case 'banned':
+          if (selectedTab.value === 'banned') {
+            selectedTab.value = 'all';
+          } else {
+            selectedTab.value = 'banned';
+          }
+          break;
+        case 'muted':
+          console.log("bef", tab, selectedTab.value);
+          if (selectedTab.value === 'muted') {
+            selectedTab.value = 'all';
+          } else {
+            selectedTab.value = 'muted';
+          }
+          console.log("aft", tab, selectedTab.value);
+          break;
+        case 'admins':
+          console.log("bef", tab, selectedTab.value);
+          if (selectedTab.value === 'admins') {
+            selectedTab.value = 'all';
+          } else {
+            selectedTab.value = 'admins';
+          }
+          break;
+        case 'ownerOptions':
+          if (selectedTab.value === 'ownerOptions') {
+            selectedTab.value = 'all';
+          } else {
+            selectedTab.value = 'ownerOptions';
+          }
+          break;
+      }
+    };
 
     const closeChannelSettings = () => {
       context.emit('close-settings')
@@ -142,38 +210,114 @@ export default defineComponent({
 
     const closeModal = () => {
       toggleTimer.value = '';
-      context.emit('update-channel');
     }
 
-    const channelName = ref('');
-    const channelType = ref('public');
-    const channelPassword = ref('');
-    const channelPasswordConf = ref('');
-    const user = useStore().state.user;
-    const wasSubmitted = ref(false);
+    const updateMuteBan = async (action: string, cmId: number, endDate: number) => {
+      await api.muteBanMember(action, cmId, endDate, { withCredentials: true })
+      .then((res) => {
+        targetCm.value = res.data;
+        context.emit('update-channels-list');
+        socket.emit('updateChannels');
 
-    let validName = true;
-    let validPassword = true;
-    let validPasswordConf = true;
+        if (action === 'muted') {
+          setTimeout(() => updateMuteBan("unmute", cmId, 0), endDate - Date.now())
+        } else if (action === 'banned') {
+          setTimeout(() => updateMuteBan("unban", cmId, 0), endDate - Date.now())
+        }
+        closeModal();
+      })
+      .catch((err) => console.log("Caught error:", err.response.data.message))
+    }
 
-    // const closeModal = () => {
-    //   context.emit("close");
-    // };
-
-    const checkName = () => {
-      const nameInput =  <HTMLInputElement>document.querySelector('input[id=\'chanName\']')!;
-
-      api.getChannelByName(channelName.value)
+    const toggleAdmin = async (cm: ChannelMember) => {
+      await api.toggleAdmin(cm.id, { withCredentials: true })
       .then(() => {
-        nameInput.setCustomValidity("A channel named [" + channelName.value + "] already exists")
-        validName = false;
+        targetCm.value = cm;
+        context.emit('update-channels-list');
+        socket.emit('updateChannels');
+        if (cm.id == props.activeChannel.id) {
+          closeChannelSettings();
+        }
+      })
+      .catch((err) => console.log("Caught error:", err.response.data.message))
+    }
+
+    const deleteChannel = async () => {
+      await api.deleteChannel(props.activeChannel.channel.id, { withCredentials: true })
+      .then(() => {
+        // targetCm.value = cm;
+        context.emit('deleted-channel');
+        closeChannelSettings();
+      })
+      .catch((err) => console.log("Caught error:", err.response.data.message))
+    }
+
+
+    let validLogin = true;
+    const checkLogin = () => {
+      const loginInput =  <HTMLInputElement>document.querySelector('input[id=\'addedLogin\']')!;
+
+      return userApi.getUserByLogin(login.value, { withCredentials: true })
+      .then((res) => { 
+        loginInput.setCustomValidity('');
+        validLogin = true;
+        return (res.data.id)
       })
       .catch(() => {
-        nameInput.setCustomValidity('');
-        validName = true;
-        console.log(channelName.value + "not found")
+        loginInput.setCustomValidity("User [" + login.value + "] doesn't exists")
+        validLogin = false;
+        return -1;
       })
     }
+
+    const addMember = async () => {
+      const userId = await checkLogin();
+      if (!validLogin)
+        return;
+
+      wasSubmitted.value = true;
+      // const pwd = (channelPassword.value? channelPassword.value : 'null');
+      const newMember = api.joinChannel(
+        props.activeChannel.channel.id, userId
+      , { withCredentials: true })
+      .then((res) => {
+        context.emit('update-channels-list');
+        socket.emit('updateChannels');
+        login.value = '';
+        wasSubmitted.value = false;
+        // closeChannelSettings();
+      })
+      .catch((err) => {
+        console.log("Caught error:", err.response.data.message);
+        wasSubmitted.value = false;
+      })
+    }
+
+    const kickMember = async (cm: ChannelMember) => {
+
+      wasSubmitted.value = true;
+      // const pwd = (channelPassword.value? channelPassword.value : 'null');
+      const newMember = api.leaveChannel(
+        cm.id,
+        { withCredentials: true })
+      .then((res) => {
+        context.emit('update-channels-list');
+        socket.emit('updateChannels');
+        wasSubmitted.value = false;
+        // closeChannelSettings();
+      })
+      .catch((err) => {
+        console.log("Caught error:", err.response.data.message);
+        wasSubmitted.value = false;
+      })
+    }
+
+    const channelPassword = ref('');
+    const channelPasswordConf = ref('');
+    const wasSubmitted = ref(false);
+
+    let validPassword = true;
+    let validPasswordConf = true;
 
     const checkPassword = () => {
       const passwordInput = <HTMLInputElement>document.querySelector('input#password')!;
@@ -202,49 +346,52 @@ export default defineComponent({
     }
 
     const submitInputs = () => {
-      checkName();
       checkPassword();
       checkPasswordConf();
       if (!validPassword || !validPasswordConf)
         return;
 
-      if (!validName)
-        return;
-
-      console.log(channelName.value, channelType.value, channelPassword.value)
       wasSubmitted.value = true;
-      const newChannel = api.saveChannel({
-        name: channelName.value,
-        owner_id: user.id,
-        type: channelType.value,
-        password: channelPassword.value
-      })
+      const pwd = (channelPassword.value? channelPassword.value : 'null');
+      const newChannel = api.updateChannelPassword(
+        props.activeChannel.channel.id, pwd,
+        { withCredentials: true }
+      )
       .then((res) => {
-        console.log("in createChannel res", res)
-        socket.emit('createChannel', res.data)
+        console.log("in updateChannel res", res)
+        context.emit('update-channels-list');
+        socket.emit('updateChannels');
+        closeChannelSettings();
       })
-      .catch((err) => console.log("Failed to create channel: ", err))
+      .catch((err) => console.log("Caught error:", err.response.data.message))
     }
 
     return {
-      channelName,
-      channelType,
+
+      deleteChannel,
       channelPassword,
       channelPasswordConf,
-      checkName,
       checkPassword,
       checkPasswordConf,
       submitInputs,
       wasSubmitted,
       closeModal,
-      selectedTab: ref('all'),
+
+      selectedTab,
+      selectedMembers,
 
       toggleTimer,
       toggleModal,
       closeChannelSettings,
       targetCm,
-      mutedMembers,
-      bannedMembers,
+      toggleTab,
+      toggleAdmin,
+      updateMuteBan,
+
+      login,
+      checkLogin,
+      addMember,
+      kickMember,
     }
   }
 });

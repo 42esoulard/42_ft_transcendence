@@ -1,13 +1,24 @@
 <template>
-	<h1 class="header__title"> Select the game you want to watch </h1>
-	<div v-for="game in games" :key="game.id">
-		<div v-if="game.users.length == 1">
-			<button class="button" v-on:click="WatchGame(game.id)"> game #{{ game.id }} : {{ game.users[0].user.username }} vs {{ game.users[0].user.username }} </button>
-		</div>
-		<div v-else>
-			<button class="button" v-on:click="WatchGame(game.id)"> game #{{ game.id }} : {{ game.users[0].user.username }} vs {{ game.users[1].user.username }} </button>
-		</div>
-	</div>
+  <h2 class="header__title">Select the game you want to watch</h2>
+  <div v-if="games.length">
+    <div v-for="game in games" :key="game.id">
+      <div v-if="game.users.length == 1">
+        <button class="button" v-on:click="WatchGame(game.id)">
+          game #{{ game.id }} : {{ game.users[0].user.username }} vs
+          {{ game.users[0].user.username }}
+        </button>
+      </div>
+      <div v-else>
+        <button class="button" v-on:click="WatchGame(game.id)">
+          game #{{ game.id }} : {{ game.users[0].user.username }} vs
+          {{ game.users[1].user.username }}
+        </button>
+      </div>
+    </div>
+  </div>
+  <div v-else>
+    <h2>No available games to watch</h2>
+  </div>
 </template>
 
 <script lang="ts">
@@ -16,7 +27,7 @@ import { defineComponent, onMounted, ref } from 'vue'
 import { pongSocket } from '@/App.vue'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { usePongApi } from "@/plugins/api.plugin";
-import { Game } from 'sdk/typescript-axios-client-generated';
+import { Game } from "sdk/typescript-axios-client-generated";
 
 export default defineComponent({
 	setup()
@@ -64,5 +75,4 @@ export default defineComponent({
 
 <style lang="scss">
 @import "../../../sass/main.scss";
-
 </style>

@@ -17,6 +17,7 @@ export class User {
   messages?: Message[];
   channel_members?: ChannelMember[];
   games?: GameUser[];
+  role?: string;
   relationships_requested?: Relationship[];
   relationships_adressed?: Relationship[];
 }

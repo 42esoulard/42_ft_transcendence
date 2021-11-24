@@ -2,11 +2,16 @@
   font-family: 'Saira';
   color: $link-color;
   text-decoration: none;
+  border: none;
+  background: none;
   &--neutral {
     &:hover {
       text-decoration: none;
       color: $link-neutral-hover;
     }
+  }
+  &--admin {
+    color: $fifth-color;
   }
   &--user-list {
     font-size: 1.5rem;

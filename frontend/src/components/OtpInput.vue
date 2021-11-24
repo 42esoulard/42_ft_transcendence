@@ -68,7 +68,7 @@ export default defineComponent({
           await authApi
             .authenticate({ code: otp.value }, { withCredentials: true })
             .then((res: any) => {
-              router.push("account");
+              router.push("Home");
             })
             .catch((err: any) => (error.value = err.response.data.message));
         }

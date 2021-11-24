@@ -43,7 +43,7 @@ export default defineComponent({
 
     const checkPassword = () => {
 
-      api.checkPasswordMatch(props.channel.id, passwordAttempt.value)
+      api.checkPasswordMatch(props.channel.id, passwordAttempt.value, { withCredentials: true })
       .then((res) => {
         console.log("password match res", res)
         if (res.data) {
@@ -56,7 +56,7 @@ export default defineComponent({
           return ;
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log("Caught error:", err.response.data.message));
     }
 
     return {

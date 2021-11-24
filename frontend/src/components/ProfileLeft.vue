@@ -1,7 +1,8 @@
 <template>
   <div class="profile-left-info">
     <div class="profile-left__avatar-div">
-      <img :src="user.avatar" class="profile-left__avatar-img" alt="" />
+      <img v-if="user.id === self.id" :src="self.avatar" class="profile-left__avatar-img" alt="" />
+      <img v-else :src="user.avatar" class="profile-left__avatar-img" alt="" />
     </div>
     <span class="profile-left__name">{{ user.username }} </span>
     <span class="profile-left__since">member since {{ formatedDate }}</span>
@@ -121,7 +122,7 @@ import { useStore } from "@/store";
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import EditUser from "@/components/EditUser.vue";
 import Modal from "@/components/Modal.vue";
-import { presenceSocket } from "@/views/UserAccount.vue";
+import { presenceSocket } from "@/App.vue";
 import { useRouter } from "vue-router";
 
 export default defineComponent({
@@ -156,7 +157,6 @@ export default defineComponent({
         if (inGameUser) {
           return "ingame";
         } else if (onlineUser) {
-          console.log("isOnline", onlineUser);
           return "online";
         }
       }

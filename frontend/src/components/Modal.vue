@@ -6,6 +6,7 @@
     <slot name="locked-channel-form"></slot>
     <slot name="settings-modal"></slot>
     <slot name="mute-ban-timer"></slot>
+    <slot name="mute-ban-popup"></slot>
   </div>
 </template>
 

@@ -10,7 +10,7 @@ Completely dockerized.
 - [Adminer](https://www.adminer.org/en/) as database management tool accessible on http://localhost:8000
 
 ## To run the application:
-NB: the installation process may take some times
+NB: the installation process may take some time
 ```sh
 $ cd ft_transcendence
 $ docker-compose up --build

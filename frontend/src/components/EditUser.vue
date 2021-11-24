@@ -74,13 +74,13 @@ export default defineComponent({
       const files = avatarInput.value.files;
       if (files.length !== 0) {
         avatar.value = files[0];
-        console.log("avatar value", avatar.value);
+        // console.log("avatar value", avatar.value);
       }
     };
 
     const updateUsername = async (): Promise<boolean> => {
       let ret = false;
-      if (!/^[a-zA-Z]+$/.test(username.value))
+      if (!/^[a-zA-Z0-9]+$/.test(username.value))
         error_username.value = "Username should only contains letters";
       else if (users.value.find((user) => user.username == username.value))
         error_username.value = "Username already taken";
@@ -96,7 +96,7 @@ export default defineComponent({
             }
           )
           .then((res) => {
-            console.log(res);
+            // console.log(res);
             store.commit("updateUsername", username.value);
             ret = true;
           })
@@ -128,16 +128,16 @@ export default defineComponent({
       let avatarUpdated = true;
       if (username.value) {
         usernameUpdated = await updateUsername();
-        console.log("Update username to", username.value);
+        // console.log("Update username to", username.value);
       } else {
-        console.log("username is unchanged");
+        // console.log("username is unchanged");
       }
       if (avatar.value) {
         avatarUpdated = await postAvatar();
-        console.log("Update avatar to", avatar.value.name);
-        console.log("Update avatar to", avatar.value);
+        // console.log("Update avatar to", avatar.value.name);
+        // console.log("Update avatar to", avatar.value);
       } else {
-        console.log("avatar is unchanged");
+        // console.log("avatar is unchanged");
       }
       if (usernameUpdated) {
         username.value = "";

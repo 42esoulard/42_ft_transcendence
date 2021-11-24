@@ -22,7 +22,7 @@ import { User } from "sdk/typescript-axios-client-generated";
 import { useAuthApi, useUserApi } from "@/plugins/api.plugin";
 import { io } from "socket.io-client";
 import { useStore } from "@/store";
-import { presenceSocket } from "@/views/UserAccount.vue";
+import { presenceSocket } from "@/App.vue";
 
 export default defineComponent({
   name: "Login",
@@ -48,7 +48,7 @@ export default defineComponent({
       userApi
         .getBannedUsers()
         .then((res: any) => {
-          for (const banned of res.data){
+          for (const banned of res.data) {
             users.value.push(banned);
           }
           if (users) {
@@ -67,7 +67,7 @@ export default defineComponent({
         .then(async (res) => {
           await getProfile();
           sendConnection();
-          router.push(`/account`);
+          router.push(`/`);
         })
         .catch((error) => console.log(error));
     };
