@@ -44,8 +44,10 @@ export default defineComponent ({
 		}
 		
 		pongSocket.on('challengeDeclined', () => {
-			challengeStatus.value = 'challenge has been declined'
-			console.log('challenge has been declined')
+			challengeStatus.value = 'challenge has been declined, you will be redirected in a few seconds'
+			setTimeout(() => {
+				router.push({name: 'Pong'})
+			}, 3000)
 		})
 
 		return { challengeStatus, cancelChallenge }

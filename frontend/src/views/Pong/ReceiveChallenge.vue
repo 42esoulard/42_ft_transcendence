@@ -11,6 +11,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { pongSocket } from '@/App.vue'
+import { useRouter } from "vue-router";
 
 export default defineComponent ({
 	props: {
@@ -19,12 +20,15 @@ export default defineComponent ({
 	},
 
 	setup(props) {
+		const router = useRouter()
+		
 		const accept = () => {
 			console.log(props.challengerId)
 			pongSocket.emit('challengeAccepted', Number(props.challengerId))
 		}
 		const refuse = () => {
 			pongSocket.emit('challengeDeclined', Number(props.challengerId))
+			router.push({name: 'Pong'})
 		}
 		
 		pongSocket.on('challengeCancelled', (challengerId: number) => {
