@@ -35,15 +35,8 @@ export default defineComponent ({
 		}
 		
 		pongSocket.on('challengeCancelled', (challengerId: number) => {
-			// if (challengeMessage && challengeMessage.value?.challengerId)
-			// {
-			// 	challenged.value = false
-			// 	challengeMessage.value = undefined
-			// }
-			// if (challenging && challengerId === store.state.user.id)
-			// {
-			// 	challenging.value = false
-			// }
+			if (challengerId === Number(props.challengerId))
+				router.push({name: 'Pong'})
 		})
 
 		return {accept, refuse}
