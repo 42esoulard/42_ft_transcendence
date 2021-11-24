@@ -39,6 +39,11 @@ export default defineComponent ({
 			pongSocket.emit('cancelChallenge', store.state.user.id)
 		}
 		
+		pongSocket.on('challengeDeclined', () => {
+			// challengeStatus.value = 'challenge has been declined'
+			console.log('challenge has been declined')
+		})
+		
 	}
 })
 </script>

@@ -26,6 +26,18 @@ export default defineComponent ({
 		const refuse = () => {
 			pongSocket.emit('challengeDeclined', Number(props.challengerId))
 		}
+		
+		pongSocket.on('challengeCancelled', (challengerId: number) => {
+			// if (challengeMessage && challengeMessage.value?.challengerId)
+			// {
+			// 	challenged.value = false
+			// 	challengeMessage.value = undefined
+			// }
+			// if (challenging && challengerId === store.state.user.id)
+			// {
+			// 	challenging.value = false
+			// }
+		})
 
 		return {accept, refuse}
 	}

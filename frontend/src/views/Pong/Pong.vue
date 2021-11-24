@@ -89,27 +89,7 @@ export default defineComponent ({
 				.catch((err) => console.log(err))
 		})
 
-		const challenged = ref(false)
-		const challengeMessage = ref<challengeMessage>()
-
-		// socket.value.on('challengeCancelled', (challengerId: number) => {
-		// 	if (challengeMessage && challengeMessage.value?.challengerId)
-		// 	{
-		// 		challenged.value = false
-		// 		challengeMessage.value = undefined
-		// 	}
-		// 	if (challenging && challengerId === store.state.user.id)
-		// 	{
-		// 		challenging.value = false
-		// 	}
-		// })
-
-		// socket.value.on('challengeDeclined', () => {
-		// 	challengeStatus.value = 'challenge has been declined'
-		// 	console.log('challenge has been declined')
-		// })
-
-		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenged}
+		return {queuing, JoinQueue, gameMode, alreadyInQueue, users}
 	}
 
 })
