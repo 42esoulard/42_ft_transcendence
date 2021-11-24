@@ -22,11 +22,6 @@
 		<button v-on:click="challenge(user.id, user.username)"> {{user.forty_two_login}} </button>
 	</div>
 
-	<div v-if="challenged">
-		<button v-on:click="accept()"> accept </button>
-		<button v-on:click="refuse()"> refuse </button>
-	</div>
-
 	<div v-if="challenging">
 		{{ challengeStatus }}
 		<button v-on:click="cancelChallenge()"> cancel challenge </button>
@@ -121,15 +116,6 @@ export default defineComponent ({
 
 		const challenged = ref(false)
 		const challengeMessage = ref<challengeMessage>()
-		socket.value.on('challengeRequest', (message: challengeMessage) => {
-			console.log('challenge received from ' + message.challengerName + ' to ' + message.challengeeName)
-			challengeMessage.value = message
-			if (message.challengeeId === store.state.user.id)
-			{
-				console.log('You have been challenged !')
-				challenged.value = true
-			}
-		})
 
 		socket.value.on('challengeCancelled', (challengerId: number) => {
 			if (challengeMessage && challengeMessage.value?.challengerId)
@@ -148,14 +134,7 @@ export default defineComponent ({
 			console.log('challenge has been declined')
 		})
 
-		const accept = () => {
-			socket.value.emit('challengeAccepted', challengeMessage.value)
-		}
-		const refuse = () => {
-			socket.value.emit('challengeDeclined', challengeMessage.value)
-		}
-
-		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenging, challengeStatus, challenged, challenge, cancelChallenge, accept, refuse}
+		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenging, challengeStatus, challenged, challenge, cancelChallenge}
 	}
 
 })
