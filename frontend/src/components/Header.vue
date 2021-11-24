@@ -135,10 +135,14 @@ export default defineComponent({
         .then((response) => {
           console.log(response);
           presenceSocket.emit("closeConnection", store.state.user);
-          store.commit("resetUser"); //store.state.user = null;
+          store.commit("resetUser");
           router.push("/login");
         })
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) => {
+          console.log("You are already disconnected");
+          store.commit("resetUser");
+          router.push("/login");
+        });
     };
 
     const userProfile = computed(() => {

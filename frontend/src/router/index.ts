@@ -154,7 +154,7 @@ const refreshToken = async () => {
     .then(async (response) => {
       await getProfile();
     })
-    .catch((err: any) => console.log(err.message));
+    .catch((err: any) => console.log(err.response.data.message));
 };
 
 const getProfile = async () => {
