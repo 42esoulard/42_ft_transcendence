@@ -1,9 +1,11 @@
 <template>
 	
-	<div>
+	<div class="header__title">
 		You have been challenged by {{ challengerName }}
-		<button v-on:click="accept()"> accept </button>
-		<button v-on:click="refuse()"> refuse </button>
+	</div>
+	<div>
+		<button class="button" v-on:click="accept()"> accept </button>
+		<button class="button" v-on:click="refuse()"> refuse </button>
 	</div>
 	
 </template>
@@ -18,6 +20,7 @@ export default defineComponent ({
 		challengerId: {type: String, required: true},
 		challengerName: {type: String, required: true},
 	},
+	inheritAttrs: false, // we dont need it, and not setting it to false a warning: "extraneous non prop attributes (authorized) were passed to component but could not be automatically inherited..."
 
 	setup(props) {
 		const router = useRouter()
@@ -49,6 +52,6 @@ export default defineComponent ({
 })
 </script>
 
-<style>
-
+<style lang="scss">
+@import "../../../sass/main.scss";
 </style>

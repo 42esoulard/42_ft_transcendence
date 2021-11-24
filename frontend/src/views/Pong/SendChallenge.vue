@@ -1,9 +1,9 @@
 <template>
 
-	<div>
+	<div class="header__title">
 		{{ challengeStatus }}
-		<button v-on:click="cancelChallenge()"> cancel challenge </button>
 	</div>
+	<button class="button" v-on:click="cancelChallenge()"> cancel challenge </button>
 
 </template>
 
@@ -18,6 +18,7 @@ export default defineComponent ({
 		challengeeId: {type: String, required: true},
 		challengeeName: {type: String, required: true},
 	},
+	inheritAttrs: false, // we dont need it, and not setting it to false a warning: "extraneous non prop attributes (authorized) were passed to component but could not be automatically inherited..."
 	setup(props) {
 		
 		const store = useStore()	
@@ -56,6 +57,7 @@ export default defineComponent ({
 })
 </script>
 
-<style>
+<style lang="scss">
+@import "../../../sass/main.scss";
 
 </style>
