@@ -56,7 +56,16 @@ export class UsersController {
   async getBannedUsers(): Promise<User[]> {
     const users: User[] = await this.userService.getBannedUsers();
     if (users == undefined) {
-      throw new NotFoundException('No users in database');
+      throw new NotFoundException('No banned users in database');
+    }
+    return users;
+  }
+
+  @Get('admins')
+  async getAdmins(): Promise<User[]> {
+    const users: User[] = await this.userService.getAdmins();
+    if (users == undefined) {
+      throw new NotFoundException('No admins in database');
     }
     return users;
   }
@@ -64,6 +73,16 @@ export class UsersController {
   @Get('delete/:id')
   async removeUser(@Param('id') id: number) {
     return await this.userService.removeUser(id);
+  }
+
+  @Get('promote/:id')
+  async promoteUser(@Param('id') id: number) {
+    return await this.userService.promoteUser(id);
+  }
+
+  @Get('demote/:id')
+  async demoteUser(@Param('id') id: number) {
+    return await this.userService.demoteUser(id);
   }
 
 
@@ -158,8 +177,8 @@ export class UsersController {
    * Update user from the POST body
    */
   @Post('update-user')
-  async updateUser(@Body() updatedUser: UpdateUserDto): Promise<User> {
-    return await this.userService.updateUser(updatedUser);
+  async updateUser(@Body() updatedUser: UpdateUserDto) {
+    await this.userService.updateUser(updatedUser);
   }
 
 	/**

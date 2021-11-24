@@ -162,8 +162,8 @@ export default defineComponent({
       blockedlist.value = !blockedlist.value;
     };
 
-    const selectList = computed(() => {
-      const list = ref<User[]>([]);
+    const selectList = computed((): User[] => {
+      const list = ref();
       if (blockedlist.value) {
         if (friendlist.value || onlinelist.value) return list.value;
         list.value = userList.value.filter((user: User) =>

@@ -22,7 +22,9 @@ export class GameUser {
 	@PrimaryColumn({ type: "number"})
 	gameId: number
 
-	@ManyToOne(() => Game, game => game.users)
+	@ManyToOne(() => Game, game => game, {
+    onDelete: 'CASCADE'
+  })
 	@JoinColumn({ name: 'gameId'})
 	game: Game
 

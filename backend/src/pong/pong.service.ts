@@ -9,11 +9,11 @@ import { GameUser } from './entity/gameUser.entity';
 export class PongService {
 	constructor(
 		@InjectRepository(Game)
-		private readonly gameRepo:Repository<Game>,
+		public gameRepo:Repository<Game>,
     @InjectRepository(Users)
     private userRepo: Repository<Users>,
     @InjectRepository(GameUser)
-    private gameUserRepo: Repository<GameUser>,
+    public gameUserRepo: Repository<GameUser>,
 		) {}
 
 	findAll(): Promise<Game[]> {

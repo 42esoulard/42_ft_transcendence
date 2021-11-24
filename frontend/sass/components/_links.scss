@@ -2,6 +2,8 @@
   font-family: 'Saira';
   color: $link-color;
   text-decoration: none;
+  border: none;
+  background: none;
   &--neutral {
     &:hover {
       text-decoration: none;

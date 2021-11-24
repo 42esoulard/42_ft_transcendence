@@ -37,6 +37,12 @@ export class Users {
   @Column({ default: false })
   banned: boolean;
 
+  @Column({ default: false })
+  admin: boolean;
+
+  @Column({ default: false })
+  owner: boolean;
+
   @Column({ type: 'varchar', length: 36, nullable: true })
   refresh_token: string;
 
@@ -49,7 +55,9 @@ export class Users {
   @OneToOne(() => GameStats, (gamestats) => gamestats.user)
   gameStats: GameStats;
 
-  @OneToMany(() => GameUser, (gameuser) => gameuser.user)
+  @OneToMany(() => GameUser, (gameuser) => gameuser.user, {
+    cascade: true,
+  })
   games: GameUser[];
 
   @OneToMany(() => Messages, (message) => message.author)

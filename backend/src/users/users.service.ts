@@ -22,6 +22,23 @@ export class UsersService {
     return await this.usersRepository.find({where: {banned: true}});
   }
 
+  async getAdmins(): Promise<Users[]> {
+    return await this.usersRepository.find({where: {admin: true}});
+  }
+
+  async getOwner(): Promise<Users[]> {
+    return await this.usersRepository.find({where: {owner: true}});
+  }
+
+  //is it possible to check if requester is an admin?
+  async promoteUser(id: number) {
+    return this.usersRepository.update(id, { admin: true });
+  }
+
+  async demoteUser(id: number) {
+    return this.usersRepository.update(id, { admin: false });
+  }
+
   async getUserChannels(id: number): Promise<Users> {
     const res = await this.usersRepository.findOne(id, {
       relations: ['channels'],
@@ -69,8 +86,10 @@ export class UsersService {
     return refresh_token.refresh_token;
   }
 
-  async updateUser(updatedUser: UpdateUserDto): Promise<User> {
-    return await this.usersRepository.save(updatedUser);
+  async updateUser(updatedUser: UpdateUserDto) {
+    await this.usersRepository.save(updatedUser);
+    if (updatedUser.banned && updatedUser.banned == true)
+    await this.usersRepository.update(updatedUser.id, {admin: false});
   }
 
   async updateUserToken(updatedUser: UpdateUserTokenDto): Promise<User> {

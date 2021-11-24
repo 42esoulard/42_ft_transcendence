@@ -44,16 +44,21 @@
     @include hover-modifier(red);
   }
   &--selector {
+    box-sizing: border-box;
     padding: 5px 20px;
     height: 2rem;
     display: flex;
     align-items: center;
-    background-color: darken($button-grey-bg, 40);
-    @include hover-modifier(darken($button-grey-bg, 40));
+    background-color: rgba(0, 0, 0, 0.5);
+    border: grey 1px solid;
+    color: grey;
+    &:hover {
+      color: $button-third-bg;
+      border: 1px $button-third-bg solid;
+    }
     &--on {
-      border: none;
+      color: white;
       background-color: $button-third-bg;
-      @include hover-modifier($button-third-bg);
     }
   }
 }
