@@ -18,7 +18,7 @@
 		<p> You are already in queue ! You will be redirected to Homepage shortly... </p>
   </div>
 
-	<div v-for="user in users" :key="user.id">
+	<div v-for="user in users" :key="user.id" class="button">
 		<router-link :to="{name: 'SendChallenge', params: {challengeeId:user.id, challengeeName: user.username} }"> challenge {{user.username}} </router-link>
 	</div>
 
@@ -30,7 +30,7 @@ import { defineComponent, onMounted, ref } from 'vue'
 import { pongSocket } from '@/App.vue'
 import { useStore } from '@/store'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
-import { challengeMessage, gameMode } from '@/types/PongGame'
+import { gameMode } from '@/types/PongGame'
 import { useUserApi } from "@/plugins/api.plugin";
 import { User } from 'sdk/typescript-axios-client-generated'
 
