@@ -29,6 +29,7 @@
 
 	<div v-if="challenging">
 		{{ challengeStatus }}
+		<button v-on:click="cancelChallenge()"> cancel challenge </button>
 	</div>
 </template>
 
@@ -103,13 +104,19 @@ export default defineComponent ({
 		const challenge = (id: number, name: string) => {
 			// utiliser le store.state.onlineuser
 			challenging.value = true
-			challengeStatus.value = 'challenge sent to ' + name
+			challengeStatus.value = 'challenge sent to ' + name + 'challenge request will automatically expire after 5 seconds'
+			
 			socket.value.emit('challengeRequest', {
 				challengerId: store.state.user.id, 
 				challengerName: store.state.user.username, 
 				challengeeId: id, 
 				challengeeName: name,
 				gameMode: 'transcendence'})
+		}
+
+		const cancelChallenge = () => {
+			challenging.value = false
+			socket.value.emit('cancelChallenge', store.state.user.id)
 		}
 
 		const challenged = ref(false)
@@ -121,6 +128,18 @@ export default defineComponent ({
 			{
 				console.log('You have been challenged !')
 				challenged.value = true
+			}
+		})
+
+		socket.value.on('challengeCancelled', (challengerId: number) => {
+			if (challengeMessage && challengeMessage.value?.challengerId)
+			{
+				challenged.value = false
+				challengeMessage.value = undefined
+			}
+			if (challenging && challengerId === store.state.user.id)
+			{
+				challenging.value = false
 			}
 		})
 
@@ -136,7 +155,7 @@ export default defineComponent ({
 			socket.value.emit('challengeDeclined', challengeMessage.value)
 		}
 
-		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenging, challengeStatus, challenged, challenge, accept, refuse}
+		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenging, challengeStatus, challenged, challenge, cancelChallenge, accept, refuse}
 	}
 
 })

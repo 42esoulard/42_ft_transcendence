@@ -70,6 +70,17 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     newChallenge.challengerSocket = client
     this.pendingChallenges.set(message.challengerId, newChallenge)
     this.server.emit('challengeRequest', message)
+    setTimeout(() => {
+    this.pendingChallenges.delete(message.challengerId)
+    this.server.emit('challengeCancelled', message.challengerId)
+    }, 5000)
+  }
+
+  @SubscribeMessage('cancelChallenge')
+  async handleCancelChallenge(client: Socket, challengerId: number)
+  {
+    this.pendingChallenges.delete(challengerId)
+    this.server.emit('challengeCancelled', challengerId)
   }
 
   @SubscribeMessage('challengeAccepted')
