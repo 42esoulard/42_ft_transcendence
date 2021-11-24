@@ -22,7 +22,6 @@ export default defineComponent({
 	setup()
 	{
 		const games = ref<Game[]>([])
-		const socket = ref(pongSocket)
 		const api = usePongApi()
 
 		onMounted(() => {
@@ -33,28 +32,28 @@ export default defineComponent({
 		})
 
 		const WatchGame = ((id: number) => {
-			socket.value.emit('watchGame', id.toString())
+			pongSocket.emit('watchGame', id.toString())
 		})
 
 		const router = useRouter()
-		socket.value.on('GoToGame', (id, player1UserName, player2UserName, gameMode) => {
+		pongSocket.on('GoToGame', (id, player1UserName, player2UserName, gameMode) => {
 			router.push({ name: 'PongGameWatch', params: {room: id, player1UserName, player2UserName, authorized: 'ok', gameMode, userType: 'spectator'}})
 		})
 
-		socket.value.on('newGame', (game: Game) => {
+		pongSocket.on('newGame', (game: Game) => {
 			console.log('new game received ' + game.id)
 			games.value.push(game)
 		})
 
-		socket.value.on('endGame', (game: Game) => {
+		pongSocket.on('endGame', (game: Game) => {
 			console.log('game ended ' + game.id)
 			games.value = games.value.filter(elem => elem.id != game.id)
 		})
 
 		onBeforeRouteLeave(() => {
-			socket.value.off('endGame')
-			socket.value.off('newGame')
-			socket.value.off('GoToGame')
+			pongSocket.off('endGame')
+			pongSocket.off('newGame')
+			pongSocket.off('GoToGame')
 		})
 
 		return { games, WatchGame }

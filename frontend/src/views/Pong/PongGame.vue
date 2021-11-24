@@ -62,23 +62,22 @@ export default defineComponent({
 		onBeforeRouteLeave(() => {
 			if (props.userType === 'player')
 			{
-				socket.value.emit('leaveGame', props.room)
+				pongSocket.emit('leaveGame', props.room)
 				window.removeEventListener("keydown", onKeyDown)
 			}
 			// remove event listener, else it will be registered as many times as we entered the component
-			socket.value.off('position')
-			socket.value.off('score')
-			socket.value.off('enlarge')
-			socket.value.off('enlargeEnd')
-			socket.value.off('gameStarting')
-			socket.value.off('gameOver')
+			pongSocket.off('position')
+			pongSocket.off('score')
+			pongSocket.off('enlarge')
+			pongSocket.off('enlargeEnd')
+			pongSocket.off('gameStarting')
+			pongSocket.off('gameOver')
 			window.removeEventListener("resize", onResize)
 		})
 
 
 		// socket event listeners
-		const socket = ref(pongSocket)
-		socket.value.on("position", (newBallPosition: Coordinates, newPlayerPositions: PlayerPositions) => {
+		pongSocket.on("position", (newBallPosition: Coordinates, newPlayerPositions: PlayerPositions) => {
 			ballPosition.value.x = newBallPosition.x * windowWidth.value
 			ballPosition.value.y = newBallPosition.y * windowWidth.value
 			playerPositions.value.player1 = newPlayerPositions.player1 * windowWidth.value
@@ -86,12 +85,12 @@ export default defineComponent({
 			draw()
 		})
 	
-		socket.value.on("score", (newScore: PlayerScores) => {
+		pongSocket.on("score", (newScore: PlayerScores) => {
 			score.value = newScore
 			draw()
 		})
 
-		socket.value.on('enlarge', (playerToEnlargeNumber: number) => {
+		pongSocket.on('enlarge', (playerToEnlargeNumber: number) => {
 			if (playerToEnlargeNumber === 1)
 			{
 				racquetLenghtRatio.value.player1 /= 2
@@ -104,7 +103,7 @@ export default defineComponent({
 			}
 		})
 		
-		socket.value.on('enlargeEnd', (playerToEnlargeNumber: number) => {
+		pongSocket.on('enlargeEnd', (playerToEnlargeNumber: number) => {
 			if (playerToEnlargeNumber === 1)
 				racquetLenghtRatio.value.player1 *= 2
 			else
@@ -112,13 +111,13 @@ export default defineComponent({
 		})
 		
 		const gameHasStarted = ref(false)
-		socket.value.on("gameStarting", () => {
+		pongSocket.on("gameStarting", () => {
 			gameHasStarted.value = true
 		})
 		
 		const winningPlayer = ref<string>('')
 		const gameIsOver = ref(false)
-		socket.value.on("gameOver", (player1Won: boolean) => {
+		pongSocket.on("gameOver", (player1Won: boolean) => {
 			if (props.userType === 'player')
 				window.removeEventListener("keydown", onKeyDown)
 			gameHasStarted.value = true
@@ -133,12 +132,12 @@ export default defineComponent({
 		// socket emit
 		const SendMoveMsg = (direction: string) => {
 			if (gameHasStarted.value)
-				socket.value.emit('moveRacquet', {room: props.room, text: direction})
+				pongSocket.emit('moveRacquet', {room: props.room, text: direction})
 		}
 		
 		const EnlargeRacquet = () => {
 			if (gameHasStarted.value)
-				socket.value.emit('enlargeRacquet', props.room)
+				pongSocket.emit('enlargeRacquet', props.room)
 		}
 		
 		const onKeyDown = (event: KeyboardEvent) => {

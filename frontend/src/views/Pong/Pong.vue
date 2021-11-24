@@ -36,7 +36,6 @@ import { User } from 'sdk/typescript-axios-client-generated'
 
 export default defineComponent ({
 	setup() {
-		const socket = ref(pongSocket)
 		const queuing = ref(false)
 		const gameMode = ref<gameMode>('transcendence')
 		const api = useUserApi()
@@ -44,18 +43,18 @@ export default defineComponent ({
 
 		const store = useStore()
 		const JoinQueue = () => {
-			socket.value.emit('joinGame', {
+			pongSocket.emit('joinGame', {
 				userId: store.state.user.id, 
 				userName: store.state.user.username, 
 				gameMode: gameMode.value})
 		}
 
-		socket.value.on('addedToQueue', () => {
+		pongSocket.on('addedToQueue', () => {
 			queuing.value = true
 		})
 		
 		const alreadyInQueue = ref(false)
-		socket.value.on('alreadyInQueue', () => {
+		pongSocket.on('alreadyInQueue', () => {
 			console.log('already in queue !')
 			alreadyInQueue.value = true
 			setTimeout(() => {
@@ -64,7 +63,7 @@ export default defineComponent ({
 		})
 
 		const router = useRouter()
-		socket.value.on('gameReadyToStart', (room: string, player1UserName: string, player2UserName: string, gameMode: gameMode) => {
+		pongSocket.on('gameReadyToStart', (room: string, player1UserName: string, player2UserName: string, gameMode: gameMode) => {
 			router.push({ name: 'PongGame', 
 			params: {
 				room,
@@ -78,11 +77,11 @@ export default defineComponent ({
 		})
 
 		onBeforeRouteLeave(() => {
-			socket.value.off('addedToQueue')
-			socket.value.off('alreadyInQueue')
-			socket.value.off('gameReadyToStart')
+			pongSocket.off('addedToQueue')
+			pongSocket.off('alreadyInQueue')
+			pongSocket.off('gameReadyToStart')
 			if (queuing.value)
-				socket.value.emit('leaveQueue')
+				pongSocket.emit('leaveQueue')
 		})
 
 		onMounted(() => {
