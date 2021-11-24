@@ -6,4 +6,12 @@
   justify-content: center;
   align-items: center;
   margin-top: 2rem;
+  gap: 2rem;
+  @media (max-width: 1100px){
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background-color: $profile-div-bg-color;
+    margin-top: 0;
+  }
 }

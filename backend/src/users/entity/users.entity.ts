@@ -12,12 +12,19 @@ import {
 } from 'typeorm';
 import { Relationships } from 'src/relationships/entity/relationships.entity';
 import { ChannelMembers } from 'src/channel_members/entity/channel_members.entity';
-// import * as bcrypt from 'bcrypt';
+import { Role } from 'src/auth/models/role.enum';
 
 @Entity('users')
 export class Users {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.USER,
+  })
+  role: Role;
 
   @Column({ type: 'varchar', length: 10, unique: true })
   username: string;
@@ -36,12 +43,6 @@ export class Users {
 
   @Column({ default: false })
   banned: boolean;
-
-  @Column({ default: false })
-  admin: boolean;
-
-  @Column({ default: false })
-  owner: boolean;
 
   @Column({ type: 'varchar', length: 36, nullable: true })
   refresh_token: string;
@@ -73,7 +74,6 @@ export class Users {
 
   @OneToMany(() => Relationships, (relationship) => relationship.adressee)
   relationships_adressed: Relationships[];
-
 
   // @OneToMany()
   // channels:

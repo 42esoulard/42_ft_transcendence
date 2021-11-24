@@ -1,7 +1,11 @@
 <template>
   <div class="banned-div">
-      <span class="banned__msg">You've been banned. You can still delete your account.</span>
-      <button class="button button--grey" @click="deleteAccount">Delete account</button>
+    <span class="banned__msg"
+      >You've been banned. You can still delete your account.</span
+    >
+    <button class="button button--grey" @click="deleteAccount">
+      Delete account
+    </button>
   </div>
 </template>
 
@@ -9,7 +13,7 @@
 import { defineComponent, inject, ref, computed, onMounted } from "vue";
 import { useStore } from "@/store";
 import { useRouter } from "vue-router";
-import { presenceSocket } from "@/views/UserAccount.vue";
+import { presenceSocket } from "@/App.vue";
 import { useUserApi, useAuthApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
@@ -20,15 +24,13 @@ export default defineComponent({
     const router = useRouter();
     const authApi = useAuthApi();
 
-    const deleteAccount = async() => {
+    const deleteAccount = async () => {
       if (store.state.user.id != 0) {
-        if(confirm("Do you really want to delete?")){
+        if (confirm("Do you really want to delete?")) {
           logOut();
           await userApi
             .removeUser(store.state.user.id)
-            .then((res: any) => {
-
-            })
+            .then((res: any) => {})
             .catch((err: any) => console.log(err));
         }
       }
@@ -46,7 +48,7 @@ export default defineComponent({
         .catch((err: any) => console.log(err.message));
     };
 
-  return {deleteAccount};
+    return { deleteAccount };
   },
 });
 </script>

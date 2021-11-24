@@ -13,12 +13,11 @@ export class User {
   two_fa_enabled?: boolean;
   refresh_token?: string;
   banned?: boolean;
-  admin?: boolean;
-  root?: boolean;
   expiry_date?: Date;
   messages?: Message[];
   channel_members?: ChannelMember[];
   games?: GameUser[];
+  role?: string;
   relationships_requested?: Relationship[];
   relationships_adressed?: Relationship[];
 }

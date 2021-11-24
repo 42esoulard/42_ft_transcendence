@@ -37,13 +37,29 @@
       <div class="users-list">
         <tr v-for="user in selectList" :key="user.id" class="users-list__elt">
           <td>
-            <img v-if="userStatus(user) == 'online'" class="users-list__avatar users-list__avatar--online" :src="user.avatar" />
-            <img v-else-if="userStatus(user) == 'ingame'" class="users-list__avatar users-list__avatar--in-game" :src="user.avatar" />
-            <img v-else class="users-list__avatar users-list__avatar--offline" :src="user.avatar" />
+            <img
+              v-if="userStatus(user) == 'online'"
+              class="users-list__avatar users-list__avatar--online"
+              :src="user.avatar"
+            />
+            <img
+              v-else-if="userStatus(user) == 'ingame'"
+              class="users-list__avatar users-list__avatar--in-game"
+              :src="user.avatar"
+            />
+            <img
+              v-else
+              class="users-list__avatar users-list__avatar--offline"
+              :src="user.avatar"
+            />
           </td>
           <td>
             <router-link
-              class="link link--user-list"
+              :class="[
+                'link',
+                'link--user-list',
+                user.role == 'user' ? '' : 'link--admin',
+              ]"
               :to="{ name: 'UserProfile', params: { username: user.username } }"
             >
               {{ user.username }}
@@ -103,9 +119,11 @@ export default defineComponent({
     const userStatus = (user: User): "online" | "offline" | "ingame" => {
       if (user != undefined) {
         const inGameUser = store.state.inGameUsers.find(
-          u => u === user.username
+          (u) => u === user.username
         );
-        const onlineUser = store.state.onlineUsers.find(u => u.id === user.id);
+        const onlineUser = store.state.onlineUsers.find(
+          (u) => u.id === user.id
+        );
         if (inGameUser) {
           return "ingame";
         } else if (onlineUser) {

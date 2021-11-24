@@ -4,7 +4,7 @@ import AddUser from '../views/AddUser.vue'
 import Users from '../views/Users.vue'
 import Chat from '../views/Chat.vue'
 import Banned from '../views/Banned.vue';
-import UserAccount from '../views/UserAccount.vue'
+import Admin from '../views/Admin.vue'
 import Pong from '../views/Pong/Pong.vue'
 import PongGame from '../views/Pong/PongGame.vue'
 import PongWatch from '../views/Pong/PongWatch.vue'
@@ -71,11 +71,11 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
-    path: '/account',
-    name: 'UserAccount',
-    component: UserAccount,
+    path: '/admin',
+    name: 'Admin',
+    component: Admin,
     meta: {
-      requiresAuth: true,
+      requiresAdmin: true,
     }
   },
   {
@@ -191,6 +191,17 @@ router.beforeEach(async (to, from) => {
     if (store.state.user.id) {
       return true;
     }
+  } else if (to.matched.some(record => record.meta.requiresAdmin)) {
+    if (store.state.user.id === 0) {
+      await getProfile();
+    }
+    if (store.state.user.id === 0) {
+      return '/login'; // redirected to login
+    }
+    if (store.state.user.role == 'user') {
+      return '/';
+    }
+    return true;
   }
 });
 

@@ -10,6 +10,10 @@
   margin-top: 2rem;
   &--admin {
     margin-top: 0;
+    @media (max-width: 800px){
+      width: 100%;
+      border-radius: 0;
+    }
   }
   @media (max-width: 600px){
     width: 100%;
@@ -65,7 +69,7 @@
   height: $users-avatar-width;
   border-radius: 50%;
   &--online {
-    border: 2px solid darken($third-color, 10%);
+    border: 2px solid $status-online-color;
   }
   &--in-game {
     border: 2px solid $status-in-game-color;

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from './interfaces/user.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -6,6 +6,7 @@ import { Users } from './entity/users.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { UpdateUserTokenDto } from './dto/updateUserToken.dto';
+import { Role } from 'src/auth/models/role.enum';
 
 @Injectable()
 export class UsersService {
@@ -15,28 +16,34 @@ export class UsersService {
   ) {}
 
   async getUsers(): Promise<Users[]> {
-    return await this.usersRepository.find({where: {banned: false}});
+    return await this.usersRepository.find({ where: { banned: false } });
   }
 
   async getBannedUsers(): Promise<Users[]> {
-    return await this.usersRepository.find({where: {banned: true}});
+    return await this.usersRepository.find({ where: { banned: true } });
   }
 
   async getAdmins(): Promise<Users[]> {
-    return await this.usersRepository.find({where: {admin: true}});
+    return await this.usersRepository.find({
+      where: [{ role: Role.ADMIN }, { role: Role.OWNER }],
+    });
   }
 
   async getOwner(): Promise<Users[]> {
-    return await this.usersRepository.find({where: {owner: true}});
+    return await this.usersRepository.find({ where: { role: Role.OWNER } });
   }
 
   //is it possible to check if requester is an admin?
   async promoteUser(id: number) {
-    return this.usersRepository.update(id, { admin: true });
+    const user = await this.usersRepository.findOne(id);
+    if (user.role == Role.OWNER) throw ForbiddenException;
+    else return this.usersRepository.update(id, { role: Role.ADMIN });
   }
 
   async demoteUser(id: number) {
-    return this.usersRepository.update(id, { admin: false });
+    const user = await this.usersRepository.findOne(id);
+    if (user.role == Role.OWNER) throw ForbiddenException;
+    else return this.usersRepository.update(id, { role: Role.USER });
   }
 
   async getUserChannels(id: number): Promise<Users> {
@@ -52,8 +59,9 @@ export class UsersService {
   }
 
   async removeUser(id: number) {
-    const user = await this.getUserbyId(id);
-    return await this.usersRepository.delete(user.id);
+    const user = await this.usersRepository.findOne(id);
+    if (user.role == Role.OWNER) throw ForbiddenException;
+    else return await this.usersRepository.delete(user.id);
   }
 
   async getUserByUsername(username: string): Promise<User> | undefined {
@@ -74,7 +82,18 @@ export class UsersService {
     const newUser = this.usersRepository.create(userDto);
     if (!newUser.avatar)
       newUser.avatar = 'http://localhost:3000/users/avatars/default.jpg';
+    if (newUser.id == 1) newUser.role = Role.OWNER;
     return await this.usersRepository.save(newUser);
+  }
+
+  async changeOwner(id: number) {
+    const owner = await this.usersRepository.find({
+      where: { role: Role.OWNER },
+    });
+    const user = await this.usersRepository.findOne(id);
+
+    await this.usersRepository.update(owner[0].id, { role: Role.ADMIN });
+    await this.usersRepository.update(user.id, { role: Role.OWNER });
   }
 
   async getRefreshToken(id: number) {
@@ -86,10 +105,23 @@ export class UsersService {
     return refresh_token.refresh_token;
   }
 
+  async banUser(id: number) {
+    const user = await this.usersRepository.findOne(id);
+    if (user.role != Role.USER) throw ForbiddenException;
+    else
+      return await this.usersRepository.update(id, {
+        banned: true,
+      });
+  }
+
+  async unbanUser(id: number) {
+    return await this.usersRepository.update(id, {
+      banned: false,
+    });
+  }
+
   async updateUser(updatedUser: UpdateUserDto) {
     await this.usersRepository.save(updatedUser);
-    if (updatedUser.banned && updatedUser.banned == true)
-    await this.usersRepository.update(updatedUser.id, {admin: false});
   }
 
   async updateUserToken(updatedUser: UpdateUserTokenDto): Promise<User> {

@@ -35,43 +35,80 @@
         </button>
       </div>
       <div class="users-list">
-        <tr v-for="user in selectList" :key="user.id" class="users-list__elt">
+        <tr
+          v-for="member in selectList"
+          :key="member.id"
+          class="users-list__elt"
+        >
           <td>
-            <img v-if="isOnline(user)" class="users-list__avatar users-list__avatar--online" :src="user.avatar" />
-            <img v-else class="users-list__avatar users-list__avatar--offline" :src="user.avatar" />
+            <img
+              v-if="isOnline(member)"
+              class="users-list__avatar users-list__avatar--online"
+              :src="member.avatar"
+            />
+            <img
+              v-else
+              class="users-list__avatar users-list__avatar--offline"
+              :src="member.avatar"
+            />
           </td>
           <td>
             <router-link
-              class="link link--user-list"
-              :to="{ name: 'UserProfile', params: { username: user.username } }"
+              :class="[
+                'link',
+                'link--user-list',
+                member.role == 'user' ? '' : 'link--admin',
+              ]"
+              :to="{
+                name: 'UserProfile',
+                params: { username: member.username },
+              }"
             >
-              {{ user.username }}
+              {{ member.username }}
             </router-link>
           </td>
           <td class="users-list__interactions">
-            <button v-if="bannedlist"
+            <button
+              v-if="bannedlist"
               class="link link--neutral"
-              @click="unbanUser(user)">
-               <i class="fas fa-user-slash" />
+              @click="unbanUser(member)"
+            >
+              <i class="fas fa-user-slash" />
             </button>
-            <button v-else
+            <button
+              v-else-if="member.role == 'user'"
               class="link link--neutral"
-              @click="banUser(user)">
-               <i class="fas fa-ban" />
+              @click="banUser(member)"
+            >
+              <i class="fas fa-ban" />
             </button>
-            <button class="link link--neutral"
-              @click="deleteUser(user)">
-               <i class="fas fa-trash" />
-            </button>
-            <button v-if="!bannedlist && !isAdmin(user)"
+            <button
               class="link link--neutral"
-              @click="promote(user)">
-               <i class="fas fa-crown" />
+              v-if="member.role == 'user'"
+              @click="deleteUser(member)"
+            >
+              <i class="fas fa-trash" />
             </button>
-            <button v-if="isAdmin(user)"
+            <button
+              v-if="!bannedlist && user.role == 'owner' && !isAdmin(member)"
               class="link link--neutral"
-              @click="demote(user)">
-               <i class="fas fa-arrow-down" />
+              @click="promote(member)"
+            >
+              <i class="fas fa-crown" />
+            </button>
+            <button
+              v-if="!bannedlist && user.role == 'owner' && isAdmin(member)"
+              class="link link--neutral"
+              @click="changeOwner(member)"
+            >
+              <i class="fas fa-chess-king" />
+            </button>
+            <button
+              v-if="isAdmin(member) && user.role == 'owner'"
+              class="link link--neutral"
+              @click="demote(member)"
+            >
+              <i class="fas fa-arrow-down" />
             </button>
           </td>
         </tr>
@@ -112,14 +149,23 @@
         </button>
       </div>
       <div class="users-list">
-        <tr v-for="channel in selectChannelList" :key="channel.id" class="users-list__elt">
+        <tr
+          v-for="channel in selectChannelList"
+          :key="channel.id"
+          class="users-list__elt"
+        >
           <td>
-            {{ channel.name }}
+            <span class="link link--user-list">
+              {{ printChannelName(channel.name) }}
+            </span>
           </td>
           <td class="users-list__interactions">
-            <button class="link link--neutral"
-              @click="deleteChannel(channel)">
-               <i class="fas fa-trash" />
+            <button
+              v-if="channel.id != 1"
+              class="link link--neutral"
+              @click="deleteChannel(channel)"
+            >
+              <i class="fas fa-trash" />
             </button>
           </td>
         </tr>
@@ -133,7 +179,6 @@
         />
       </div>
     </div>
-
   </div>
 </template>
 
@@ -142,15 +187,19 @@ import { computed, defineComponent, onMounted, ref } from "vue";
 import { useStore } from "@/store";
 import { User, Channel } from "sdk/typescript-axios-client-generated";
 import { io } from "socket.io-client";
-import { useUserApi, useChatApi } from "@/plugins/api.plugin";
+import { useUserApi, useChatApi, useAuthApi } from "@/plugins/api.plugin";
+import { useRouter } from "vue-router";
+import { presenceSocket } from "@/App.vue";
 
 export default defineComponent({
-  name: "UserAccount",
+  name: "Admin",
   components: {},
   setup() {
     const store = useStore();
     const userApi = useUserApi();
     const chatApi = useChatApi();
+    const authApi = useAuthApi();
+    const router = useRouter();
     const userList = ref<User[]>([]);
     const bannedList = ref<User[]>([]);
     const channelList = ref<Channel[]>([]);
@@ -172,8 +221,7 @@ export default defineComponent({
     };
 
     const isAdmin = (user: User): boolean => {
-      if (user != undefined && user.admin)
-        return true;
+      if (user != undefined && user.role != "user") return true;
       return false;
     };
 
@@ -193,13 +241,12 @@ export default defineComponent({
         })
         .catch((err: any) => console.log(err.message));
       chatApi
-        .getChannels()
+        .getChannels({ withCredentials: true })
         .then((res: any) => {
           channelList.value = res.data;
           channelList.value.sort((a, b) => a.name.localeCompare(b.name));
         })
         .catch((err: any) => console.log(err.message));
-
     });
 
     const toggleOnline = () => {
@@ -241,97 +288,144 @@ export default defineComponent({
         (entity: User) => entity.id != store.state.user.id
       );
       if (adminlist.value)
-        list.value = list.value.filter(
-        (entity: User) => entity.admin == true
-      );
+        list.value = list.value.filter((entity: User) => entity.role != "user");
       return list.value;
     });
 
     const selectChannelList = computed((): Channel[] => {
       const list = ref();
 
-      list.value = channelList.value;
       if (publiclist.value) {
         if (privatelist.value) return list.value;
-        return list.value.filter((chan: Channel) => chan.type == "public");
+        list.value = channelList.value.filter(
+          (chan: Channel) => chan.type == "public"
+        );
+      } else if (privatelist.value)
+        list.value = channelList.value.filter(
+          (chan: Channel) => chan.type == "private"
+        );
+      else list.value = channelList.value;
+      if (searchQueryChat.value.length) {
+        list.value = list.value.filter((entity: Channel) =>
+          entity.name.toLowerCase().startsWith(searchQueryChat.value)
+        );
       }
-      else if (privatelist.value)
-        return list.value.filter((chan: Channel) => chan.type == "private");
       return list.value;
     });
 
-    const deleteUser = async(user: User) => {
-      if(confirm(`Do you really want to delete ${user.username}?`)){
+    const deleteUser = async (user: User) => {
+      if (confirm(`Do you really want to delete ${user.username}?`)) {
         await userApi
           .removeUser(user.id)
           .then((res: any) => {
             console.log("account deleted");
-            userList.value = userList.value.filter((usr: User) => usr.id != user.id);
-            bannedList.value = bannedList.value.filter((usr: User) => usr.id != user.id);
+            userList.value = userList.value.filter(
+              (usr: User) => usr.id != user.id
+            );
+            bannedList.value = bannedList.value.filter(
+              (usr: User) => usr.id != user.id
+            );
           })
           .catch((err: any) => console.log(err));
       }
     };
 
-    const deleteChannel = async(channel: Channel) => {
-      if(confirm(`Do you really want to delete ${channel.name}?`)){
+    const deleteChannel = async (channel: Channel) => {
+      if (confirm(`Do you really want to delete ${channel.name}?`)) {
         await chatApi
-          .deleteChannel(channel.id)
+          .deleteChannel(channel.id, { withCredentials: true })
           .then((res: any) => {
             console.log("channel deleted");
-            channelList.value = channelList.value.filter((chan: Channel) => chan.id != chan.id);
+            channelList.value = channelList.value.filter(
+              (chan: Channel) => chan.id != channel.id
+            );
           })
           .catch((err: any) => console.log(err));
       }
     };
 
-    const promote = async(user: User) => {
-      if(confirm(`Do you really want to promote ${user.username}?`)){
+    const promote = async (user: User) => {
+      if (confirm(`Do you really want to promote ${user.username}?`)) {
         await userApi
-          .promoteUser(user.id)
+          .promoteUser(user.id, { withCredentials: true })
           .then((res: any) => {
             console.log("user promoted");
-            user.admin = true;
+            user.role = "admin";
           })
           .catch((err: any) => console.log(err));
       }
     };
 
-    const demote = async(user: User) => {
-      if(confirm(`Do you really want to demote ${user.username}?`)){
+    const demote = async (user: User) => {
+      if (confirm(`Do you really want to demote ${user.username}?`)) {
         await userApi
-          .demoteUser(user.id)
+          .demoteUser(user.id, { withCredentials: true })
           .then((res: any) => {
             console.log("user demoted");
-            user.admin = false;
+            user.role = "user";
           })
           .catch((err: any) => console.log(err));
       }
     };
 
-    const banUser = async(user: User) => {
-      if(confirm(`Do you really want to ban ${user.username}?`)){
+    const changeOwner = async (user: User) => {
+      if (confirm(`Do you really want to promote ${user.username} owner?`)) {
         await userApi
-          .updateUser({id: user.id, banned: true})
+          .changeOwner(user.id, { withCredentials: true })
+          .then((res: any) => {
+            console.log("owner changed");
+            user.role = "owner";
+            logOut();
+          })
+          .catch((err: any) => console.log(err));
+      }
+    };
+
+    const logOut = () => {
+      authApi
+        .logout({ withCredentials: true })
+        .then((response) => {
+          console.log(response);
+          presenceSocket.emit("closeConnection", store.state.user);
+          store.commit("resetUser"); //store.state.user = null;
+          router.push("/login");
+        })
+        .catch((err: any) => console.log(err.message));
+    };
+
+    const banUser = async (user: User) => {
+      if (confirm(`Do you really want to ban ${user.username}?`)) {
+        await userApi
+          .banUser(user.id, { withCredentials: true })
           .then((res: any) => {
             console.log("user banned");
             bannedList.value.push(user);
-            userList.value = userList.value.filter((usr: User) => usr.id != user.id);
-            user.admin = false;
+            userList.value = userList.value.filter(
+              (usr: User) => usr.id != user.id
+            );
+            user.role == "user";
           })
           .catch((err: any) => console.log(err));
       }
     };
 
-    const unbanUser = async(user: User) => {
+    const unbanUser = async (user: User) => {
       await userApi
-        .updateUser({id: user.id, banned: false})
+        .unbanUser(user.id, { withCredentials: true })
         .then((res: any) => {
           console.log("user unbanned");
           userList.value.push(user);
-          bannedList.value = bannedList.value.filter((usr: User) => usr.id != user.id);
+          bannedList.value = bannedList.value.filter(
+            (usr: User) => usr.id != user.id
+          );
         })
         .catch((err: any) => console.log(err));
+    };
+
+    const printChannelName = (channelName: string) => {
+      return channelName.length > 15
+        ? channelName.slice(0, 15) + "..."
+        : channelName;
     };
 
     return {
@@ -358,7 +452,10 @@ export default defineComponent({
       togglePrivate,
       privatelist,
       publiclist,
-      deleteChannel
+      deleteChannel,
+      channelList,
+      printChannelName,
+      changeOwner,
     };
   },
 });

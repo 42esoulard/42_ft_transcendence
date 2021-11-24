@@ -6,7 +6,6 @@ import { io } from "socket.io-client";
 import { useStore } from "@/store";
 import { computed, onUpdated } from "vue";
 import { User } from "sdk/typescript-axios-client-generated";
-
 export const pongSocket = io("http://localhost:3000/pong");
 export const presenceSocket = io("http://localhost:3000/presence");
 

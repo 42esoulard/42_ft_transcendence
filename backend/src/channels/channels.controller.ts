@@ -6,6 +6,7 @@ import {
   Param,
   NotFoundException,
   UseGuards,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ChannelsService } from './channels.service';
 import { Channel } from './interfaces/channel.interface';
@@ -197,11 +198,14 @@ export class ChannelsController {
   async deleteChannel(
     @Param('chan_id') chan_id: number,
   ): Promise<DeleteResult> {
-    const dr: DeleteResult = await this.channelService.deleteChannel(chan_id);
-    if (dr == undefined) {
-      throw new NotFoundException('Failed to leave channel');
-    }
-    return dr;
+    if (chan_id == 1){
+      const dr: DeleteResult = await this.channelService.deleteChannel(chan_id);
+      if (dr == undefined) {
+        throw new NotFoundException('Failed to leave channel');
+      }
+      return dr;
+    } else
+      throw new ForbiddenException('General can\'t be deleted');
   }
 
   @Get('/admin-action/:action/:cm_id/:end_date')

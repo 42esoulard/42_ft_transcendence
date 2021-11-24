@@ -1,5 +1,5 @@
-import { User } from "src/users/interfaces/user.interface";
-import { Request } from 'express'
+import { User } from 'src/users/interfaces/user.interface';
+import { Request } from 'express';
 
 /**
  * This file is an extension of the Request type
@@ -8,7 +8,7 @@ import { Request } from 'express'
  */
 declare module 'express-serve-static-core' {
   interface Request {
-    user?: User,
-    fileValidationError?: string,
+    user?: User;
+    fileValidationError?: string;
   }
 }

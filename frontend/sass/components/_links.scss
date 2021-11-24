@@ -10,6 +10,9 @@
       color: $link-neutral-hover;
     }
   }
+  &--admin {
+    color: $fifth-color;
+  }
   &--user-list {
     font-size: 1.5rem;
     &:hover {

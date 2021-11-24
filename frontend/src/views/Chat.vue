@@ -1,11 +1,11 @@
 <template>
-  <ChatComponent/>
+  <ChatComponent />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import { io } from "socket.io-client";
-import ChatComponent from "@/components/chat/ChatComponent.vue"
+import ChatComponent from "@/components/chat/ChatComponent.vue";
 
 export default defineComponent({
   name: "Chat",

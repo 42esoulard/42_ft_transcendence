@@ -59,6 +59,11 @@
     &--on {
       color: white;
       background-color: $button-third-bg;
+      &:hover {
+        color: white;
+        border: grey solid 1px;
+        background-color: grey;
+      }
     }
   }
 }
