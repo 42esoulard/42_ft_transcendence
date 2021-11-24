@@ -1,15 +1,17 @@
 <template>
 
 	<div>
-		Challenging
+		{{ challengeStatus }}
+		<button v-on:click="cancelChallenge()"> cancel challenge </button>
 	</div>
 
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { pongSocket } from '@/App.vue'
 import { useStore } from '@/store'
+import { useRouter } from "vue-router";
 
 export default defineComponent ({
 	props: {
@@ -23,9 +25,9 @@ export default defineComponent ({
 			challenge(Number(props.challengeeId), props.challengeeName)
 		})
 
+		const challengeStatus = ref('')
 		const challenge = (id: number, name: string) => {
-			// challenging.value = true
-			// challengeStatus.value = 'challenge sent to ' + name + 'challenge request will automatically expire after 5 seconds'
+			challengeStatus.value = 'challenge sent to ' + name
 			pongSocket.emit('challengeRequest', {
 				challengerId: store.state.user.id, 
 				challengerName: store.state.user.username, 
@@ -34,15 +36,19 @@ export default defineComponent ({
 				gameMode: 'transcendence'})
 		}
 
+		const router = useRouter()
 		const cancelChallenge = () => {
-			// challenging.value = false
 			pongSocket.emit('cancelChallenge', store.state.user.id)
+			router.push({name: 'Pong'})
+
 		}
 		
 		pongSocket.on('challengeDeclined', () => {
-			// challengeStatus.value = 'challenge has been declined'
+			challengeStatus.value = 'challenge has been declined'
 			console.log('challenge has been declined')
 		})
+
+		return { challengeStatus, cancelChallenge }
 		
 	}
 })
