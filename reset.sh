@@ -15,7 +15,7 @@ fi
 rm -rf backend/node_modules
 rm -rf frontend/node_modules
 rm -rf backend/dist
-docker-compose up --build --remove-orphans
+# docker-compose up --build --remove-orphans
 
 # To reset Auto-increment on table "users"
 # ALTER SEQUENCE users_id_seq RESTART WITH 1;
