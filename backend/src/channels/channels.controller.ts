@@ -17,7 +17,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
-import { ChannelMembersService } from 'src/channel_members/channel_members.service';
 import { DeleteResult } from 'typeorm';
 import { JwtTwoFactorGuard } from 'src/auth/guards/jwtTwoFactor.guard';
 // import { UpdateChannelDto } from './dto/updateChannel.dto';

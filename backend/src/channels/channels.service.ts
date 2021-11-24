@@ -10,6 +10,7 @@ import { Users } from 'src/users/entity/users.entity';
 import { ChannelMembersService } from 'src/channel_members/channel_members.service';
 import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
 import { reduce } from 'rxjs';
+import { RelationshipsService } from 'src/relationships/relationships.service';
 
 @Injectable()
 export class ChannelsService {
@@ -18,6 +19,7 @@ export class ChannelsService {
     private readonly channelsRepository: Repository<Channels>,
     private readonly userService: UsersService,
     private readonly channelMemberService: ChannelMembersService,
+    private readonly relationshipService: RelationshipsService,
   ) {}
 
   async seed(): Promise<Channel> {
@@ -94,9 +96,43 @@ export class ChannelsService {
     return userChannels.filter((userChannels) => !userChannels.ban);
   }
 
+  async filterBlocked(
+    user: Users,
+    userChannels: ChannelMember[],
+  ): Promise<ChannelMember[]> {
+    return await this.relationshipService
+      .getUserBlocked(user.id)
+      .then((res) => {
+        console.log(
+          'here blocked users',
+          res.map((res) => res.adresseeId),
+        );
+        userChannels.forEach((cm) => {
+          // console.log('messages', cm.channel.messages);
+          cm.channel.messages = cm.channel.messages.filter(
+            (msg) => !res.map((res) => res.adresseeId).includes(msg.author.id),
+          );
+          cm.channel.channel_members = cm.channel.channel_members.filter(
+            (member) =>
+              !res.map((res) => res.adresseeId).includes(member.member.id),
+          );
+          console.log('after filter messages', cm.channel.messages);
+        });
+        return userChannels;
+      });
+  }
+
   async getUserChannels(user_id: number): Promise<ChannelMember[]> {
     const user: Users = await this.userService.getUserbyId(user_id);
-    return await this.channelMemberService.getUserChannels(user);
+    return await this.channelMemberService
+      .getUserChannels(user)
+      .then(async (res) => {
+        console.log(
+          'IN GETUSERCHANNELS FILTERED ',
+          await this.filterBlocked(user, res),
+        );
+        return await this.filterBlocked(user, res);
+      });
   }
 
   async getAvailableChannels(user_id: number): Promise<Channel[]> {
