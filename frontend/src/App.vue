@@ -68,7 +68,7 @@ export default {
 			if (message.challengeeId === store.state.user.id)
 			{
 				console.log('You have been challenged !')
-        router.push({name: 'ChallengeReceived', params: {challengerId: message.challengerId, challengerName: message.challengerName}})
+        router.push({name: 'ChallengeReceived', params: {challengerId: message.challengerId, challengerName: message.challengerName, authorized: 'ok'}})
 			}
 		})
 

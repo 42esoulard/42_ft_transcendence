@@ -19,7 +19,7 @@
   </div>
 
 	<div v-for="user in users" :key="user.id" class="button">
-		<router-link :to="{name: 'SendChallenge', params: {challengeeId:user.id, challengeeName: user.username} }"> challenge {{user.username}} </router-link>
+		<router-link :to="{name: 'SendChallenge', params: {challengeeId:user.id, challengeeName: user.username, authorized: 'ok'} }"> challenge {{user.username}} </router-link>
 	</div>
 
 </template>
