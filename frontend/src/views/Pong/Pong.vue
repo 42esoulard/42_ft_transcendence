@@ -19,13 +19,9 @@
   </div>
 
 	<div v-for="user in users" :key="user.id">
-		<button v-on:click="challenge(user.id, user.username)"> {{user.forty_two_login}} </button>
+		<router-link :to="{name: 'SendChallenge', params: {challengeeId:user.id, challengeeName: user.username} }"> challenge {{user.username}} </router-link>
 	</div>
 
-	<div v-if="challenging">
-		{{ challengeStatus }}
-		<button v-on:click="cancelChallenge()"> cancel challenge </button>
-	</div>
 </template>
 
 
@@ -91,50 +87,29 @@ export default defineComponent ({
 				getUsers()
 				.then((res: any) => users.value = res.data)
 				.catch((err) => console.log(err))
-
 		})
-
-		const challenging = ref(false)
-		const challengeStatus = ref('')
-		const challenge = (id: number, name: string) => {
-			// utiliser le store.state.onlineuser
-			challenging.value = true
-			challengeStatus.value = 'challenge sent to ' + name + 'challenge request will automatically expire after 5 seconds'
-			
-			socket.value.emit('challengeRequest', {
-				challengerId: store.state.user.id, 
-				challengerName: store.state.user.username, 
-				challengeeId: id, 
-				challengeeName: name,
-				gameMode: 'transcendence'})
-		}
-
-		const cancelChallenge = () => {
-			challenging.value = false
-			socket.value.emit('cancelChallenge', store.state.user.id)
-		}
 
 		const challenged = ref(false)
 		const challengeMessage = ref<challengeMessage>()
 
-		socket.value.on('challengeCancelled', (challengerId: number) => {
-			if (challengeMessage && challengeMessage.value?.challengerId)
-			{
-				challenged.value = false
-				challengeMessage.value = undefined
-			}
-			if (challenging && challengerId === store.state.user.id)
-			{
-				challenging.value = false
-			}
-		})
+		// socket.value.on('challengeCancelled', (challengerId: number) => {
+		// 	if (challengeMessage && challengeMessage.value?.challengerId)
+		// 	{
+		// 		challenged.value = false
+		// 		challengeMessage.value = undefined
+		// 	}
+		// 	if (challenging && challengerId === store.state.user.id)
+		// 	{
+		// 		challenging.value = false
+		// 	}
+		// })
 
-		socket.value.on('challengeDeclined', () => {
-			challengeStatus.value = 'challenge has been declined'
-			console.log('challenge has been declined')
-		})
+		// socket.value.on('challengeDeclined', () => {
+		// 	challengeStatus.value = 'challenge has been declined'
+		// 	console.log('challenge has been declined')
+		// })
 
-		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenging, challengeStatus, challenged, challenge, cancelChallenge}
+		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenged}
 	}
 
 })

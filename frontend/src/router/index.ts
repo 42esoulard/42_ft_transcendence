@@ -9,6 +9,7 @@ import Pong from '../views/Pong/Pong.vue'
 import PongGame from '../views/Pong/PongGame.vue'
 import PongWatch from '../views/Pong/PongWatch.vue'
 import ReceiveChallenge from '../views/Pong/ReceiveChallenge.vue'
+import SendChallenge from '../views/Pong/SendChallenge.vue'
 import FakeLogin from '../views/FakeLogin.vue'
 import Login from '../views/Login.vue';
 import { store } from "@/store";
@@ -138,6 +139,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/pong/challenge/received',
     name: 'ChallengeReceived',
     component: ReceiveChallenge,
+    props: true
+  },
+  {
+    path: '/pong/challenge/sent',
+    name: 'SendChallenge',
+    component: SendChallenge,
     props: true
   },
   {
