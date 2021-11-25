@@ -10,6 +10,7 @@ import { Users } from 'src/users/entity/users.entity';
 import { ChannelMembersService } from 'src/channel_members/channel_members.service';
 import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
 import { reduce } from 'rxjs';
+import { RelationshipsService } from 'src/relationships/relationships.service';
 
 @Injectable()
 export class ChannelsService {
@@ -18,6 +19,7 @@ export class ChannelsService {
     private readonly channelsRepository: Repository<Channels>,
     private readonly userService: UsersService,
     private readonly channelMemberService: ChannelMembersService,
+    private readonly relationshipService: RelationshipsService,
   ) {}
 
   async seed(): Promise<Channel> {
@@ -37,8 +39,6 @@ export class ChannelsService {
           'Channel did not comply database requirements',
         );
       });
-    // .then(() => console.log('Channels seed complete!'))
-    // .catch(() => console.log('Channels seed failed :('));
   }
 
   /**
@@ -64,7 +64,7 @@ export class ChannelsService {
     channel_id: number,
     user_id: number,
   ): Promise<ChannelMember> {
-    const channel: Channels = await this.getChannelById(channel_id);
+    const channel: Channels = await this.getChannelById(channel_id, user_id);
     const user: Users = await this.userService.getUserbyId(user_id);
 
     return await this.channelMemberService.getChannelMember(channel, user);
@@ -94,9 +94,33 @@ export class ChannelsService {
     return userChannels.filter((userChannels) => !userChannels.ban);
   }
 
+  async filterBlocked(
+    user: Users,
+    userChannels: ChannelMember[],
+  ): Promise<ChannelMember[]> {
+    return await this.relationshipService
+      .getUserBlocked(user.id)
+      .then((res) => {
+        userChannels.forEach((cm) => {
+          cm.channel.messages = cm.channel.messages.filter(
+            (msg) => !res.map((res) => res.adresseeId).includes(msg.author.id),
+          );
+          cm.channel.channel_members = cm.channel.channel_members.filter(
+            (member) =>
+              !res.map((res) => res.adresseeId).includes(member.member.id),
+          );
+        });
+        return userChannels;
+      });
+  }
+
   async getUserChannels(user_id: number): Promise<ChannelMember[]> {
     const user: Users = await this.userService.getUserbyId(user_id);
-    return await this.channelMemberService.getUserChannels(user);
+    return await this.channelMemberService
+      .getUserChannels(user)
+      .then(async (res) => {
+        return await this.filterBlocked(user, res);
+      });
   }
 
   async getAvailableChannels(user_id: number): Promise<Channel[]> {
@@ -123,18 +147,38 @@ export class ChannelsService {
    * Gets a channel in database by its id
    * nb: findOne(id) is a function from the typeORM library
    */
-  async getChannelById(id: number): Promise<Channels> {
-    console.log('in get channel by id', id);
-    return await this.channelsRepository.findOne(id, {
-      relations: ['messages', 'channel_members'],
-    });
+  async getChannelById(chanId: number, userId: number): Promise<Channels> {
+    return await this.channelsRepository
+      .findOne(chanId, {
+        relations: ['messages', 'channel_members'],
+      })
+      .then(async (channel) => {
+        return await this.relationshipService
+          .getBlockedByUser(userId)
+          .then((blocked) => {
+            channel.messages = channel.messages.filter(
+              (msg) =>
+                !blocked
+                  .map((blocked) => blocked.adresseeId)
+                  .includes(msg.author.id),
+            );
+            channel.channel_members = channel.channel_members.filter(
+              (member) =>
+                !blocked
+                  .map((blocked) => blocked.adresseeId)
+                  .includes(member.member.id),
+            );
+            return channel;
+          });
+      });
   }
 
   async checkPasswordMatch(
     channel_id: number,
+    user_id: number,
     attempt: string,
   ): Promise<boolean> {
-    const channel: Channels = await this.getChannelById(channel_id);
+    const channel: Channels = await this.getChannelById(channel_id, user_id);
     const ret = await bcrypt.compare(attempt, channel.password);
     return await ret;
   }
@@ -143,12 +187,11 @@ export class ChannelsService {
     channel_id: number,
     user_id: number,
   ): Promise<ChannelMember> {
-    const channel: Channels = await this.getChannelById(channel_id);
+    const channel: Channels = await this.getChannelById(channel_id, user_id);
     const user: Users = await this.userService.getUserbyId(user_id);
 
     const cm = await this.channelMemberService.getChannelMember(channel, user);
     if (cm) {
-      console.log('in joinchannel', cm);
       return await cm;
     }
     return await this.channelMemberService.createChannelMember(channel, user);
@@ -218,8 +261,12 @@ export class ChannelsService {
     return await this.channelMemberService.toggleAdmin(cm_id);
   }
 
-  async updateChannelPassword(chan_id: number, pwd: string): Promise<Channel> {
-    const channel = await this.getChannelById(chan_id);
+  async updateChannelPassword(
+    chan_id: number,
+    user_id: number,
+    pwd: string,
+  ): Promise<Channel> {
+    const channel = await this.getChannelById(chan_id, user_id);
 
     if (pwd != 'null') {
       const salt = await bcrypt.genSalt();

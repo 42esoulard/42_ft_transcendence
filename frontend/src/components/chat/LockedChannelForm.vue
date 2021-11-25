@@ -30,7 +30,8 @@ export default defineComponent({
 
     const passwordInput = computed(() => <HTMLInputElement>document.querySelector('input')!);
     const passwordAttempt = ref('');
-    const user = useStore().state.user;
+    const store = useStore();
+    const user = computed(() => store.state.user);
     const sock = ref(socket);
 
     const closeModal = () => {
@@ -43,7 +44,7 @@ export default defineComponent({
 
     const checkPassword = () => {
 
-      api.checkPasswordMatch(props.channel.id, passwordAttempt.value, { withCredentials: true })
+      api.checkPasswordMatch(props.channel.id, user.value.id, passwordAttempt.value, { withCredentials: true })
       .then((res) => {
         console.log("password match res", res)
         if (res.data) {

@@ -7,6 +7,7 @@ import {
   NotFoundException,
   UseGuards,
   ForbiddenException,
+  Req,
 } from '@nestjs/common';
 import { ChannelsService } from './channels.service';
 import { Channel } from './interfaces/channel.interface';
@@ -18,7 +19,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
-import { ChannelMembersService } from 'src/channel_members/channel_members.service';
 import { DeleteResult } from 'typeorm';
 import { JwtTwoFactorGuard } from 'src/auth/guards/jwtTwoFactor.guard';
 // import { UpdateChannelDto } from './dto/updateChannel.dto';
@@ -44,7 +44,7 @@ export class ChannelsController {
   /**
    * Returns a channel found in database by its id.
    */
-  @Get(':id')
+  @Get('/channel/:chanId/:userId')
   @UseGuards(JwtTwoFactorGuard)
   @ApiOkResponse({
     description: 'The channel has been found in database',
@@ -56,10 +56,17 @@ export class ChannelsController {
   @ApiBadRequestResponse({
     description: 'Invalid ID supplied',
   })
-  async getChannelById(@Param('id') id: number): Promise<Channel> {
-    const channel: Channel = await this.channelService.getChannelById(id);
+  async getChannelById(
+    @Param('chanId') chanId: number,
+    @Param('userId') userId: number,
+    // @Req() request: Request,
+  ): Promise<Channel> {
+    const channel: Channel = await this.channelService.getChannelById(
+      chanId,
+      userId,
+    );
     if (channel == undefined) {
-      if (id == 1) {
+      if (chanId == 1) {
         const generalChan: Channel = await this.channelService.seed();
         if (generalChan == undefined) {
           throw new NotFoundException("Couldn't initialize general channel");
@@ -127,14 +134,16 @@ export class ChannelsController {
     return cm;
   }
 
-  @Get('/join-protected/:channel/:attempt')
+  @Get('/join-protected/:channel/:user/:attempt')
   @UseGuards(JwtTwoFactorGuard)
   async checkPasswordMatch(
     @Param('channel') channel_id: number,
+    @Param('user') user_id: number,
     @Param('attempt') attempt: string,
   ): Promise<boolean> {
     const match: boolean = await this.channelService.checkPasswordMatch(
       channel_id,
+      user_id,
       attempt,
     );
     if (match == undefined) {
@@ -236,14 +245,16 @@ export class ChannelsController {
     return cm;
   }
 
-  @Get('/update-pwd/:chan_id/:pwd')
+  @Get('/update-pwd/:chan_id/:user_id/:pwd')
   @UseGuards(JwtTwoFactorGuard)
   async updateChannelPassword(
     @Param('chan_id') chan_id: number,
+    @Param('user_id') user_id: number,
     @Param('pwd') pwd: string,
   ): Promise<Channel> {
     const channel: Channel = await this.channelService.updateChannelPassword(
       chan_id,
+      user_id,
       pwd,
     );
     if (channel == undefined) {

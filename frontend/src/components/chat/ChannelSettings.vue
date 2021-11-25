@@ -19,11 +19,9 @@
         <span @click="closeChannelSettings()"><img class="fas fa-lg fa-arrow-left chat-channels__tag chat-channels__tag--settings" title="Back to Channel"  /></span>
       </div>
       <span></span>
-
     </div>
 
     <div>
-
       <div class='chat-admin-pannel__tabs'>
         <button
           @click="toggleTab('banned')"
@@ -35,8 +33,6 @@
         >
           banned
         </button>
-        <!-- <button class='chat-admin-pannel__tab' @click="">Banned</button> -->
-        <!-- <button class='chat-admin-pannel__tab' @click="selectedTab = 'muted'">Muted</button> -->
         <button
           @click="toggleTab('muted')"
           :class="[
@@ -91,8 +87,8 @@
               <span @click="kickMember(cm)"><img class="fas fa-user-times chat-channels__tag chat-channels__tag--greyed" title="Kick user" /></span>
             </div>
           </li>
-          <form v-if="selectedTab == 'all'" @submit.prevent='addMember()'>
-            <input class="chat-channel-form__input" required type="text" name='name' id='addedLogin' placeholder="Enter the user's 42 login" minlength="1" maxlength="200" v-model="login" @input="checkLogin()">
+          <form v-if="selectedTab == 'all'" @submit.prevent='considerMember()'>
+            <input class="chat-channel-form__input" required type="text" name='name' id='usernameInput' placeholder="Enter the user's username" minlength="1" maxlength="200" v-model="username" @input="checkUsername()">
             <button class="button button--create-chan" for='name'><i class="fa fa-user-plus"></i></button>
           </form>
         </div>
@@ -125,13 +121,12 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, computed, onMounted } from "vue";
+import { ref, defineComponent, computed } from "vue";
 import { ChannelMember, ChatApi, UserApi } from "@/../sdk/typescript-axios-client-generated";
 import { socket } from "./ChatComponent.vue"
 import { useStore } from '@/store';
 import Modal from "@/components/Modal.vue";
 import MuteBanTimer from "@/components/chat/MuteBanTimer.vue";
-import { User } from 'sdk/typescript-axios-client-generated';
 
 export default defineComponent({
   name: 'ChannelSettings',
@@ -141,8 +136,11 @@ export default defineComponent({
   setup(props, context) {
     const api = new ChatApi();
     const userApi = new UserApi();
+    const store = useStore();
+    const user = computed(() => store.state.user);
+
     const toggleTimer = ref('');
-    const login = ref('');
+    const username = ref('');
     const targetCm = ref();
     const selectedTab = ref('all');
     const allMembers = ref(computed(() => props.activeChannel.channel.channel_members
@@ -245,47 +243,66 @@ export default defineComponent({
     const deleteChannel = async () => {
       await api.deleteChannel(props.activeChannel.channel.id, { withCredentials: true })
       .then(() => {
-        // targetCm.value = cm;
         context.emit('deleted-channel');
         closeChannelSettings();
       })
       .catch((err) => console.log("Caught error:", err.response.data.message))
     }
 
+    let usernames = <string[]>[];
 
-    let validLogin = true;
-    const checkLogin = () => {
-      const loginInput =  <HTMLInputElement>document.querySelector('input[id=\'addedLogin\']')!;
+    const getUserNames = () => {
+      return userApi.getUsers({ withCredentials: true })
+      .then((res) => {
+        usernames = res.data.map((user) => user.username);
+      })
+      .catch((err) => { console.log("Caught error:", err.response.data.message) })
+    }
+    getUserNames();
+    
+    let validUsername = true;
+    const checkUsername = () => {
+      const usernameInput =  <HTMLInputElement>document.querySelector('input[id=\'usernameInput\']')!;
 
-      return userApi.getUserByLogin(login.value, { withCredentials: true })
+      if (usernames.includes(username.value)) {
+        usernameInput.setCustomValidity('');
+        validUsername = true;
+      } else {
+        console.log("here username doesnt exist", username.value)
+        usernameInput.setCustomValidity("User doesn't exist")
+        validUsername = false;
+      }
+      usernameInput.reportValidity();
+    }
+
+    const checkUsernameInDb = () => {
+      const usernameInput =  <HTMLInputElement>document.querySelector('input[id=\'usernameInput\']')!;
+
+      return userApi.getUserByUsername(username.value, { withCredentials: true })
       .then((res) => { 
-        loginInput.setCustomValidity('');
-        validLogin = true;
+        usernameInput.setCustomValidity('');
+        validUsername = true;
+        usernameInput.reportValidity();
         return (res.data.id)
       })
       .catch(() => {
-        loginInput.setCustomValidity("User [" + login.value + "] doesn't exists")
-        validLogin = false;
+        usernameInput.setCustomValidity("User doesn't exist")
+        validUsername = false;
+        usernameInput.reportValidity();
         return -1;
       })
     }
 
-    const addMember = async () => {
-      const userId = await checkLogin();
-      if (!validLogin)
-        return;
-
+    const addMember = async (userId: number) => {
       wasSubmitted.value = true;
-      // const pwd = (channelPassword.value? channelPassword.value : 'null');
       const newMember = api.joinChannel(
         props.activeChannel.channel.id, userId
       , { withCredentials: true })
       .then((res) => {
         context.emit('update-channels-list');
         socket.emit('updateChannels');
-        login.value = '';
+        username.value = '';
         wasSubmitted.value = false;
-        // closeChannelSettings();
       })
       .catch((err) => {
         console.log("Caught error:", err.response.data.message);
@@ -293,10 +310,18 @@ export default defineComponent({
       })
     }
 
+    const considerMember = async () => {
+      await checkUsernameInDb()
+      .then((res) => {
+        if (!validUsername)
+          return;
+        addMember(res)
+      })
+    }
+
     const kickMember = async (cm: ChannelMember) => {
 
       wasSubmitted.value = true;
-      // const pwd = (channelPassword.value? channelPassword.value : 'null');
       const newMember = api.leaveChannel(
         cm.id,
         { withCredentials: true })
@@ -304,7 +329,6 @@ export default defineComponent({
         context.emit('update-channels-list');
         socket.emit('updateChannels');
         wasSubmitted.value = false;
-        // closeChannelSettings();
       })
       .catch((err) => {
         console.log("Caught error:", err.response.data.message);
@@ -354,7 +378,7 @@ export default defineComponent({
       wasSubmitted.value = true;
       const pwd = (channelPassword.value? channelPassword.value : 'null');
       const newChannel = api.updateChannelPassword(
-        props.activeChannel.channel.id, pwd,
+        props.activeChannel.channel.id, user.value.id, pwd,
         { withCredentials: true }
       )
       .then((res) => {
@@ -388,9 +412,9 @@ export default defineComponent({
       toggleAdmin,
       updateMuteBan,
 
-      login,
-      checkLogin,
-      addMember,
+      username,
+      checkUsername,
+      considerMember,
       kickMember,
     }
   }

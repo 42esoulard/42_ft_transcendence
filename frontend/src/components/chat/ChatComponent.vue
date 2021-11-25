@@ -132,7 +132,7 @@ import { io } from "socket.io-client";
 import { useStore } from '@/store';
 import { defineComponent, reactive, ref, watch, computed } from "vue";
 import { Info } from "@/types/Info";
-import { ChatApi, User, Message, Channel, ChannelMember } from '@/../sdk/typescript-axios-client-generated';
+import { ChatApi, User, Message, Channel, ChannelMember, RelationshipApi } from '@/../sdk/typescript-axios-client-generated';
 import Modal from "@/components/Modal.vue";
 import Toast from "@/components/Toast.vue";
 import NewChannelForm from "@/components/chat/NewChannelForm.vue";
@@ -159,7 +159,7 @@ export const ChatComponent = defineComponent({
   setup() {
 
     const api = new ChatApi();
-    // const userApi = useUserApi();
+    const relApi = new RelationshipApi();
     const store = useStore();
     const user = computed(() => store.state.user);
     // const firstTimeConnect = computed(() => store.state.firstTimeConnect);
@@ -184,7 +184,8 @@ export const ChatComponent = defineComponent({
     ** Default channel = id 1, "General". Automatically joined on connection, can't be left.
     */
     const getDefaultChannel = async () => {
-      await api.getChannelById(1, { withCredentials: true })
+      console.log("IN DEFAULT CHANNEL BEFORE GCBI", 1, user.value.id)
+      await api.getChannelById(1, user.value.id, { withCredentials: true })
       .then(async (chan) => {
         await joinChannel(chan.data)
         .then(() => updateChannelsList())
@@ -233,7 +234,8 @@ export const ChatComponent = defineComponent({
     const getMessagesUpdate = async (channelId: number) => {
       console.log("in get messages channel", channelId)
       if (activeChannel.value!.channel && activeChannel.value!.channel.id === channelId) {
-        await api.getChannelById(channelId, { withCredentials: true })
+        console.log("IN GET MESSAGES UPDATE BEFORE GCBI", channelId, user.value.id)
+        await api.getChannelById(channelId, user.value.id, { withCredentials: true })
         .then((res) => {
           activeChannel.value!.channel = res.data;
           channelMessages.value = res.data.messages;
@@ -357,8 +359,9 @@ export const ChatComponent = defineComponent({
     // }
 
     const directMessage = (recipient: User) => {
+
       const newChannel = api.saveChannel({
-        name: user.value.forty_two_login + ' to ' + recipient.forty_two_login,
+        name: user.value.username + ' to ' + recipient.username,
         owner_id: user.value.id,
         type: 'private',
         password: '',
@@ -367,7 +370,6 @@ export const ChatComponent = defineComponent({
         updateChannelsList();
         activeChannel.value = cm.data;
         isMember.value = true;
-        console.log("ACTIVECHANNEL", activeChannel)
         getMessagesUpdate(cm.data.channel.id);
         store.dispatch("setMessage", "You're now a member of channel [" + cm.data.channel.name.substring(0, 15) + "]");
         await api.joinChannel(cm.data.channel.id, recipient.id, { withCredentials: true })
@@ -403,11 +405,6 @@ export const ChatComponent = defineComponent({
       console.log("channelSettings", channelSettings)
     }
 
-    // const toggleAdminSettings = async () => {
-    //   const channelMembers = await api.getChannelMembers(activeChannel.value!.channel.id);
-    //   settingsModal.value = true;
-    // }
-
     const switchChannel =  (cm: ChannelMember) => {
       channelSettings.value = false;
       activeChannel.value = cm;
@@ -416,11 +413,20 @@ export const ChatComponent = defineComponent({
       getMessagesUpdate(cm.channel.id);
     }
 
-    socket.on("chat-message", (data: any) => {
+    socket.on("chat-message", async (data: any) => {
       console.log("0RECEIVED CHAT MESSAGE, data:", data)
       if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
-        channelMessages.value.push(data);
-        console.log("in get messages:", channelMessages.value);
+        await relApi.getBlockedByUser(user.value.id)
+        .then((blocked) => {
+          console.log("blocked", blocked.data.map((blocked) => blocked.adresseeId));
+          console.log(data.author.id)
+          if (blocked.data.map((blocked) => blocked.adresseeId).includes(data.author.id)) {
+            return;
+          }
+          channelMessages.value.push(data);
+          console.log("in get messages:", channelMessages.value);
+        })
+        
     }
       // getMessagesUpdate(data.channel);
     });
