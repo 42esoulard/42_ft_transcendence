@@ -88,7 +88,7 @@
             </div>
           </li>
           <form v-if="selectedTab == 'all'" @submit.prevent='considerMember()'>
-            <input class="chat-channel-form__input" required type="text" name='name' id='addedLogin' placeholder="Enter the user's username" minlength="1" maxlength="200" v-model="username" @input="checkUsername()">
+            <input class="chat-channel-form__input" required type="text" name='name' id='usernameInput' placeholder="Enter the user's username" minlength="1" maxlength="200" v-model="username" @input="checkUsername()">
             <button class="button button--create-chan" for='name'><i class="fa fa-user-plus"></i></button>
           </form>
         </div>
@@ -262,30 +262,33 @@ export default defineComponent({
     
     let validUsername = true;
     const checkUsername = () => {
-      const usernameInput =  <HTMLInputElement>document.querySelector('input[id=\'addedLogin\']')!;
+      const usernameInput =  <HTMLInputElement>document.querySelector('input[id=\'usernameInput\']')!;
 
       if (usernames.includes(username.value)) {
         usernameInput.setCustomValidity('');
         validUsername = true;
       } else {
-        usernameInput.setCustomValidity("User [" + username.value + "] doesn't exist")
+        console.log("here username doesnt exist", username.value)
+        usernameInput.setCustomValidity("User doesn't exist")
         validUsername = false;
       }
       usernameInput.reportValidity();
     }
 
     const checkUsernameInDb = () => {
-      const usernameInput =  <HTMLInputElement>document.querySelector('input[id=\'addedLogin\']')!;
+      const usernameInput =  <HTMLInputElement>document.querySelector('input[id=\'usernameInput\']')!;
 
-      return userApi.getUserByLogin(username.value, { withCredentials: true })
+      return userApi.getUserByUsername(username.value, { withCredentials: true })
       .then((res) => { 
         usernameInput.setCustomValidity('');
         validUsername = true;
+        usernameInput.reportValidity();
         return (res.data.id)
       })
       .catch(() => {
-        usernameInput.setCustomValidity("User [" + username.value + "] doesn't exist")
+        usernameInput.setCustomValidity("User doesn't exist")
         validUsername = false;
+        usernameInput.reportValidity();
         return -1;
       })
     }

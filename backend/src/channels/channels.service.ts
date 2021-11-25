@@ -39,8 +39,6 @@ export class ChannelsService {
           'Channel did not comply database requirements',
         );
       });
-    // .then(() => console.log('Channels seed complete!'))
-    // .catch(() => console.log('Channels seed failed :('));
   }
 
   /**
@@ -103,12 +101,7 @@ export class ChannelsService {
     return await this.relationshipService
       .getUserBlocked(user.id)
       .then((res) => {
-        console.log(
-          'here blocked users',
-          res.map((res) => res.adresseeId),
-        );
         userChannels.forEach((cm) => {
-          // console.log('messages', cm.channel.messages);
           cm.channel.messages = cm.channel.messages.filter(
             (msg) => !res.map((res) => res.adresseeId).includes(msg.author.id),
           );
@@ -116,7 +109,6 @@ export class ChannelsService {
             (member) =>
               !res.map((res) => res.adresseeId).includes(member.member.id),
           );
-          console.log('after filter messages', cm.channel.messages);
         });
         return userChannels;
       });
@@ -127,10 +119,6 @@ export class ChannelsService {
     return await this.channelMemberService
       .getUserChannels(user)
       .then(async (res) => {
-        console.log(
-          'IN GETUSERCHANNELS FILTERED ',
-          await this.filterBlocked(user, res),
-        );
         return await this.filterBlocked(user, res);
       });
   }
@@ -180,10 +168,8 @@ export class ChannelsService {
                   .map((blocked) => blocked.adresseeId)
                   .includes(member.member.id),
             );
-            // console.log('after filter messages', cm.channel.messages);
             return channel;
           });
-        // return userChannels;
       });
   }
 
@@ -206,7 +192,6 @@ export class ChannelsService {
 
     const cm = await this.channelMemberService.getChannelMember(channel, user);
     if (cm) {
-      console.log('in joinchannel', cm);
       return await cm;
     }
     return await this.channelMemberService.createChannelMember(channel, user);

@@ -6,6 +6,7 @@ import {
   Param,
   NotFoundException,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ChannelsService } from './channels.service';
 import { Channel } from './interfaces/channel.interface';
@@ -57,8 +58,8 @@ export class ChannelsController {
   async getChannelById(
     @Param('chanId') chanId: number,
     @Param('userId') userId: number,
+    // @Req() request: Request,
   ): Promise<Channel> {
-    console.log("IN CONTROLLER GCBI", chanId, userId);
     const channel: Channel = await this.channelService.getChannelById(
       chanId,
       userId,

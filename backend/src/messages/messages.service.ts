@@ -47,7 +47,7 @@ export class MessagesService {
    */
   async getMessageById(id: number): Promise<Message> {
     const res = await this.messagesRepository.findOne(id);
-    console.log('res', res);
+    // console.log('res', res);
     return res;
   }
 
