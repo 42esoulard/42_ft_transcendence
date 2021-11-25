@@ -132,7 +132,7 @@ import { io } from "socket.io-client";
 import { useStore } from '@/store';
 import { defineComponent, reactive, ref, watch, computed } from "vue";
 import { Info } from "@/types/Info";
-import { ChatApi, User, Message, Channel, ChannelMember } from '@/../sdk/typescript-axios-client-generated';
+import { ChatApi, User, Message, Channel, ChannelMember, RelationshipApi } from '@/../sdk/typescript-axios-client-generated';
 import Modal from "@/components/Modal.vue";
 import Toast from "@/components/Toast.vue";
 import NewChannelForm from "@/components/chat/NewChannelForm.vue";
@@ -159,7 +159,7 @@ export const ChatComponent = defineComponent({
   setup() {
 
     const api = new ChatApi();
-    // const userApi = useUserApi();
+    const relApi = new RelationshipApi();
     const store = useStore();
     const user = computed(() => store.state.user);
     // const firstTimeConnect = computed(() => store.state.firstTimeConnect);
@@ -418,11 +418,20 @@ export const ChatComponent = defineComponent({
       getMessagesUpdate(cm.channel.id);
     }
 
-    socket.on("chat-message", (data: any) => {
+    socket.on("chat-message", async (data: any) => {
       console.log("0RECEIVED CHAT MESSAGE, data:", data)
       if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
-        channelMessages.value.push(data);
-        console.log("in get messages:", channelMessages.value);
+        await relApi.getBlockedByUser(user.value.id)
+        .then((blocked) => {
+          console.log("blocked", blocked.data.map((blocked) => blocked.adresseeId));
+          console.log(data.author.id)
+          if (blocked.data.map((blocked) => blocked.adresseeId).includes(data.author.id)) {
+            return;
+          }
+          channelMessages.value.push(data);
+          console.log("in get messages:", channelMessages.value);
+        })
+        
     }
       // getMessagesUpdate(data.channel);
     });

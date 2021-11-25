@@ -160,9 +160,31 @@ export class ChannelsService {
    * nb: findOne(id) is a function from the typeORM library
    */
   async getChannelById(chanId: number, userId: number): Promise<Channels> {
-    return await this.channelsRepository.findOne(chanId, {
-      relations: ['messages', 'channel_members'],
-    });
+    return await this.channelsRepository
+      .findOne(chanId, {
+        relations: ['messages', 'channel_members'],
+      })
+      .then(async (channel) => {
+        return await this.relationshipService
+          .getBlockedByUser(userId)
+          .then((blocked) => {
+            channel.messages = channel.messages.filter(
+              (msg) =>
+                !blocked
+                  .map((blocked) => blocked.adresseeId)
+                  .includes(msg.author.id),
+            );
+            channel.channel_members = channel.channel_members.filter(
+              (member) =>
+                !blocked
+                  .map((blocked) => blocked.adresseeId)
+                  .includes(member.member.id),
+            );
+            // console.log('after filter messages', cm.channel.messages);
+            return channel;
+          });
+        // return userChannels;
+      });
   }
 
   async checkPasswordMatch(

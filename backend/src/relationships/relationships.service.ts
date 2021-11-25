@@ -52,6 +52,12 @@ export class RelationshipsService {
     });
   }
 
+  async getBlockedByUser(user: number): Promise<Relationship[]> {
+    return await this.relationshipsRepository.find({
+      where: [{ requesterId: user, nature: 'blocked' }],
+    });
+  }
+
   async saveRelationship(
     relationshipDto: CreateRelationshipDto,
   ): Promise<Relationship> {
