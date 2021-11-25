@@ -61,8 +61,7 @@
       background-color: $button-third-bg;
       &:hover {
         color: white;
-        border: grey solid 1px;
-        background-color: grey;
+        background-color: $button-third-bg;
       }
     }
   }

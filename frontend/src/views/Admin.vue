@@ -72,6 +72,7 @@
               v-if="bannedlist"
               class="link link--neutral"
               @click="unbanUser(member)"
+              title="unban"
             >
               <i class="fas fa-user-slash" />
             </button>
@@ -79,6 +80,7 @@
               v-else-if="member.role == 'user'"
               class="link link--neutral"
               @click="banUser(member)"
+              title="ban"
             >
               <i class="fas fa-ban" />
             </button>
@@ -86,6 +88,7 @@
               class="link link--neutral"
               v-if="member.role == 'user'"
               @click="deleteUser(member)"
+              title="delete"
             >
               <i class="fas fa-trash" />
             </button>
@@ -93,6 +96,7 @@
               v-if="!bannedlist && user.role == 'owner' && !isAdmin(member)"
               class="link link--neutral"
               @click="promote(member)"
+              title="promote"
             >
               <i class="fas fa-crown" />
             </button>
@@ -100,6 +104,7 @@
               v-if="!bannedlist && user.role == 'owner' && isAdmin(member)"
               class="link link--neutral"
               @click="changeOwner(member)"
+              title="promote owner"
             >
               <i class="fas fa-chess-king" />
             </button>
@@ -107,6 +112,7 @@
               v-if="isAdmin(member) && user.role == 'owner'"
               class="link link--neutral"
               @click="demote(member)"
+              title="demote"
             >
               <i class="fas fa-arrow-down" />
             </button>
@@ -164,6 +170,7 @@
               v-if="channel.id != 1"
               class="link link--neutral"
               @click="deleteChannel(channel)"
+              title="delete"
             >
               <i class="fas fa-trash" />
             </button>
