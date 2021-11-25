@@ -18,9 +18,10 @@
 		<p> You are already in queue ! You will be redirected to Homepage shortly... </p>
   </div>
 
-	<div v-for="user in users" :key="user.id">
-		<button v-on:click="challenge(user.id, user.username)"> {{user.username}} </button>
+	<div v-for="user in users" :key="user.id" class="button">
+		<router-link :to="{name: 'SendChallenge', params: {challengeeId:user.id, challengeeName: user.username, authorized: 'ok'} }"> challenge {{user.username}} </router-link>
 	</div>
+
 </template>
 
 
@@ -29,13 +30,12 @@ import { defineComponent, onMounted, ref } from 'vue'
 import { pongSocket } from '@/App.vue'
 import { useStore } from '@/store'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
-import { challengeMessage, gameMode } from '@/types/PongGame'
+import { gameMode } from '@/types/PongGame'
 import { useUserApi } from "@/plugins/api.plugin";
 import { User } from 'sdk/typescript-axios-client-generated'
 
 export default defineComponent ({
 	setup() {
-		const socket = ref(pongSocket)
 		const queuing = ref(false)
 		const gameMode = ref<gameMode>('transcendence')
 		const api = useUserApi()
@@ -43,15 +43,18 @@ export default defineComponent ({
 
 		const store = useStore()
 		const JoinQueue = () => {
-			socket.value.emit('joinGame', {userId: store.state.user.id, userName: store.state.user.username, gameMode: gameMode.value})
+			pongSocket.emit('joinGame', {
+				userId: store.state.user.id, 
+				userName: store.state.user.username, 
+				gameMode: gameMode.value})
 		}
 
-		socket.value.on('addedToQueue', () => {
+		pongSocket.on('addedToQueue', () => {
 			queuing.value = true
 		})
 		
 		const alreadyInQueue = ref(false)
-		socket.value.on('alreadyInQueue', () => {
+		pongSocket.on('alreadyInQueue', () => {
 			console.log('already in queue !')
 			alreadyInQueue.value = true
 			setTimeout(() => {
@@ -60,13 +63,12 @@ export default defineComponent ({
 		})
 
 		const router = useRouter()
-		socket.value.on('gameReadyToStart', (id: string, player1UserName: string, player2UserName: string, gameMode: gameMode) => {
-			router.push({ name: 'PongGame', params: {room: id, player1UserName, player2UserName, authorized: 'ok', gameMode, userType: 'player'} })
-		})
 
 		onBeforeRouteLeave(() => {
+			pongSocket.off('addedToQueue')
+			pongSocket.off('alreadyInQueue')
 			if (queuing.value)
-				socket.value.emit('leaveQueue')
+				pongSocket.emit('leaveQueue')
 		})
 
 		onMounted(() => {
@@ -74,21 +76,9 @@ export default defineComponent ({
 				getUsers()
 				.then((res: any) => users.value = res.data)
 				.catch((err) => console.log(err))
-
 		})
 
-		const challenge = (id: number, name: string) => {
-			// utiliser le store.state.onlineuser
-			socket.value.emit('challengeRequest', {challengerId: store.state.user.id, challengerName: store.state.user.username, challengeeId: id, challengeeName: name})
-		}
-
-		socket.value.on('challengeRequest', (message: challengeMessage) => {
-			console.log('challenge received from ' + message.challengerName + ' to ' + message.challengeeName)
-			if (message.challengeeId === store.state.user.id)
-				console.log('You have been challenged !')
-		})
-
-		return {queuing, JoinQueue, gameMode, alreadyInQueue, users, challenge}
+		return {queuing, JoinQueue, gameMode, alreadyInQueue, users}
 	}
 
 })

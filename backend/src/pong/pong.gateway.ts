@@ -7,7 +7,8 @@ import { Game } from './entity/games.entity';
 import { GameUser } from './entity/gameUser.entity';
 import { pongGame } from './classes/pong.pongGame';
 import { player } from './classes/pong.player';
-import { challengeMessage, joinGameMessage } from './classes/pong.types';
+import { challengeMessage, gameMode, joinGameMessage } from './classes/pong.types';
+import { challenge } from './classes/pong.challenge';
 
 
 @WebSocketGateway( { namespace: '/pong'})
@@ -25,9 +26,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   
   private logger: Logger = new Logger('PongGateway');
 
-  private games = new Map() // pongGame map. key = room id
+  private games = new Map<string, pongGame>() // pongGame map. key = room id
   private waitingPlayerClassic: player = null
   private waitingPlayerTranscendence: player = null
+
+  private pendingChallenges = new Map<number, challenge>() // key = challenger id
   
   
   afterInit(server: Server): void {
@@ -62,10 +65,51 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('challengeRequest')
   async handleAskToPlay(client: Socket, message: challengeMessage)
   {
-    this.logger.log(message.challengeeName)
+    const newChallenge = new challenge(message.challengerId, message.challengerName, message.challengeeId, message.challengeeName, message.gameMode)
+    newChallenge.challengerSocket = client
+    this.pendingChallenges.set(message.challengerId, newChallenge)
     this.server.emit('challengeRequest', message)
+    // setTimeout(() => {
+    // this.pendingChallenges.delete(message.challengerId)
+    // this.server.emit('challengeCancelled', message.challengerId)
+    // }, 5000)
+  }
+
+  @SubscribeMessage('cancelChallenge')
+  async handleCancelChallenge(client: Socket, challengerId: number)
+  {
+    this.pendingChallenges.delete(challengerId)
+    this.server.emit('challengeCancelled', challengerId)
+  }
+
+  @SubscribeMessage('challengeAccepted')
+  async handleAcceptChallenge(client: Socket, challengerId: number)
+  {
+    const challenge = this.pendingChallenges.get(challengerId)
+    if (!challenge)
+    {
+      this.logger.error('challenge does not exist')
+      return
+    }
+    challenge.challengeeSocket = client
+    // this.logger.log('challenge accepted ', message)
+    const player1 = new player(challenge.challengerId, challenge.challengeeName, challenge.challengeeSocket, 1)
+    const player2 = new player(challenge.challengerId, challenge.challengerName, challenge.challengerSocket, 2)
+    this.createGame(player1, player2, challenge.gameMode)
   }
   
+  @SubscribeMessage('challengeDeclined')
+  async handleDeclineChallenge(client: Socket, challengerId: number)
+  {
+    const challenge = this.pendingChallenges.get(challengerId)
+    if (!challenge)
+    {
+      this.logger.error('challenge does not exist')
+      return
+    }
+    challenge.challengerSocket.emit('challengeDeclined')
+    this.pendingChallenges.delete(challengerId)
+  }
   
   @SubscribeMessage('joinGame')
   async handleJoinGameMessage(client: Socket, message: joinGameMessage): Promise<void>
@@ -80,14 +124,21 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       if (!this.waitingPlayerClassic)
         this.addPlayerToQueue(client, message)
       else
-        this.createGame(this.waitingPlayerClassic, message, client)
+      {
+        const player2 = new player(message.userId, message.userName, client, 2)
+        this.createGame(this.waitingPlayerClassic, player2, message.gameMode)
+      }
     }
     if (message.gameMode === 'transcendence')
     {
       if (!this.waitingPlayerTranscendence)
         this.addPlayerToQueue(client, message)
       else
-        this.createGame(this.waitingPlayerTranscendence, message, client)
+      {
+        const player2 = new player(message.userId, message.userName, client, 2)
+        this.createGame(this.waitingPlayerTranscendence, player2, message.gameMode)
+
+      }
     }
   }
 
@@ -162,10 +213,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return false
   }
 
-  async createGame(player1: player, message: joinGameMessage, client: Socket)
+  async createGame(player1: player, player2: player, gameMode: gameMode)
   {
-    const player2 = new player(message.userId, message.userName, client, 2)
-    const game = new pongGame(player1, player2, this.gameRepo, this.gameUserRepo, this.server, message.gameMode)
+    const game = new pongGame(player1, player2, this.gameRepo, this.gameUserRepo, this.server, gameMode)
     await game.createGame()
     this.games.set(game.room, game)
     this.server.emit("newInGameUsers", [player1.userName, player2.userName]);

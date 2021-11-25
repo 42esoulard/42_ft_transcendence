@@ -4,11 +4,12 @@ import AddUser from '../views/AddUser.vue'
 import Users from '../views/Users.vue'
 import Chat from '../views/Chat.vue'
 import Banned from '../views/Banned.vue';
-import UserAccount from '../views/UserAccount.vue'
+import Admin from '../views/Admin.vue'
 import Pong from '../views/Pong/Pong.vue'
 import PongGame from '../views/Pong/PongGame.vue'
 import PongWatch from '../views/Pong/PongWatch.vue'
-import PongGameWatch from '../views/Pong/PongGameWatch.vue'
+import ReceiveChallenge from '../views/Pong/ReceiveChallenge.vue'
+import SendChallenge from '../views/Pong/SendChallenge.vue'
 import FakeLogin from '../views/FakeLogin.vue'
 import Login from '../views/Login.vue';
 import { store } from "@/store";
@@ -71,11 +72,11 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
-    path: '/account',
-    name: 'UserAccount',
-    component: UserAccount,
+    path: '/admin',
+    name: 'Admin',
+    component: Admin,
     meta: {
-      requiresAuth: true,
+      requiresAdmin: true,
     }
   },
   {
@@ -127,6 +128,40 @@ const routes: Array<RouteRecordRaw> = [
       else {
         console.log('redirected to PongWatch')
         next({ name: 'PongWatch' })
+      }
+    }
+  },
+  {
+    path: '/pong/challenge/received',
+    name: 'ChallengeReceived',
+    component: ReceiveChallenge,
+    props: true,
+    beforeEnter(to, from, next) {
+      if (to.params.authorized)
+      {
+        next()
+      }
+      else
+      {
+        console.log('redirected to Pong')
+        next({name: 'Pong'})
+      }
+    }
+  },
+  {
+    path: '/pong/challenge/sent',
+    name: 'SendChallenge',
+    component: SendChallenge,
+    props: true,
+    beforeEnter(to, from, next) {
+      if (to.params.authorized)
+      {
+        next()
+      }
+      else
+      {
+        console.log('redirected to Pong')
+        next({name: 'Pong'})
       }
     }
   },
@@ -191,6 +226,17 @@ router.beforeEach(async (to, from) => {
     if (store.state.user.id) {
       return true;
     }
+  } else if (to.matched.some(record => record.meta.requiresAdmin)) {
+    if (store.state.user.id === 0) {
+      await getProfile();
+    }
+    if (store.state.user.id === 0) {
+      return '/login'; // redirected to login
+    }
+    if (store.state.user.role == 'user') {
+      return '/';
+    }
+    return true;
   }
 });
 

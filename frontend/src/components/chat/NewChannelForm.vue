@@ -59,6 +59,17 @@ export default defineComponent({
     let validPassword = true;
     let validPasswordConf = true;
 
+    let channelNames = <string[]>[];
+
+    const getChannelNames = () => {
+      return api.getChannels({ withCredentials: true })
+      .then((res) => {
+        channelNames = res.data.map((chan) => chan.name);
+      })
+      .catch((err) => { console.log("Caught error:", err.response.data.message) })
+    }
+    getChannelNames();
+
     const closeModal = () => {
       context.emit("close");
     };
@@ -66,7 +77,21 @@ export default defineComponent({
     const checkName = () => {
       const nameInput =  <HTMLInputElement>document.querySelector('input[id=\'chanName\']')!;
 
-      api.getChannelByName(channelName.value, { withCredentials: true })
+      if (channelNames.includes(channelName.value)) {
+        nameInput.setCustomValidity("A channel named [" + channelName.value + "] already exists")
+        validName = false;
+      } else {
+        nameInput.setCustomValidity('');
+        validName = true;
+        console.log(channelName.value + "not found")
+      }
+      nameInput.reportValidity();
+    }
+
+    const checkNameInDb = async () => {
+      const nameInput =  <HTMLInputElement>document.querySelector('input[id=\'chanName\']')!;
+
+      await api.getChannelByName(channelName.value, { withCredentials: true })
       .then(() => { 
         nameInput.setCustomValidity("A channel named [" + channelName.value + "] already exists")
         validName = false;
@@ -74,8 +99,9 @@ export default defineComponent({
       .catch(() => {
         nameInput.setCustomValidity('');
         validName = true;
-        console.log(channelName.value + "not found")
+        // console.log(channelName.value + "not found")
       })
+      nameInput.reportValidity();
     }
 
     const checkPassword = () => {
@@ -104,26 +130,30 @@ export default defineComponent({
       }
     }
   
-    const submitInputs = () => {
-      checkName();
+    const submitInputs = async () => {
       checkPassword();
       checkPasswordConf();
       if (!validPassword || !validPasswordConf)
         return;
     
-      if (!validName)
-        return;
+      checkNameInDb().then(() => {
+        if (validName) {
+          createChannel();
+        }
+      })
+    }
 
+    const createChannel = () => {
       console.log(channelName.value, channelType.value, channelPassword.value)
       wasSubmitted.value = true;
-      const newChannel = api.saveChannel({
+      api.saveChannel({
         name: channelName.value,
         owner_id: user.id, 
         type: channelType.value,
         password: channelPassword.value
       }, { withCredentials: true })
       .then((res) => {
-        console.log("in createChannel res", res)
+        // console.log("in createChannel res", res)
         socket.emit('createChannel', res.data);
         closeModal();
       })

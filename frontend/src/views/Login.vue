@@ -85,7 +85,7 @@ export default defineComponent({
               if (res.data.newlyCreated == true) {
                 store.commit("setFirstTimeConnect", true);
               }
-              router.push("/account");
+              router.push("/");
             }
           })
           .catch((err: any) => console.log(err.message));

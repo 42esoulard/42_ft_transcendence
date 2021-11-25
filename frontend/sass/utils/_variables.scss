@@ -3,6 +3,7 @@ $prim-color: #00ffff;
 $second-color: adjust_hue($prim-color, 120);
 $third-color: adjust_hue($second-color, 120);
 $fourth-color: complement($prim-color);
+$fifth-color: adjust_hue($second-color, 120);
 
 //HEADER
 $header-bg-color: black;
@@ -55,8 +56,7 @@ $profile-social-gap: 5px;
 $profile-social-margin: 1rem 0 0 0;
 
 //ACCOUNT
-$account-width: 1000px;
-$account-height: 700px;
+
 
 
 //USERS
@@ -213,6 +213,6 @@ $link-color: white;
 $link-neutral-hover: darken($prim-color, 15);
 
 //OTHERS
-$status-online-color: rgb(0, 255, 0);
-$status-in-game-color: rgb(255, 0, 0);
-$status-offline-color: rgb(125, 125, 125);
+$status-online-color: $third-color;
+$status-in-game-color: $fourth-color;
+$status-offline-color: grey;

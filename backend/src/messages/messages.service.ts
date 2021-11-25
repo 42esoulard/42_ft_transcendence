@@ -47,7 +47,7 @@ export class MessagesService {
    */
   async getMessageById(id: number): Promise<Message> {
     const res = await this.messagesRepository.findOne(id);
-    console.log('res', res);
+    // console.log('res', res);
     return res;
   }
 
@@ -60,6 +60,7 @@ export class MessagesService {
     const newMessage: Message = this.messagesRepository.create(messageDto);
     newMessage.channel = await this.channelService.getChannelById(
       messageDto.channel_id,
+      messageDto.author_id,
     );
     newMessage.author = await this.userService.getUserbyId(
       messageDto.author_id,

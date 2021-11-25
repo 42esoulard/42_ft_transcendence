@@ -41,6 +41,7 @@
               <td class="table-cell">vs</td>
               <td class="table-cell">
                 <router-link
+                  v-if="historyObject(game).opponent"
                   class="link link--neutral"
                   :to="{
                     name: 'UserProfile',
@@ -49,6 +50,7 @@
                 >
                   {{ historyObject(game).opponent }}
                 </router-link>
+                <span v-else>[deleted]</span>
               </td>
             </tr>
           </tbody>
@@ -96,11 +98,13 @@ export default defineComponent({
     const historyObject = function (game: Game) {
       const opponent =
         game.users[0].userId == user.id ? game.users[1] : game.users[0];
-      const result = opponent.won === true ? "loss" : "win";
+      const gameUser =
+        game.users[0].userId == user.id ? game.users[0] : game.users[1];
+      const result = gameUser.won === true ? "win" : "loss";
       return {
         date: moment(game.startedAt).format("MM-DD-YYYY"),
         result: result,
-        opponent: opponent.user.username,
+        opponent: opponent ? opponent.user.username : null,
       };
     };
 

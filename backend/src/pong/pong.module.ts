@@ -11,6 +11,7 @@ import { GameUser } from './entity/gameUser.entity';
 @Module({
 	imports: [TypeOrmModule.forFeature([Game, GameStats, Users, GameUser])],
 	providers: [PongGateway, PongService],
-	controllers: [PongController]
+	controllers: [PongController],
+  exports: [PongService],
 })
 export class PongModule {}

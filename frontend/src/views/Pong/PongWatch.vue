@@ -22,60 +22,55 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
-import { pongSocket } from "@/App.vue";
-import { useRouter } from "vue-router";
+
+import { defineComponent, onMounted, ref } from 'vue'
+import { pongSocket } from '@/App.vue'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { usePongApi } from "@/plugins/api.plugin";
 import { Game } from "sdk/typescript-axios-client-generated";
 
 export default defineComponent({
-  setup() {
-    const games = ref<Game[]>([]);
-    const socket = ref(pongSocket);
-    const api = usePongApi();
+	setup()
+	{
+		const games = ref<Game[]>([])
+		const api = usePongApi()
 
-    onMounted(() => {
-      api
-        .getOnGoingGames()
-        .then((res: any) => (games.value = res.data))
-        .catch(err => console.log(err));
-    });
+		onMounted(() => {
+			api.
+				getOnGoingGames()
+				.then((res: any) => games.value = res.data)
+				.catch((err) => console.log(err))
+		})
 
-    const WatchGame = (id: number) => {
-      socket.value.emit("watchGame", id.toString());
-    };
+		const WatchGame = ((id: number) => {
+			pongSocket.emit('watchGame', id.toString())
+		})
 
-    const router = useRouter();
-    socket.value.on(
-      "GoToGame",
-      (id, player1UserName, player2UserName, gameMode) => {
-        router.push({
-          name: "PongGameWatch",
-          params: {
-            room: id,
-            player1UserName,
-            player2UserName,
-            authorized: "ok",
-            gameMode,
-            userType: "spectator"
-          }
-        });
-      }
-    );
+		const router = useRouter()
+		pongSocket.on('GoToGame', (id, player1UserName, player2UserName, gameMode) => {
+			router.push({ name: 'PongGameWatch', params: {room: id, player1UserName, player2UserName, authorized: 'ok', gameMode, userType: 'spectator'}})
+		})
 
-    socket.value.on("newGame", (game: Game) => {
-      console.log("new game received " + game.id);
-      games.value.push(game);
-    });
+		pongSocket.on('newGame', (game: Game) => {
+			console.log('new game received ' + game.id)
+			games.value.push(game)
+		})
 
-    socket.value.on("endGame", (game: Game) => {
-      console.log("game ended " + game.id);
-      games.value = games.value.filter(elem => elem.id != game.id);
-    });
+		pongSocket.on('endGame', (game: Game) => {
+			console.log('game ended ' + game.id)
+			games.value = games.value.filter(elem => elem.id != game.id)
+		})
 
-    return { games, WatchGame };
-  }
-});
+		onBeforeRouteLeave(() => {
+			pongSocket.off('endGame')
+			pongSocket.off('newGame')
+			pongSocket.off('GoToGame')
+		})
+
+		return { games, WatchGame }
+	},
+
+})
 </script>
 
 <style lang="scss">

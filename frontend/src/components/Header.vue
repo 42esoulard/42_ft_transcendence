@@ -63,6 +63,15 @@
             live
           </SideBarLink>
           <SideBarLink
+            v-if="user.role != 'user'"
+            class="menu__link"
+            @click="isActive = !isActive"
+            to="/admin"
+            icon="fas fa-crown"
+          >
+            admin
+          </SideBarLink>
+          <SideBarLink
             class="menu__link"
             @click="isActive = !isActive"
             to="/adduser"
@@ -89,7 +98,7 @@
         :key="user.id"
         class="header-bloc"
       >
-        <router-link to="/account" class="user-bloc">
+        <router-link :to="{ name: 'UserProfile', params: { username: user.username } }" class="user-bloc">
           <img class="user-bloc__avatar" :src="user.avatar" alt="" />
           <span class="user-bloc__username">{{ user.username }}</span>
         </router-link>
@@ -110,7 +119,7 @@ import SideBarLink from "./SideBarLink.vue";
 import { presenceSocket } from "@/App.vue";
 
 export default defineComponent({
-  name: "UserAccount",
+  name: "Admin",
   components: { SideBarLink },
   setup() {
     const store = useStore();

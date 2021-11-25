@@ -6,6 +6,7 @@ import {
 import { Users } from '../users/entity/users.entity';
 import { configService } from '../config/config.service';
 import { Channels } from 'src/channels/entity/channels.entity';
+import { Role } from 'src/auth/models/role.enum';
 
 const defaultAvatar = 'http://localhost:3000/users/avatars/default.jpg';
 
@@ -21,6 +22,7 @@ async function run() {
           username: 'Owner',
           forty_two_login: 'Owner', //should not be necessary as owner is not a 42 user
           avatar: 'http://localhost:3000/users/avatars/owner.jpg',
+          role: Role.OWNER,
         },
         {
           username: 'user1',

@@ -28,6 +28,11 @@ export class RelationshipsController {
     return await this.relationshipService.getUserBlocked(id);
   }
 
+  @Get('/blocked-by/:id')
+  async getBlockedByUser(@Param('id') id: number): Promise<Relationship[]> {
+    return await this.relationshipService.getBlockedByUser(id);
+  }
+
   @Post()
   async saveRelationship(
     @Body() newRelationship: CreateRelationshipDto,

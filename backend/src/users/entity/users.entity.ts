@@ -12,12 +12,19 @@ import {
 } from 'typeorm';
 import { Relationships } from 'src/relationships/entity/relationships.entity';
 import { ChannelMembers } from 'src/channel_members/entity/channel_members.entity';
-// import * as bcrypt from 'bcrypt';
+import { Role } from 'src/auth/models/role.enum';
 
 @Entity('users')
 export class Users {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.USER,
+  })
+  role: Role;
 
   @Column({ type: 'varchar', length: 10, unique: true })
   username: string;
@@ -49,7 +56,9 @@ export class Users {
   @OneToOne(() => GameStats, (gamestats) => gamestats.user)
   gameStats: GameStats;
 
-  @OneToMany(() => GameUser, (gameuser) => gameuser.user)
+  @OneToMany(() => GameUser, (gameuser) => gameuser.user, {
+    cascade: true,
+  })
   games: GameUser[];
 
   @OneToMany(() => Messages, (message) => message.author)
@@ -65,7 +74,6 @@ export class Users {
 
   @OneToMany(() => Relationships, (relationship) => relationship.adressee)
   relationships_adressed: Relationships[];
-
 
   // @OneToMany()
   // channels:
