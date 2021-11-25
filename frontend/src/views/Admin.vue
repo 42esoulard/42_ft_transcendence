@@ -288,7 +288,7 @@ export default defineComponent({
       else list.value = userList.value;
       if (searchQuery.value.length) {
         list.value = list.value.filter((entity: User) =>
-          entity.username.toLowerCase().startsWith(searchQuery.value)
+          entity.username.toLowerCase().startsWith(searchQuery.value.toLowerCase())
         );
       }
       list.value = list.value.filter(
@@ -314,7 +314,7 @@ export default defineComponent({
       else list.value = channelList.value;
       if (searchQueryChat.value.length) {
         list.value = list.value.filter((entity: Channel) =>
-          entity.name.toLowerCase().startsWith(searchQueryChat.value)
+          entity.name.toLowerCase().startsWith(searchQueryChat.value.toLowerCase())
         );
       }
       return list.value;
@@ -323,7 +323,7 @@ export default defineComponent({
     const deleteUser = async (user: User) => {
       if (confirm(`Do you really want to delete ${user.username}?`)) {
         await userApi
-          .removeUser(user.id)
+          .removeUser(user.id, { withCredentials: true })
           .then((res: any) => {
             console.log("account deleted");
             userList.value = userList.value.filter(

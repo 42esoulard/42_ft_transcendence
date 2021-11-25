@@ -181,6 +181,7 @@ export class UsersController {
   }
 
   @Post('update-user')
+  @UseGuards(JwtTwoFactorGuard)
   async updateUser(@Body() updatedUser: UpdateUserDto) {
     await this.userService.updateUser(updatedUser);
   }
