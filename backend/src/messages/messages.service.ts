@@ -60,6 +60,7 @@ export class MessagesService {
     const newMessage: Message = this.messagesRepository.create(messageDto);
     newMessage.channel = await this.channelService.getChannelById(
       messageDto.channel_id,
+      messageDto.author_id,
     );
     newMessage.author = await this.userService.getUserbyId(
       messageDto.author_id,

@@ -184,7 +184,8 @@ export const ChatComponent = defineComponent({
     ** Default channel = id 1, "General". Automatically joined on connection, can't be left.
     */
     const getDefaultChannel = async () => {
-      await api.getChannelById(1, { withCredentials: true })
+      console.log("IN DEFAULT CHANNEL BEFORE GCBI", 1, user.value.id)
+      await api.getChannelById(1, user.value.id, { withCredentials: true })
       .then(async (chan) => {
         await joinChannel(chan.data)
         .then(() => updateChannelsList())
@@ -233,7 +234,8 @@ export const ChatComponent = defineComponent({
     const getMessagesUpdate = async (channelId: number) => {
       console.log("in get messages channel", channelId)
       if (activeChannel.value!.channel && activeChannel.value!.channel.id === channelId) {
-        await api.getChannelById(channelId, { withCredentials: true })
+        console.log("IN GET MESSAGES UPDATE BEFORE GCBI", channelId, user.value.id)
+        await api.getChannelById(channelId, user.value.id, { withCredentials: true })
         .then((res) => {
           activeChannel.value!.channel = res.data;
           channelMessages.value = res.data.messages;

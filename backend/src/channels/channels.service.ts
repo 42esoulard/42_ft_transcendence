@@ -66,7 +66,7 @@ export class ChannelsService {
     channel_id: number,
     user_id: number,
   ): Promise<ChannelMember> {
-    const channel: Channels = await this.getChannelById(channel_id);
+    const channel: Channels = await this.getChannelById(channel_id, user_id);
     const user: Users = await this.userService.getUserbyId(user_id);
 
     return await this.channelMemberService.getChannelMember(channel, user);
@@ -159,18 +159,18 @@ export class ChannelsService {
    * Gets a channel in database by its id
    * nb: findOne(id) is a function from the typeORM library
    */
-  async getChannelById(id: number): Promise<Channels> {
-    console.log('in get channel by id', id);
-    return await this.channelsRepository.findOne(id, {
+  async getChannelById(chanId: number, userId: number): Promise<Channels> {
+    return await this.channelsRepository.findOne(chanId, {
       relations: ['messages', 'channel_members'],
     });
   }
 
   async checkPasswordMatch(
     channel_id: number,
+    user_id: number,
     attempt: string,
   ): Promise<boolean> {
-    const channel: Channels = await this.getChannelById(channel_id);
+    const channel: Channels = await this.getChannelById(channel_id, user_id);
     const ret = await bcrypt.compare(attempt, channel.password);
     return await ret;
   }
@@ -179,7 +179,7 @@ export class ChannelsService {
     channel_id: number,
     user_id: number,
   ): Promise<ChannelMember> {
-    const channel: Channels = await this.getChannelById(channel_id);
+    const channel: Channels = await this.getChannelById(channel_id, user_id);
     const user: Users = await this.userService.getUserbyId(user_id);
 
     const cm = await this.channelMemberService.getChannelMember(channel, user);
@@ -254,8 +254,12 @@ export class ChannelsService {
     return await this.channelMemberService.toggleAdmin(cm_id);
   }
 
-  async updateChannelPassword(chan_id: number, pwd: string): Promise<Channel> {
-    const channel = await this.getChannelById(chan_id);
+  async updateChannelPassword(
+    chan_id: number,
+    user_id: number,
+    pwd: string,
+  ): Promise<Channel> {
+    const channel = await this.getChannelById(chan_id, user_id);
 
     if (pwd != 'null') {
       const salt = await bcrypt.genSalt();

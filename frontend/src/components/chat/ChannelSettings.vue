@@ -141,6 +141,9 @@ export default defineComponent({
   setup(props, context) {
     const api = new ChatApi();
     const userApi = new UserApi();
+    const store = useStore();
+    const user = computed(() => store.state.user);
+
     const toggleTimer = ref('');
     const login = ref('');
     const targetCm = ref();
@@ -354,7 +357,7 @@ export default defineComponent({
       wasSubmitted.value = true;
       const pwd = (channelPassword.value? channelPassword.value : 'null');
       const newChannel = api.updateChannelPassword(
-        props.activeChannel.channel.id, pwd,
+        props.activeChannel.channel.id, user.value.id, pwd,
         { withCredentials: true }
       )
       .then((res) => {
