@@ -359,8 +359,9 @@ export const ChatComponent = defineComponent({
     // }
 
     const directMessage = (recipient: User) => {
+
       const newChannel = api.saveChannel({
-        name: user.value.forty_two_login + ' to ' + recipient.forty_two_login,
+        name: user.value.username + ' to ' + recipient.username,
         owner_id: user.value.id,
         type: 'private',
         password: '',
@@ -369,7 +370,6 @@ export const ChatComponent = defineComponent({
         updateChannelsList();
         activeChannel.value = cm.data;
         isMember.value = true;
-        console.log("ACTIVECHANNEL", activeChannel)
         getMessagesUpdate(cm.data.channel.id);
         store.dispatch("setMessage", "You're now a member of channel [" + cm.data.channel.name.substring(0, 15) + "]");
         await api.joinChannel(cm.data.channel.id, recipient.id, { withCredentials: true })
@@ -404,11 +404,6 @@ export const ChatComponent = defineComponent({
       }
       console.log("channelSettings", channelSettings)
     }
-
-    // const toggleAdminSettings = async () => {
-    //   const channelMembers = await api.getChannelMembers(activeChannel.value!.channel.id);
-    //   settingsModal.value = true;
-    // }
 
     const switchChannel =  (cm: ChannelMember) => {
       channelSettings.value = false;
