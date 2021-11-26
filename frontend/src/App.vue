@@ -6,7 +6,7 @@ import { io } from "socket.io-client";
 import { useStore } from "@/store";
 import { computed, onUpdated } from "vue";
 import { User } from "sdk/typescript-axios-client-generated";
-import { challengeMessage, gameMode } from './types/PongGame';
+import { challengeExport, challengeMessage, gameMode } from './types/PongGame';
 import { useRouter } from 'vue-router';
 
 export const pongSocket = io("http://localhost:3000/pong");
@@ -80,6 +80,10 @@ export default {
         router.push({name: 'ChallengeReceived', params: {challengerName: message.challengerName, authorized: 'ok'}})
 			}
 		});
+
+    pongSocket.on('allPendingChallenges', (message: challengeExport[]) => {
+      store.commit('allPendingChallenges', message)
+    })
 
     return {
       user: computed(() => store.state.user),

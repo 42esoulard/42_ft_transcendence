@@ -7,7 +7,7 @@ import { Game } from './entity/games.entity';
 import { GameUser } from './entity/gameUser.entity';
 import { pongGame } from './classes/pong.pongGame';
 import { player } from './classes/pong.player';
-import { challengeMessage, gameMode, joinGameMessage } from './classes/pong.types';
+import { challengeExport, challengeMessage, gameMode, joinGameMessage } from './classes/pong.types';
 import { challenge } from './classes/pong.challenge';
 
 
@@ -63,6 +63,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleConnection(client: Socket, ...args: any[]): void {
     this.logger.log('Client connected ' + client.id);
     this.sendPlayingUsers(client)
+    this.sendPendingChallenges(client)
   }
 
   sendPlayingUsers(client: Socket)
@@ -74,6 +75,17 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.logger.log(playingUsers)
     if (playingUsers.length)
       client.emit('allPlayingUsers', playingUsers)
+  }
+
+  sendPendingChallenges(client: Socket)
+  {
+    // send only challengeeId and challengerId for each pending challenge
+
+    var pendingChallengesArray: challengeExport[] = []
+    this.pendingChallenges.forEach((challenge: challenge) => {
+      pendingChallengesArray.push({challengerName: challenge.challengerName, challengeeName: challenge.challengeeName})
+    })
+    client.emit('allPendingChallenges', pendingChallengesArray)
   }
 
   @SubscribeMessage('challengeRequest')

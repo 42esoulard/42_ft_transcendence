@@ -1,3 +1,4 @@
+import { challengeExport } from '@/types/PongGame'
 import { User } from 'sdk/typescript-axios-client-generated'
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
@@ -115,7 +116,16 @@ export const store = createStore<State>({
     removeChallenge(state: State, challenger: string)
     {
       state.challengesReceived = state.challengesReceived.filter(user => user !== challenger)
-    }
+    },
+    allPendingChallenges(state: State, challenges: challengeExport[])
+    {
+      // register only challenges that are adressed to loged in user
+      challenges.forEach((challenge) => {
+        if (challenge.challengeeName === state.user.username)
+          state.challengesReceived.push(challenge.challengerName)
+      })
+    },
+
 
   },
   actions: {
