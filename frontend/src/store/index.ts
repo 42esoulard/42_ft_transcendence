@@ -10,6 +10,7 @@ export interface State {
   isConnected: boolean,
   onlineUsers: User[];
   inGameUsers: string[];
+  challengesReceived: string[]; // string of usernames
 }
 
 // define injection key
@@ -29,6 +30,7 @@ export const store = createStore<State>({
     isConnected: false,
     onlineUsers: [],
     inGameUsers: [],
+    challengesReceived: [],
   },
   getters: {},
   mutations: {
@@ -104,6 +106,15 @@ export const store = createStore<State>({
     {
       if (players.length)
         state.inGameUsers = players
+    },
+
+    addChallenge(state: State, challenger: string)
+    {
+      state.challengesReceived.push(challenger)
+    },
+    removeChallenge(state: State, challenger: string)
+    {
+      state.challengesReceived = state.challengesReceived.filter(user => user !== challenger)
     }
 
   },

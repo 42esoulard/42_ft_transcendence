@@ -75,6 +75,7 @@ export default {
 			console.log('challenge received from ' + message.challengerName + ' to ' + message.challengeeName)
 			if (message.challengeeId === store.state.user.id)
 			{
+        store.commit('addChallenge', message.challengerName)
 				console.log('You have been challenged !')
         router.push({name: 'ChallengeReceived', params: {challengerName: message.challengerName, authorized: 'ok'}})
 			}
