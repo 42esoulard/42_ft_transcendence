@@ -17,7 +17,6 @@ import { onBeforeRouteLeave, useRouter } from "vue-router";
 
 export default defineComponent ({
 	props: {
-		challengerId: {type: String, required: true},
 		challengerName: {type: String, required: true},
 	},
 	inheritAttrs: false, // we dont need it, and not setting it to false a warning: "extraneous non prop attributes (authorized) were passed to component but could not be automatically inherited..."
@@ -26,17 +25,17 @@ export default defineComponent ({
 		const router = useRouter()
 		
 		const accept = () => {
-			console.log(props.challengerId)
-			pongSocket.emit('challengeAccepted', Number(props.challengerId))
+			console.log(props.challengerName)
+			pongSocket.emit('challengeAccepted', props.challengerName)
 		}
 		const refuse = () => {
-			pongSocket.emit('challengeDeclined', Number(props.challengerId))
+			pongSocket.emit('challengeDeclined', props.challengerName)
 			router.push({name: 'Pong'})
 		}
 		
-		pongSocket.on('challengeCancelled', (challengerId: number) => {
+		pongSocket.on('challengeCancelled', (challengerName: string) => {
 			console.log('cancel')
-			if (challengerId === Number(props.challengerId))
+			if (challengerName === props.challengerName)
 				router.push({name: 'Pong'})
 		})
 

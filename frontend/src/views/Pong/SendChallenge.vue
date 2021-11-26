@@ -39,7 +39,7 @@ export default defineComponent ({
 
 		const router = useRouter()
 		const cancelChallenge = () => {
-			pongSocket.emit('cancelChallenge', store.state.user.id)
+			pongSocket.emit('cancelChallenge', store.state.user.username)
 			router.push({name: 'Pong'})
 
 		}
