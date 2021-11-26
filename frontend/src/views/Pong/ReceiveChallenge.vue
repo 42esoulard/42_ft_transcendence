@@ -1,19 +1,21 @@
 <template>
-	
-	<div class="header__title">
-		You have been challenged by {{ challengerName }}
+
+	<div v-for="challenger in challenges" :key="challenger">	
+		<div class="header__title">
+			You have been challenged by {{ challenger }}
+		</div>
+		<div>
+			<button class="button" v-on:click="accept(challenger)"> accept </button>
+			<button class="button" v-on:click="refuse(challenger)"> refuse </button>
+		</div>
 	</div>
-	<div>
-		<button class="button" v-on:click="accept()"> accept </button>
-		<button class="button" v-on:click="refuse()"> refuse </button>
-	</div>
-	
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
 import { pongSocket } from '@/App.vue'
 import { onBeforeRouteLeave, useRouter } from "vue-router";
+import { store } from "@/store";
 
 export default defineComponent ({
 	props: {
@@ -24,26 +26,28 @@ export default defineComponent ({
 	setup(props) {
 		const router = useRouter()
 		
-		const accept = () => {
-			console.log(props.challengerName)
-			pongSocket.emit('challengeAccepted', props.challengerName)
+		const accept = (challengerName: string) => {
+			store.commit('removeChallenge', challengerName)
+			pongSocket.emit('challengeAccepted', challengerName)
 		}
-		const refuse = () => {
-			pongSocket.emit('challengeDeclined', props.challengerName)
-			router.push({name: 'Pong'})
+		const refuse = (challengerName: string) => {
+			store.commit('removeChallenge', challengerName)
+			pongSocket.emit('challengeDeclined', challengerName)
+			// router.push({name: 'Pong'})
 		}
 		
 		pongSocket.on('challengeCancelled', (challengerName: string) => {
-			console.log('cancel')
-			if (challengerName === props.challengerName)
-				router.push({name: 'Pong'})
+			store.commit('removeChallenge', challengerName)
+			// if (challengerName === props.challengerName)
+			// 	router.push({name: 'Pong'})
 		})
 
 		onBeforeRouteLeave(() => {
 			pongSocket.off('challengeCancelled')
 		})
 
-		return {accept, refuse}
+		return {accept, refuse,
+      challenges: computed(() => store.state.challengesReceived),}
 	}
 
 })
