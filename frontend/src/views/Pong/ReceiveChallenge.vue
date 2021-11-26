@@ -33,13 +33,10 @@ export default defineComponent ({
 		const refuse = (challengerName: string) => {
 			store.commit('removeChallenge', challengerName)
 			pongSocket.emit('challengeDeclined', challengerName)
-			// router.push({name: 'Pong'})
 		}
 		
 		pongSocket.on('challengeCancelled', (challengerName: string) => {
 			store.commit('removeChallenge', challengerName)
-			// if (challengerName === props.challengerName)
-			// 	router.push({name: 'Pong'})
 		})
 
 		onBeforeRouteLeave(() => {

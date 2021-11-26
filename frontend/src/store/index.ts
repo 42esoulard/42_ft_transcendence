@@ -10,7 +10,7 @@ export interface State {
   isConnected: boolean,
   onlineUsers: User[];
   inGameUsers: string[];
-  challengesReceived: string[]; // string of usernames
+  challengesReceived: string[]; // string[] of usernames
 }
 
 // define injection key
