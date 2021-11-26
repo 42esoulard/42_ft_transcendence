@@ -12,6 +12,7 @@ export interface State {
   onlineUsers: User[];
   inGameUsers: string[];
   challengesReceived: string[]; // string[] of usernames
+  allPendingChallenges: challengeExport[];
 }
 
 // define injection key
@@ -32,6 +33,7 @@ export const store = createStore<State>({
     onlineUsers: [],
     inGameUsers: [],
     challengesReceived: [],
+    allPendingChallenges: []
   },
   getters: {},
   mutations: {
@@ -119,11 +121,14 @@ export const store = createStore<State>({
     },
     allPendingChallenges(state: State, challenges: challengeExport[])
     {
-      // register only challenges that are adressed to loged in user
-      challenges.forEach((challenge) => {
-        if (challenge.challengeeName === state.user.username)
-          state.challengesReceived.push(challenge.challengerName)
-      })
+      // // register only challenges that are adressed to loged in user
+      // challenges.forEach((challenge) => {
+      //   if (challenge.challengeeName === state.user.username)
+      //     state.challengesReceived.push(challenge.challengerName)
+      // })
+
+      if (challenges.length)
+        state.allPendingChallenges = challenges
     },
 
 
