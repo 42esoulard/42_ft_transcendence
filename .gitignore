@@ -10,7 +10,8 @@ api-spec.json
 */package-lock.json
 backend/uploads/avatars/*
 !backend/uploads/avatars/default.jpg
-!backend/uploads/avatars/owner.jpg
+!backend/uploads/avatars/Owner.jpg
+!backend/uploads/avatars/user1.jpg
 frontend/sdk/typescript-axios-client-generated
 npm-errors
 .vscode
