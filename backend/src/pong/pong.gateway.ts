@@ -40,10 +40,20 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleDisconnect(client: Socket): void {
     this.logger.log('Client disconected ' + client.id);
     this.clearQueue(client)
+    this.leaveGameIfPlaying(client)
+    this.cancelChallengeIfChallenging(client)
+  }
+
+  leaveGameIfPlaying(client: Socket)
+  {
     this.games.forEach((game: pongGame) => {
       if (game.player1.clientSocket.id === client.id || game.player2.clientSocket.id === client.id)
         this.leaveGame(client, game.room)
     })
+  }
+
+  cancelChallengeIfChallenging(client: Socket)
+  {
     this.pendingChallenges.forEach((pendingChallenge: challenge) => {
       if (pendingChallenge.challengerSocket.id === client.id)
         this.cancelChallenge(pendingChallenge.challengerName)
