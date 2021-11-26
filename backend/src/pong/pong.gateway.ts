@@ -44,6 +44,10 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       if (game.player1.clientSocket.id === client.id || game.player2.clientSocket.id === client.id)
         this.leaveGame(client, game.room)
     })
+    this.pendingChallenges.forEach((pendingChallenge: challenge) => {
+      if (pendingChallenge.challengerSocket.id === client.id)
+        this.cancelChallenge(pendingChallenge.challengerName)
+    })
   }
   
   handleConnection(client: Socket, ...args: any[]): void {
@@ -78,8 +82,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('cancelChallenge')
   async handleCancelChallenge(client: Socket, challengerName: string)
   {
-    this.pendingChallenges.delete(challengerName)
-    this.server.emit('challengeCancelled', challengerName)
+    this.cancelChallenge(challengerName)
   }
 
   @SubscribeMessage('challengeAccepted')
@@ -249,5 +252,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       delete this.waitingPlayerTranscendence
       this.waitingPlayerTranscendence = null
     }
-  }  
+  }
+
+  cancelChallenge(challengerName: string)
+  {
+    this.pendingChallenges.delete(challengerName)
+    this.server.emit('challengeCancelled', challengerName)
+  }
 }

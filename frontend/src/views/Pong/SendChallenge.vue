@@ -54,6 +54,7 @@ export default defineComponent ({
 
 		onBeforeRouteLeave(() => {
 			pongSocket.off('challengeDeclined')
+			pongSocket.emit('cancelChallenge', store.state.user.username)
 		})
 
 		return { challengeStatus, cancelChallenge }
