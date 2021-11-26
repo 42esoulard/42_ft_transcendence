@@ -135,18 +135,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/pong/challenge/received',
     name: 'ChallengeReceived',
     component: ReceiveChallenge,
-    props: true,
-    beforeEnter(to, from, next) {
-      if (to.params.authorized)
-      {
-        next()
-      }
-      else
-      {
-        console.log('redirected to Pong')
-        next({name: 'Pong'})
-      }
-    }
   },
   {
     path: '/pong/challenge/sent',

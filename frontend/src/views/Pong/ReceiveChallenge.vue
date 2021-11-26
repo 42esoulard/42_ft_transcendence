@@ -18,10 +18,6 @@ import { onBeforeRouteLeave, useRouter } from "vue-router";
 import { store } from "@/store";
 
 export default defineComponent ({
-	props: {
-		challengerName: {type: String, required: true},
-	},
-	inheritAttrs: false, // we dont need it, and not setting it to false a warning: "extraneous non prop attributes (authorized) were passed to component but could not be automatically inherited..."
 
 	setup(props) {
 		const router = useRouter()

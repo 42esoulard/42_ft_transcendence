@@ -77,7 +77,6 @@ export default {
 			{
         store.commit('addChallenge', message.challengerName)
 				console.log('You have been challenged !')
-        router.push({name: 'ChallengeReceived', params: {challengerName: message.challengerName, authorized: 'ok'}})
 			}
 		});
 

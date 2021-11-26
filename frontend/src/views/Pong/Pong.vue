@@ -22,6 +22,8 @@
 		<router-link :to="{name: 'SendChallenge', params: {challengeeId:user.id, challengeeName: user.username, authorized: 'ok'} }"> challenge {{user.username}} </router-link>
 	</div>
 
+	<ReceiveChallenge />
+
 </template>
 
 
@@ -33,8 +35,10 @@ import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { gameMode } from '@/types/PongGame'
 import { useUserApi } from "@/plugins/api.plugin";
 import { User } from 'sdk/typescript-axios-client-generated'
+import ReceiveChallenge from './ReceiveChallenge.vue'
 
 export default defineComponent ({
+	components: { ReceiveChallenge },
 	setup() {
 		const queuing = ref(false)
 		const gameMode = ref<gameMode>('transcendence')
