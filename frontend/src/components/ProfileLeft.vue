@@ -93,7 +93,7 @@
         </Modal>
       </transition>
       <transition name="zoomin">
-        <Modal v-show="showModal2" @close="toggleModal(2)">
+        <Modal v-if="showModal2" @close="toggleModal(2)"> <!-- v-if instead v-show to reset avatar and errors in modal -->
           <template v-slot:edit-user>
             <EditUser @close="toggleModal(2)" />
           </template>

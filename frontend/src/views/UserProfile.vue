@@ -19,7 +19,7 @@ import Stats from "../components/Stats.vue";
 import ProfileLeft from "../components/ProfileLeft.vue";
 import { User } from "sdk/typescript-axios-client-generated";
 import moment from "moment";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useUserApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
@@ -28,6 +28,7 @@ export default defineComponent({
   setup() {
     const userApi = useUserApi();
     const route = useRoute();
+    const router = useRouter();
     const store = useStore();
     const userRef = ref();
     const username = route.params.username;
@@ -38,7 +39,10 @@ export default defineComponent({
         .then((res: any) => {
           userRef.value = res.data;
         })
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) => {
+          console.log(err.message)
+          router.push('/notfound');
+          });
     });
 
     const formatedDate = computed(() => {

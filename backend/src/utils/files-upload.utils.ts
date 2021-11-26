@@ -27,7 +27,8 @@ function _editFileName(req: Request, file: Express.Multer.File, callback) {
   if (req.user?.forty_two_login) {
     newName = req.user.forty_two_login;
   }
-  callback(null, `${newName}${fileExtName}`);
+  console.log("new name:", `${newName}_tmp${fileExtName}`)
+  callback(null, `${newName}_tmp${fileExtName}`);
 }
 
 export const saveImageToStorage = {

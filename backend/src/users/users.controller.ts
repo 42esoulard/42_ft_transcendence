@@ -37,7 +37,6 @@ import { createReadStream } from 'fs';
 import { extname, join } from 'path';
 import { Request, Response } from 'express';
 import { JwtTwoFactorGuard } from 'src/auth/guards/jwtTwoFactor.guard';
-import * as fs from 'fs';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/role.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -45,7 +44,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 @ApiTags('User')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(private readonly userService: UsersService) { }
 
   @Get()
   async getUsers(): Promise<User[]> {
@@ -198,7 +197,7 @@ export class UsersController {
     @Req() req: Request,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log(file);
+    // console.log(file);
     if (req.fileValidationError) {
       console.log(req.fileValidationError);
       throw new BadRequestException(req.fileValidationError);
@@ -211,22 +210,25 @@ export class UsersController {
       removeFile(`./${file.path}`);
       throw new BadRequestException('Invalid file, hacker !?');
     }
-    // crop the avatar
-    let newFilePath = file.path;
+    // crop the avatar and save it with proper name and ext
+    let newFilePath = file.path.replace('_tmp', '');
     const ext = extname(file.path);
     if (ext != '.jpg') {
-      newFilePath = file.path.replace(ext, '.jpg');
+      newFilePath = newFilePath.replace(ext, '.jpg');
       file.filename = file.filename.replace(ext, '.jpg');
-      setTimeout(() => {
-        fs.unlinkSync(file.path);
-      }, 1000);
     }
     handleAvatar(`./${file.path}`, `./${newFilePath}`);
+
     // Save the URL where the file will be accessible by frontend
+    file.filename = file.filename.replace('_tmp', '');
     this.userService.updateUser({
       id: req.user.id,
       avatar: `${process.env.BASE_URL}/users/avatars/${file.filename}`,
     });
+    // Remove the tmp file
+    setTimeout(() => {
+      removeFile(file.path);
+    }, 1000);
     const response = {
       message: 'Avatar has been uploaded successfully',
       originalname: file.originalname,
@@ -239,10 +241,10 @@ export class UsersController {
    * Returns an avatar from its finename
    */
   @ApiCookieAuth()
-  @Get('/avatars/:imgpath')
+  @Get('/avatars/:filename')
   @UseGuards(JwtTwoFactorGuard)
   getAvatar(
-    @Param('imgpath') filename: string,
+    @Param('filename') filename: string,
     @Res({ passthrough: true }) res: Response,
   ) {
     const file = createReadStream(join('./uploads/avatars/', filename)).on(
