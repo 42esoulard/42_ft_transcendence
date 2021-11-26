@@ -10,5 +10,4 @@ export class challenge {
 	public gameMode: gameMode) {
 	}
 	challengerSocket: Socket
-	challengeeSocket: Socket
 }

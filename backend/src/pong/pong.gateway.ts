@@ -104,10 +104,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.logger.error('challenge does not exist')
       return
     }
-    challenge.challengeeSocket = client
     // this.logger.log('challenge accepted ', message)
-    const player1 = new player(challenge.challengerId, challenge.challengeeName, challenge.challengeeSocket, 1)
-    const player2 = new player(challenge.challengerId, challenge.challengerName, challenge.challengerSocket, 2)
+    const player1 = new player(challenge.challengerId, challenge.challengeeName, client, 1)
+    const player2 = new player(challenge.challengerId, challenge.challengerName, client, 2)
     this.createGame(player1, player2, challenge.gameMode)
   }
   
