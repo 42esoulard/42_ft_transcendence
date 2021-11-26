@@ -19,6 +19,7 @@
 }
 
 .sidebar-link {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,6 +42,59 @@
   color: $sidebar-link-active-color;
   &:hover {
     color: $sidebar-item-hover;
+  }
+}
+
+/* .sidebar-link.hot {
+  color: darken($third-color, 15);
+  &:hover {
+    color: $sidebar-item-hover;
+  }
+} */
+
+.sidebar-link__notif {
+	position: absolute;
+  width: 20px;
+	height: 20px;
+  border-radius: 20px;
+	right: 25%;
+	top: 34%;
+  background-color: red;
+  color: white;
+  text-align: center;
+  font-weight: 900;
+
+  @media (max-height: 800px){
+    width: 18px;
+    height: 18px;
+    border-radius: 18px;
+    right: 28%;
+    top: 30%;
+  }
+  @media (max-height: 700px){
+    width: 15px;
+    height: 15px;
+    border-radius: 15px;
+    right: 32%;
+    top: 25%;
+  }
+  @media (max-height: 600px){
+    right: 25%;
+    top: 34%;
+  }
+  @media (max-width: 950px){
+    width: 15px;
+    height: 15px;
+    border-radius: 15px;
+    right: 25%;
+    top: 34%;
+  }
+  @media (max-width: 800px){
+    width: 15px;
+    height: 15px;
+    border-radius: 15px;
+    right: 25%;
+    top: 34%;
   }
 }
 
