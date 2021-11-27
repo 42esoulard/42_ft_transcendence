@@ -28,7 +28,7 @@
   align-items: center;
   justify-content: center;
   gap: $profile-left-gap;
-  border-radius: 20px;
+  border-radius: 10px;
   @media (max-width: 1200px){
     padding: 1rem;
   }
@@ -100,7 +100,7 @@
 
 .profile-stats {
   background-color: $profile-div-bg-color;
-  border-radius: 20px;
+  border-radius: 10px;
   justify-self: center;
   display: flex;
   justify-content: center;

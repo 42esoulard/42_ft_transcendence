@@ -75,7 +75,7 @@ button {
   border: 0;
   padding: 10px 20px;
   margin-top: 20px;
-  border-radius: 20px;
+  border-radius: 10px;
 }
 .submit {
   text-align: center;
