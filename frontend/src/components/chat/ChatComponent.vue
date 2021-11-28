@@ -185,7 +185,7 @@ export const ChatComponent = defineComponent({
     */
     const getDefaultChannel = async () => {
       console.log("IN DEFAULT CHANNEL BEFORE GCBI", 1, user.value.id)
-      await api.getChannelById(1, user.value.id, { withCredentials: true })
+      await api.getChannelById(1, { withCredentials: true })
       .then(async (chan) => {
         await joinChannel(chan.data)
         .then(() => updateChannelsList())
@@ -201,7 +201,7 @@ export const ChatComponent = defineComponent({
     const updateChannelsList = async () => {
       mutePopup.value = false;
       passwordPrompt.value = false;
-      await api.getUserChannels(user.value.id, { withCredentials: true })
+      await api.getUserChannels({ withCredentials: true })
       .then(async (res) => {
         joinedChannels.value = res.data;
         console.log("in  channels list", joinedChannels.value)
@@ -216,7 +216,7 @@ export const ChatComponent = defineComponent({
           console.log("Caught error:", err.response.data.message);
           getDefaultChannel();
         });
-        await api.getAvailableChannels(user.value.id, { withCredentials: true })
+        await api.getAvailableChannels({ withCredentials: true })
         .then((res) => {
           availableChannels.value = res.data;
           console.log("avail", availableChannels.value);
@@ -226,16 +226,11 @@ export const ChatComponent = defineComponent({
       .catch((err) => console.log("Caught error:", err.response.data.message));
     }
 
-    /*
-    ** When the currently viewed channel gets a new message (either sent or received).
-    ** All channel info is refetched from the API to get the whole message info and
-    ** updated related infos (channel, user..)
-    */
     const getMessagesUpdate = async (channelId: number) => {
       console.log("in get messages channel", channelId)
       if (activeChannel.value!.channel && activeChannel.value!.channel.id === channelId) {
         console.log("IN GET MESSAGES UPDATE BEFORE GCBI", channelId, user.value.id)
-        await api.getChannelById(channelId, user.value.id, { withCredentials: true })
+        await api.getChannelById(channelId, { withCredentials: true })
         .then((res) => {
           activeChannel.value!.channel = res.data;
           channelMessages.value = res.data.messages;
@@ -286,7 +281,7 @@ export const ChatComponent = defineComponent({
     /*
     ** For non-joined channels display
     */
-    const previewChannel = (channel: Channel) => {
+    const previewChannel = async (channel: Channel) => {
       activeChannel.value = {
         id: 0,
         channel: channel,
@@ -299,6 +294,15 @@ export const ChatComponent = defineComponent({
       isMember.value = false;
       channelSettings.value = false;
       channelMessages.value = channel.messages;
+      await api.getChannelPreview(channel.id, { withCredentials: true })
+        .then((res) => {
+          activeChannel.value!.channel = res.data;
+          channelMessages.value = res.data.messages;
+          // console.log("in get messages:", channelMessages.value);
+          return res;
+        })
+        .catch((err) => console.log("Caught error:", err.response.data.message));
+        
     }
 
     const applyForMembership = async (channel: Channel) => {
@@ -316,7 +320,7 @@ export const ChatComponent = defineComponent({
 
     const joinChannel = async (channel: Channel) => {
 
-      await api.joinChannel(channel.id, user.value.id, { withCredentials: true })
+      await api.joinChannel("self", channel.id, user.value.id, { withCredentials: true })
         .then((res)=> {
           console.log(res)
           updateChannelsList();
@@ -344,7 +348,7 @@ export const ChatComponent = defineComponent({
     const leaveChannel = async () => {
 
       const name = activeChannel.value!.channel.name;
-      await api.leaveChannel(activeChannel.value!.id, { withCredentials: true })
+      await api.leaveChannel("self", activeChannel.value!.id, { withCredentials: true })
       .then((res) => {
         store.dispatch("setMessage", "You're no longer a member of channel [" + name.substring(0, 15) + "]");
         updateChannelsList();
@@ -372,7 +376,7 @@ export const ChatComponent = defineComponent({
         isMember.value = true;
         getMessagesUpdate(cm.data.channel.id);
         store.dispatch("setMessage", "You're now a member of channel [" + cm.data.channel.name.substring(0, 15) + "]");
-        await api.joinChannel(cm.data.channel.id, recipient.id, { withCredentials: true })
+        await api.joinChannel("dm", cm.data.channel.id, recipient.id, { withCredentials: true })
         .then((res)=> {
           console.log(res)
           socket.emit('updateChannels', cm.data)

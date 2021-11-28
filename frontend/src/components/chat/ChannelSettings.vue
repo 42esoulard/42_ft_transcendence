@@ -296,7 +296,7 @@ export default defineComponent({
     const addMember = async (userId: number) => {
       wasSubmitted.value = true;
       const newMember = api.joinChannel(
-        props.activeChannel.channel.id, userId
+        "added", props.activeChannel.channel.id, userId
       , { withCredentials: true })
       .then((res) => {
         context.emit('update-channels-list');
@@ -323,7 +323,7 @@ export default defineComponent({
 
       wasSubmitted.value = true;
       const newMember = api.leaveChannel(
-        cm.id,
+        "kick", cm.id,
         { withCredentials: true })
       .then((res) => {
         context.emit('update-channels-list');
@@ -378,7 +378,7 @@ export default defineComponent({
       wasSubmitted.value = true;
       const pwd = (channelPassword.value? channelPassword.value : 'null');
       const newChannel = api.updateChannelPassword(
-        props.activeChannel.channel.id, user.value.id, pwd,
+        props.activeChannel.channel.id, pwd,
         { withCredentials: true }
       )
       .then((res) => {

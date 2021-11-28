@@ -62,9 +62,9 @@ export default defineComponent({
     let channelNames = <string[]>[];
 
     const getChannelNames = () => {
-      return api.getChannels({ withCredentials: true })
+      return api.getChannelsNames({ withCredentials: true })
       .then((res) => {
-        channelNames = res.data.map((chan) => chan.name);
+        channelNames = res.data;
       })
       .catch((err) => { console.log("Caught error:", err.response.data.message) })
     }
