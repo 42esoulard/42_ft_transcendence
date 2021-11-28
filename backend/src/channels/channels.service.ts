@@ -11,6 +11,7 @@ import { ChannelMembersService } from 'src/channel_members/channel_members.servi
 import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
 import { reduce } from 'rxjs';
 import { RelationshipsService } from 'src/relationships/relationships.service';
+import { Role } from 'src/auth/models/role.enum';
 
 @Injectable()
 export class ChannelsService {
@@ -60,6 +61,10 @@ export class ChannelsService {
     return channel;
   }
 
+  async getUser(user_id: number): Promise<Users> {
+    return await this.userService.getUserbyId(user_id);
+  }
+
   async getChannelMember(
     channel_id: number,
     user_id: number,
@@ -70,25 +75,23 @@ export class ChannelsService {
     return await this.channelMemberService.getChannelMember(channel, user);
   }
 
-  // async getChannelMembers(channel_id: number): Promise<ChannelMember> {
-  //   const channel: Channels = await this.getChannelById(channel_id);
+  async getCmById(
+    cm_id: number,
+  ): Promise<ChannelMember> {
+    return await this.channelMemberService.getChannelMemberById(cm_id);
+  }
 
-  //   return await this.channelMemberService.getChannelMembers(channel);
-  // }
-
-  // async getChannelMutedMembers(channel_id: number): Promise<ChannelMember> {
-  //   const channel: Channels = await this.getChannelById(channel_id);
-
-  //   return await this.channelMemberService.getChannelMutedMembers(channel);
-  // }
-
-  // async getChannelBannedMembers(
-  //   channel_id: number,
-  // ): Promise<ChannelMember> {
-  //   const channel: Channels = await this.getChannelById(channel_id);
-
-  //   return await this.channelMemberService.getChannelMutedMembers(channel);
-  // }
+  async checkBlocked(user_id: number, blocked_id: number): Promise<boolean> {
+    return await this.relationshipService
+      .getUserBlocked(user_id)
+      .then((res) => {
+        if (res && (res.map((res) => res.adresseeId).includes(blocked_id) ||
+        res.map((res) => res.requesterId).includes(blocked_id))) {
+          return true;
+        }
+        return false;
+      });
+  }
 
   async filterBanned(userChannels: ChannelMember[]): Promise<ChannelMember[]> {
     return userChannels.filter((userChannels) => !userChannels.ban);
@@ -99,18 +102,46 @@ export class ChannelsService {
     userChannels: ChannelMember[],
   ): Promise<ChannelMember[]> {
     return await this.relationshipService
-      .getUserBlocked(user.id)
+      .getBlockedByUser(user.id)
       .then((res) => {
         userChannels.forEach((cm) => {
-          cm.channel.messages = cm.channel.messages.filter(
-            (msg) => !res.map((res) => res.adresseeId).includes(msg.author.id),
-          );
-          cm.channel.channel_members = cm.channel.channel_members.filter(
-            (member) =>
-              !res.map((res) => res.adresseeId).includes(member.member.id),
-          );
+          if (res && cm.channel.messages) {
+            cm.channel.messages = cm.channel.messages.filter(
+              (msg) => !res.map((res) => res.adresseeId).includes(msg.author.id),
+            );
+          }
+          if (res && cm.channel.channel_members) {
+            cm.channel.channel_members = cm.channel.channel_members.filter(
+              (member) =>
+                !res.map((res) => res.adresseeId).includes(member.member.id),
+            );
+          }
         });
         return userChannels;
+      });
+  }
+
+  async filterBlockedInAvail(
+    userId: number,
+    channels: Channel[],
+  ): Promise<Channel[]> {
+    return await this.relationshipService
+      .getBlockedByUser(userId)
+      .then((res) => {
+        channels.forEach((chan) => {
+          if (chan.messages && res) {
+            chan.messages = chan.messages.filter(
+              (msg) => !res.map((res) => res.adresseeId).includes(msg.author.id),
+            );
+          }
+          if (chan.channel_members && res) {
+            chan.channel_members = chan.channel_members.filter(
+              (member) =>
+                !res.map((res) => res.adresseeId).includes(member.member.id),
+            );
+          }
+        });
+        return channels;
       });
   }
 
@@ -124,6 +155,10 @@ export class ChannelsService {
   }
 
   async getAvailableChannels(user_id: number): Promise<Channel[]> {
+    const user = await this.getUser(user_id);
+    if (user == undefined) {
+      return undefined;
+    }
     let channels = await this.getChannels();
     return await this.getUserChannels(user_id).then(async (res) => {
       const userChannels = res.map((cm) => cm.channel);
@@ -133,13 +168,16 @@ export class ChannelsService {
             .map((userChannels) => userChannels.id)
             .includes(channels.id),
       );
+      if (user.role == Role.OWNER || user.role == Role.ADMIN) {
+        return await this.filterBlockedInAvail(user_id, channels);
+      }
       channels = channels.filter((channels) => channels.type === 'public');
       channels.forEach((channel) => {
         if (channel.password) {
           channel.messages = [];
         }
       });
-      return await channels;
+      return await this.filterBlockedInAvail(user_id, channels);
     });
   }
 
@@ -153,21 +191,69 @@ export class ChannelsService {
         relations: ['messages', 'channel_members'],
       })
       .then(async (channel) => {
+        if (channel == undefined) {
+          return undefined;
+        }
         return await this.relationshipService
           .getBlockedByUser(userId)
           .then((blocked) => {
-            channel.messages = channel.messages.filter(
-              (msg) =>
-                !blocked
-                  .map((blocked) => blocked.adresseeId)
-                  .includes(msg.author.id),
-            );
-            channel.channel_members = channel.channel_members.filter(
-              (member) =>
-                !blocked
-                  .map((blocked) => blocked.adresseeId)
-                  .includes(member.member.id),
-            );
+            if (channel.messages && blocked) {
+              channel.messages = channel.messages.filter(
+                (msg) =>
+                  !blocked
+                    .map((blocked) => blocked.adresseeId)
+                    .includes(msg.author.id),
+              );
+            }
+            if (channel.channel_members && blocked) {
+              channel.channel_members = channel.channel_members.filter(
+                (member) =>
+                  !blocked
+                    .map((blocked) => blocked.adresseeId)
+                    .includes(member.member.id),
+              );
+            }
+            return channel;
+          });
+      });
+  }
+
+  async getChannelPreview(chanId: number, userId: number): Promise<Channel> {
+    const user = await this.getUser(userId);
+    if (user == undefined) {
+      return undefined;
+    }
+    return await this.channelsRepository
+      .findOne(chanId, {
+        relations: ['messages'],
+      })
+      .then(async (channel) => {
+        if (channel == undefined) {
+          return undefined;
+        }
+        if (user.role == Role.USER && channel.type == 'private') {
+          channel.messages = [];
+          return channel;
+        }
+        return await this.relationshipService
+          .getBlockedByUser(userId)
+          .then((blocked) => {
+            if (channel.messages && blocked) {
+              channel.messages = channel.messages.filter(
+                (msg) =>
+                  !blocked
+                    .map((blocked) => blocked.adresseeId)
+                    .includes(msg.author.id),
+              );
+            }
+            if (channel.channel_members && blocked) {
+              channel.channel_members = channel.channel_members.filter(
+                (member) =>
+                  !blocked
+                    .map((blocked) => blocked.adresseeId)
+                    .includes(member.member.id),
+              );
+            }
             return channel;
           });
       });

@@ -44,7 +44,7 @@ export default defineComponent({
 
     const checkPassword = () => {
 
-      api.checkPasswordMatch(props.channel.id, user.value.id, passwordAttempt.value, { withCredentials: true })
+      api.checkPasswordMatch(props.channel.id, passwordAttempt.value, { withCredentials: true })
       .then((res) => {
         console.log("password match res", res)
         if (res.data) {

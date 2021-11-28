@@ -25,7 +25,7 @@
                 <span v-if="activeChannel.channel.type === 'private'"><img class="fas fa-eye-slash chat-channels__tag chat-channels__tag--private" title="This community is private" /></span>
                 <span v-if="activeChannel.channel.password"><img class="fas fa-lock chat-channels__tag chat-channels__tag--locked" title="This channel is password-protected" /></span>
               </div>
-              <div v-if="activeChannel.is_admin || activeChannel.is_owner" class="chat-channels__tag-container">
+              <div v-if="activeChannel.is_admin || activeChannel.is_owner || user.role == 'admin' || user.role == 'owner'" class="chat-channels__tag-container">
                 <span v-if="activeChannel.is_owner"><img class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner" /></span>
                 <span v-if="activeChannel.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
                 <span @click="channelSettings = true"><img class="fas fa-lg fa-cogs chat-channels__tag chat-channels__tag--settings" title="Channel Settings"  /></span>
@@ -51,7 +51,7 @@
                           <button class="button link link--neutral" title="DM" @click="directMessage(message.author)"><i class="fas fa-envelope" /></button>
                           <button class="button" title="Challenge"><i class="fas fa-table-tennis" /></button>
                           <button class="button" title="Block"><i class="fas fa-ban" /></button>
-                          <button v-if="activeChannel && activeChannel.is_admin" class="button" title="Admin Actions"><i class="fas fa-cog" /></button>
+                          <!-- <button v-if="activeChannel && activeChannel.is_admin || user.role == 'admin' || user.role == 'owner'" class="button" title="Admin Actions"><i class="fas fa-cog" /></button> -->
                       </div>
                     </div>
                     <div>: </div>
@@ -184,8 +184,8 @@ export const ChatComponent = defineComponent({
     ** Default channel = id 1, "General". Automatically joined on connection, can't be left.
     */
     const getDefaultChannel = async () => {
-      console.log("IN DEFAULT CHANNEL BEFORE GCBI", 1, user.value.id)
-      await api.getChannelById(1, user.value.id, { withCredentials: true })
+      // console.log("IN DEFAULT CHANNEL BEFORE GCBI", 1, user.value.id)
+      await api.getDefaultChannel({ withCredentials: true })
       .then(async (chan) => {
         await joinChannel(chan.data)
         .then(() => updateChannelsList())
@@ -201,22 +201,34 @@ export const ChatComponent = defineComponent({
     const updateChannelsList = async () => {
       mutePopup.value = false;
       passwordPrompt.value = false;
-      await api.getUserChannels(user.value.id, { withCredentials: true })
+      await api.getUserChannels({ withCredentials: true })
       .then(async (res) => {
         joinedChannels.value = res.data;
         console.log("in  channels list", joinedChannels.value)
         await api.getChannelMember(activeChannel.value!.channel.id, activeChannel.value!.member.id, { withCredentials: true })
         .then((res) => {
           activeChannel.value = res.data;
-          if (!activeChannel.value.is_admin)
+          if (!activeChannel.value.is_admin && user.value.role !== 'admin' && user.value.role !== 'owner')
             channelSettings.value = false;
           console.log(res.data)
         })
-        .catch((err) => {
+        .catch(async (err) => {
           console.log("Caught error:", err.response.data.message);
-          getDefaultChannel();
+          if (user.value.role !== 'admin' && user.value.role !== 'owner') {
+            getDefaultChannel();
+          } else {
+            await api.getChannelPreview(activeChannel.value!.channel.id, { withCredentials: true })
+            .then((res) => {
+              activeChannel.value!.channel = res.data;
+              channelMessages.value = res.data.messages;
+              // console.log("in get messages:", channelMessages.value);
+              return res;
+            })
+            .catch((err) => console.log("Caught error:", err.response.data.message));
+        
+          }
         });
-        await api.getAvailableChannels(user.value.id, { withCredentials: true })
+        await api.getAvailableChannels({ withCredentials: true })
         .then((res) => {
           availableChannels.value = res.data;
           console.log("avail", availableChannels.value);
@@ -226,16 +238,11 @@ export const ChatComponent = defineComponent({
       .catch((err) => console.log("Caught error:", err.response.data.message));
     }
 
-    /*
-    ** When the currently viewed channel gets a new message (either sent or received).
-    ** All channel info is refetched from the API to get the whole message info and
-    ** updated related infos (channel, user..)
-    */
     const getMessagesUpdate = async (channelId: number) => {
       console.log("in get messages channel", channelId)
       if (activeChannel.value!.channel && activeChannel.value!.channel.id === channelId) {
-        console.log("IN GET MESSAGES UPDATE BEFORE GCBI", channelId, user.value.id)
-        await api.getChannelById(channelId, user.value.id, { withCredentials: true })
+        // console.log("IN GET MESSAGES UPDATE BEFORE GCBI", channelId, user.value.id)
+        await api.getChannelById(channelId, { withCredentials: true })
         .then((res) => {
           activeChannel.value!.channel = res.data;
           channelMessages.value = res.data.messages;
@@ -286,7 +293,7 @@ export const ChatComponent = defineComponent({
     /*
     ** For non-joined channels display
     */
-    const previewChannel = (channel: Channel) => {
+    const previewChannel = async (channel: Channel) => {
       activeChannel.value = {
         id: 0,
         channel: channel,
@@ -299,6 +306,15 @@ export const ChatComponent = defineComponent({
       isMember.value = false;
       channelSettings.value = false;
       channelMessages.value = channel.messages;
+      await api.getChannelPreview(channel.id, { withCredentials: true })
+        .then((res) => {
+          activeChannel.value!.channel = res.data;
+          channelMessages.value = res.data.messages;
+          // console.log("in get messages:", channelMessages.value);
+          return res;
+        })
+        .catch((err) => console.log("Caught error:", err.response.data.message));
+        
     }
 
     const applyForMembership = async (channel: Channel) => {
@@ -316,13 +332,13 @@ export const ChatComponent = defineComponent({
 
     const joinChannel = async (channel: Channel) => {
 
-      await api.joinChannel(channel.id, user.value.id, { withCredentials: true })
+      await api.joinChannel("self", channel.id, user.value.id, { withCredentials: true })
         .then((res)=> {
-          console.log(res)
+          // console.log(res)
           updateChannelsList();
           activeChannel.value = res.data;
           isMember.value = true;
-          console.log("ACTIVECHANNEL", activeChannel)
+          // console.log("ACTIVECHANNEL", activeChannel)
           getMessagesUpdate(res.data.channel.id);
           if (channel.id !== 1) {
             store.dispatch("setMessage", "You're now a member of channel [" + channel.name.substring(0, 15) + "]");
@@ -344,7 +360,7 @@ export const ChatComponent = defineComponent({
     const leaveChannel = async () => {
 
       const name = activeChannel.value!.channel.name;
-      await api.leaveChannel(activeChannel.value!.id, { withCredentials: true })
+      await api.leaveChannel("self", activeChannel.value!.id, { withCredentials: true })
       .then((res) => {
         store.dispatch("setMessage", "You're no longer a member of channel [" + name.substring(0, 15) + "]");
         updateChannelsList();
@@ -372,9 +388,9 @@ export const ChatComponent = defineComponent({
         isMember.value = true;
         getMessagesUpdate(cm.data.channel.id);
         store.dispatch("setMessage", "You're now a member of channel [" + cm.data.channel.name.substring(0, 15) + "]");
-        await api.joinChannel(cm.data.channel.id, recipient.id, { withCredentials: true })
+        await api.joinChannel("dm", cm.data.channel.id, recipient.id, { withCredentials: true })
         .then((res)=> {
-          console.log(res)
+          // console.log(res)
           socket.emit('updateChannels', cm.data)
           return res;
         })
@@ -402,7 +418,7 @@ export const ChatComponent = defineComponent({
           mutePopup.value = !mutePopup.value;
           break;
       }
-      console.log("channelSettings", channelSettings)
+      // console.log("channelSettings", channelSettings)
     }
 
     const switchChannel =  (cm: ChannelMember) => {
@@ -418,8 +434,8 @@ export const ChatComponent = defineComponent({
       if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
         await relApi.getBlockedByUser(user.value.id)
         .then((blocked) => {
-          console.log("blocked", blocked.data.map((blocked) => blocked.adresseeId));
-          console.log(data.author.id)
+          // console.log("blocked", blocked.data.map((blocked) => blocked.adresseeId));
+          // console.log(data.author.id)
           if (blocked.data.map((blocked) => blocked.adresseeId).includes(data.author.id)) {
             return;
           }

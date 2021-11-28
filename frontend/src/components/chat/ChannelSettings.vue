@@ -55,7 +55,7 @@
         </button>
         <button
           @click="toggleTab('ownerOptions')"
-          v-if="activeChannel.is_owner"
+          v-if="activeChannel.is_owner || user.role == 'admin' || user.role == 'owner'"
           :class="[
             'button',
             'button--selector',
@@ -71,15 +71,15 @@
             <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: cm.member.username} }">
               {{ cm.member.username }}
             </router-link>
-            <div v-if="(activeChannel.is_owner && activeChannel.id == cm.id) || (!activeChannel.is_owner && (cm.is_owner || cm.is_admin) && activeChannel.id != cm.id)" class="chat-channels__tag-container">
+            <div v-if="(activeChannel.is_owner && activeChannel.id == cm.id) || ((!activeChannel.is_owner && user.role == 'user') && (cm.is_owner || cm.is_admin) && activeChannel.id != cm.id)" class="chat-channels__tag-container">
               <span v-if="cm.is_owner"><img class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner" /></span>
               <span v-if="cm.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
             </div>
-            <div v-else-if="(activeChannel.is_owner && cm.is_admin) || (activeChannel.is_admin && activeChannel.id == cm.id)" class="chat-channels__tag-container">
+            <div v-else-if="((activeChannel.is_owner || user.role == 'owner' || user.role == 'admin') && cm.is_admin) || (activeChannel.is_admin && activeChannel.id == cm.id)" class="chat-channels__tag-container">
               <span @click="toggleAdmin(cm)"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin-togglable" title="Remove from Admins" /></span>
             </div>
             <div v-if="!cm.is_admin">
-              <span v-if="activeChannel.is_owner" @click="toggleAdmin(cm)"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--greyed" title="Promote to Admin" /></span>
+              <span v-if="activeChannel.is_owner || user.role == 'owner' || user.role == 'admin'" @click="toggleAdmin(cm)"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--greyed" title="Promote to Admin" /></span>
               <span v-if="cm.mute" @click="toggleModal('unmute', cm)"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--mute" title="Unmute user" /></span>
               <span v-else @click="toggleModal('muted', cm)"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--greyed" title="Mute user" /></span>
               <span v-if="cm.ban" @click="toggleModal('unban', cm)"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--ban" title="Unban user" /></span>
@@ -296,7 +296,7 @@ export default defineComponent({
     const addMember = async (userId: number) => {
       wasSubmitted.value = true;
       const newMember = api.joinChannel(
-        props.activeChannel.channel.id, userId
+        "added", props.activeChannel.channel.id, userId
       , { withCredentials: true })
       .then((res) => {
         context.emit('update-channels-list');
@@ -323,7 +323,7 @@ export default defineComponent({
 
       wasSubmitted.value = true;
       const newMember = api.leaveChannel(
-        cm.id,
+        "kick", cm.id,
         { withCredentials: true })
       .then((res) => {
         context.emit('update-channels-list');
@@ -378,7 +378,7 @@ export default defineComponent({
       wasSubmitted.value = true;
       const pwd = (channelPassword.value? channelPassword.value : 'null');
       const newChannel = api.updateChannelPassword(
-        props.activeChannel.channel.id, user.value.id, pwd,
+        props.activeChannel.channel.id, pwd,
         { withCredentials: true }
       )
       .then((res) => {
@@ -412,6 +412,7 @@ export default defineComponent({
       toggleAdmin,
       updateMuteBan,
 
+      user,
       username,
       checkUsername,
       considerMember,

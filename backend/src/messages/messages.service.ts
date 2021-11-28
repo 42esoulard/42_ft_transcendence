@@ -68,6 +68,9 @@ export class MessagesService {
     await this.channelMemberService
       .getChannelMember(newMessage.channel, newMessage.author)
       .then((res) => {
+        if (res == undefined) {
+          throw new ForbiddenException('not a member');
+        }
         if (this.channelMemberService.checkMute(res)) {
           throw new ForbiddenException('muted');
         }
