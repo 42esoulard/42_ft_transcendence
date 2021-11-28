@@ -7,13 +7,15 @@
           >profile</SideBarLink
         >
         <SideBarLink to="/chat" icon="fas fa-comments">chat</SideBarLink>
-        <SideBarLink to="" icon="fas fa-trophy">ladder</SideBarLink>
+        <SideBarLink to="/ladder" icon="fas fa-trophy">ladder</SideBarLink>
         <SideBarLink to="/users" icon="fas fa-users">users</SideBarLink>
         <SideBarLink to="/pong" icon="fas fa-table-tennis">play</SideBarLink>
         <SideBarLink to="/pong/watch" icon="fas fa-play-circle"
           >live</SideBarLink
         >
-        <SideBarLink v-if="user.role != 'user'" to="/admin" icon="fas fa-crown">admin</SideBarLink>
+        <SideBarLink v-if="user.role != 'user'" to="/admin" icon="fas fa-crown"
+          >admin</SideBarLink
+        >
         <SideBarLink to="/adduser" icon="fas fa-toolbox">add</SideBarLink>
       </div>
     </div>

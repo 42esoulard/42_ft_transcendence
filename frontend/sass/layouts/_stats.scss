@@ -7,15 +7,16 @@
   align-items: start;
   @media (max-width: 950px){
     width: 60%;
-    gap: 0;
+    gap: 2rem;
     border-radius: 0;
     grid-template: 40% 60% / 100%;
+    padding-top: 2rem;
   }
   min-height: 100%;
 }
 
 .stats-info {
-  width: 80%;
+  width: 90%;
   padding: 0rem 1rem;
   display: grid;
   margin: auto;
@@ -38,10 +39,10 @@
   &--win {
     color: $stats-win-color;
   }
-  &--rank {
-    color: $stats-rank-color;
+  &--loss {
   }
   &--games {
+    color: $prim-color;
   }
 }
 

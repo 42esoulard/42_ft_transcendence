@@ -56,17 +56,17 @@ export default {
       store.commit("allPlayingUsers", playersUserNames);
       console.log("allPlayingUsers", store.state.inGameUsers);
     });
-		
+
     pongSocket.on('gameReadyToStart', (room: string, player1UserName: string, player2UserName: string, gameMode: gameMode) => {
-			router.push({ name: 'PongGame', 
+			router.push({ name: 'PongGame',
 			params: {
 				room,
-				player1UserName, 
+				player1UserName,
 				player2UserName,
 				gameMode,
 				authorized: 'ok',
 				userType: 'player'
-				} 
+				}
 			})
 		});
 

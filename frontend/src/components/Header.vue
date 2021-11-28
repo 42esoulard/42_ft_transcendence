@@ -1,7 +1,10 @@
 <template>
   <transition name="fade--log">
     <div class="header">
-      <div class="menu" v-if="(width < 950 || height < 600) && user.id != 0 && !user.banned">
+      <div
+        class="menu"
+        v-if="(width < 950 || height < 600) && user.id != 0 && !user.banned"
+      >
         <button @click="isActive = !isActive" class="menu-button">
           <i class="menu__icon fas fa-bars" />
         </button>
@@ -33,7 +36,7 @@
           <SideBarLink
             class="menu__link"
             @click="isActive = !isActive"
-            to=""
+            to="/ladder"
             icon="fas fa-trophy"
           >
             ladder
@@ -98,7 +101,10 @@
         :key="user.id"
         class="header-bloc"
       >
-        <router-link :to="{ name: 'UserProfile', params: { username: user.username } }" class="user-bloc">
+        <router-link
+          :to="{ name: 'UserProfile', params: { username: user.username } }"
+          class="user-bloc"
+        >
           <img class="user-bloc__avatar" :src="user.avatar" alt="" />
           <span class="user-bloc__username">{{ user.username }}</span>
         </router-link>

@@ -1,7 +1,12 @@
 <template>
   <div class="profile-left-info">
     <div class="profile-left__avatar-div">
-      <img v-if="user.id === self.id" :src="self.avatar" class="profile-left__avatar-img" alt="" />
+      <img
+        v-if="user.id === self.id"
+        :src="self.avatar"
+        class="profile-left__avatar-img"
+        alt=""
+      />
       <img v-else :src="user.avatar" class="profile-left__avatar-img" alt="" />
     </div>
     <span class="profile-left__name">{{ user.username }} </span>
@@ -11,37 +16,41 @@
       class="profile-left__status"
       ><i class="status status--online fas fa-circle" /> online</span
     >
-    <span v-else-if="userStatus == 'offline' && relationState(user) >= -1" class="profile-left__status"
+    <span
+      v-else-if="userStatus == 'offline' && relationState(user) >= -1"
+      class="profile-left__status"
       ><i class="status status--offline fas fa-circle" /> offline</span
     >
-    <span v-else-if="userStatus == 'ingame' && relationState(user) >= -1" class="profile-left__status"
+    <span
+      v-else-if="userStatus == 'ingame' && relationState(user) >= -1"
+      class="profile-left__status"
       ><i class="status status--in-game fas fa-circle" /> in game</span
     >
   </div>
   <div v-if="relationState(user) >= 0" class="profile-left__social">
     <button
-      v-show="relationState(user) == 0"
+      v-if="relationState(user) == 0"
       @click="addFriend(user)"
       class="button button--second"
     >
       <i class="upload-icon fas fa-user-plus" /> add friend
     </button>
     <button
-      v-show="relationState(user) == 1"
+      v-else-if="relationState(user) == 1"
       @click="removeFriend(user)"
       class="button button--second"
     >
       <i class="upload-icon fas fa-user-minus" /> remove friend
     </button>
     <button
-      v-show="relationState(user) == 2"
+      v-else-if="relationState(user) == 2"
       @click="acceptFriend(user)"
       class="button button--second"
     >
       <i class="upload-icon fas fa-user-plus" /> accept invitation
     </button>
     <button
-      v-show="relationState(user) == 3"
+      v-else-if="relationState(user) == 3"
       @click="removeFriend(user)"
       class="button button--second"
     >
@@ -50,7 +59,11 @@
     <button v-if="user.id != self.id" class="button button--primary">
       <i class="upload-icon fas fa-envelope" /> send message
     </button>
-    <button v-if="user.id != self.id" class="button button--third">
+    <button
+      v-if="user.id != self.id && userStatus == 'online'"
+      @click="challengeUser"
+      class="button button--third"
+    >
       <i class="upload-icon fas fa-table-tennis" /> invite game
     </button>
     <button
@@ -93,7 +106,8 @@
         </Modal>
       </transition>
       <transition name="zoomin">
-        <Modal v-if="showModal2" @close="toggleModal(2)"> <!-- v-if instead v-show to reset avatar and errors in modal -->
+        <Modal v-if="showModal2" @close="toggleModal(2)">
+          <!-- v-if instead v-show to reset avatar and errors in modal -->
           <template v-slot:edit-user>
             <EditUser @close="toggleModal(2)" />
           </template>
@@ -116,7 +130,7 @@ import { User, Relationship } from "sdk/typescript-axios-client-generated";
 import {
   useRelationshipApi,
   useAuthApi,
-  useUserApi
+  useUserApi,
 } from "@/plugins/api.plugin";
 import { useStore } from "@/store";
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
@@ -130,8 +144,8 @@ export default defineComponent({
   props: {
     user: {
       type: Object as PropType<User>,
-      required: true
-    }
+      required: true,
+    },
   },
   components: { Modal, InitTwoFactor, EditUser },
   setup(props) {
@@ -151,9 +165,11 @@ export default defineComponent({
     const userStatus = computed((): "online" | "offline" | "ingame" => {
       if (user != undefined) {
         const inGameUser = store.state.inGameUsers.find(
-          u => u === user.username
+          (u) => u === user.username
         );
-        const onlineUser = store.state.onlineUsers.find(u => u.id === user.id);
+        const onlineUser = store.state.onlineUsers.find(
+          (u) => u.id === user.id
+        );
         if (inGameUser) {
           return "ingame";
         } else if (onlineUser) {
@@ -184,7 +200,7 @@ export default defineComponent({
           store.commit("toggleTwoFactor", false);
           store.dispatch("setMessage", res.data.message);
         })
-        .catch(error => console.log(error));
+        .catch((error) => console.log(error));
     };
 
     const toggleModal = (nbr: number) => {
@@ -216,7 +232,7 @@ export default defineComponent({
     const logOut = () => {
       authApi
         .logout({ withCredentials: true })
-        .then(response => {
+        .then((response) => {
           console.log(response);
           presenceSocket.emit("closeConnection", store.state.user);
           store.commit("resetUser"); //store.state.user = null;
@@ -230,9 +246,11 @@ export default defineComponent({
         await relationshipApi
           .saveRelationship({
             requesterId: store.state.user.id,
-            adresseeId: user.id
+            adresseeId: user.id,
           })
-          .then((res: any) => window.location.reload())
+          .then((res: any) => {
+            userFriendships.value.push(res.data);
+          })
           .catch((err: any) => console.log(err));
       }
     };
@@ -242,9 +260,21 @@ export default defineComponent({
         await relationshipApi
           .removeRelationship({
             userId1: user.id,
-            userId2: store.state.user.id
+            userId2: store.state.user.id,
           })
-          .then((res: any) => window.location.reload())
+          .then((res: any) => {
+            let index = 0;
+            for (const friendship of userFriendships.value) {
+              if (
+                friendship.requesterId == user.id ||
+                friendship.adresseeId == user.id
+              ) {
+                userFriendships.value.splice(index, 1);
+                break;
+              }
+              index++;
+            }
+          })
           .catch((err: any) => console.log(err));
       }
     };
@@ -254,9 +284,13 @@ export default defineComponent({
         await relationshipApi
           .validateRelationship({
             requesterId: user.id,
-            adresseeId: store.state.user.id
+            adresseeId: store.state.user.id,
           })
-          .then((res: any) => window.location.reload())
+          .then((res: any) => {
+            for (const friendship of userFriendships.value) {
+              if (friendship.requesterId == user.id) friendship.pending = false;
+            }
+          })
           .catch((err: any) => console.log(err));
       }
     };
@@ -281,7 +315,11 @@ export default defineComponent({
       }
 
       for (const relationship of userBlocked.value) {
-        if (store.state.user.id == relationship.requesterId) return 4;
+        if (
+          store.state.user.id == relationship.requesterId &&
+          relationship.adresseeId == user.id
+        )
+          return 4;
         if (store.state.user.id == relationship.adresseeId) return -2;
       }
 
@@ -294,7 +332,7 @@ export default defineComponent({
           .saveRelationship({
             requesterId: store.state.user.id,
             adresseeId: user.id,
-            nature: "blocked"
+            nature: "blocked",
           })
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
@@ -306,11 +344,22 @@ export default defineComponent({
         await relationshipApi
           .removeRelationship({
             userId1: user.id,
-            userId2: store.state.user.id
+            userId2: store.state.user.id,
           })
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
       }
+    };
+
+    const challengeUser = () => {
+      router.push({
+        name: "SendChallenge",
+        params: {
+          challengeeId: user.id,
+          challengeeName: user.username,
+          authorized: "ok",
+        },
+      });
     };
 
     return {
@@ -330,8 +379,9 @@ export default defineComponent({
       showBackdrop,
       block,
       unblock,
-      deleteAccount
+      deleteAccount,
+      challengeUser,
     };
-  }
+  },
 });
 </script>

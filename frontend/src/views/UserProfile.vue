@@ -40,9 +40,9 @@ export default defineComponent({
           userRef.value = res.data;
         })
         .catch((err: any) => {
-          console.log(err.message)
-          router.push('/notfound');
-          });
+          console.log(err.message);
+          router.push("/notfound");
+        });
     });
 
     const formatedDate = computed(() => {

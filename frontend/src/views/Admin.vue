@@ -288,7 +288,9 @@ export default defineComponent({
       else list.value = userList.value;
       if (searchQuery.value.length) {
         list.value = list.value.filter((entity: User) =>
-          entity.username.toLowerCase().startsWith(searchQuery.value.toLowerCase())
+          entity.username
+            .toLowerCase()
+            .startsWith(searchQuery.value.toLowerCase())
         );
       }
       list.value = list.value.filter(
@@ -296,7 +298,9 @@ export default defineComponent({
       );
       if (adminlist.value)
         list.value = list.value.filter((entity: User) => entity.role != "user");
-      return list.value;
+      return list.value.sort(
+        (a: User, b: User) => a.role == "user" && b.role != "user"
+      );
     });
 
     const selectChannelList = computed((): Channel[] => {
@@ -314,7 +318,9 @@ export default defineComponent({
       else list.value = channelList.value;
       if (searchQueryChat.value.length) {
         list.value = list.value.filter((entity: Channel) =>
-          entity.name.toLowerCase().startsWith(searchQueryChat.value.toLowerCase())
+          entity.name
+            .toLowerCase()
+            .startsWith(searchQueryChat.value.toLowerCase())
         );
       }
       return list.value;

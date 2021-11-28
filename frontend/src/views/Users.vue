@@ -1,89 +1,99 @@
 <template>
-  <div v-if="userList.length" class="users-div">
-    <div class="users">
-      <div class="users__title">Userlist</div>
-      <div class="users-list-selectors" :key="friendlist">
-        <button
-          @click="toggleOnline"
-          :class="[
-            'button',
-            'button--selector',
-            onlinelist ? 'button--selector--on' : '',
-          ]"
-        >
-          online
-        </button>
-        <button
-          @click="toggleFriends"
-          :class="[
-            'button',
-            'button--selector',
-            friendlist ? 'button--selector--on' : '',
-          ]"
-        >
-          friends
-        </button>
-        <button
-          @click="toggleBlocked"
-          :class="[
-            'button',
-            'button--selector',
-            blockedlist ? 'button--selector--on' : '',
-          ]"
-        >
-          blocked
-        </button>
-      </div>
-      <div class="users-list">
-        <tr v-for="user in selectList" :key="user.id" class="users-list__elt">
-          <td>
-            <img
-              v-if="userStatus(user) == 'online'"
-              class="users-list__avatar users-list__avatar--online"
-              :src="user.avatar"
-            />
-            <img
-              v-else-if="userStatus(user) == 'ingame'"
-              class="users-list__avatar users-list__avatar--in-game"
-              :src="user.avatar"
-            />
-            <img
-              v-else
-              class="users-list__avatar users-list__avatar--offline"
-              :src="user.avatar"
-            />
-          </td>
-          <td>
-            <router-link
-              :class="[
-                'link',
-                'link--user-list',
-                user.role == 'user' ? '' : 'link--admin',
-              ]"
-              :to="{ name: 'UserProfile', params: { username: user.username } }"
-            >
-              {{ user.username }}
-            </router-link>
-          </td>
-          <td class="users-list__interactions">
-            <i class="link link--neutral fas fa-envelope" />
-            <i class="link link--neutral fas fa-table-tennis" />
-          </td>
-        </tr>
-      </div>
+  <div v-if="userList.length" class="users-main">
+    <div class="users-div">
+      <div class="users">
+        <div class="users__title">Userlist</div>
+        <div class="users-list-selectors" :key="friendlist">
+          <button
+            @click="toggleOnline"
+            :class="[
+              'button',
+              'button--selector',
+              onlinelist ? 'button--selector--on' : '',
+            ]"
+          >
+            online
+          </button>
+          <button
+            @click="toggleFriends"
+            :class="[
+              'button',
+              'button--selector',
+              friendlist ? 'button--selector--on' : '',
+            ]"
+          >
+            friends
+          </button>
+          <button
+            @click="toggleBlocked"
+            :class="[
+              'button',
+              'button--selector',
+              blockedlist ? 'button--selector--on' : '',
+            ]"
+          >
+            blocked
+          </button>
+        </div>
+        <div class="users-list">
+          <tr v-for="user in selectList" :key="user.id" class="users-list__elt">
+            <td>
+              <img
+                v-if="userStatus(user) == 'online'"
+                class="users-list__avatar users-list__avatar--online"
+                :src="user.avatar"
+              />
+              <img
+                v-else-if="userStatus(user) == 'ingame'"
+                class="users-list__avatar users-list__avatar--in-game"
+                :src="user.avatar"
+              />
+              <img
+                v-else
+                class="users-list__avatar users-list__avatar--offline"
+                :src="user.avatar"
+              />
+            </td>
+            <td>
+              <router-link
+                :class="[
+                  'link',
+                  'link--user-list',
+                  user.role == 'user' ? '' : 'link--admin',
+                ]"
+                :to="{ name: 'UserProfile', params: { username: user.username } }"
+              >
+                {{ user.username }}
+              </router-link>
+            </td>
+            <td class="users-list__interactions">
+              <i class="link link--neutral fas fa-envelope" />
+              <button
+                v-if="userStatus(user) == 'online'"
+                class="link link--neutral"
+                @click="challengeUser(user)"
+                title="challenge"
+              >
+                <i class="fas fa-table-tennis" />
+              </button>
+            </td>
+          </tr>
+        </div>
 
-      <div class="users-search">
-        <input
-          class="users-search__bar"
-          type="text"
-          maxlength="10"
-          v-model="searchQuery"
-        />
+        <div class="users-search">
+          <input
+            class="users-search__bar"
+            type="text"
+            maxlength="10"
+            v-model="searchQuery"
+          />
+        </div>
       </div>
     </div>
+    <Pending />
   </div>
   <div v-else>
-    <p>Loading some data...</p>
+      <p>Loading some data...</p>
   </div>
 </template>
 
@@ -92,10 +102,14 @@ import { defineComponent, inject, onMounted, ref, computed } from "vue";
 import { User, Relationship } from "sdk/typescript-axios-client-generated";
 import { useStore } from "@/store";
 import { useUserApi, useRelationshipApi } from "@/plugins/api.plugin";
+import { useRouter } from "vue-router";
+import Pending from "../components/Pending.vue";
 
 export default defineComponent({
+  components: { Pending },
   name: "Users",
   setup() {
+    const router = useRouter();
     const store = useStore();
     const userList = ref<User[]>([]);
     const friendList = ref<number[]>([]);
@@ -213,8 +227,22 @@ export default defineComponent({
           (user: User) =>
             !blockedList.value.find((id: number) => id === user.id)
         );
+      list.value.sort((a: User, b: User) => a.username.localeCompare(b.username));
+      list.value.sort((a: User, b: User) => userStatus(a) == 'offline' && userStatus(b) != 'offline' );
+      list.value.sort((a: User, b: User) => userStatus(a) == 'ingame' && userStatus(b) == 'online' );
       return list.value;
     });
+
+    const challengeUser = (usr: User) => {
+      router.push({
+        name: "SendChallenge",
+        params: {
+          challengeeId: usr.id,
+          challengeeName: usr.username,
+          authorized: "ok",
+        },
+      });
+    };
 
     return {
       userList,
@@ -227,6 +255,7 @@ export default defineComponent({
       selectList,
       searchQuery,
       userStatus,
+      challengeUser,
     };
   },
 });

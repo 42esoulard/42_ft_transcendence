@@ -1,4 +1,8 @@
 .button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
   background-color: $button-bg-color;
   border-radius: $button-border-radius;
   border: $button-border;
@@ -29,6 +33,17 @@
   &--log-out {
     padding: 5px 10px;
     background-color: rgba(0, 0, 0, 0.2);
+  }
+  &--start {
+    font-size: $button-log-in-size;
+    background-color: $button-third-bg;
+    @include hover-modifier($button-third-bg);
+    width: 60%;
+    padding: 5px;
+    @media (max-width: 950px){
+      font-size: 1.3rem;
+      padding: 0.1rem 0.5rem;
+    }
   }
   &--log-in {
     font-size: $button-log-in-size;
@@ -62,6 +77,25 @@
       &:hover {
         color: white;
         background-color: $button-third-bg;
+      }
+    }
+  }
+  &--invitation {
+    padding: 0.2rem 1rem;
+    &--cancel {
+      background-color: grey;
+      &:hover {
+        background-color: darken(grey, 15);
+      }
+    }
+    &--pending {
+      padding: 0.2rem 0.5rem;
+    }
+    &--decline {
+      padding: 0.2rem 0.5rem;
+      background-color: rgb(50, 50, 50);
+      &:hover {
+        background-color: darken(rgb(50, 50, 50), 15);
       }
     }
   }

@@ -1,8 +1,7 @@
 .profile {
   width: $profile-width;
   height: $profile-height;
-  display: grid;
-  grid-template: 100% / 50% 50%;
+  display: flex;
   color: white;
   justify-content: center;
   margin: auto;
@@ -12,23 +11,25 @@
     width: 800px;
   }
   @media (max-width: 950px){
-    width: 100%;
+    flex-direction: column;
     height: 100%;
+    width: 100%;
     gap: 0;
     margin: 0;
-    grid-template: 50% 50% / 100%;
   }
 
 }
 
 .profile-left {
-  background-color: $profile-div-bg-color;
+  background-color: $div-bg-color;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: $profile-left-gap;
   border-radius: 10px;
+  padding: 0 2rem;
+  width: 100%;
   @media (max-width: 1200px){
     padding: 1rem;
   }
@@ -84,7 +85,10 @@
   flex-direction: column;
   justify-content: center;
   gap: $profile-social-gap;
-  @media (max-width: 800px){
+  @media (max-width: 950px){
+    width: 40%;
+  }
+  @media (max-width: 400px){
     width: 50%;
   }
 }
@@ -99,7 +103,7 @@
 }
 
 .profile-stats {
-  background-color: $profile-div-bg-color;
+  background-color: $div-bg-color;
   border-radius: 10px;
   justify-self: center;
   display: flex;
@@ -107,6 +111,7 @@
   align-items: flex-start;
   width: $profile-stats-width;
   height: 100%;
+  padding: 0 2rem;
   @media (max-width: 1200px){
     margin: 0;
   }

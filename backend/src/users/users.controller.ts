@@ -55,6 +55,15 @@ export class UsersController {
     return users;
   }
 
+  @Get('ladder')
+  async getUsersLadder(): Promise<User[]> {
+    const users: User[] = await this.userService.getUsersLadder();
+    if (users == undefined) {
+      throw new NotFoundException('No users in database');
+    }
+    return users;
+  }
+
   @Get('banned')
   async getBannedUsers(): Promise<User[]> {
     const users: User[] = await this.userService.getBannedUsers();

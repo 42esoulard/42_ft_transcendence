@@ -31,10 +31,12 @@ export default {
     //     props.to === "/pong/watch" &&
     //     !isActive.value
     // );
-    const hasNotification = computed(() => 
-      ((store.state.inGameUsers.length > 0 && props.to === "/pong/watch")
-      || (store.state.onlineUsers.length > 1 && props.to === "/pong")) // test à faire sur le tableau de challenges
-      && !isActive.value);
+    const hasNotification = computed(
+      () =>
+        ((store.state.inGameUsers.length > 0 && props.to === "/pong/watch") ||
+          (store.state.onlineUsers.length > 1 && props.to === "/pong")) && // test à faire sur le tableau de challenges
+        !isActive.value
+    );
 
     // console.log("inGameUsers", store.state.inGameUsers);
     // console.log("hasLives", hasLives.value);

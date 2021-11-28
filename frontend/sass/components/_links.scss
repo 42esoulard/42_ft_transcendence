@@ -9,15 +9,21 @@
       text-decoration: none;
       color: $link-neutral-hover;
     }
+    &--green {
+      color: darken($third-color, 15);
+    }
   }
   &--admin {
     color: $fifth-color;
   }
   &--user-list {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     &:hover {
     text-decoration: none;
     color: $link-neutral-hover;
+    }
+    &--pending {
+      font-size: 1.2rem;
     }
   }
 }

@@ -4,6 +4,7 @@ $second-color: adjust_hue($prim-color, 120);
 $third-color: adjust_hue($second-color, 120);
 $fourth-color: complement($prim-color);
 $fifth-color: adjust_hue($second-color, 120);
+$div-bg-color: rgba(0, 0, 0, 80%);
 
 //HEADER
 $header-bg-color: black;
@@ -40,7 +41,6 @@ $sidebar-border-radius: 50px;
 $profile-width: 1000px;
 $profile-height: 700px;
 $profile-background-color: rgba(0, 0, 0, 80%);
-$profile-div-bg-color: rgba(0, 0, 0, 80%);
 $profile-avatar-width: 50%;
 $profile-left-gap: 1rem;
 $profile-left-margin: 0 0;
@@ -143,7 +143,7 @@ $stats-number-size: 3rem;
 $stats-rank-size: 3rem;
 $stats-info-grid: 80% 20% / 33% 33% 33%;
 $stats-win-color: $third-color;
-$stats-rank-color: $prim-color;
+$stats-rank-color: white;
 $stats-text-font: "Saira";
 $stats-text-size: 1.5rem;
 $stats-bloc-margin: 0rem 0rem;

@@ -1,0 +1,166 @@
+.pong-main {
+  display: grid;
+  width: 1000px;
+  height: 700px;
+  grid-template: 35% 65% / 1fr 1fr;
+  gap: 2rem;
+  margin: auto;
+  margin-top: 2rem;
+  justify-content: space-between;
+  align-items: space-between;
+  @media (max-width: 1100px){
+    width: 800px;
+  }
+  @media (max-width: 950px){
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    gap: 0.5rem;
+  }
+
+}
+
+.pong-launch {
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  background-color: $div-bg-color;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  &--bis {
+    background-color: transparent;
+    padding: 0;
+  }
+  @media (max-width: 600px){
+    width: 100%;
+  }
+}
+
+.pong-launch__buttons {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  @media (max-width: 950px){
+    gap: 2px;
+    padding: 1rem;
+  }
+}
+
+.pong-launch__selector {
+  border: none;
+  background: none;
+  color: grey;
+  font-family: "Saira";
+  font-size: 1.3rem;
+  transition: all 0.5s ease;
+  &:hover {
+    color: rgb(200, 200, 200);
+  }
+  @media (max-width: 950px){
+    font-size: 1rem;
+  }
+  &--on {
+    color: white;
+    font-size: 1.6rem;
+    @media (max-width: 950px){
+      font-size: 1.3rem;
+    }
+  }
+}
+
+.pong-ruleset {
+  grid-row: 1 / 3;
+  grid-column: 2 / 3;
+  width: 100%;
+  height: 100%;
+  padding: 1rem 0 2rem 0;
+  background-color: $div-bg-color;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  @media (max-width: 600px){
+    width: 100%;
+  }
+}
+
+.pong-rule {
+  height: 80px;
+  width: 100%;
+  display: flex;
+  gap: 2rem;
+  padding: 0 3rem;
+  align-items: center;
+  &--right {
+    flex-direction: row-reverse;
+  }
+
+}
+
+.pong-rule__icon {
+  font-size: 50px;
+  @media (max-width: 950px){
+    font-size: 30px;
+  }
+}
+
+.pong-rule__text {
+  text-align: justify;
+  color: white;
+  font-family: "Saira";
+  &--transcendence {
+    font-weight: bold;
+    color: $prim-color;
+  }
+  &--title {
+    font-size: 2rem;
+    @media (max-width: 950px){
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.pong-invitations {
+  padding: 1rem;
+  background-color: $div-bg-color;
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+}
+
+.pong-invitation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Saira";
+  padding: 0 2rem;
+}
+
+.pong-invitation__buttons {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.pong-invitation__countdown {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.queuing {
+  padding: 1rem;
+  background-color: $div-bg-color;
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

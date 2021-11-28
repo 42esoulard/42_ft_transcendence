@@ -2,14 +2,16 @@
   <div class="stats">
     <div class="stats-info">
       <div class="stats-bloc">
-        <span class="stats-bloc__number stats-bloc__number--rank">#4</span>
-        <span class="stats-bloc__text">rank</span>
-      </div>
-      <div class="stats-bloc">
         <span class="stats-bloc__number stats-bloc__number--win">
           {{ numberOfWin }}
         </span>
         <span class="stats-bloc__text">win</span>
+      </div>
+      <div class="stats-bloc">
+        <span class="stats-bloc__number stats-bloc__number--loss">
+          {{ numberOfGames - numberOfWin }}
+        </span>
+        <span class="stats-bloc__text">loss</span>
       </div>
       <div class="stats-bloc">
         <span class="stats-bloc__number stats-bloc__number--games">
@@ -25,7 +27,7 @@
     <div class="list-div">
       <span class="list-div__title">Game History</span>
       <div class="list-div-panel">
-        <table class="table">
+        <table class="table table-borderless">
           <tbody class="table__body">
             <tr class="table-row" v-for="game in gameHistory" :key="game.id">
               <td class="table-cell">{{ historyObject(game).date }}</td>
@@ -89,6 +91,7 @@ export default defineComponent({
           for (const gameUser of games.value) {
             gameHistory.value.push(gameUser.game);
           }
+          gameHistory.value.reverse();
         })
         .catch((err: any) => {
           console.log("not found");

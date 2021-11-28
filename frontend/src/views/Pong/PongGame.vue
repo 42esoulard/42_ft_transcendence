@@ -24,8 +24,8 @@
   </div>
 
   <p v-if="!gameIsOver && userType === 'player'">
-    <button class="button" v-on:click="SendMoveMsg('up')">Up</button>
-    <button class="button" v-on:click="SendMoveMsg('down')">Down</button>
+    <button class="button" v-on:click="SendMoveMsg('up')"><i class="fas fa-arrow-up" /></button>
+    <button class="button" v-on:click="SendMoveMsg('down')"><i class="fas fa-arrow-down" /></button>
   </p>
 </template>
 
@@ -53,10 +53,10 @@ export default defineComponent({
 		room: {type: String, required: true}
 	},
 	inheritAttrs: false, // we dont need it, and not setting it to false a warning: "extraneous non prop attributes (authorized) were passed to component but could not be automatically inherited..."
-	
+
 	setup(props) {
-	
-		const { context, canvas, ballPosition, playerPositions, racquetLenghtRatio, score, windowWidth, player1EnlargeRemaining, player2EnlargeRemaining, 
+
+		const { context, canvas, ballPosition, playerPositions, racquetLenghtRatio, score, windowWidth, player1EnlargeRemaining, player2EnlargeRemaining,
 			onResize, initCanvas, draw } = getDraw(props.gameMode)
 
 		// lifecycle hooks
@@ -95,7 +95,7 @@ export default defineComponent({
 			playerPositions.value.player2 = newPlayerPositions.player2 * windowWidth.value
 			draw()
 		})
-	
+
 		pongSocket.on("score", (newScore: PlayerScores) => {
 			score.value = newScore
 			draw()
@@ -113,19 +113,19 @@ export default defineComponent({
 				player2EnlargeRemaining.value--
 			}
 		})
-		
+
 		pongSocket.on('enlargeEnd', (playerToEnlargeNumber: number) => {
 			if (playerToEnlargeNumber === 1)
 				racquetLenghtRatio.value.player1 *= 2
 			else
 				racquetLenghtRatio.value.player2 *= 2
 		})
-		
+
 		const gameHasStarted = ref(false)
 		pongSocket.on("gameStarting", () => {
 			gameHasStarted.value = true
 		})
-		
+
 		const winningPlayer = ref<string>('')
 		const gameIsOver = ref(false)
 		pongSocket.on("gameOver", (player1Won: boolean) => {
@@ -138,19 +138,19 @@ export default defineComponent({
 			else
 				winningPlayer.value = props.player2UserName
 		})
-		
+
 
 		// socket emit
 		const SendMoveMsg = (direction: string) => {
 			if (gameHasStarted.value)
 				pongSocket.emit('moveRacquet', {room: props.room, text: direction})
 		}
-		
+
 		const EnlargeRacquet = () => {
 			if (gameHasStarted.value)
 				pongSocket.emit('enlargeRacquet', props.room)
 		}
-		
+
 		const onKeyDown = (event: KeyboardEvent) => {
 			const codes = ['ArrowUp', 'ArrowDown'];
 			if (props.gameMode === 'transcendence')

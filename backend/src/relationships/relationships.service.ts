@@ -39,6 +39,7 @@ export class RelationshipsService {
         { requesterId: id, nature: 'friendship' },
         { adresseeId: id, nature: 'friendship' },
       ],
+      relations: ['requester', 'adressee'],
     });
     return ret;
   }

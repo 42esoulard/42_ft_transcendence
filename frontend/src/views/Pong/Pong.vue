@@ -1,94 +1,132 @@
-
 <template>
-  <div v-if="!queuing">
-    <h1 class="header__title">Click to play</h1>
-		<select v-model="gameMode">
-			<option disabled>Please select game mode</option>
-			<option>classic</option>
-			<option>transcendence</option>
-		</select>
-		<button class="button button--log-in" v-on:click="JoinQueue()"> Join Game </button>
+  <div class="pong-main">
+      <div class="pong-launch">
+        <div v-if="!queuing" class="pong-launch pong-launch--bis">
+          <h1 class="pong-launch__title">Random game</h1>
+          <div class="pong-launch__buttons">
+            <button
+              @click="toggleClassic"
+              :class="[
+                'pong-launch__selector',
+                classicMode ? 'pong-launch__selector--on' : '',
+              ]"
+            >
+              classic mode
+            </button>
+            <button
+              @click="toggleCustom"
+              :class="[
+                'pong-launch__selector',
+                classicMode ? '' : 'pong-launch__selector--on',
+              ]"
+            >
+              transcendence
+            </button>
+          </div>
+          <button class="button button--start" v-on:click="JoinQueue()">
+            Play
+          </button>
+        </div>
+          <div v-else>
+            <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+          </div>
+      </div>
+
+      <div v-if="!queuing" class="pong-invitations">
+        <div class="list-div">
+          <h1>Invitations</h1>
+          <hr />
+          <div class="table__body">
+            <ReceiveChallenge />
+          </div>
+        </div>
+      </div>
+
+    <Ruleset />
   </div>
 
-  <div v-else>
-		<p> Waiting for opponent... </p>
+  <div v-if="alreadyInQueue" class="header__title">
+    <p>
+      You are already in queue ! You will be redirected to Homepage shortly...
+    </p>
   </div>
-  
-	<div v-if="alreadyInQueue" class="header__title">
-		<p> You are already in queue ! You will be redirected to Homepage shortly... </p>
-  </div>
-
-	<div v-for="user in users" :key="user.id" class="button">
-		<router-link :to="{name: 'SendChallenge', params: {challengeeId:user.id, challengeeName: user.username, authorized: 'ok'} }"> challenge {{user.username}} </router-link>
-	</div>
-
-	<ReceiveChallenge />
-
 </template>
 
-
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
-import { pongSocket } from '@/App.vue'
-import { useStore } from '@/store'
-import { onBeforeRouteLeave, useRouter } from 'vue-router'
-import { gameMode } from '@/types/PongGame'
+import { defineComponent, onMounted, ref, computed } from "vue";
+import { pongSocket } from "@/App.vue";
+import { useStore } from "@/store";
+import { onBeforeRouteLeave, useRouter } from "vue-router";
+import { gameMode } from "@/types/PongGame";
 import { useUserApi } from "@/plugins/api.plugin";
-import { User } from 'sdk/typescript-axios-client-generated'
-import ReceiveChallenge from './ReceiveChallenge.vue'
+import { User } from "sdk/typescript-axios-client-generated";
+import ReceiveChallenge from "./ReceiveChallenge.vue";
+import Ruleset from "../../components/Ruleset.vue";
 
-export default defineComponent ({
-	components: { ReceiveChallenge },
-	setup() {
-		const queuing = ref(false)
-		const gameMode = ref<gameMode>('transcendence')
-		const api = useUserApi()
-		const users = ref<User[]>([])
+export default defineComponent({
+  components: { ReceiveChallenge, Ruleset },
+  setup() {
+    const queuing = ref(false);
+    const gameMode = ref<gameMode>("transcendence");
+    const api = useUserApi();
+    const users = ref<User[]>([]);
+    const classicMode = ref(true);
 
-		const store = useStore()
-		const JoinQueue = () => {
-			pongSocket.emit('joinGame', {
-				userId: store.state.user.id, 
-				userName: store.state.user.username, 
-				gameMode: gameMode.value})
-		}
+    const store = useStore();
+    const JoinQueue = () => {
+      pongSocket.emit("joinGame", {
+        userId: store.state.user.id,
+        userName: store.state.user.username,
+        gameMode: classicMode.value ? "classic" : "transcendence",
+      });
+    };
 
-		pongSocket.on('addedToQueue', () => {
-			queuing.value = true
-		})
-		
-		const alreadyInQueue = ref(false)
-		pongSocket.on('alreadyInQueue', () => {
-			console.log('already in queue !')
-			alreadyInQueue.value = true
-			setTimeout(() => {
-				router.push({name: 'Home'})
-			}, 3000)
-		})
+    pongSocket.on("addedToQueue", () => {
+      queuing.value = true;
+    });
 
-		const router = useRouter()
+    const alreadyInQueue = ref(false);
+    pongSocket.on("alreadyInQueue", () => {
+      console.log("already in queue !");
+      alreadyInQueue.value = true;
+      setTimeout(() => {
+        router.push({ name: "Home" });
+      }, 3000);
+    });
 
-		onBeforeRouteLeave(() => {
-			pongSocket.off('addedToQueue')
-			pongSocket.off('alreadyInQueue')
-			if (queuing.value)
-				pongSocket.emit('leaveQueue')
-		})
+    const router = useRouter();
 
-		onMounted(() => {
-			api.
-				getUsers()
-				.then((res: any) => users.value = res.data)
-				.catch((err) => console.log(err))
-		})
+    onBeforeRouteLeave(() => {
+      pongSocket.off("addedToQueue");
+      pongSocket.off("alreadyInQueue");
+      if (queuing.value) pongSocket.emit("leaveQueue");
+    });
 
-		return {queuing, JoinQueue, gameMode, alreadyInQueue, users}
-	}
+    onMounted(() => {
+      api
+        .getUsers()
+        .then((res: any) => (users.value = res.data))
+        .catch((err) => console.log(err));
+    });
 
-})
+    const toggleClassic = () => (classicMode.value = true);
+    const toggleCustom = () => (classicMode.value = false);
+
+    return {
+      queuing,
+      JoinQueue,
+      gameMode,
+      alreadyInQueue,
+      users,
+      classicMode,
+      toggleClassic,
+      toggleCustom,
+      challenges: computed(() => store.state.challengesReceived)
+    };
+  },
+});
 </script>
 
 <style lang="scss">
 @import "../../../sass/main.scss";
-
 </style>

@@ -6,6 +6,7 @@ import Chat from '../views/Chat.vue'
 import Banned from '../views/Banned.vue';
 import Admin from '../views/Admin.vue'
 import Pong from '../views/Pong/Pong.vue'
+import Ladder from '../views/Ladder.vue'
 import PongGame from '../views/Pong/PongGame.vue'
 import PongWatch from '../views/Pong/PongWatch.vue'
 import ReceiveChallenge from '../views/Pong/ReceiveChallenge.vue'
@@ -54,6 +55,14 @@ const routes: Array<RouteRecordRaw> = [
     path: '/users',
     name: 'Users',
     component: Users,
+    meta: {
+      requiresAuth: true,
+    }
+  },
+  {
+    path: '/ladder',
+    name: 'Ladder',
+    component: Ladder,
     meta: {
       requiresAuth: true,
     }

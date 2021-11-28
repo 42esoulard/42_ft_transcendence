@@ -1,0 +1,12 @@
+.ladder__td {
+  display: flex;
+  justify-content: flex-start;
+  gap: 2rem;
+  align-items: center;
+  width: 70%;
+  &--rank {
+    font-family: "Saira";
+    font-size: 2rem;
+  }
+}
+

@@ -19,6 +19,10 @@ export class UsersService {
     return await this.usersRepository.find({ where: { banned: false } });
   }
 
+  async getUsersLadder(): Promise<Users[]> {
+    return await this.usersRepository.find({ where: { banned: false }, relations: ['games'] });
+  }
+
   async getBannedUsers(): Promise<Users[]> {
     return await this.usersRepository.find({ where: { banned: true } });
   }
