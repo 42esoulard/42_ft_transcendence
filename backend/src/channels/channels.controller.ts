@@ -300,6 +300,13 @@ export class ChannelsController {
     if (cm == undefined) {
       throw new NotFoundException('No user channels found');
     }
+    const user: User = await this.channelService.getUser(request.user.id);
+    if (user == undefined) {
+      throw new NotFoundException('Couldnt identify request account');
+    }
+    if (user.role == Role.ADMIN || user.role == Role.OWNER) {
+      return cm;
+    }
     return this.channelService.filterBanned(cm);
   }
 
