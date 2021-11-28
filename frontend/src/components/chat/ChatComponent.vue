@@ -184,7 +184,7 @@ export const ChatComponent = defineComponent({
     ** Default channel = id 1, "General". Automatically joined on connection, can't be left.
     */
     const getDefaultChannel = async () => {
-      console.log("IN DEFAULT CHANNEL BEFORE GCBI", 1, user.value.id)
+      // console.log("IN DEFAULT CHANNEL BEFORE GCBI", 1, user.value.id)
       await api.getDefaultChannel({ withCredentials: true })
       .then(async (chan) => {
         await joinChannel(chan.data)
@@ -241,7 +241,7 @@ export const ChatComponent = defineComponent({
     const getMessagesUpdate = async (channelId: number) => {
       console.log("in get messages channel", channelId)
       if (activeChannel.value!.channel && activeChannel.value!.channel.id === channelId) {
-        console.log("IN GET MESSAGES UPDATE BEFORE GCBI", channelId, user.value.id)
+        // console.log("IN GET MESSAGES UPDATE BEFORE GCBI", channelId, user.value.id)
         await api.getChannelById(channelId, { withCredentials: true })
         .then((res) => {
           activeChannel.value!.channel = res.data;
@@ -334,11 +334,11 @@ export const ChatComponent = defineComponent({
 
       await api.joinChannel("self", channel.id, user.value.id, { withCredentials: true })
         .then((res)=> {
-          console.log(res)
+          // console.log(res)
           updateChannelsList();
           activeChannel.value = res.data;
           isMember.value = true;
-          console.log("ACTIVECHANNEL", activeChannel)
+          // console.log("ACTIVECHANNEL", activeChannel)
           getMessagesUpdate(res.data.channel.id);
           if (channel.id !== 1) {
             store.dispatch("setMessage", "You're now a member of channel [" + channel.name.substring(0, 15) + "]");
@@ -390,7 +390,7 @@ export const ChatComponent = defineComponent({
         store.dispatch("setMessage", "You're now a member of channel [" + cm.data.channel.name.substring(0, 15) + "]");
         await api.joinChannel("dm", cm.data.channel.id, recipient.id, { withCredentials: true })
         .then((res)=> {
-          console.log(res)
+          // console.log(res)
           socket.emit('updateChannels', cm.data)
           return res;
         })
@@ -418,7 +418,7 @@ export const ChatComponent = defineComponent({
           mutePopup.value = !mutePopup.value;
           break;
       }
-      console.log("channelSettings", channelSettings)
+      // console.log("channelSettings", channelSettings)
     }
 
     const switchChannel =  (cm: ChannelMember) => {
@@ -434,8 +434,8 @@ export const ChatComponent = defineComponent({
       if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
         await relApi.getBlockedByUser(user.value.id)
         .then((blocked) => {
-          console.log("blocked", blocked.data.map((blocked) => blocked.adresseeId));
-          console.log(data.author.id)
+          // console.log("blocked", blocked.data.map((blocked) => blocked.adresseeId));
+          // console.log(data.author.id)
           if (blocked.data.map((blocked) => blocked.adresseeId).includes(data.author.id)) {
             return;
           }
