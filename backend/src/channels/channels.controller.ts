@@ -235,8 +235,16 @@ export class ChannelsController {
           }
         })
         await this.channelService.getChannelMember(channel_id, request.user.id)
-        .then((res) => {
-          if (!res.is_admin && !res.is_owner && res.member.role !== Role.ADMIN && res.member.role != Role.OWNER) {
+        .then(async (res) => {
+          if (!res) {
+            const user: User = await this.channelService.getUser(request.user.id);
+            if (user == undefined) {
+              throw new NotFoundException('Couldnt identify request account');
+            }
+            if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
+              throw new ForbiddenException('Failed to join channel: missing authorization to act for this user');
+            }
+          } else if (!res.is_admin && !res.is_owner && res.member.role !== Role.ADMIN && res.member.role != Role.OWNER) {
             throw new ForbiddenException('Failed to join channel: missing authorization to act for this user');
           }
         })
@@ -337,6 +345,9 @@ export class ChannelsController {
       if (cm == undefined) {
         throw new NotFoundException('Channel Member not found');
       }
+      if (cm.channel.id == 1) {
+        throw new NotFoundException('Thou shalt not leave General!!');
+      }
       switch (type) {
         case "kick":
           await this.channelService.checkBlocked(cm.member.id, request.user.id)
@@ -346,8 +357,15 @@ export class ChannelsController {
             }
           })
           await this.channelService.getChannelMember(cm.channel.id, request.user.id)
-          .then((res) => {
-            if (!res.is_admin && !res.is_owner && res.member.role !== Role.ADMIN && res.member.role != Role.OWNER) {
+          .then(async (res) => {
+            if (!res) {
+              const user: User = await this.channelService.getUser(request.user.id);
+              if (user == undefined) {
+                throw new NotFoundException('Couldnt identify request account');
+              }
+              if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
+                throw new ForbiddenException('Failed to leave channel: missing authorization to act for this user');              }
+            } else if (!res.is_admin && !res.is_owner && res.member.role !== Role.ADMIN && res.member.role != Role.OWNER) {
               throw new ForbiddenException('Failed to leave channel: missing authorization to act for this user');
             }
           })
@@ -385,7 +403,7 @@ export class ChannelsController {
         if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
           throw new ForbiddenException('You dont have the right to delete this channel');
         }
-      } else if (!cm.is_owner) {
+      } else if (!cm.is_owner && cm.member.role !== Role.OWNER  && cm.member.role !== Role.ADMIN) {
         throw new ForbiddenException('You dont have the right to delete this channel');
       }
 
@@ -423,7 +441,7 @@ export class ChannelsController {
       if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
         throw new ForbiddenException('You dont have the right to act on this channel\s members');
       }
-    } else if (!req_cm.is_admin && !req_cm.is_owner) {
+    } else if (!req_cm.is_admin && !req_cm.is_owner && req_cm.member.role !== Role.ADMIN && req_cm.member.role !== Role.OWNER) {
       throw new ForbiddenException('You dont have the right to act on this channel\s members');
     }
 

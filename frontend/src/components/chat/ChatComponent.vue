@@ -25,7 +25,7 @@
                 <span v-if="activeChannel.channel.type === 'private'"><img class="fas fa-eye-slash chat-channels__tag chat-channels__tag--private" title="This community is private" /></span>
                 <span v-if="activeChannel.channel.password"><img class="fas fa-lock chat-channels__tag chat-channels__tag--locked" title="This channel is password-protected" /></span>
               </div>
-              <div v-if="activeChannel.is_admin || activeChannel.is_owner" class="chat-channels__tag-container">
+              <div v-if="activeChannel.is_admin || activeChannel.is_owner || user.role == 'admin' || user.role == 'owner'" class="chat-channels__tag-container">
                 <span v-if="activeChannel.is_owner"><img class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner" /></span>
                 <span v-if="activeChannel.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
                 <span @click="channelSettings = true"><img class="fas fa-lg fa-cogs chat-channels__tag chat-channels__tag--settings" title="Channel Settings"  /></span>
@@ -51,7 +51,7 @@
                           <button class="button link link--neutral" title="DM" @click="directMessage(message.author)"><i class="fas fa-envelope" /></button>
                           <button class="button" title="Challenge"><i class="fas fa-table-tennis" /></button>
                           <button class="button" title="Block"><i class="fas fa-ban" /></button>
-                          <button v-if="activeChannel && activeChannel.is_admin" class="button" title="Admin Actions"><i class="fas fa-cog" /></button>
+                          <!-- <button v-if="activeChannel && activeChannel.is_admin || user.role == 'admin' || user.role == 'owner'" class="button" title="Admin Actions"><i class="fas fa-cog" /></button> -->
                       </div>
                     </div>
                     <div>: </div>
@@ -185,7 +185,7 @@ export const ChatComponent = defineComponent({
     */
     const getDefaultChannel = async () => {
       console.log("IN DEFAULT CHANNEL BEFORE GCBI", 1, user.value.id)
-      await api.getChannelById(1, { withCredentials: true })
+      await api.getDefaultChannel({ withCredentials: true })
       .then(async (chan) => {
         await joinChannel(chan.data)
         .then(() => updateChannelsList())
@@ -208,13 +208,25 @@ export const ChatComponent = defineComponent({
         await api.getChannelMember(activeChannel.value!.channel.id, activeChannel.value!.member.id, { withCredentials: true })
         .then((res) => {
           activeChannel.value = res.data;
-          if (!activeChannel.value.is_admin)
+          if (!activeChannel.value.is_admin && user.value.role !== 'admin' && user.value.role !== 'owner')
             channelSettings.value = false;
           console.log(res.data)
         })
-        .catch((err) => {
+        .catch(async (err) => {
           console.log("Caught error:", err.response.data.message);
-          getDefaultChannel();
+          if (user.value.role !== 'admin' && user.value.role !== 'owner') {
+            getDefaultChannel();
+          } else {
+            await api.getChannelPreview(activeChannel.value!.channel.id, { withCredentials: true })
+            .then((res) => {
+              activeChannel.value!.channel = res.data;
+              channelMessages.value = res.data.messages;
+              // console.log("in get messages:", channelMessages.value);
+              return res;
+            })
+            .catch((err) => console.log("Caught error:", err.response.data.message));
+        
+          }
         });
         await api.getAvailableChannels({ withCredentials: true })
         .then((res) => {
