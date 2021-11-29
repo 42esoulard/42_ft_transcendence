@@ -83,7 +83,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     var pendingChallengesArray: challengeExport[] = []
     this.pendingChallenges.forEach((challenge: challenge) => {
-      pendingChallengesArray.push({challengerName: challenge.challengerName, challengeeName: challenge.challengeeName})
+      pendingChallengesArray.push({challengerName: challenge.challengerName, challengeeName: challenge.challengeeName, expiry_date: challenge.expiry_date})
     })
     client.emit('allPendingChallenges', pendingChallengesArray)
   }

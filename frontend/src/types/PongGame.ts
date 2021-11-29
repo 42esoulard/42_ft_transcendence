@@ -33,4 +33,5 @@ export type challengeMessage = {
 export type challengeExport = {
   challengerName: string;
   challengeeName: string;
+  expiry_date: Date;
 };
