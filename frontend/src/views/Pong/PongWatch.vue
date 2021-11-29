@@ -1,23 +1,27 @@
 <template>
-  <h2 class="header__title">Select the game you want to watch</h2>
-  <div v-if="games.length">
-    <div v-for="game in games" :key="game.id">
-      <div v-if="game.users.length == 1">
-        <button class="button" v-on:click="WatchGame(game.id)">
-          game #{{ game.id }} : {{ game.users[0].user.username }} vs
-          {{ game.users[0].user.username }}
-        </button>
-      </div>
-      <div v-else>
-        <button class="button" v-on:click="WatchGame(game.id)">
-          game #{{ game.id }} : {{ game.users[0].user.username }} vs
-          {{ game.users[1].user.username }}
-        </button>
-      </div>
+  <div class="users-main users-main--watch">
+    <div class="users-div">
+      <div class="users users--ladder">
+          <div class="users__title">Ongoing games</div>
+          <div class="users-list users-list--watch">
+            <tr v-for="game in games" :key="game.id" class="users-list__elt">
+              <div class="pong-watch__td">
+                <td>
+                  <span class="link link--user-list">
+                    {{ game.users[0].user.username }} vs
+                    {{ game.users[1].user.username }}
+                  </span>
+                  </td>
+                  <td>
+                  <button class="button button--third button--invitation" v-on:click="WatchGame(game.id)">
+                    <i class="fas fa-eye" /> watch
+                  </button>
+                </td>
+              </div>
+            </tr>
+          </div>
+        </div>
     </div>
-  </div>
-  <div v-else>
-    <h2>No available games to watch</h2>
   </div>
 </template>
 

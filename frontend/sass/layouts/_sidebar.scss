@@ -15,10 +15,6 @@
   @media (max-width: 950px), (max-height: 600px) {
     visibility: hidden;
   }
-  &--in-game {
-    transition: opacity 2s ease;
-    opacity: 0;
-  }
 }
 
 .sidebar-link {

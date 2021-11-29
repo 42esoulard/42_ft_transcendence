@@ -5,6 +5,7 @@
         <button
           @click="$router.push('/pong')"
           class="button button--log-in pong-btn"
+          v-if="!gameIsOver"
         >
           <h1><i class="fas fa-door-open" /></h1>
           <h1>exit</h1>
@@ -93,8 +94,9 @@
       </div>
       <div v-if="gameIsOver" class="pong-result">
         <h2 class="pong-score">{{ winningPlayer }} won !</h2>
-        <button class="button button--log-in" @click="$router.push('/pong')">
-          Play Again
+        <button class="button button--log-in pong-btn" @click="$router.push('/pong')">
+          <h1><i class="fas fa-door-open" /></h1>
+          <h1>exit</h1>
         </button>
       </div>
     </div>
@@ -145,11 +147,7 @@ export default defineComponent({
 
     // lifecycle hooks
     onMounted(() => {
-      const header = document.querySelector(".header");
-      const sidebar = document.querySelector(".sidebar");
 
-      if (header) header.classList.add(".header--in-game");
-      if (sidebar) sidebar.classList.add(".sidebar--in-game");
       if (props.userType === "player")
         window.addEventListener("keydown", onKeyDown);
       window.addEventListener("resize", onResize);
@@ -159,11 +157,6 @@ export default defineComponent({
     });
 
     onBeforeRouteLeave(() => {
-      const header = document.querySelector(".header");
-      const sidebar = document.querySelector(".sidebar");
-
-      if (header) header.classList.remove(".header--in-game");
-      if (sidebar) sidebar.classList.remove(".sidebar--in-game");
       if (props.userType === "player") {
         pongSocket.emit("leaveGame", props.room);
         window.removeEventListener("keydown", onKeyDown);

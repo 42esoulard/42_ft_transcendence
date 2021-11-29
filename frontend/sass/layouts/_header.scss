@@ -9,10 +9,6 @@
   &--invisible {
     background-color: transparent;
   }
-  &--in-game {
-    transition: opacity 2s ease;
-    opacity: 0;
-  }
 }
 
 .header-link {

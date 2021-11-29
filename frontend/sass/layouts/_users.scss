@@ -74,6 +74,9 @@
   flex-direction: column;
   padding: 0 6rem;
   overflow-y: scroll;
+  &--watch {
+    padding: 0 4rem;
+  }
 }
 
 .users-list__elt {

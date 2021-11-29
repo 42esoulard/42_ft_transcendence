@@ -124,6 +124,9 @@ const routes: Array<RouteRecordRaw> = [
     path: "/pong/watch",
     name: "PongWatch",
     component: PongWatch,
+    meta: {
+      requiresAuth: true,
+    },
   },
   {
     path: "/pong/watch/live",

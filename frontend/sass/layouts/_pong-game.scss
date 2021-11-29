@@ -4,6 +4,13 @@
   }
 }
 
+.pong-watch__td {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .pong-score {
   color: white;
   font-size: 3rem;
@@ -79,6 +86,7 @@ canvas {
   display: flex;
   gap: 1rem;
   opacity: 0.8;
+  align-items: center;
   &:hover {
     opacity: 1;
   }
