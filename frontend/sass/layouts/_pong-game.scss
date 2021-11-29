@@ -47,6 +47,11 @@ canvas {
   display: flex;
   gap: 1rem;
   z-index: 2;
+  &--top {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+  }
 }
 
 @keyframes pong-appears {
@@ -70,12 +75,9 @@ canvas {
   }
 }
 
-.pong-exit {
+.pong-btn {
   display: flex;
   gap: 1rem;
-  position: absolute;
-  top: 2rem;
-  left: 2rem;
   opacity: 0.8;
   &:hover {
     opacity: 1;
@@ -102,7 +104,7 @@ canvas {
   --star-color: var(--primary-color);
   --star-tail-length: 6em;
   --star-tail-height: 2px;
-  --star-width: calc(var(--star-tail-length) / 6);
+  --star-width: calc(var(--star-tail-length) * 0.15);
   --fall-duration: 9s;
   --tail-fade-duration: var(--fall-duration);
 
@@ -125,10 +127,10 @@ canvas {
 
   @for $i from 1 through $star-count {
     &:nth-child(#{$i}) {
-      --star-tail-length: #{random_range(500em, 750em) / 100};
-      --top-offset: #{random_range(0vh, 10000vh) / 100};
-      --fall-duration: #{random_range(6000, 12000s) / 1000};
-      --fall-delay: #{random_range(0, 10000s) / 1000};
+      --star-tail-length: #{random_range(500em, 750em) * 0.01};
+      --top-offset: #{random_range(0vh, 10000vh) * 0.01};
+      --fall-duration: #{random_range(6000, 12000s) * 0.001};
+      --fall-delay: #{random_range(0, 10000s) * 0.001};
     }
   }
 
@@ -136,7 +138,7 @@ canvas {
     position: absolute;
     content: '';
     top: 0;
-    left: calc(var(--star-width) / -2);
+    left: calc(var(--star-width) * -0.5);
     width: var(--star-width);
     height: 100%;
     background: linear-gradient(45deg, transparent, currentColor, transparent);

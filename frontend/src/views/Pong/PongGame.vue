@@ -1,17 +1,28 @@
 <template>
   <transition name="fade">
     <div class="pong-container">
-      <button
-        @click="$router.push('/pong')"
-        class="button button--log-in pong-exit"
-      >
-        <h1><i class="fas fa-door-open" /></h1>
-        <h1>exit</h1>
-      </button>
+      <div class="pong-buttons pong-buttons--top">
+        <button
+          @click="$router.push('/pong')"
+          class="button button--log-in pong-btn"
+        >
+          <h1><i class="fas fa-door-open" /></h1>
+          <h1>exit</h1>
+        </button>
+
+        <button
+          @click="toggleAnimations"
+          :class="['button',  'button--log-in', animations ? 'button--third' : '', 'pong-btn']"
+        >
+          <h1><i class="fas fa-meteor" /></h1>
+          <h1 v-if="animations">on</h1>
+          <h1 v-else>off</h1>
+        </button>
+      </div>
       <h2 class="pong-score" v-if="!gameIsOver">
         {{ player1UserName }} vs {{ player2UserName }}
       </h2>
-      <div class="stars">
+      <div class="stars" v-if="animations">
         <div class="star"></div>
         <div class="star"></div>
         <div class="star"></div>
@@ -92,7 +103,7 @@
 
 <script lang="ts">
 import { pongSocket } from "@/App.vue";
-import { defineComponent, onMounted, PropType, ref } from "vue";
+import { computed, defineComponent, onMounted, PropType, ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import getDraw from "@/composables/draw";
 import {
@@ -130,6 +141,7 @@ export default defineComponent({
       initCanvas,
       draw,
     } = getDraw(props.gameMode);
+    const animations = ref(true);
 
     // lifecycle hooks
     onMounted(() => {
@@ -235,6 +247,10 @@ export default defineComponent({
       else if (event.code === "Space") EnlargeRacquet();
     };
 
+    const toggleAnimations = () => {
+      animations.value = !animations.value;
+    }
+
     return {
       score,
       gameHasStarted,
@@ -242,6 +258,8 @@ export default defineComponent({
       winningPlayer,
       canvas,
       SendMoveMsg,
+      animations,
+      toggleAnimations
     };
   },
 });
