@@ -20,6 +20,10 @@
         />
         <div v-else class="chat-box">
             <div v-if="activeChannel" class='chat-header'>
+
+              <div v-if="activeChannel.notification" class="chat-header__notif" title="Turn off notifications" @click="toggleNotification()"></div>
+              <div v-else class="chat-header__notif chat-header__notif--off" title="Turn on notifications" @click="toggleNotification()"></div>
+
               <div class="chat-header__channel-name" :title="activeChannel.channel.name">{{ activeChannel.channel.name }}</div>
               <div>
                 <span v-if="activeChannel.channel.type === 'private'"><img class="fas fa-eye-slash chat-channels__tag chat-channels__tag--private" title="This community is private" /></span>
@@ -151,10 +155,10 @@ export const ChatComponent = defineComponent({
   components: { NewChannelForm, LockedChannelForm, ChannelSettings, ChannelsList, MuteBanPopup, Modal, Toast },
 
   beforePageLeave() {
-    this.socket.emit("leave", 'a user');
+    socket.emit("leave", 'a user');
   },
   beforeRouteLeave() {
-    this.socket.emit("leave", 'a user');
+    socket.emit("leave", 'a user');
   },
   setup() {
 
@@ -183,6 +187,8 @@ export const ChatComponent = defineComponent({
     /*
     ** Default channel = id 1, "General". Automatically joined on connection, can't be left.
     */
+   store.state.chatNotification = false;
+
     const getDefaultChannel = async () => {
       // console.log("IN DEFAULT CHANNEL BEFORE GCBI", 1, user.value.id)
       await api.getDefaultChannel({ withCredentials: true })
@@ -275,7 +281,7 @@ export const ChatComponent = defineComponent({
       }, { withCredentials: true })
       .then(() => {
         getMessagesUpdate(newContent.channel.id);
-          // socket.emit('updateChannels');        
+          // socket.emit('update-channels');        
         socket.emit("chat-message", newContent);
       })
       .catch(async (err: any) => {
@@ -299,6 +305,8 @@ export const ChatComponent = defineComponent({
         channel: channel,
         is_admin: false,
         is_owner: false,
+        notification: false,
+        new_message: false,
         member: user.value,
         ban: null,
         mute: null,
@@ -315,6 +323,17 @@ export const ChatComponent = defineComponent({
         })
         .catch((err) => console.log("Caught error:", err.response.data.message));
         
+    }
+
+    const toggleNotification = async () => {
+      // activeChannel.value = cm;
+      console.log(activeChannel.value!.notification)
+      await api.toggleNotification(activeChannel.value!.id, { withCredentials: true })
+      .then((res) => { 
+        console.log("after toggle notif", res.data)
+        activeChannel.value = res.data;
+      })
+      .catch((err) => console.log("Caught error:", err.response.data.message));
     }
 
     const applyForMembership = async (channel: Channel) => {
@@ -342,7 +361,7 @@ export const ChatComponent = defineComponent({
           getMessagesUpdate(res.data.channel.id);
           if (channel.id !== 1) {
             store.dispatch("setMessage", "You're now a member of channel [" + channel.name.substring(0, 15) + "]");
-            socket.emit('updateChannels');
+            socket.emit('update-channels');
           }
           return res;
         })
@@ -354,7 +373,7 @@ export const ChatComponent = defineComponent({
       store.dispatch("setMessage", "Channel [" + activeChannel.value!.channel.name.substring(0, 15) + "] has been deleted");
       updateChannelsList();
       switchChannel(joinedChannels.value[0]);
-      socket.emit('updateChannels')
+      socket.emit('update-channels')
     }
 
     const leaveChannel = async () => {
@@ -365,7 +384,7 @@ export const ChatComponent = defineComponent({
         store.dispatch("setMessage", "You're no longer a member of channel [" + name.substring(0, 15) + "]");
         updateChannelsList();
         switchChannel(joinedChannels.value[0]);
-        socket.emit('updateChannels');
+        socket.emit('update-channels');
       })
       .catch((err) => console.log("Caught error:", err.response.data.message));
     }
@@ -380,6 +399,7 @@ export const ChatComponent = defineComponent({
         name: user.value.username + ' to ' + recipient.username,
         owner_id: user.value.id,
         type: 'private',
+        notification: true,
         password: '',
       }, { withCredentials: true })
       .then(async (cm) => {
@@ -391,7 +411,7 @@ export const ChatComponent = defineComponent({
         await api.joinChannel("dm", cm.data.channel.id, recipient.id, { withCredentials: true })
         .then((res)=> {
           // console.log(res)
-          socket.emit('updateChannels', cm.data)
+          socket.emit('update-channels', cm.data)
           return res;
         })
         .catch((err) => console.log("Caught error:", err.response.data.message));
@@ -421,9 +441,14 @@ export const ChatComponent = defineComponent({
       // console.log("channelSettings", channelSettings)
     }
 
-    const switchChannel =  (cm: ChannelMember) => {
+    const switchChannel =  async (cm: ChannelMember) => {
       channelSettings.value = false;
       activeChannel.value = cm;
+      await api.setNewMessage(false, cm.channel.id, { withCredentials: true })
+      .then((res) => { 
+        activeChannel.value = res.data;
+      })
+      .catch((err) => console.log("Caught error:", err.response.data.message));
       isMember.value = true;
       console.log("in switchChannel", cm)
       getMessagesUpdate(cm.channel.id);
@@ -431,31 +456,40 @@ export const ChatComponent = defineComponent({
 
     socket.on("chat-message", async (data: any) => {
       console.log("0RECEIVED CHAT MESSAGE, data:", data)
-      if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
-        await relApi.getBlockedByUser(user.value.id)
-        .then((blocked) => {
+      await relApi.getBlockedByUser(user.value.id)
+        .then(async (blocked) => {
           // console.log("blocked", blocked.data.map((blocked) => blocked.adresseeId));
           // console.log(data.author.id)
           if (blocked.data.map((blocked) => blocked.adresseeId).includes(data.author.id)) {
             return;
           }
-          channelMessages.value.push(data);
-          console.log("in get messages:", channelMessages.value);
-        })
-        
-    }
+          if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
+          
+            channelMessages.value.push(data);
+            console.log("in get messages:", channelMessages.value);
+          } else if (activeChannel.value!.channel) {
+            console.log("set newMessage = true here");
+            await api.setNewMessage(true, data.channel.id, { withCredentials: true })
+            .then((res) => { 
+              store.state.chatNotification = true; 
+              console.log(res)
+              updateChannelsList();
+            })
+            .catch((err) => console.log("Caught error:", err.response.data.message));
+          }
       // getMessagesUpdate(data.channel);
+      });
     });
 
-    socket.on("typing", (user: string) => {
-      typing.value = user;
-    });
+    // socket.on("typing", (user: string) => {
+    //   typing.value = user;
+    // });
 
-    socket.on("stopTyping", () => {
-      typing.value = "";
-    });
+    // socket.on("stopTyping", () => {
+    //   typing.value = "";
+    // });
 
-    socket.on('createdChannel', async (cm: ChannelMember) => {
+    socket.on('created-channel', async (cm: ChannelMember) => {
       // toggleModal(0);
       await updateChannelsList()
       .then(() => {
@@ -464,34 +498,34 @@ export const ChatComponent = defineComponent({
       .catch((err) => console.log("Caught error:", err.response.data.message));
     })
 
-    socket.on('updateChannels', () => {
+    socket.on('update-channels', () => {
       updateChannelsList();
     })
 
-    socket.on("join", (username: string, connectionsNb: number) => {
-      info.push({
-        username: username,
-        action: "joined",
-      });
+    // socket.on("join", (username: string, connectionsNb: number) => {
+    //   info.push({
+    //     username: username,
+    //     action: "joined",
+    //   });
 
-      //updating connection nb for newcomer
-      socket.emit("get-connections")
+    //   //updating connection nb for newcomer
+    //   // socket.emit("get-connections")
 
-      setTimeout(() => {
-        info.length = 0;
-      }, 5000);
-    });
+    //   setTimeout(() => {
+    //     info.length = 0;
+    //   }, 5000);
+    // });
 
-    socket.on("leave", (user: string) => {
-      info.push({
-        username: user,
-        action: "left",
-      });
+    // socket.on("leave", (user: string) => {
+    //   info.push({
+    //     username: user,
+    //     action: "left",
+    //   });
 
-      setTimeout(() => {
-        info.length = 0;
-      }, 5000);
-    });
+    //   setTimeout(() => {
+    //     info.length = 0;
+    //   }, 5000);
+    // });
 
     // socket.on("connections", (data: number) => {
     //   connections.value = data;
@@ -504,7 +538,12 @@ export const ChatComponent = defineComponent({
     });
 
     window.onbeforeunload = () => {
-      socket.emit("leave", user.value.username);
+      // socket.emit("leave", user.value.username);
+      socket.off('chat-message');
+      socket.off('created-channel');
+      socket.off('join-channel');
+      socket.off('update-channels');
+      // socket.off('leave');
     };
 
     return {
@@ -539,6 +578,7 @@ export const ChatComponent = defineComponent({
       // toggleAdminSettings,
       toggleModal,
 
+      toggleNotification,
       toastMessage: computed(() => store.state.message),
       hoveringLock: ref(false),
       userInfo: ref(false),

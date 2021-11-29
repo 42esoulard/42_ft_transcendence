@@ -207,6 +207,43 @@ export class ChannelsController {
     return owner;
   }
 
+  @Get('/chat-message/:status/:chanId')
+  @UseGuards(JwtTwoFactorGuard)
+  async setNewMessage(
+    @Param('status') status: boolean,
+    @Param('chanId') chanId: number,
+    @Req() request: Request,
+  ): Promise<ChannelMember> {
+    console.log("hereeeee", status)
+    const cm: ChannelMember = await this.channelService.getChannelMember(
+      chanId, request.user.id
+    );
+    if (cm == undefined) {
+      throw new NotFoundException('Not a member of this channel');
+    } else if (!cm.notification) {
+      throw new NotFoundException('Not subscribed to this channel\'s notifications');
+    }
+    if (status == cm.new_message) {
+      return cm;
+    }
+    return await this.channelService.setNewMessage(status, cm.id);
+  }
+
+  @Get('/toggle-notification/:cmId')
+  @UseGuards(JwtTwoFactorGuard)
+  async toggleNotification(
+    @Param('cmId') cmId: number,
+    @Req() request: Request,
+  ): Promise<ChannelMember> {
+    const cm: ChannelMember = await this.channelService.getCmById(cmId);
+    if (cm == undefined) {
+      throw new NotFoundException('Not a member of this channel');
+    } else if (cm.member.id !== request.user.id) {
+      throw new ForbiddenException('Only subscribed users can change their own notification settings');
+    }
+    return await this.channelService.toggleNotification(cm);
+  }
+
   /**
    * Add a user as a member of a channel.
    * Logged in users only.

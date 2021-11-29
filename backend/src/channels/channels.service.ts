@@ -75,6 +75,14 @@ export class ChannelsService {
     return await this.channelMemberService.getChannelMember(channel, user);
   }
 
+  async setNewMessage(status: boolean, cmId: number): Promise<ChannelMember> {
+    return await this.channelMemberService.setNewMessage(status, cmId);
+  }
+
+  async toggleNotification(cm: ChannelMember): Promise<ChannelMember> {
+    return await this.channelMemberService.toggleNotification(cm.id);
+  }
+
   async getCmById(
     cm_id: number,
   ): Promise<ChannelMember> {
@@ -328,6 +336,7 @@ export class ChannelsService {
       owner,
       true,
       true,
+      channelDto.notification,
     );
   }
 

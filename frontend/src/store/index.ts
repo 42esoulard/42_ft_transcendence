@@ -19,6 +19,7 @@ export interface State {
   inGameUsers: string[];
   challengesReceived: ChallengeReceived[];
   allPendingChallenges: challengeExport[];
+  chatNotification: boolean;
 }
 
 // define injection key
@@ -41,6 +42,7 @@ export const store = createStore<State>({
     inGameUsers: [],
     challengesReceived: [],
     allPendingChallenges: [],
+    chatNotification: false,
   },
   getters: {},
   mutations: {

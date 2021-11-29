@@ -150,7 +150,8 @@ export default defineComponent({
         name: channelName.value,
         owner_id: user.id, 
         type: channelType.value,
-        password: channelPassword.value
+        password: channelPassword.value,
+        notification: false,
       }, { withCredentials: true })
       .then((res) => {
         // console.log("in createChannel res", res)

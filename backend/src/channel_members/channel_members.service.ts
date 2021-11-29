@@ -5,6 +5,7 @@ import { ChannelMembers } from './entity/channel_members.entity';
 import * as bcrypt from 'bcrypt';
 import { Users } from 'src/users/entity/users.entity';
 import { Channels } from 'src/channels/entity/channels.entity';
+import { ChannelMember } from './interfaces/channel_member.interface';
 
 @Injectable()
 export class ChannelMembersService {
@@ -48,6 +49,7 @@ export class ChannelMembersService {
     user: Users,
     is_owner = false,
     is_admin = false,
+    notification = false,
   ): Promise<ChannelMembers> {
     return await this.channelMembersRepository
       .save({
@@ -55,6 +57,7 @@ export class ChannelMembersService {
         member: user,
         is_owner: is_owner,
         is_admin: is_admin,
+        notification: notification,
       })
       .then((res) => {
         return res;
@@ -161,6 +164,42 @@ export class ChannelMembersService {
     }
     return true;
   }
+
+  async setNewMessage(status: boolean, cmId: number): Promise<ChannelMember> {
+    
+    const cm: ChannelMembers = await this.getChannelMemberById(cmId);
+    console.log("wutwutwutwut", cm)
+    console.log(status);
+    cm.new_message = status;
+    return await this.channelMembersRepository
+    .save(cm)
+    .then((res) => {
+      console.log("heee", res);
+      return res;
+    })
+    .catch(() => {
+      throw new BadRequestException(
+        'Channel member did not comply database requirements',
+      );
+    });
+  }
+
+  async toggleNotification(cmId: number): Promise<ChannelMember> {
+    const cm: ChannelMembers = await this.getChannelMemberById(cmId);
+    cm.notification = !cm.notification;
+    
+    return await this.channelMembersRepository
+      .save(cm)
+      .then((res) => {
+        return res;
+      })
+      .catch(() => {
+        throw new BadRequestException(
+          'Channel Member did not comply database requirements',
+        );
+      });
+  }
+
   // /**
   //  * Lists all channelmembers in database
   //  * nb: find() is a function from the typeORM library

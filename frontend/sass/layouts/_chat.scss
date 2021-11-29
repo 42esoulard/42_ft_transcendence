@@ -65,6 +65,40 @@
   cursor: pointer;
 }
 
+
+.chat-header__notif {
+  cursor: pointer;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+  right: 25%;
+  // top: 34%;
+  background-color: red;
+  color: white;
+  text-align: center;
+  font-weight: 900;
+  &--off {
+    background-color: grey;
+  }
+}
+
+.chat-channels__notif {
+  cursor: pointer;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+  // right: 25%;
+  // top: 34%;
+  background-color: red;
+  color: white;
+  text-align: center;
+  font-weight: 900;
+  &--off {
+    background-color: grey;
+  }
+}
 // .chat-header__tag {
 //   border-style: solid;
 //   border-radius: $chat-header-border-radius;
