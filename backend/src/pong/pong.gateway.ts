@@ -117,7 +117,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       return
     }
     // this.logger.log('challenge accepted ', message)
-    const player1 = new player(challenge.challengerId, challenge.challengeeName, client, 1)
+    const player1 = new player(challenge.challengeeId, challenge.challengeeName, client, 1)
     const player2 = new player(challenge.challengerId, challenge.challengerName, challenge.challengerSocket, 2)
     this.createGame(player1, player2, challenge.gameMode)
   }
