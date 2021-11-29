@@ -17,7 +17,7 @@ export interface State {
   isConnected: boolean;
   onlineUsers: User[];
   inGameUsers: string[];
-  challengesReceived: ChallengeReceived[]; // string[] of usernames
+  challengesReceived: ChallengeReceived[];
   allPendingChallenges: challengeExport[];
 }
 
@@ -124,14 +124,17 @@ export const store = createStore<State>({
       );
     },
     allPendingChallenges(state: State, challenges: challengeExport[]) {
-      // // register only challenges that are adressed to loged in user
-      // challenges.forEach((challenge) => {
-      //   if (challenge.challengeeName === state.user.username)
-      //     state.challengesReceived.push(challenge.challengerName)
-      // })
-
-      if (challenges.length) state.allPendingChallenges = challenges;
+      console.log('allPendingChallenges')
+      if (challenges.length)
+        state.allPendingChallenges = challenges;
     },
+    userPendingChallenges(state: State) {
+      // console.log(' user pending challenges')
+      state.allPendingChallenges.forEach((challenge) => {
+        if (challenge.challengeeName === state.user.username)
+          state.challengesReceived.push({challenger: challenge.challengerName, expiry_date: challenge.expiry_date})
+      })
+    }
   },
   actions: {
     setMessage(context, payload: string) {
@@ -146,6 +149,14 @@ export const store = createStore<State>({
         context.commit("setMessage", "");
       }, 10000);
     },
+
+    // we call setPendingChallenges once store.user has been set
+    // we wait one second before commiting, to be sure that store.allPendingChallenges has been set too
+    setPendingChallenges(context) {
+      setTimeout(() => {
+        context.commit('userPendingChallenges')
+      }, 1000)
+    }
   },
 });
 

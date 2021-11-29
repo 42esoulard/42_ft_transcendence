@@ -76,7 +76,9 @@ export default defineComponent({
       await authApi
         .profile({ withCredentials: true })
         .then((response) => {
+          // console.log('get Profile')
           store.state.user = response.data;
+          store.dispatch('setPendingChallenges')
         })
         .catch((err: Error) => {
           console.log("ERROR GET PROFILE");

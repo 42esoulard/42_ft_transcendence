@@ -190,7 +190,9 @@ const getProfile = async () => {
   await axios
     .get<User>("http://localhost:3000/auth/profile")
     .then((response) => {
+      // console.log('get Profile')
       store.state.user = response.data;
+      store.dispatch('setPendingChallenges')
     })
     .catch(async (err: Error) => {
       await refreshToken();
