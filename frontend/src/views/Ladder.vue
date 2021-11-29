@@ -30,7 +30,10 @@
                   'link--user-list',
                   user.role == 'user' ? '' : 'link--admin',
                 ]"
-                :to="{ name: 'UserProfile', params: { username: user.username } }"
+                :to="{
+                  name: 'UserProfile',
+                  params: { username: user.username },
+                }"
               >
                 {{ user.username }}
               </router-link>
@@ -50,7 +53,7 @@
     </div>
   </div>
   <div v-else>
-      <p>Loading some data...</p>
+    <p>Loading some data...</p>
   </div>
 </template>
 
@@ -116,7 +119,15 @@ export default defineComponent({
           entity.username.toLowerCase().startsWith(searchQuery.value)
         );
       }
-      list.value.sort((a: User, b: User) => (a.games ? a.games.filter((game: GameUser) => game.won == true).length : 0) < (b.games ? b.games.filter((game: GameUser) => game.won == true).length : 0));
+      list.value.sort(
+        (a: User, b: User) =>
+          (a.games
+            ? a.games.filter((game: GameUser) => game.won == true).length
+            : 0) <
+          (b.games
+            ? b.games.filter((game: GameUser) => game.won == true).length
+            : 0)
+      );
       return list.value;
     });
 
@@ -127,7 +138,7 @@ export default defineComponent({
       blockedlist,
       selectList,
       searchQuery,
-      userStatus
+      userStatus,
     };
   },
 });

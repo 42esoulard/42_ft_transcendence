@@ -1,25 +1,31 @@
 <template>
-  <div v-for="challenger in challenges" :key="challenger">
+  <div
+    v-for="challenge in challengesList"
+    :key="challenge"
+    class="pong-challenges"
+  >
     <div class="pong-invitation">
-      <div class="pong-invitation__countdown">
-        <i class="fas fa-stopwatch" /> 30s
-      </div>
       <router-link
         :class="['link', 'link--user-list']"
-        :to="{ name: 'UserProfile', params: { username: challenger } }"
+        :to="{
+          name: 'UserProfile',
+          params: { username: challenge.challenger },
+        }"
       >
-        {{ challenger }}
+        {{ challenge.challenger }}
       </router-link>
       <div class="pong-invitation__buttons">
         <button
           class="button button--third button--invitation"
-          v-on:click="accept(challenger)"
+          v-on:click="accept(challenge.challenger)"
+          title="accept"
         >
           accept
         </button>
         <button
           class="button button--invitation"
-          v-on:click="refuse(challenger)"
+          v-on:click="refuse(challenge.challenger)"
+          title="decline"
         >
           decline
         </button>
@@ -30,15 +36,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, onUpdated, ref } from "vue";
 import { pongSocket } from "@/App.vue";
-import { onBeforeRouteLeave, useRouter } from "vue-router";
 import { store } from "@/store";
 
 export default defineComponent({
-  setup(props) {
-    const router = useRouter();
-
+  setup() {
     const accept = (challengerName: string) => {
       store.commit("removeChallenge", challengerName);
       pongSocket.emit("challengeAccepted", challengerName);
@@ -52,14 +55,10 @@ export default defineComponent({
       store.commit("removeChallenge", challengerName);
     });
 
-    onBeforeRouteLeave(() => {
-      pongSocket.off("challengeCancelled");
-    });
-
     return {
       accept,
       refuse,
-      challenges: computed(() => store.state.challengesReceived),
+      challengesList: computed(() => store.state.challengesReceived),
     };
   },
 });

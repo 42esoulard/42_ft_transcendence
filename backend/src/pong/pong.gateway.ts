@@ -23,7 +23,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @WebSocketServer()
   server: Server;
-  
+
   private logger: Logger = new Logger('PongGateway');
 
   private games = new Map<string, pongGame>() // pongGame map. key = room id
@@ -31,12 +31,12 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   private waitingPlayerTranscendence: player = null
 
   private pendingChallenges = new Map<string, challenge>() // key = challenger name
-  
-  
+
+
   afterInit(server: Server): void {
     this.logger.log('Initialized')
   }
-  
+
   handleDisconnect(client: Socket): void {
     this.logger.log('Client disconected ' + client.id);
     this.clearQueue(client)
@@ -59,7 +59,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.cancelChallenge(pendingChallenge.challengerName)
     })
   }
-  
+
   handleConnection(client: Socket, ...args: any[]): void {
     this.logger.log('Client connected ' + client.id);
     this.sendPlayingUsers(client)
@@ -91,7 +91,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('challengeRequest')
   async handleAskToPlay(client: Socket, message: challengeMessage)
   {
-    const newChallenge = new challenge(message.challengerId, message.challengerName, message.challengeeId, message.challengeeName, message.gameMode)
+    const newChallenge = new challenge(message.challengerId, message.challengerName, message.challengeeId, message.challengeeName, message.expiry_date, message.gameMode)
     newChallenge.challengerSocket = client
     this.pendingChallenges.set(message.challengerName, newChallenge)
     this.server.emit('challengeRequest', message)
@@ -121,7 +121,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const player2 = new player(challenge.challengerId, challenge.challengerName, challenge.challengerSocket, 2)
     this.createGame(player1, player2, challenge.gameMode)
   }
-  
+
   @SubscribeMessage('challengeDeclined')
   async handleDeclineChallenge(client: Socket, challengerName: string)
   {
@@ -134,7 +134,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     challenge.challengerSocket.emit('challengeDeclined')
     this.pendingChallenges.delete(challengerName)
   }
-  
+
   @SubscribeMessage('joinGame')
   async handleJoinGameMessage(client: Socket, message: joinGameMessage): Promise<void>
   {
@@ -172,7 +172,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.waitingPlayerClassic = new player(message.userId, message.userName, client, 1)
     if (message.gameMode === 'transcendence')
       this.waitingPlayerTranscendence = new player(message.userId, message.userName, client, 1)
-  
+
     client.emit('addedToQueue')
   }
 
@@ -195,7 +195,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.clearQueue(client)
   }
 
-  
+
   @SubscribeMessage('leaveGame')
   handleLeaveGame(client: Socket, room:string): void
   {

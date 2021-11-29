@@ -13,7 +13,7 @@
 .table-borderless > tfoot > tr > th,
 .table-borderless > thead > tr > td,
 .table-borderless > thead > tr > th {
-    border: none;
+  border: none;
 }
 
 .table__body {
@@ -28,7 +28,7 @@
 
 .table-cell {
   background-clip: padding-box;
-  font-family: 'Saira';
+  font-family: "Saira";
   font-size: 1.1rem;
   color: white;
   &--win {

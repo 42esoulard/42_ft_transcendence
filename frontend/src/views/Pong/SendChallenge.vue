@@ -1,10 +1,29 @@
 <template>
-  <div class="header__title">
-    {{ challengeStatus }}
+  <div>
+    <div
+      class="lds-roller"
+      v-if="challengeStatus != 'challenge has been declined!'"
+    >
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <div class="challenge-sent">
+      <h1 class="challenge-status">{{ challengeStatus }}</h1>
+      <button
+        v-if="challengeStatus != 'challenge has been declined!'"
+        class="button button--primary button--invitation"
+        v-on:click="cancelChallenge()"
+      >
+        cancel
+      </button>
+    </div>
   </div>
-  <button class="button" v-on:click="cancelChallenge()">
-    cancel challenge
-  </button>
 </template>
 
 <script lang="ts">
@@ -33,22 +52,38 @@ export default defineComponent({
         challengerName: store.state.user.username,
         challengeeId: id,
         challengeeName: name,
+        expiry_date: new Date(new Date().getTime() + 30000),
         gameMode: "transcendence",
       });
+      setTimeout(() => timedOutChallenge(), 30000);
     };
 
     const router = useRouter();
+
     const cancelChallenge = () => {
       pongSocket.emit("cancelChallenge", store.state.user.username);
-      router.push({ name: "Pong" });
+      history.go();
+    };
+
+    const timedOutChallenge = () => {
+      if (
+        store.state.inGameUsers.find((u) => u === store.state.user.username)
+      ) {
+        console.log("COUCOU");
+        return;
+      }
+      pongSocket.emit("cancelChallenge", store.state.user.username);
+      challengeStatus.value = "challenge has been declined!";
+      setTimeout(() => {
+        history.go();
+      }, 2000);
     };
 
     pongSocket.on("challengeDeclined", () => {
       console.log("declined");
-      challengeStatus.value =
-        "challenge has been declined, you will be redirected in a few seconds";
+      challengeStatus.value = "challenge has been declined!";
       setTimeout(() => {
-        router.push({ name: "Pong" });
+        history.go();
       }, 2000);
     });
 

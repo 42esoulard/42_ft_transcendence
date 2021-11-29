@@ -1,10 +1,10 @@
-@mixin button-hover () {
+@mixin button-hover() {
   border: $button-hover-border;
   background-color: $button-hover-bg-color;
   text-decoration: none;
 }
 
-@mixin hover-modifier ($color) {
+@mixin hover-modifier($color) {
   &:hover {
     background-color: darken($color, 5);
   }

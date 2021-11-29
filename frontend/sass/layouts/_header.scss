@@ -9,6 +9,10 @@
   &--invisible {
     background-color: transparent;
   }
+  &--in-game {
+    transition: opacity 2s ease;
+    opacity: 0;
+  }
 }
 
 .header-link {
@@ -24,12 +28,12 @@
   font-size: $header-font-size;
   font-family: $header-font;
   padding-left: $sidebar-width;
-  @media (max-width: 950px){
+  @media (max-width: 950px) {
     padding-left: 0;
   }
- }
+}
 
- .header-bloc {
+.header-bloc {
   background-color: $header-bloc-bg;
   padding: 5px 10px;
   border-radius: 25px;
@@ -39,9 +43,9 @@
   align-items: center;
   justify-content: center;
   gap: $header-bloc-gap;
- }
+}
 
- .user-bloc {
+.user-bloc {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -50,23 +54,22 @@
     text-decoration: none;
     opacity: $user-bloc-hover-opacity;
   }
- }
+}
 
- .user-bloc__username {
+.user-bloc__username {
   font-family: $user-bloc-name-font;
   font-size: $user-bloc-name-size;
   color: $user-bloc-name-color;
-  @media (max-width: 1200px){
+  @media (max-width: 1200px) {
     font-size: 1rem;
   }
-  @media (max-width: 950px){
+  @media (max-width: 950px) {
     font-size: 0.7rem;
   }
- }
+}
 
- .user-bloc__avatar {
+.user-bloc__avatar {
   width: $user-bloc-avatar-width;
   height: $user-bloc-avatar-width;
   border-radius: 50%;
- }
-
+}

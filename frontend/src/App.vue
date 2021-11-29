@@ -1,3 +1,16 @@
+<template>
+  <Header />
+  <div class="main-div">
+    <SideBar />
+    <div class="router-view">
+      <router-view :key="$route.fullPath" />
+    </div>
+  </div>
+  <transition name="toast">
+    <Toast v-if="message" :message="message" />
+  </transition>
+</template>
+
 <script lang="ts">
 import SideBar from "./components/SideBar.vue";
 import Header from "./components/Header.vue";
@@ -5,9 +18,9 @@ import Toast from "@/components/Toast.vue";
 import { io } from "socket.io-client";
 import { useStore } from "@/store";
 import { computed, onUpdated } from "vue";
-import { User } from "sdk/typescript-axios-client-generated";
-import { challengeExport, challengeMessage, gameMode } from './types/PongGame';
-import { useRouter } from 'vue-router';
+import { Relationship, User } from "sdk/typescript-axios-client-generated";
+import { challengeExport, challengeMessage, gameMode } from "./types/PongGame";
+import { useRouter } from "vue-router";
 
 export const pongSocket = io("http://localhost:3000/pong");
 export const presenceSocket = io("http://localhost:3000/presence");
@@ -26,6 +39,7 @@ export default {
         }
       }
     });
+
     presenceSocket.on("newUser", (user: User) => {
       store.commit("addOnlineUser", user);
       // console.log("onlineUsers", store.state.onlineUsers);
@@ -57,53 +71,59 @@ export default {
       console.log("allPlayingUsers", store.state.inGameUsers);
     });
 
-    pongSocket.on('gameReadyToStart', (room: string, player1UserName: string, player2UserName: string, gameMode: gameMode) => {
-			router.push({ name: 'PongGame',
-			params: {
-				room,
-				player1UserName,
-				player2UserName,
-				gameMode,
-				authorized: 'ok',
-				userType: 'player'
-				}
-			})
-		});
+    pongSocket.on(
+      "gameReadyToStart",
+      (
+        room: string,
+        player1UserName: string,
+        player2UserName: string,
+        gameMode: gameMode
+      ) => {
+        router.push({
+          name: "PongGame",
+          params: {
+            room,
+            player1UserName,
+            player2UserName,
+            gameMode,
+            authorized: "ok",
+            userType: "player",
+          },
+        });
+      }
+    );
 
-    const router = useRouter()
-    pongSocket.on('challengeRequest', (message: challengeMessage) => {
-			console.log('challenge received from ' + message.challengerName + ' to ' + message.challengeeName)
-			if (message.challengeeId === store.state.user.id)
-			{
-        store.commit('addChallenge', message.challengerName)
-				console.log('You have been challenged !')
-			}
-		});
+    const router = useRouter();
+    pongSocket.on("challengeRequest", (message: challengeMessage) => {
+      console.log(
+        "challenge received from " +
+          message.challengerName +
+          " to " +
+          message.challengeeName
+      );
+      if (message.challengeeId === store.state.user.id) {
+        store.commit("addChallenge", {
+          challenger: message.challengerName,
+          expiry_date: message.expiry_date,
+        });
+        store.dispatch(
+          "setChallenge",
+          `${message.challengerName} challenged you! [PONG-LINK]`
+        );
+      }
+    });
 
-    pongSocket.on('allPendingChallenges', (message: challengeExport[]) => {
-      store.commit('allPendingChallenges', message)
-    })
+    pongSocket.on("allPendingChallenges", (message: challengeExport[]) => {
+      store.commit("allPendingChallenges", message);
+    });
 
     return {
       user: computed(() => store.state.user),
-      message: computed(() => store.state.message)
+      message: computed(() => store.state.message),
     };
-  }
+  },
 };
 </script>
-
-<template>
-  <Header />
-  <div class="main-div">
-    <SideBar />
-    <div class="router-view">
-      <router-view :key="$route.fullPath" />
-    </div>
-  </div>
-  <transition name="toast">
-    <Toast v-if="message" :message="message" />
-  </transition>
-</template>
 
 <style lang="scss">
 @import "../sass/main.scss";

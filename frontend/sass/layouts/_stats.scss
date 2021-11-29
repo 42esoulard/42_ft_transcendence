@@ -5,7 +5,7 @@
   height: $stats-height;
   justify-content: center;
   align-items: start;
-  @media (max-width: 950px){
+  @media (max-width: 950px) {
     width: 60%;
     gap: 2rem;
     border-radius: 0;
@@ -31,7 +31,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  font-family: 'Saira';
+  font-family: "Saira";
 }
 
 .stats-bloc__number {
@@ -49,7 +49,7 @@
 .stats-bloc__text {
   font-family: $stats-text-font;
   font-size: $stats-text-size;
-  font-family: 'Saira';
+  font-family: "Saira";
 }
 
 .progress-bar {
@@ -70,7 +70,7 @@
   height: $progress-bar-inside-height;
   border-radius: $progress-bar-inside-border-radius;
   background: $progress-bar-inside-bg;
-  position : absolute;
+  position: absolute;
 }
 
 .our-progress-bar__label {

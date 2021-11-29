@@ -13,24 +13,12 @@ import { store } from "@/store";
 
 export default {
   props: {
-    to: { type: String, requited: true },
+    to: { type: String, required: true },
     icon: { type: String, required: true },
   },
   setup(props: any) {
     const route = useRoute();
     const isActive = computed(() => route.path === props.to);
-    // const hasChallenges = computed(
-    //   () =>
-    //     store.state.onlineUsers.length > 1 &&
-    //     props.to === "/pong" && // test à faire sur le tableau de challenges
-    //     !isActive.value
-    // );
-    // const hasLives = computed(
-    //   () =>
-    //     store.state.inGameUsers.length > 0 &&
-    //     props.to === "/pong/watch" &&
-    //     !isActive.value
-    // );
     const hasNotification = computed(
       () =>
         ((store.state.inGameUsers.length > 0 && props.to === "/pong/watch") ||

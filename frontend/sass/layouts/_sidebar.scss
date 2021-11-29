@@ -12,9 +12,12 @@
   background-color: $sidebar-bg-color;
   position: fixed;
   padding-top: $header-height;
-  @media (max-width: 950px),
-          (max-height: 600px) {
+  @media (max-width: 950px), (max-height: 600px) {
     visibility: hidden;
+  }
+  &--in-game {
+    transition: opacity 2s ease;
+    opacity: 0;
   }
 }
 
@@ -32,7 +35,7 @@
     text-decoration: none;
     color: $sidebar-item-hover;
   }
-  @media (max-width: 950px){
+  @media (max-width: 950px) {
     flex-direction: row;
     font-size: 1.2rem;
   }
@@ -53,43 +56,43 @@
 } */
 
 .sidebar-link__notif {
-	position: absolute;
+  position: absolute;
   width: 20px;
-	height: 20px;
+  height: 20px;
   border-radius: 20px;
-	right: 25%;
-	top: 34%;
+  right: 25%;
+  top: 34%;
   background-color: red;
   color: white;
   text-align: center;
   font-weight: 900;
 
-  @media (max-height: 800px){
+  @media (max-height: 800px) {
     width: 18px;
     height: 18px;
     border-radius: 18px;
     right: 28%;
     top: 30%;
   }
-  @media (max-height: 700px){
+  @media (max-height: 700px) {
     width: 15px;
     height: 15px;
     border-radius: 15px;
     right: 32%;
     top: 25%;
   }
-  @media (max-height: 600px){
+  @media (max-height: 600px) {
     right: 25%;
     top: 34%;
   }
-  @media (max-width: 950px){
+  @media (max-width: 950px) {
     width: 15px;
     height: 15px;
     border-radius: 15px;
     right: 25%;
     top: 34%;
   }
-  @media (max-width: 800px){
+  @media (max-width: 800px) {
     width: 15px;
     height: 15px;
     border-radius: 15px;
@@ -102,21 +105,20 @@
   min-width: 2.5rem;
   height: auto;
 
-  @media (max-height: 800px){
+  @media (max-height: 800px) {
     min-width: 2rem;
   }
-  @media (max-height: 700px){
+  @media (max-height: 700px) {
     min-width: 1.5rem;
   }
-  @media (max-height: 600px){
+  @media (max-height: 600px) {
     min-width: 1rem;
   }
-  @media (max-width: 950px){
+  @media (max-width: 950px) {
     margin-right: 0.5rem;
     min-width: 1rem;
   }
-  @media (max-width: 800px){
+  @media (max-width: 800px) {
     min-width: 0.75rem;
   }
 }
-

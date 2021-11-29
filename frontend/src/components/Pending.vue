@@ -3,50 +3,75 @@
     <div class="friendships-panel">
       <h1 class="friendships-panel__title">Friendships pending</h1>
       <div class="table__body">
-        <div v-for="friendship in getPendingList" :key="friendship" class="friendship">
-          <router-link
-        class="link link--user-list link--user-list--pending"
-        :to="{ name: 'UserProfile', params: { username: friendship.requester.username } }"
+        <div
+          v-for="friendship in getPendingList"
+          :key="friendship"
+          class="friendship"
         >
-          {{ friendship.requester.username }}
-        </router-link>
-        <div class="friendship__buttons">
-          <button
-            class="button button--third button--invitation button--invitation--pending"
-            @click="acceptFriend(friendship.requester)"
-            title="accept"
+          <router-link
+            class="link link--user-list link--user-list--pending"
+            :to="{
+              name: 'UserProfile',
+              params: { username: friendship.requester.username },
+            }"
           >
-            <i class="friendship__icon fas fa-user-check" />
-          </button>
-          <button
-            class="button button--third button--invitation button--invitation--decline"
-            @click="removeFriend(friendship.requester)"
-            title="decline"
-          >
-            <i class="friendship__icon fas fa-user-slash" />
-          </button>
-        </div>
-
+            {{ friendship.requester.username }}
+          </router-link>
+          <div class="friendship__buttons">
+            <button
+              class="
+                button
+                button--third
+                button--invitation
+                button--invitation--pending
+              "
+              @click="acceptFriend(friendship.requester)"
+              title="accept"
+            >
+              <i class="friendship__icon fas fa-user-check" />
+            </button>
+            <button
+              class="
+                button
+                button--third
+                button--invitation
+                button--invitation--decline
+              "
+              @click="removeFriend(friendship.requester)"
+              title="decline"
+            >
+              <i class="friendship__icon fas fa-user-slash" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
     <div class="friendships-panel">
       <h1 class="friendships-panel__title">Friendships requests</h1>
       <div class="table__body">
-        <div v-for="friendship in getAdressedList" :key="friendship" class="friendship">
+        <div
+          v-for="friendship in getAdressedList"
+          :key="friendship"
+          class="friendship"
+        >
           <router-link
-        class="link link--user-list link--user-list--pending"
-        :to="{ name: 'UserProfile', params: { username: friendship.adressee.username } }"
-        >
-          {{ friendship.adressee.username }}
-        </router-link>
-        <button
-          class="button button--third button--invitation button--invitation--cancel"
-          @click="removeFriend(friendship.adressee)"
-          title="cancel"
-        >
-          <i class="friendship__icon fas fa-user-minus" />
-        </button>
+            class="link link--user-list link--user-list--pending"
+            :to="{
+              name: 'UserProfile',
+              params: { username: friendship.adressee.username },
+            }"
+          >
+            {{ friendship.adressee.username }}
+          </router-link>
+          <button
+            class="
+              button button--third button--invitation button--invitation--cancel
+            "
+            @click="removeFriend(friendship.adressee)"
+            title="cancel"
+          >
+            <i class="friendship__icon fas fa-user-minus" />
+          </button>
         </div>
       </div>
     </div>
@@ -70,25 +95,33 @@ export default defineComponent({
       relationshipApi
         .getAllUserFriendships(store.state.user.id)
         .then((res: any) => {
-          for (const relationship of res.data){
+          for (const relationship of res.data) {
             if (relationship.pending == true)
               relationships.value.push(relationship);
           }
         })
         .catch((err: any) => console.log(err.message));
-    })
+    });
 
     const acceptFriend = async (user: User) => {
       if (store.state.user.id != 0) {
         await relationshipApi
-          .validateRelationship({
-            requesterId: user.id,
-            adresseeId: store.state.user.id,
-          })
+          .validateRelationship(
+            {
+              requesterId: user.id,
+              adresseeId: store.state.user.id,
+            },
+            {
+              withCredentials: true,
+            }
+          )
           .then((res: any) => {
             for (const friendship of relationships.value) {
               if (friendship.requesterId == user.id)
-                relationships.value.splice(relationships.value.indexOf(friendship), 1);
+                relationships.value.splice(
+                  relationships.value.indexOf(friendship),
+                  1
+                );
             }
           })
           .catch((err: any) => console.log(err));
@@ -98,10 +131,15 @@ export default defineComponent({
     const removeFriend = async (user: User) => {
       if (store.state.user.id != 0) {
         await relationshipApi
-          .removeRelationship({
-            userId1: user.id,
-            userId2: store.state.user.id,
-          })
+          .removeRelationship(
+            {
+              userId1: user.id,
+              userId2: store.state.user.id,
+            },
+            {
+              withCredentials: true,
+            }
+          )
           .then((res: any) => {
             let index = 0;
             for (const friendship of relationships.value) {
@@ -120,15 +158,18 @@ export default defineComponent({
     };
 
     const getPendingList = computed(() => {
-      return relationships.value.filter((rs: Relationship) => rs.adresseeId == store.state.user.id);
+      return relationships.value.filter(
+        (rs: Relationship) => rs.adresseeId == store.state.user.id
+      );
     });
 
     const getAdressedList = computed(() => {
-      return relationships.value.filter((rs: Relationship) => rs.requesterId == store.state.user.id);
+      return relationships.value.filter(
+        (rs: Relationship) => rs.requesterId == store.state.user.id
+      );
     });
 
     return { getPendingList, getAdressedList, acceptFriend, removeFriend };
-
   },
 });
 </script>

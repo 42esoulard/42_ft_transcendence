@@ -1,32 +1,93 @@
 <template>
-  <h1 class="header__title">
-    {{ player1UserName }} --- vs --- {{ player2UserName }}
-  </h1>
-
-  <div class="header__title" v-if="!gameHasStarted && userType === 'player'">
-    <div v-if="gameMode == 'transcendence'">
-      <h1>Press space for some transcendence magic !</h1>
+  <transition name="fade">
+    <div class="pong-container">
+      <button
+        @click="$router.push('/pong')"
+        class="button button--log-in pong-exit"
+      >
+        <h1><i class="fas fa-door-open" /></h1>
+        <h1>exit</h1>
+      </button>
+      <h2 class="pong-score" v-if="!gameIsOver">
+        {{ player1UserName }} vs {{ player2UserName }}
+      </h2>
+      <div class="stars">
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+      </div>
+      <canvas v-if="!gameIsOver" ref="canvas" />
+      <div v-if="!gameIsOver && userType === 'player'" class="pong-buttons">
+        <button class="button" v-on:click="SendMoveMsg('up')">
+          <i class="fas fa-arrow-up" />
+        </button>
+        <button class="button" v-on:click="SendMoveMsg('down')">
+          <i class="fas fa-arrow-down" />
+        </button>
+      </div>
+      <div v-if="gameIsOver" class="pong-result">
+        <h2 class="pong-score">{{ winningPlayer }} won !</h2>
+        <button class="button button--log-in" @click="$router.push('/pong')">
+          Play Again
+        </button>
+      </div>
     </div>
-    <div v-if="gameMode == 'classic'">
-      <h1>Get ready, game is about to start !</h1>
-    </div>
-  </div>
-
-  <canvas v-if="!gameIsOver" ref="canvas"> </canvas>
-
-  <div v-else class="header__title">
-    <h2>{{ winningPlayer }} won !</h2>
-    <div v-if="userType === 'player'">
-      <button class="button" @click="$router.push('/pong')">Play Again</button>
-      <p>OR</p>
-      <button class="button" @click="$router.push('/pong')">Start New Game</button>
-    </div>
-  </div>
-
-  <p v-if="!gameIsOver && userType === 'player'">
-    <button class="button" v-on:click="SendMoveMsg('up')"><i class="fas fa-arrow-up" /></button>
-    <button class="button" v-on:click="SendMoveMsg('down')"><i class="fas fa-arrow-down" /></button>
-  </p>
+  </transition>
 </template>
 
 <script lang="ts">
@@ -39,137 +100,151 @@ import {
   gameMode,
   PlayerPositions,
   PlayerScores,
-  userType
+  userType,
 } from "@/types/PongGame";
 
 export default defineComponent({
-	props: {
-		gameMode: {type: String as () => gameMode, required: true},
-		// ou {type: String as PropType<gameMode>}
-		// cf https://frontendsociety.com/using-a-typescript-interfaces-and-types-as-a-prop-type-in-vuejs-508ab3f83480
-		userType: {type: String as () => userType, required: true},
-		player1UserName: {type: String, required: true},
-		player2UserName: {type: String, required: true},
-		room: {type: String, required: true}
-	},
-	inheritAttrs: false, // we dont need it, and not setting it to false a warning: "extraneous non prop attributes (authorized) were passed to component but could not be automatically inherited..."
+  props: {
+    gameMode: { type: String as () => gameMode, required: true },
+    // ou {type: String as PropType<gameMode>}
+    // cf https://frontendsociety.com/using-a-typescript-interfaces-and-types-as-a-prop-type-in-vuejs-508ab3f83480
+    userType: { type: String as () => userType, required: true },
+    player1UserName: { type: String, required: true },
+    player2UserName: { type: String, required: true },
+    room: { type: String, required: true },
+  },
+  inheritAttrs: false, // we dont need it, and not setting it to false a warning: "extraneous non prop attributes (authorized) were passed to component but could not be automatically inherited..."
 
-	setup(props) {
+  setup(props) {
+    const {
+      context,
+      canvas,
+      ballPosition,
+      playerPositions,
+      racquetLenghtRatio,
+      score,
+      windowWidth,
+      player1EnlargeRemaining,
+      player2EnlargeRemaining,
+      onResize,
+      initCanvas,
+      draw,
+    } = getDraw(props.gameMode);
 
-		const { context, canvas, ballPosition, playerPositions, racquetLenghtRatio, score, windowWidth, player1EnlargeRemaining, player2EnlargeRemaining,
-			onResize, initCanvas, draw } = getDraw(props.gameMode)
+    // lifecycle hooks
+    onMounted(() => {
+      const header = document.querySelector(".header");
+      const sidebar = document.querySelector(".sidebar");
 
-		// lifecycle hooks
-		onMounted(() => {
-			if (props.userType === 'player')
-				window.addEventListener("keydown", onKeyDown)
-			window.addEventListener("resize", onResize)
-			console.log('mounted')
-			if (canvas.value)
-				context.value = canvas.value.getContext("2d")
-			initCanvas()
-		})
+      if (header) header.classList.add(".header--in-game");
+      if (sidebar) sidebar.classList.add(".sidebar--in-game");
+      if (props.userType === "player")
+        window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("resize", onResize);
+      console.log("mounted");
+      if (canvas.value) context.value = canvas.value.getContext("2d");
+      initCanvas();
+    });
 
-		onBeforeRouteLeave(() => {
-			if (props.userType === 'player')
-			{
-				pongSocket.emit('leaveGame', props.room)
-				window.removeEventListener("keydown", onKeyDown)
-			}
-			// remove event listener, else it will be registered as many times as we entered the component
-			pongSocket.off('position')
-			pongSocket.off('score')
-			pongSocket.off('enlarge')
-			pongSocket.off('enlargeEnd')
-			pongSocket.off('gameStarting')
-			pongSocket.off('gameOver')
-			window.removeEventListener("resize", onResize)
-		})
+    onBeforeRouteLeave(() => {
+      const header = document.querySelector(".header");
+      const sidebar = document.querySelector(".sidebar");
 
+      if (header) header.classList.remove(".header--in-game");
+      if (sidebar) sidebar.classList.remove(".sidebar--in-game");
+      if (props.userType === "player") {
+        pongSocket.emit("leaveGame", props.room);
+        window.removeEventListener("keydown", onKeyDown);
+      }
+      // remove event listener, else it will be registered as many times as we entered the component
+      pongSocket.off("position");
+      pongSocket.off("score");
+      pongSocket.off("enlarge");
+      pongSocket.off("enlargeEnd");
+      pongSocket.off("gameStarting");
+      pongSocket.off("gameOver");
+      window.removeEventListener("resize", onResize);
+    });
 
-		// socket event listeners
-		pongSocket.on("position", (newBallPosition: Coordinates, newPlayerPositions: PlayerPositions) => {
-			ballPosition.value.x = newBallPosition.x * windowWidth.value
-			ballPosition.value.y = newBallPosition.y * windowWidth.value
-			playerPositions.value.player1 = newPlayerPositions.player1 * windowWidth.value
-			playerPositions.value.player2 = newPlayerPositions.player2 * windowWidth.value
-			draw()
-		})
+    // socket event listeners
+    pongSocket.on(
+      "position",
+      (newBallPosition: Coordinates, newPlayerPositions: PlayerPositions) => {
+        ballPosition.value.x = newBallPosition.x * windowWidth.value;
+        ballPosition.value.y = newBallPosition.y * windowWidth.value;
+        playerPositions.value.player1 =
+          newPlayerPositions.player1 * windowWidth.value;
+        playerPositions.value.player2 =
+          newPlayerPositions.player2 * windowWidth.value;
+        draw();
+      }
+    );
 
-		pongSocket.on("score", (newScore: PlayerScores) => {
-			score.value = newScore
-			draw()
-		})
+    pongSocket.on("score", (newScore: PlayerScores) => {
+      score.value = newScore;
+      draw();
+    });
 
-		pongSocket.on('enlarge', (playerToEnlargeNumber: number) => {
-			if (playerToEnlargeNumber === 1)
-			{
-				racquetLenghtRatio.value.player1 /= 2
-				player1EnlargeRemaining.value--
-			}
-			else
-			{
-				racquetLenghtRatio.value.player2 /= 2
-				player2EnlargeRemaining.value--
-			}
-		})
+    pongSocket.on("enlarge", (playerToEnlargeNumber: number) => {
+      if (playerToEnlargeNumber === 1) {
+        racquetLenghtRatio.value.player1 /= 2;
+        player1EnlargeRemaining.value--;
+      } else {
+        racquetLenghtRatio.value.player2 /= 2;
+        player2EnlargeRemaining.value--;
+      }
+    });
 
-		pongSocket.on('enlargeEnd', (playerToEnlargeNumber: number) => {
-			if (playerToEnlargeNumber === 1)
-				racquetLenghtRatio.value.player1 *= 2
-			else
-				racquetLenghtRatio.value.player2 *= 2
-		})
+    pongSocket.on("enlargeEnd", (playerToEnlargeNumber: number) => {
+      if (playerToEnlargeNumber === 1) racquetLenghtRatio.value.player1 *= 2;
+      else racquetLenghtRatio.value.player2 *= 2;
+    });
 
-		const gameHasStarted = ref(false)
-		pongSocket.on("gameStarting", () => {
-			gameHasStarted.value = true
-		})
+    const gameHasStarted = ref(false);
+    pongSocket.on("gameStarting", () => {
+      gameHasStarted.value = true;
+    });
 
-		const winningPlayer = ref<string>('')
-		const gameIsOver = ref(false)
-		pongSocket.on("gameOver", (player1Won: boolean) => {
-			if (props.userType === 'player')
-				window.removeEventListener("keydown", onKeyDown)
-			gameHasStarted.value = true
-			gameIsOver.value = true
-			if (player1Won)
-				winningPlayer.value = props.player1UserName
-			else
-				winningPlayer.value = props.player2UserName
-		})
+    const winningPlayer = ref<string>("");
+    const gameIsOver = ref(false);
+    pongSocket.on("gameOver", (player1Won: boolean) => {
+      if (props.userType === "player")
+        window.removeEventListener("keydown", onKeyDown);
+      gameHasStarted.value = true;
+      gameIsOver.value = true;
+      if (player1Won) winningPlayer.value = props.player1UserName;
+      else winningPlayer.value = props.player2UserName;
+    });
 
+    // socket emit
+    const SendMoveMsg = (direction: string) => {
+      if (gameHasStarted.value)
+        pongSocket.emit("moveRacquet", { room: props.room, text: direction });
+    };
 
-		// socket emit
-		const SendMoveMsg = (direction: string) => {
-			if (gameHasStarted.value)
-				pongSocket.emit('moveRacquet', {room: props.room, text: direction})
-		}
+    const EnlargeRacquet = () => {
+      if (gameHasStarted.value) pongSocket.emit("enlargeRacquet", props.room);
+    };
 
-		const EnlargeRacquet = () => {
-			if (gameHasStarted.value)
-				pongSocket.emit('enlargeRacquet', props.room)
-		}
+    const onKeyDown = (event: KeyboardEvent) => {
+      const codes = ["ArrowUp", "ArrowDown"];
+      if (props.gameMode === "transcendence") codes.push("Space");
+      if (!codes.includes(event.code)) return;
+      if (event.code === "ArrowUp") SendMoveMsg("up");
+      else if (event.code === "ArrowDown") SendMoveMsg("down");
+      else if (event.code === "Space") EnlargeRacquet();
+    };
 
-		const onKeyDown = (event: KeyboardEvent) => {
-			const codes = ['ArrowUp', 'ArrowDown'];
-			if (props.gameMode === 'transcendence')
-				codes.push('Space')
-			if (!codes.includes(event.code))
-				return;
-			if (event.code === 'ArrowUp')
-				SendMoveMsg('up')
-			else if (event.code === 'ArrowDown')
-				SendMoveMsg('down')
-			else if (event.code === 'Space')
-				EnlargeRacquet()
-		}
-
-		return { score, gameHasStarted, gameIsOver, winningPlayer, canvas, SendMoveMsg }
-
-	},
-
-})
+    return {
+      score,
+      gameHasStarted,
+      gameIsOver,
+      winningPlayer,
+      canvas,
+      SendMoveMsg,
+    };
+  },
+});
 </script>
 
 <style lang="scss">

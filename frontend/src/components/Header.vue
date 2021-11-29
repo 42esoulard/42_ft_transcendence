@@ -94,7 +94,7 @@
       </div>
       <div v-else></div>
       <router-link to="/" class="header-link">
-        <h1 class="header__title">Space Pong</h1>
+        <h1 class="header__title">Transcendence</h1>
       </router-link>
       <div
         v-if="width >= 950 && user.id != 0 && !user.banned"
@@ -122,7 +122,7 @@ import { useRouter } from "vue-router";
 import { useStore } from "@/store";
 import { useAuthApi } from "@/plugins/api.plugin";
 import SideBarLink from "./SideBarLink.vue";
-import { presenceSocket } from "@/App.vue";
+import { pongSocket, presenceSocket } from "@/App.vue";
 
 export default defineComponent({
   name: "Admin",
@@ -145,6 +145,8 @@ export default defineComponent({
     });
 
     const logOut = () => {
+      pongSocket.off("challengeDeclined");
+      pongSocket.emit("cancelChallenge", store.state.user.username);
       authApi
         .logout({ withCredentials: true })
         .then((response) => {

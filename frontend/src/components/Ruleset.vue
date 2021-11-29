@@ -5,15 +5,14 @@
     <div class="pong-rule">
       <i class="fas fa-gamepad pong-rule__icon" />
       <span class="pong-rule__text"
-        >Move your paddle with the keyboard's arrow up and arrow down, or by clicking on the arrow buttons</span
+        >Move your paddle with the keyboard's arrow up and arrow down, or by
+        clicking on the arrow buttons</span
       >
     </div>
     <hr />
     <div class="pong-rule pong-rule--right">
       <i class="fas fa-trophy pong-rule__icon" />
-      <span class="pong-rule__text"
-        >Score 11 points to win the game</span
-      >
+      <span class="pong-rule__text">Score 11 points to win the game</span>
     </div>
     <hr />
     <div class="pong-rule pong-rule">

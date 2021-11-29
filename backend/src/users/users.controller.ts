@@ -84,8 +84,7 @@ export class UsersController {
     return users;
   }
 
-  @Roles(Role.ADMIN, Role.OWNER)
-  @UseGuards(JwtTwoFactorGuard, RolesGuard)
+  @UseGuards(JwtTwoFactorGuard)
   @Get('delete/:id')
   async removeUser(@Param('id') id: number) {
     return await this.userService.removeUser(id);

@@ -1,5 +1,5 @@
 .link {
-  font-family: 'Saira';
+  font-family: "Saira";
   color: $link-color;
   text-decoration: none;
   border: none;
@@ -19,8 +19,8 @@
   &--user-list {
     font-size: 1.2rem;
     &:hover {
-    text-decoration: none;
-    color: $link-neutral-hover;
+      text-decoration: none;
+      color: $link-neutral-hover;
     }
     &--pending {
       font-size: 1.2rem;

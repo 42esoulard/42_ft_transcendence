@@ -61,7 +61,10 @@
                   'link--user-list',
                   user.role == 'user' ? '' : 'link--admin',
                 ]"
-                :to="{ name: 'UserProfile', params: { username: user.username } }"
+                :to="{
+                  name: 'UserProfile',
+                  params: { username: user.username },
+                }"
               >
                 {{ user.username }}
               </router-link>
@@ -93,7 +96,7 @@
     <Pending />
   </div>
   <div v-else>
-      <p>Loading some data...</p>
+    <p>Loading some data...</p>
   </div>
 </template>
 
@@ -227,19 +230,35 @@ export default defineComponent({
           (user: User) =>
             !blockedList.value.find((id: number) => id === user.id)
         );
-      list.value.sort((a: User, b: User) => a.username.localeCompare(b.username));
-      list.value.sort((a: User, b: User) => userStatus(a) == 'offline' && userStatus(b) != 'offline' );
-      list.value.sort((a: User, b: User) => userStatus(a) == 'ingame' && userStatus(b) == 'online' );
+      list.value.sort((a: User, b: User) =>
+        a.username.localeCompare(b.username)
+      );
+      list.value.sort(
+        (a: User, b: User) =>
+          userStatus(a) == "offline" && userStatus(b) != "offline"
+      );
+      list.value.sort(
+        (a: User, b: User) =>
+          userStatus(a) == "ingame" && userStatus(b) == "online"
+      );
       return list.value;
     });
 
     const challengeUser = (usr: User) => {
+      for (const challenge of store.state.challengesReceived) {
+        if (challenge.challenger == usr.username) {
+          store.dispatch(
+            "setMessage",
+            `Error: ${usr.username} already invited you to play!`
+          );
+          return;
+        }
+      }
       router.push({
-        name: "SendChallenge",
+        name: "Pong",
         params: {
           challengeeId: usr.id,
           challengeeName: usr.username,
-          authorized: "ok",
         },
       });
     };

@@ -51,7 +51,7 @@
   justify-content: space-between;
   align-items: center;
   padding: $chat-header-padding;
-  background-color:$chat-header-bg;
+  background-color: $chat-header-bg;
 }
 
 .chat-header__channel-name {
@@ -86,9 +86,9 @@
 
 .chat-messages {
   height: $chat-msg-container-height;
-  overflow-x:hidden; 
-  display:flex; 
-  flex-direction:column-reverse;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column-reverse;
   margin: $chat-msg-container-margin;
 }
 
@@ -107,16 +107,24 @@
 .chat-channels__lock-img {
   cursor: pointer;
   &--unlocked {
-    color:$prim-color;
+    color: $prim-color;
     animation: fadein ease-out 200ms;
   }
   @keyframes fadein {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   @keyframes fadeout {
-    from { opacity: 1; }
-    to { opacity: 0; }
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
   }
 }
 
@@ -131,7 +139,6 @@
 .chat-messages__author {
   min-width: $chat-msg-author-width;
   text-align: left;
-
 }
 .chat-messages__content {
   overflow-wrap: anywhere;
@@ -146,7 +153,7 @@
   height: $chans-height;
   width: $chans-width;
   min-width: $chans-min-width;
-  overflow-x:hidden;
+  overflow-x: hidden;
 }
 
 .chat-channels__list {
@@ -163,7 +170,8 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: $chans-item-hover-bg;
     color: $chat-font-dark;
     border-style: none;
@@ -211,7 +219,8 @@
       cursor: pointer;
     }
   }
-  &--ban, &--mute {
+  &--ban,
+  &--mute {
     cursor: pointer;
   }
 }
@@ -220,11 +229,11 @@
   white-space: nowrap;
   width: $chans-createbtn-width;
   padding: $chans-createbtn-padding;
-  background-color:$chans-createbtn-bg;
+  background-color: $chans-createbtn-bg;
   color: $chat-font-light;
   border-style: double;
   &:hover {
-    background-color:$chat-bg-light;
+    background-color: $chat-bg-light;
     color: $chat-bg-dark;
     transition: 150ms;
   }
@@ -234,7 +243,7 @@
   padding: $chans-title-padding;
   white-space: nowrap;
   text-align: center;
-  text-decoration-line:overline underline;  
+  text-decoration-line: overline underline;
   font-weight: bold;
 }
 
@@ -242,7 +251,7 @@
 .chat-channel-form {
   position: absolute;
   background-color: $chat-bg-dark;
-  color:$chat-font-light;
+  color: $chat-font-light;
   width: $channel-form-width;
   padding: $channel-form-padding;
   left: $channel-form-position;
@@ -264,7 +273,7 @@
   margin: $channel-form-title-margin;
   width: $channel-form-title-width;
   font-size: $channel-form-title-font-size;
-  text-align:center;  
+  text-align: center;
 }
 
 .chat-channel-form__subtitle {
@@ -296,11 +305,11 @@
 .chat-user__card {
   background-color: rgba(59, 59, 59, 0.466);
   display: none;
-  position:absolute;
+  position: absolute;
   height: 2.75rem;
   width: 300px;
-  left:5rem;
-  top:-0.6rem;
+  left: 5rem;
+  top: -0.6rem;
   z-index: 3000000;
 }
 
@@ -308,8 +317,11 @@
   position: relative;
 }
 
-.chat-messages__author-container > .chat-messages__author:hover + .chat-user__card, .chat-messages__author-container > .chat-user__card:hover {
-  display:block;
+.chat-messages__author-container
+  > .chat-messages__author:hover
+  + .chat-user__card,
+.chat-messages__author-container > .chat-user__card:hover {
+  display: block;
 }
 
 // .chat-user__card {
@@ -338,7 +350,8 @@
   flex-direction: row;
   justify-content: space-between;
   text-align: center;
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: $chans-item-hover-bg;
     color: $chat-font-dark;
     border-style: none;
@@ -348,9 +361,9 @@
 
 .chat-admin-pannel__users-list {
   height: $chat-msg-container-height;
-  overflow-x:hidden; 
-  display:flex; 
-  flex-direction:column;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
   margin: 20px;
   background: $chat-bg-light;
 }

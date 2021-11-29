@@ -1,3 +1,3 @@
-import { mdiMessageText } from '@mdi/js';
+import { mdiMessageText } from "@mdi/js";
 
-export { mdiMessageText }
+export { mdiMessageText };

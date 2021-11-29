@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Delete, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, UseGuards } from '@nestjs/common';
 import { RelationshipsService } from './relationships.service';
 import { Relationship } from './interfaces/relationship.interface';
 import { CreateRelationshipDto } from './dto/createRelationship.dto';
 import { ValidateRelationshipDto } from './dto/validateRelationship.dto';
 import { RemoveRelationshipDto } from './dto/removeRelationship.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtTwoFactorGuard } from 'src/auth/guards/jwtTwoFactor.guard';
 
 @ApiTags('Relationship')
 @Controller('relationships')
@@ -34,6 +35,7 @@ export class RelationshipsController {
   }
 
   @Post()
+  @UseGuards(JwtTwoFactorGuard)
   async saveRelationship(
     @Body() newRelationship: CreateRelationshipDto,
   ): Promise<Relationship> {
@@ -41,6 +43,7 @@ export class RelationshipsController {
   }
 
   @Post('validate-relationship')
+  @UseGuards(JwtTwoFactorGuard)
   async validateRelationship(
     @Body() toMajRelationship: ValidateRelationshipDto,
   ) {
@@ -50,6 +53,7 @@ export class RelationshipsController {
   }
 
   @Delete()
+  @UseGuards(JwtTwoFactorGuard)
   async removeRelationship(
     @Body() toRemoveRelationship: RemoveRelationshipDto,
   ) {

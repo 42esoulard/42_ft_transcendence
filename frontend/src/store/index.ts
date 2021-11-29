@@ -1,22 +1,28 @@
-import { challengeExport } from '@/types/PongGame'
-import { User } from 'sdk/typescript-axios-client-generated'
-import { InjectionKey } from 'vue'
-import { createStore, useStore as baseUseStore, Store } from 'vuex'
+import { challengeExport } from "@/types/PongGame";
+import { User, Relationship } from "sdk/typescript-axios-client-generated";
+import { InjectionKey } from "vue";
+import { createStore, useStore as baseUseStore, Store } from "vuex";
+
+interface ChallengeReceived {
+  challenger: string;
+  expiry_date: Date;
+}
 
 // define your typings for the store state
 export interface State {
-  user: User,
-  message: string,
-  firstTimeConnect: boolean,
-  isConnected: boolean,
+  user: User;
+  message: string;
+  error: boolean;
+  firstTimeConnect: boolean;
+  isConnected: boolean;
   onlineUsers: User[];
   inGameUsers: string[];
-  challengesReceived: string[]; // string[] of usernames
+  challengesReceived: ChallengeReceived[]; // string[] of usernames
   allPendingChallenges: challengeExport[];
 }
 
 // define injection key
-export const key: InjectionKey<Store<State>> = Symbol()
+export const key: InjectionKey<Store<State>> = Symbol();
 
 /**
  * Following is the actual store
@@ -27,17 +33,17 @@ export const store = createStore<State>({
       id: 0,
       username: "0",
     },
-    message: '',
+    message: "",
+    error: false,
     firstTimeConnect: false,
     isConnected: false,
     onlineUsers: [],
     inGameUsers: [],
     challengesReceived: [],
-    allPendingChallenges: []
+    allPendingChallenges: [],
   },
   getters: {},
   mutations: {
-
     resetUser(state: State) {
       state.user.id = 0;
       state.user.username = "0";
@@ -71,80 +77,79 @@ export const store = createStore<State>({
     },
 
     addOnlineUser(state: State, newUser: User) {
-      const user = state.onlineUsers.find(user => user.id === newUser.id);
-      if (!user)
-        state.onlineUsers.push(newUser);
+      const user = state.onlineUsers.find((user) => user.id === newUser.id);
+      if (!user) state.onlineUsers.push(newUser);
     },
 
     allConnectedUsers(state: State, connectedUsers: User[]) {
-      if (connectedUsers.length)
-        state.onlineUsers = connectedUsers;
+      if (connectedUsers.length) state.onlineUsers = connectedUsers;
     },
 
     removeOnlineUser(state: State, id: number) {
       if (id) {
-        state.onlineUsers = state.onlineUsers.filter(u => u.id !== id);
+        state.onlineUsers = state.onlineUsers.filter((u) => u.id !== id);
       }
     },
-    
+
     addInGameUsers(state: State, players: string[]) {
-      const user1 = state.inGameUsers.find(user => user === players[0]);
-      if (!user1)
-      state.inGameUsers.push(players[0]);
-      const user2 = state.inGameUsers.find(user => user === players[1]);
-      if (!user2)
-      state.inGameUsers.push(players[1]);
+      const user1 = state.inGameUsers.find((user) => user === players[0]);
+      if (!user1) state.inGameUsers.push(players[0]);
+      const user2 = state.inGameUsers.find((user) => user === players[1]);
+      if (!user2) state.inGameUsers.push(players[1]);
     },
-    
+
     removeInGameUsers(state: State, players: string[]) {
       if (players[0]) {
-        state.inGameUsers = state.inGameUsers.filter(user => user !== players[0]);
+        state.inGameUsers = state.inGameUsers.filter(
+          (user) => user !== players[0]
+        );
       }
       if (players[1]) {
-        state.inGameUsers = state.inGameUsers.filter(user => user !== players[1]);
+        state.inGameUsers = state.inGameUsers.filter(
+          (user) => user !== players[1]
+        );
       }
     },
 
-    allPlayingUsers(state: State, players: string[])
-    {
-      if (players.length)
-        state.inGameUsers = players
+    allPlayingUsers(state: State, players: string[]) {
+      if (players.length) state.inGameUsers = players;
     },
 
-    addChallenge(state: State, challenger: string)
-    {
-      state.challengesReceived.push(challenger)
+    addChallenge(state: State, challenge: ChallengeReceived) {
+      state.challengesReceived.push(challenge);
     },
-    removeChallenge(state: State, challenger: string)
-    {
-      state.challengesReceived = state.challengesReceived.filter(user => user !== challenger)
+    removeChallenge(state: State, challenger: string) {
+      state.challengesReceived = state.challengesReceived.filter(
+        (user) => user.challenger !== challenger
+      );
     },
-    allPendingChallenges(state: State, challenges: challengeExport[])
-    {
+    allPendingChallenges(state: State, challenges: challengeExport[]) {
       // // register only challenges that are adressed to loged in user
       // challenges.forEach((challenge) => {
       //   if (challenge.challengeeName === state.user.username)
       //     state.challengesReceived.push(challenge.challengerName)
       // })
 
-      if (challenges.length)
-        state.allPendingChallenges = challenges
+      if (challenges.length) state.allPendingChallenges = challenges;
     },
-
-
   },
   actions: {
     setMessage(context, payload: string) {
-      context.commit('setMessage', payload);
+      context.commit("setMessage", payload);
       setTimeout(() => {
-        context.commit('setMessage', '');
+        context.commit("setMessage", "");
       }, 3000);
     },
-
+    setChallenge(context, payload: string) {
+      context.commit("setMessage", payload);
+      setTimeout(() => {
+        context.commit("setMessage", "");
+      }, 10000);
+    },
   },
-})
+});
 
 // define your own `useStore` composition function
 export function useStore() {
-  return baseUseStore(key)
+  return baseUseStore(key);
 }

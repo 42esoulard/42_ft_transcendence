@@ -57,8 +57,6 @@ $profile-social-margin: 1rem 0 0 0;
 
 //ACCOUNT
 
-
-
 //USERS
 $users-avatar-width: 3rem;
 $users-wrap-width: 3.5rem;
@@ -71,8 +69,8 @@ $users-title-size: 1.5rem;
 $chat-main-font: "Saira", Arial;
 $chat-font-light: white;
 $chat-font-dark: black;
-$chat-bg-light:rgba(240, 255, 255, 0.253);
-$chat-bg-dark:rgba(0, 0, 0, 0.808);
+$chat-bg-light: rgba(240, 255, 255, 0.253);
+$chat-bg-dark: rgba(0, 0, 0, 0.808);
 $chat-height: 600px;
 $chat-width: 70%;
 $chat-border-radius: 10px;
@@ -122,7 +120,7 @@ $chans-title-padding: 20px;
 $channel-form-width: 300px;
 $channel-form-padding: 20px;
 $channel-form-position: 50%;
-$channel-form-margin: - ($channel-form-width * 0.5);
+$channel-form-margin: -($channel-form-width * 0.5);
 $channel-form-border-radius: 15px;
 $channel-form-title-padding: 10px;
 $channel-form-title-margin: 10px;
@@ -163,7 +161,6 @@ $list-div-title-size: 1.5rem;
 $table-cell-win-color: darken($third-color, 15);
 $table-cell-loss-color: white;
 
-
 //PROGRESS BAR
 $progress-bar-width: 100%;
 $progress-bar-height: 2rem;
@@ -172,7 +169,11 @@ $progress-bar-bg: #313131;
 $progress-bar-border-radius: 16px;
 $progress-bar-box-shadow: inset 0 1px 2px #000;
 $progress-bar-border: 1px solid black;
-$progress-bar-inside-bg: linear-gradient(to right, darken($prim-color, 15), darken($third-color, 15));
+$progress-bar-inside-bg: linear-gradient(
+  to right,
+  darken($prim-color, 15),
+  darken($third-color, 15)
+);
 $progress-bar-label-font: "Saira";
 $progress-bar-inside-height: 80%;
 $progress-bar-inside-border-radius: 12px;

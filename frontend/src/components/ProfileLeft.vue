@@ -220,10 +220,14 @@ export default defineComponent({
     const deleteAccount = async () => {
       if (store.state.user.id != 0) {
         if (confirm("Do you really want to delete?")) {
-          logOut();
           await userApi
-            .removeUser(store.state.user.id)
-            .then((res: any) => console.log("account deleted"))
+            .removeUser(store.state.user.id, {
+              withCredentials: true,
+            })
+            .then((res: any) => {
+              console.log("account deleted");
+              logOut();
+            })
             .catch((err: any) => console.log(err));
         }
       }
@@ -244,10 +248,15 @@ export default defineComponent({
     const addFriend = async (user: User) => {
       if (store.state.user.id != 0) {
         await relationshipApi
-          .saveRelationship({
-            requesterId: store.state.user.id,
-            adresseeId: user.id,
-          })
+          .saveRelationship(
+            {
+              requesterId: store.state.user.id,
+              adresseeId: user.id,
+            },
+            {
+              withCredentials: true,
+            }
+          )
           .then((res: any) => {
             userFriendships.value.push(res.data);
           })
@@ -258,10 +267,15 @@ export default defineComponent({
     const removeFriend = async (user: User) => {
       if (store.state.user.id != 0) {
         await relationshipApi
-          .removeRelationship({
-            userId1: user.id,
-            userId2: store.state.user.id,
-          })
+          .removeRelationship(
+            {
+              userId1: user.id,
+              userId2: store.state.user.id,
+            },
+            {
+              withCredentials: true,
+            }
+          )
           .then((res: any) => {
             let index = 0;
             for (const friendship of userFriendships.value) {
@@ -269,7 +283,7 @@ export default defineComponent({
                 friendship.requesterId == user.id ||
                 friendship.adresseeId == user.id
               ) {
-                userFriendships.value.splice(index, 1);
+                if (friendship.pending) userFriendships.value.splice(index, 1);
                 break;
               }
               index++;
@@ -282,13 +296,20 @@ export default defineComponent({
     const acceptFriend = async (user: User) => {
       if (store.state.user.id != 0) {
         await relationshipApi
-          .validateRelationship({
-            requesterId: user.id,
-            adresseeId: store.state.user.id,
-          })
+          .validateRelationship(
+            {
+              requesterId: user.id,
+              adresseeId: store.state.user.id,
+            },
+            {
+              withCredentials: true,
+            }
+          )
           .then((res: any) => {
             for (const friendship of userFriendships.value) {
-              if (friendship.requesterId == user.id) friendship.pending = false;
+              if (friendship.requesterId == user.id) {
+                friendship.pending = false;
+              }
             }
           })
           .catch((err: any) => console.log(err));
@@ -329,11 +350,16 @@ export default defineComponent({
     const block = async (user: User) => {
       if (store.state.user.id != 0) {
         await relationshipApi
-          .saveRelationship({
-            requesterId: store.state.user.id,
-            adresseeId: user.id,
-            nature: "blocked",
-          })
+          .saveRelationship(
+            {
+              requesterId: store.state.user.id,
+              adresseeId: user.id,
+              nature: "blocked",
+            },
+            {
+              withCredentials: true,
+            }
+          )
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
       }
@@ -342,22 +368,35 @@ export default defineComponent({
     const unblock = async (user: User) => {
       if (store.state.user.id != 0) {
         await relationshipApi
-          .removeRelationship({
-            userId1: user.id,
-            userId2: store.state.user.id,
-          })
+          .removeRelationship(
+            {
+              userId1: user.id,
+              userId2: store.state.user.id,
+            },
+            {
+              withCredentials: true,
+            }
+          )
           .then((res: any) => window.location.reload())
           .catch((err: any) => console.log(err));
       }
     };
 
     const challengeUser = () => {
+      for (const challenge of store.state.challengesReceived) {
+        if (challenge.challenger == user.username) {
+          store.dispatch(
+            "setMessage",
+            `Error: ${user.username} already invited you to play!`
+          );
+          return;
+        }
+      }
       router.push({
-        name: "SendChallenge",
+        name: "Pong",
         params: {
           challengeeId: user.id,
           challengeeName: user.username,
-          authorized: "ok",
         },
       });
     };

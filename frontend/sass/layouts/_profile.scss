@@ -7,17 +7,16 @@
   margin: auto;
   margin-top: 2rem;
   gap: 2rem;
-  @media (max-width: 1200px){
+  @media (max-width: 1200px) {
     width: 800px;
   }
-  @media (max-width: 950px){
+  @media (max-width: 950px) {
     flex-direction: column;
     height: 100%;
     width: 100%;
     gap: 0;
     margin: 0;
   }
-
 }
 
 .profile-left {
@@ -30,10 +29,10 @@
   border-radius: 10px;
   padding: 0 2rem;
   width: 100%;
-  @media (max-width: 1200px){
+  @media (max-width: 1200px) {
     padding: 1rem;
   }
-  @media (max-width: 950px){
+  @media (max-width: 950px) {
     border-radius: 0;
     justify-content: flex-start;
   }
@@ -75,7 +74,6 @@
 
 .profile-left__status {
   font-family: "Saira";
-
 }
 
 .profile-left__social {
@@ -85,10 +83,10 @@
   flex-direction: column;
   justify-content: center;
   gap: $profile-social-gap;
-  @media (max-width: 950px){
+  @media (max-width: 950px) {
     width: 40%;
   }
-  @media (max-width: 400px){
+  @media (max-width: 400px) {
     width: 50%;
   }
 }
@@ -97,7 +95,7 @@
   display: flex;
   justify-content: center;
   align-content: center;
-  font-family: 'Saira';
+  font-family: "Saira";
   font-size: 1.2rem;
   color: grey;
 }
@@ -112,10 +110,10 @@
   width: $profile-stats-width;
   height: 100%;
   padding: 0 2rem;
-  @media (max-width: 1200px){
+  @media (max-width: 1200px) {
     margin: 0;
   }
-  @media (max-width: 950px){
+  @media (max-width: 950px) {
     border-radius: 0;
   }
   @media (max-width: 800px) {
