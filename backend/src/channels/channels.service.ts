@@ -12,6 +12,8 @@ import { ChannelMember } from 'src/channel_members/interfaces/channel_member.int
 import { reduce } from 'rxjs';
 import { RelationshipsService } from 'src/relationships/relationships.service';
 import { Role } from 'src/auth/models/role.enum';
+import { ChannelMembers } from 'src/channel_members/entity/channel_members.entity';
+import { Messages } from 'src/messages/entity/messages.entity';
 
 @Injectable()
 export class ChannelsService {
@@ -64,6 +66,58 @@ export class ChannelsService {
   async getUser(user_id: number): Promise<Users> {
     return await this.userService.getUserbyId(user_id);
   }
+
+  async getNotifications(userId: number): Promise<boolean> {
+    const user: Users = await this.userService.getUserbyId(userId);
+    if (user == undefined) {
+      return undefined;
+    }
+    let cms: ChannelMembers[] = await this.channelMemberService.getUserChannels(user);
+    if (cms == undefined) {
+      return undefined;
+    }
+    cms = cms.filter((cms) => cms.new_message);
+    if (cms.length) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  async getNewNotification(data: Messages, userId: number): Promise<boolean> {
+    // const user: Users = await this.userService.getUserbyId(userId);
+    // if (user == undefined) {
+    //   return undefined;
+    // }
+    console.log("IN GET NEW NOTIF", data.channel.id, userId)
+    let cms: ChannelMember = await this.getChannelMember(data.channel.id, userId);
+    if (cms == undefined || cms.ban) {
+      return false;
+    }
+
+    await this.relationshipService.getBlockedByUser(userId)
+    .then(async (blocked) => {
+    // console.log("blocked", blocked.data.map((blocked) => blocked.adresseeId));
+    // console.log(data.author.id)
+      if (blocked.map((blocked) => blocked.adresseeId).includes(data.author.id)) {
+        return false;
+      }
+    // if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
+    
+    //   channelMessages.value.push(data);
+    //   console.log("in get messages:", channelMessages.value);
+    // } else if (activeChannel.value!.channel) {
+      console.log("set newMessage = true here");
+      return await this.channelMemberService.setNewMessage(true, cms.id)
+      .then((res) => { 
+        return true
+      })
+      .catch((err) => console.log("Caught error:", err.response.data.message));
+    // }
+    // return false;
+  })
+// getMessagesUpdate(data.channel);
+};
 
   async getChannelMember(
     channel_id: number,

@@ -40,7 +40,7 @@
 <script lang="ts">
 import { ref, defineComponent, computed, onMounted } from "vue";
 import { ChatApi } from "@/../sdk/typescript-axios-client-generated";
-import { socket } from "./ChatComponent.vue"
+import { chatSocket } from "@/App.vue";
 import { useStore } from '@/store'
  
 export default defineComponent({
@@ -155,7 +155,7 @@ export default defineComponent({
       }, { withCredentials: true })
       .then((res) => {
         // console.log("in createChannel res", res)
-        socket.emit('createChannel', res.data);
+        chatSocket.emit('createChannel', res.data);
         closeModal();
       })
       .catch((err) => console.log("Caught error:", err.response.data.message))

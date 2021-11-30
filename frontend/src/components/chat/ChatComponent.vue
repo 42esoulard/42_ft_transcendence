@@ -132,7 +132,7 @@
 </template>
 
 <script lang="ts">
-import { io } from "socket.io-client";
+// import { io } from "socket.io-client";
 import { useStore } from '@/store';
 import { defineComponent, reactive, ref, watch, computed } from "vue";
 import { Info } from "@/types/Info";
@@ -144,21 +144,20 @@ import LockedChannelForm from "@/components/chat/LockedChannelForm.vue";
 import ChannelSettings from "@/components/chat/ChannelSettings.vue";
 import ChannelsList from "@/components/chat/ChannelsList.vue";
 import MuteBanPopup from "@/components/chat/MuteBanPopup.vue";
-
+import { chatSocket } from "@/App.vue"
 /*
-** socket is defined here to be able to import it from other chat related components
+** chatSocket is defined here to be able to import it from other chat related components
 */
-export const socket = io("http://localhost:3000/chat");
 
 export const ChatComponent = defineComponent({
   name: "ChatComponent",
   components: { NewChannelForm, LockedChannelForm, ChannelSettings, ChannelsList, MuteBanPopup, Modal, Toast },
 
   beforePageLeave() {
-    socket.emit("leave", 'a user');
+    chatSocket.emit("leave", 'a user');
   },
   beforeRouteLeave() {
-    socket.emit("leave", 'a user');
+    chatSocket.emit("leave", 'a user');
   },
   setup() {
 
@@ -183,18 +182,28 @@ export const ChatComponent = defineComponent({
     const channelSettings = ref(false);
     const isMember = ref(false);
     const mutePopup = ref(false);
+    // const refresh = ref(false);
 
     /*
     ** Default channel = id 1, "General". Automatically joined on connection, can't be left.
     */
-   store.state.chatNotification = false;
+    store.state.chatNotification = false;
+    store.state.chatOn = true;
 
     const getDefaultChannel = async () => {
       // console.log("IN DEFAULT CHANNEL BEFORE GCBI", 1, user.value.id)
       await api.getDefaultChannel({ withCredentials: true })
       .then(async (chan) => {
         await joinChannel(chan.data)
-        .then(() => updateChannelsList())
+        .then(async () => {
+          await api.setNewMessage('false', chan.data.id, { withCredentials: true })
+          .then((res) => { 
+            updateChannelsList();
+            activeChannel.value = res.data;
+          })
+          .catch((err) => console.log("Caught error:", err.response.data.message));
+        })
+        .catch((err) => console.log("Caught error:", err.response.data.message));
       })
       .catch((err) => console.log("Caught error:", err.response.data.message));
     }
@@ -281,8 +290,8 @@ export const ChatComponent = defineComponent({
       }, { withCredentials: true })
       .then(() => {
         getMessagesUpdate(newContent.channel.id);
-          // socket.emit('update-channels');        
-        socket.emit("chat-message", newContent);
+          // chatSocket.emit('update-channels');        
+        chatSocket.emit("chat-message", newContent);
       })
       .catch(async (err: any) => {
         console.log("Caught error:", err.response.data.message)
@@ -344,7 +353,7 @@ export const ChatComponent = defineComponent({
       }
     }
 
-    socket.on("join-channel", (chan: Channel) => {
+    chatSocket.on("join-channel", (chan: Channel) => {
       console.log("IN JOIN CHANNEL")
       joinChannel(chan);
     });
@@ -361,7 +370,7 @@ export const ChatComponent = defineComponent({
           getMessagesUpdate(res.data.channel.id);
           if (channel.id !== 1) {
             store.dispatch("setMessage", "You're now a member of channel [" + channel.name.substring(0, 15) + "]");
-            socket.emit('update-channels');
+            chatSocket.emit('update-channels');
           }
           return res;
         })
@@ -373,7 +382,7 @@ export const ChatComponent = defineComponent({
       store.dispatch("setMessage", "Channel [" + activeChannel.value!.channel.name.substring(0, 15) + "] has been deleted");
       updateChannelsList();
       switchChannel(joinedChannels.value[0]);
-      socket.emit('update-channels')
+      chatSocket.emit('update-channels')
     }
 
     const leaveChannel = async () => {
@@ -384,7 +393,7 @@ export const ChatComponent = defineComponent({
         store.dispatch("setMessage", "You're no longer a member of channel [" + name.substring(0, 15) + "]");
         updateChannelsList();
         switchChannel(joinedChannels.value[0]);
-        socket.emit('update-channels');
+        chatSocket.emit('update-channels');
       })
       .catch((err) => console.log("Caught error:", err.response.data.message));
     }
@@ -411,7 +420,7 @@ export const ChatComponent = defineComponent({
         await api.joinChannel("dm", cm.data.channel.id, recipient.id, { withCredentials: true })
         .then((res)=> {
           // console.log(res)
-          socket.emit('update-channels', cm.data)
+          chatSocket.emit('update-channels', cm.data)
           return res;
         })
         .catch((err) => console.log("Caught error:", err.response.data.message));
@@ -444,8 +453,9 @@ export const ChatComponent = defineComponent({
     const switchChannel =  async (cm: ChannelMember) => {
       channelSettings.value = false;
       activeChannel.value = cm;
-      await api.setNewMessage(false, cm.channel.id, { withCredentials: true })
+      await api.setNewMessage('false', cm.channel.id, { withCredentials: true })
       .then((res) => { 
+        updateChannelsList();
         activeChannel.value = res.data;
       })
       .catch((err) => console.log("Caught error:", err.response.data.message));
@@ -454,7 +464,7 @@ export const ChatComponent = defineComponent({
       getMessagesUpdate(cm.channel.id);
     }
 
-    socket.on("chat-message", async (data: any) => {
+    chatSocket.on("chat-message-on", async (data: any) => {
       console.log("0RECEIVED CHAT MESSAGE, data:", data)
       await relApi.getBlockedByUser(user.value.id)
         .then(async (blocked) => {
@@ -469,27 +479,27 @@ export const ChatComponent = defineComponent({
             console.log("in get messages:", channelMessages.value);
           } else if (activeChannel.value!.channel) {
             console.log("set newMessage = true here");
-            await api.setNewMessage(true, data.channel.id, { withCredentials: true })
+            await api.setNewMessage('true', data.channel.id, { withCredentials: true })
             .then((res) => { 
               store.state.chatNotification = true; 
               console.log(res)
               updateChannelsList();
             })
-            .catch((err) => console.log("Caught error:", err.response.data.message));
+          .catch((err) => console.log("Caught error:", err.response.data.message));
           }
       // getMessagesUpdate(data.channel);
       });
     });
 
-    // socket.on("typing", (user: string) => {
+    // chatSocket.on("typing", (user: string) => {
     //   typing.value = user;
     // });
 
-    // socket.on("stopTyping", () => {
+    // chatSocket.on("stopTyping", () => {
     //   typing.value = "";
     // });
 
-    socket.on('created-channel', async (cm: ChannelMember) => {
+    chatSocket.on('created-channel', async (cm: ChannelMember) => {
       // toggleModal(0);
       await updateChannelsList()
       .then(() => {
@@ -498,25 +508,29 @@ export const ChatComponent = defineComponent({
       .catch((err) => console.log("Caught error:", err.response.data.message));
     })
 
-    socket.on('update-channels', () => {
+    chatSocket.on('update-channels', () => {
       updateChannelsList();
     })
 
-    // socket.on("join", (username: string, connectionsNb: number) => {
+    // chatSocket.on('update-notifications', () => {
+    //   refresh.value = true;
+    //   console.log("refresh true")
+    // })
+    // chatSocket.on("join", (username: string, connectionsNb: number) => {
     //   info.push({
     //     username: username,
     //     action: "joined",
     //   });
 
     //   //updating connection nb for newcomer
-    //   // socket.emit("get-connections")
+    //   // chatSocket.emit("get-connections")
 
     //   setTimeout(() => {
     //     info.length = 0;
     //   }, 5000);
     // });
 
-    // socket.on("leave", (user: string) => {
+    // chatSocket.on("leave", (user: string) => {
     //   info.push({
     //     username: user,
     //     action: "left",
@@ -527,27 +541,27 @@ export const ChatComponent = defineComponent({
     //   }, 5000);
     // });
 
-    // socket.on("connections", (data: number) => {
+    // chatSocket.on("connections", (data: number) => {
     //   connections.value = data;
     // });
 
-    watch(newMessage, (newMessage) => {
-      newMessage
-        ? socket.emit("typing", user.value.username)
-        : socket.emit("stopTyping");
-    });
+    // watch(newMessage, (newMessage) => {
+    //   newMessage
+    //     ? chatSocket.emit("typing", user.value.username)
+    //     : chatSocket.emit("stopTyping");
+    // });
 
     window.onbeforeunload = () => {
-      // socket.emit("leave", user.value.username);
-      socket.off('chat-message');
-      socket.off('created-channel');
-      socket.off('join-channel');
-      socket.off('update-channels');
-      // socket.off('leave');
+      // chatSocket.emit("leave", user.value.username);
+      chatSocket.off('chat-message');
+      chatSocket.off('created-channel');
+      chatSocket.off('join-channel');
+      chatSocket.off('update-channels');
+      // chatSocket.off('leave');
     };
 
     return {
-      socket,
+      chatSocket,
 
       send,
       newMessage,

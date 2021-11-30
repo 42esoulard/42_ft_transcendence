@@ -210,7 +210,7 @@ export class ChannelsController {
   @Get('/chat-message/:status/:chanId')
   @UseGuards(JwtTwoFactorGuard)
   async setNewMessage(
-    @Param('status') status: boolean,
+    @Param('status') status: string,
     @Param('chanId') chanId: number,
     @Req() request: Request,
   ): Promise<ChannelMember> {
@@ -223,10 +223,11 @@ export class ChannelsController {
     } else if (!cm.notification) {
       throw new NotFoundException('Not subscribed to this channel\'s notifications');
     }
-    if (status == cm.new_message) {
+    const bool = (status == 'true' ? true : false);
+    if (bool == cm.new_message) {
       return cm;
     }
-    return await this.channelService.setNewMessage(status, cm.id);
+    return await this.channelService.setNewMessage(bool, cm.id);
   }
 
   @Get('/toggle-notification/:cmId')

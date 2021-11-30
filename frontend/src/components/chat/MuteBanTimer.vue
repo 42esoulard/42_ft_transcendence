@@ -31,7 +31,6 @@
 <script lang="ts">
 import { ref, defineComponent, computed } from "vue";
 import { ChatApi } from "@/../sdk/typescript-axios-client-generated";
-import { socket } from "./ChatComponent.vue"
 import { useStore } from '@/store'
  
 export default defineComponent({
@@ -39,8 +38,6 @@ export default defineComponent({
   props: [ 'action', 'targetCm', 'activeChannel' ],
   emits: ['close', 'update-mute-ban'],
   setup(props, context) {
-    const api = new ChatApi();
-    const store = useStore();
 
     const dateInput = computed(() => <HTMLInputElement>document.querySelector('input')!);
     const curDate = new Date(Date.now() + 3600000);

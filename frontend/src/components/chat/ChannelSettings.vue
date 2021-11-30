@@ -123,7 +123,7 @@
 <script lang="ts">
 import { ref, defineComponent, computed } from "vue";
 import { ChannelMember, ChatApi, UserApi } from "@/../sdk/typescript-axios-client-generated";
-import { socket } from "./ChatComponent.vue"
+import { chatSocket } from "@/App.vue";
 import { useStore } from '@/store';
 import Modal from "@/components/Modal.vue";
 import MuteBanTimer from "@/components/chat/MuteBanTimer.vue";
@@ -215,7 +215,7 @@ export default defineComponent({
       .then((res) => {
         targetCm.value = res.data;
         context.emit('update-channels-list');
-        socket.emit('update-channels');
+        chatSocket.emit('update-channels');
 
         if (action === 'muted') {
           setTimeout(() => updateMuteBan("unmute", cmId, 0), endDate - Date.now())
@@ -232,7 +232,7 @@ export default defineComponent({
       .then(() => {
         targetCm.value = cm;
         context.emit('update-channels-list');
-        socket.emit('update-channels');
+        chatSocket.emit('update-channels');
         if (cm.id == props.activeChannel.id) {
           closeChannelSettings();
         }
@@ -300,7 +300,7 @@ export default defineComponent({
       , { withCredentials: true })
       .then((res) => {
         context.emit('update-channels-list');
-        socket.emit('update-channels');
+        chatSocket.emit('update-channels');
         username.value = '';
         wasSubmitted.value = false;
       })
@@ -327,7 +327,7 @@ export default defineComponent({
         { withCredentials: true })
       .then((res) => {
         context.emit('update-channels-list');
-        socket.emit('update-channels');
+        chatSocket.emit('update-channels');
         wasSubmitted.value = false;
       })
       .catch((err) => {
@@ -384,7 +384,7 @@ export default defineComponent({
       .then((res) => {
         console.log("in updateChannel res", res)
         context.emit('update-channels-list');
-        socket.emit('update-channels');
+        chatSocket.emit('update-channels');
         closeChannelSettings();
       })
       .catch((err) => console.log("Caught error:", err.response.data.message))

@@ -169,7 +169,7 @@ export class ChannelMembersService {
     
     const cm: ChannelMembers = await this.getChannelMemberById(cmId);
     console.log("wutwutwutwut", cm)
-    console.log(status);
+    console.log(status, typeof cm.new_message, typeof status);
     cm.new_message = status;
     return await this.channelMembersRepository
     .save(cm)
@@ -186,6 +186,11 @@ export class ChannelMembersService {
 
   async toggleNotification(cmId: number): Promise<ChannelMember> {
     const cm: ChannelMembers = await this.getChannelMemberById(cmId);
+    if (cm == undefined) {
+      throw new BadRequestException(
+        'Channel Member did not comply database requirements',
+      );
+    }
     cm.notification = !cm.notification;
     
     return await this.channelMembersRepository

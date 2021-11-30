@@ -1,3 +1,5 @@
+import { Param } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -8,6 +10,11 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { ChannelsService } from 'src/channels/channels.service';
+import { Messages } from 'src/messages/entity/messages.entity';
+// import { ChannelMembersService } from 'src/channel_members/channel_members.service';
+// import { RelationshipsService } from 'src/relationships/relationships.service';
+import { User } from 'src/users/interfaces/user.interface';
 
 @WebSocketGateway({
   namespace: '/chat',
@@ -17,34 +24,84 @@ import { Server, Socket } from 'socket.io';
   },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  constructor(
+    private readonly channelsService: ChannelsService,
+    // private readonly relationshipService: RelationshipsService,
+  ){}
+
   @WebSocketServer()
   server: Server;
 
-  connections = 0;
+  async handleConnection(@ConnectedSocket() client: Socket) {
+    console.log('A client has connected to the chat');
+    // client.emit('update-notifications');
+    // await this.cmRepo.find({where: { new_message: true },})
+    // .then((res) => {
+    //   client.emit('chat-notifications', res);
+    // })
+    client.on('newConnection', async (user: User) => {
+      await this.channelsService.getNotifications(user.id)
+      .then((res) => {
+        if (res) {
+          client.emit('chatNotifications');
+        }
+      })
+    })
 
-  async handleConnection() {
-    console.log('A client has connected');
-    this.connections++;
-    // Notify connected clients of current users
-    this.server.emit('connections', this.connections);
+    client.on('chat-message-off', async (data: Messages, user: User) => {
+      await this.channelsService.getNewNotification(data, user.id)
+      .then((res) => {
+        if (res) {
+          client.emit('chatNotifications');
+        }
+      })
+      .catch((err) => console.log("Caught error:", err.response.data.message))
+    })
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
     console.log('A client has disconnected');
-    this.connections--;
     client.disconnect();
-    // Notify connected clients of current users
-    this.server.emit('connections', this.connections);
-  }
-
-  @SubscribeMessage('get-connections')
-  async getConnections(@ConnectedSocket() client: Socket) {
-    client.broadcast.emit('connections', this.connections);
   }
 
   @SubscribeMessage('chat-message')
   async onChat(@ConnectedSocket() client: Socket, @MessageBody() message) {
     client.broadcast.emit('chat-message', message);
+  }
+
+  @SubscribeMessage('chat-message-on')
+  async onChatMessageOn(@ConnectedSocket() client: Socket, @MessageBody() message) {
+    client.emit('chat-message-on', message);
+  }
+
+  @SubscribeMessage('chat-message-off')
+  async onChatMessageOff(@ConnectedSocket() client: Socket, @MessageBody() message, user: User) {
+    // await relApi.getBlockedByUser(user.value.id)
+    //     .then(async (blocked) => {
+    //       // console.log("blocked", blocked.data.map((blocked) => blocked.adresseeId));
+    //       // console.log(data.author.id)
+    //       if (blocked.data.map((blocked) => blocked.adresseeId).includes(data.author.id)) {
+    //         return;
+    //       }
+    //       if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
+          
+    //         channelMessages.value.push(data);
+    //         console.log("in get messages:", channelMessages.value);
+    //       } else if (activeChannel.value!.channel) {
+    //         console.log("set newMessage = true here");
+    //         await api.setNewMessage('true', data.channel.id, { withCredentials: true })
+    //         .then((res) => { 
+    //           store.state.chatNotification = true; 
+    //           console.log(res)
+    //           updateChannelsList();
+    //         })
+    //         .catch((err) => console.log("Caught error:", err.response.data.message));
+    //       }
+    //   // getMessagesUpdate(data.channel);
+    //   });
+    
+    client.emit('chatNotifications', message);
+  
   }
 
   @SubscribeMessage('createChannel')
@@ -75,26 +132,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.leave(channel);
   }
 
-  @SubscribeMessage('typing')
-  async onTyping(
-    @MessageBody() TypingUser: string,
-    @ConnectedSocket() client: Socket,
-  ) {
-    client.broadcast.emit('typing', TypingUser);
-    // console.log(TypingUser);
-  }
-
-  @SubscribeMessage('stopTyping')
-  async onStopTyping(@ConnectedSocket() client: Socket) {
-    client.broadcast.emit('stopTyping');
-  }
-
-  @SubscribeMessage('join')
-  async onJoin(@MessageBody() user: string, @ConnectedSocket() client: Socket) {
-    console.log(user, ' joined');
-    // User has joined the chat
-    client.broadcast.emit('join', user, this.connections);
-  }
+  // @SubscribeMessage('join')
+  // async onJoin(@MessageBody() user: string, @ConnectedSocket() client: Socket) {
+  //   console.log(user, ' joined');
+  //   // User has joined the chat
+  //   client.broadcast.emit('join', user, this.connections);
+  // }
 
   @SubscribeMessage('leave')
   async onLeave(

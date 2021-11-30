@@ -18,7 +18,7 @@
 <script lang="ts">
 import { ref, defineComponent, computed } from "vue";
 import { ChatApi } from "@/../sdk/typescript-axios-client-generated";
-import { socket } from "./ChatComponent.vue"
+import chatSocket from "@/App.vue";
 import { useStore } from '@/store'
  
 export default defineComponent({
@@ -31,8 +31,6 @@ export default defineComponent({
     const passwordInput = computed(() => <HTMLInputElement>document.querySelector('input')!);
     const passwordAttempt = ref('');
     const store = useStore();
-    const user = computed(() => store.state.user);
-    const sock = ref(socket);
 
     const closeModal = () => {
       context.emit("close");
