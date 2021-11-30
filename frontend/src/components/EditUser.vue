@@ -23,7 +23,7 @@
         v-focus
         name="username"
         v-model="username"
-        maxlength="10"
+        maxlength="8"
         :placeholder="user.username"
       />
       <transition-group name="fade--error">
@@ -31,7 +31,7 @@
         <p v-if="error_avatar" class="error">{{ error_avatar }}</p>
       </transition-group>
       <hr />
-      <button class="button button--primary">Update your info</button>
+      <button class="button button--primary" style="margin: auto">Update your info</button>
     </form>
   </div>
 </template>
@@ -80,7 +80,7 @@ export default defineComponent({
 
     const updateUsername = async (): Promise<boolean> => {
       let ret = false;
-      if (!/^[a-zA-Z0-9]+$/.test(username.value))
+      if (!/^[a-zA-Z]+$/.test(username.value))
         error_username.value = "Username should only contains letters";
       else if (users.value.find((user) => user.username == username.value))
         error_username.value = "Username already taken";

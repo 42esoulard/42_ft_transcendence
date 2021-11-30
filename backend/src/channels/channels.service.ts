@@ -75,9 +75,7 @@ export class ChannelsService {
     return await this.channelMemberService.getChannelMember(channel, user);
   }
 
-  async getCmById(
-    cm_id: number,
-  ): Promise<ChannelMember> {
+  async getCmById(cm_id: number): Promise<ChannelMember> {
     return await this.channelMemberService.getChannelMemberById(cm_id);
   }
 
@@ -85,8 +83,11 @@ export class ChannelsService {
     return await this.relationshipService
       .getUserBlocked(user_id)
       .then((res) => {
-        if (res && (res.map((res) => res.adresseeId).includes(blocked_id) ||
-        res.map((res) => res.requesterId).includes(blocked_id))) {
+        if (
+          res &&
+          (res.map((res) => res.adresseeId).includes(blocked_id) ||
+            res.map((res) => res.requesterId).includes(blocked_id))
+        ) {
           return true;
         }
         return false;
@@ -107,7 +108,8 @@ export class ChannelsService {
         userChannels.forEach((cm) => {
           if (res && cm.channel.messages) {
             cm.channel.messages = cm.channel.messages.filter(
-              (msg) => !res.map((res) => res.adresseeId).includes(msg.author.id),
+              (msg) =>
+                !res.map((res) => res.adresseeId).includes(msg.author.id),
             );
           }
           if (res && cm.channel.channel_members) {
@@ -131,7 +133,8 @@ export class ChannelsService {
         channels.forEach((chan) => {
           if (chan.messages && res) {
             chan.messages = chan.messages.filter(
-              (msg) => !res.map((res) => res.adresseeId).includes(msg.author.id),
+              (msg) =>
+                !res.map((res) => res.adresseeId).includes(msg.author.id),
             );
           }
           if (chan.channel_members && res) {

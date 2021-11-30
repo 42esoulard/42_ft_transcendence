@@ -20,7 +20,7 @@ import { RolesGuard } from './guards/roles.guard';
     JwtTwoFactorStrategy,
     RefreshTwoFactorStrategy,
     SessionSerializer,
-    RolesGuard
+    RolesGuard,
   ],
   imports: [
     UsersModule,
@@ -29,6 +29,6 @@ import { RolesGuard } from './guards/roles.guard';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1d' },
     }),
-  ]
+  ],
 })
-export class AuthModule { }
+export class AuthModule {}

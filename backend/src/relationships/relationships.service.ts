@@ -79,11 +79,7 @@ export class RelationshipsService {
     return await this.relationshipsRepository.save(newRelationship);
   }
 
-  async validateRelationship(relationshipDto: ValidateRelationshipDto) {
-    const relationship = await this.getRelationship(
-      relationshipDto.requesterId,
-      relationshipDto.adresseeId,
-    );
+  async validateRelationship(relationship: Relationship) {
     relationship.pending = false;
     return await this.relationshipsRepository.update(relationship.id, {
       pending: false,

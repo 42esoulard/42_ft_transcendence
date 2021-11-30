@@ -1,7 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
+import {
+  DocumentBuilder,
+  SwaggerDocumentOptions,
+  SwaggerModule,
+} from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import * as fs from "fs";
+import * as fs from 'fs';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import { TypeORMSession } from './auth/entity/TypeORMSession.entity';
@@ -15,7 +19,7 @@ async function bootstrap() {
 
   app.enableCors({
     credentials: true,
-    origin: ["http://localhost:8080", "http://127.0.0.1:8080"]
+    origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
   }); // Mandatory to interact w/ vue js which is on a different port
 
   //Setting up the OpenApi to generate client sdk
@@ -28,15 +32,12 @@ async function bootstrap() {
     .addCookieAuth('tokens')
     .build();
   const options: SwaggerDocumentOptions = {
-    operationIdFactory: (
-      controllerKey: string,
-      methodKey: string
-    ) => methodKey
+    operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
   };
   const document = SwaggerModule.createDocument(app, config, options);
 
   // To save the api specification in root
-  fs.writeFileSync("./api-spec.json", JSON.stringify(document));
+  fs.writeFileSync('./api-spec.json', JSON.stringify(document));
 
   SwaggerModule.setup('api', app, document);
 
@@ -48,8 +49,7 @@ async function bootstrap() {
       },
       resave: false,
       saveUninitialized: false,
-      store: new TypeormStore({})
-        .connect(sessionRepository),
+      store: new TypeormStore({}).connect(sessionRepository),
       secret: process.env.JWT_SECRET,
     }),
   );

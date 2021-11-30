@@ -21,8 +21,7 @@ export default {
     const isActive = computed(() => route.path === props.to);
     const hasNotification = computed(
       () =>
-        ((store.state.inGameUsers.length > 0 && props.to === "/pong/watch") ||
-          (store.state.challengesReceived.length > 0 && props.to === "/pong")) && // test à faire sur le tableau de challenges
+        ((store.state.challengesReceived.length > 0 && props.to === "/pong")) && // test à faire sur le tableau de challenges
         !isActive.value
     );
 

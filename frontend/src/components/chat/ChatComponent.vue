@@ -11,12 +11,12 @@
           </p>
         </div> -->
 
-        <ChannelSettings v-if="channelSettings"  
-          @close-settings="channelSettings = false" 
-          @update-channel="getMessagesUpdate(activeChannel.channel.id)" 
-          @update-channels-list="updateChannelsList()" 
+        <ChannelSettings v-if="channelSettings"
+          @close-settings="channelSettings = false"
+          @update-channel="getMessagesUpdate(activeChannel.channel.id)"
+          @update-channels-list="updateChannelsList()"
           @deleted-channel="deletedChannel()"
-          :activeChannel="activeChannel" 
+          :activeChannel="activeChannel"
         />
         <div v-else class="chat-box">
             <div v-if="activeChannel" class='chat-header'>
@@ -82,15 +82,15 @@
                 />
                 <div v-else @mouseover="hoveringLock = true" @mouseout="hoveringLock = false">
                   <div v-if="hoveringLock">
-                  <button v-if="activeChannel" 
-                  class="chat-box__input chat-box__input--blued" 
+                  <button v-if="activeChannel"
+                  class="chat-box__input chat-box__input--blued"
                   @click="applyForMembership(activeChannel.channel)">
                     <div>Join the channel to send messages</div>
                   </button>
                   </div>
                   <div v-else>
-                  <button v-if="activeChannel" 
-                  class="chat-box__input chat-box__input--greyed" 
+                  <button v-if="activeChannel"
+                  class="chat-box__input chat-box__input--greyed"
                   @click="applyForMembership(activeChannel.channel)">
                     <div>Join the channel to send messages</div>
                   </button>
@@ -225,7 +225,7 @@ export const ChatComponent = defineComponent({
               return res;
             })
             .catch((err) => console.log("Caught error:", err.response.data.message));
-        
+
           }
         });
         await api.getAvailableChannels({ withCredentials: true })
@@ -275,7 +275,7 @@ export const ChatComponent = defineComponent({
       }, { withCredentials: true })
       .then(() => {
         getMessagesUpdate(newContent.channel.id);
-          // socket.emit('updateChannels');        
+          // socket.emit('updateChannels');
         socket.emit("chat-message", newContent);
       })
       .catch(async (err: any) => {
@@ -314,7 +314,7 @@ export const ChatComponent = defineComponent({
           return res;
         })
         .catch((err) => console.log("Caught error:", err.response.data.message));
-        
+
     }
 
     const applyForMembership = async (channel: Channel) => {
@@ -442,7 +442,7 @@ export const ChatComponent = defineComponent({
           channelMessages.value.push(data);
           console.log("in get messages:", channelMessages.value);
         })
-        
+
     }
       // getMessagesUpdate(data.channel);
     });

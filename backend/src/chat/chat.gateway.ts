@@ -51,14 +51,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleCreateChannel(@ConnectedSocket() client: Socket, @MessageBody() info) {
     // User has created a new chatroom
     client.emit('createdChannel', info);
-    
+
     //Notify other users of chatroom creation
     client.broadcast.emit('updateChannels', info);
   }
 
   @SubscribeMessage('updateChannels')
   handleUpdateChannels(@ConnectedSocket() client: Socket, @MessageBody() info) {
-    
     //Notify other users of chatroom creation
     client.broadcast.emit('updateChannels', info);
   }

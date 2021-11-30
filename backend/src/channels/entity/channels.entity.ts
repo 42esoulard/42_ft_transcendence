@@ -36,5 +36,4 @@ export class Channels {
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
   created_at: Date;
-
 }

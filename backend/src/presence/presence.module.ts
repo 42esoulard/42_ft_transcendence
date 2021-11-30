@@ -10,4 +10,4 @@ import { PresenceGateway } from './presence.gateway';
   //   }),
   // ]
 })
-export class PresenceModule { }
+export class PresenceModule {}

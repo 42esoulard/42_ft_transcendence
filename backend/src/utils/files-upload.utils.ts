@@ -1,7 +1,7 @@
-import { Request } from "express";
-import { extname } from "path";
-import * as fs from "fs";
-import { diskStorage } from "multer";
+import { Request } from 'express';
+import { extname } from 'path';
+import * as fs from 'fs';
+import { diskStorage } from 'multer';
 import { fromFile } from 'file-type';
 
 const validFileExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
@@ -10,7 +10,7 @@ const validMimeTypes = [
   'image/jpeg',
   'image/png',
   'image/gif',
-  'image/webp'
+  'image/webp',
 ];
 
 function _imageFileFilter(req: Request, file: Express.Multer.File, callback) {
@@ -23,11 +23,11 @@ function _imageFileFilter(req: Request, file: Express.Multer.File, callback) {
 
 function _editFileName(req: Request, file: Express.Multer.File, callback) {
   const fileExtName = extname(file.originalname);
-  let newName = "user"; // default filename 
+  let newName = 'user'; // default filename
   if (req.user?.forty_two_login) {
     newName = req.user.forty_two_login;
   }
-  console.log("new name:", `${newName}_tmp${fileExtName}`)
+  console.log('new name:', `${newName}_tmp${fileExtName}`);
   callback(null, `${newName}_tmp${fileExtName}`);
 }
 
@@ -37,10 +37,12 @@ export const saveImageToStorage = {
     filename: _editFileName,
   }),
   fileFilter: _imageFileFilter,
-  limits: { fileSize: 1024 * 1024 } //(in bytes)
-}
+  limits: { fileSize: 1024 * 1024 }, //(in bytes)
+};
 
-export const IsFileExtensionSafe = async (filePath: string): Promise<boolean> => {
+export const IsFileExtensionSafe = async (
+  filePath: string,
+): Promise<boolean> => {
   // console.log('FILEPATH', filePath);
   try {
     const fileType = await fromFile(filePath);
@@ -60,4 +62,4 @@ export const removeFile = (filePath: string) => {
   } catch (error) {
     console.log(error);
   }
-}
+};

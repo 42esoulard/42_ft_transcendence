@@ -26,7 +26,7 @@ export class Users {
   })
   role: Role;
 
-  @Column({ type: 'varchar', length: 10, unique: true })
+  @Column({ type: 'varchar', length: 8, unique: true })
   username: string;
 
   @Column({ type: 'varchar', length: 50, unique: true, nullable: true })

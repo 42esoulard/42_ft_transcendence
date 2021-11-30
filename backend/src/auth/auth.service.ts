@@ -14,16 +14,28 @@ import { Response } from 'express';
 export class AuthService implements AuthProvider {
   constructor(
     private readonly usersService: UsersService,
-    private readonly jwtService: JwtService
-  ) { }
+    private readonly jwtService: JwtService,
+  ) {}
 
   async validateUser(userProfile: FortyTwoUser): Promise<User> {
-    const user: User = await this.usersService.getUserByLogin(userProfile.username);
+    const user: User = await this.usersService.getUserByLogin(
+      userProfile.username,
+    );
     if (user) {
       return user;
     } else {
-      const { username, photo } = userProfile;
-      return this.usersService.saveUser({ username: username, forty_two_login: username, two_fa_enabled: false, avatar: photo });
+      let { username, photo } = userProfile;
+      if (await this.usersService.getUserByUsername(username))
+        username =
+        (username.length < 8
+          ? username
+          : username.substr(0, username.length - 1)) + '1';
+      return this.usersService.saveUser({
+        username: username,
+        forty_two_login: username,
+        two_fa_enabled: false,
+        avatar: photo,
+      });
     }
   }
 
@@ -33,8 +45,12 @@ export class AuthService implements AuthProvider {
   }
 
   async generateAccessToken(user: User, isTwoFAauthenticated = false) {
-    const payload: JwtPayload = { username: user.username, sub: user.id, isTwoFAauthenticated };
-    return this.jwtService.sign(payload)
+    const payload: JwtPayload = {
+      username: user.username,
+      sub: user.id,
+      isTwoFAauthenticated,
+    };
+    return this.jwtService.sign(payload);
   }
 
   async generateRefreshToken(id: number) {
@@ -44,13 +60,16 @@ export class AuthService implements AuthProvider {
     const refresh_token = {
       id: id,
       refresh_token: uuid(),
-      expiry_date: oneYearFromNow
+      expiry_date: oneYearFromNow,
     };
-    this.usersService.updateUserToken(refresh_token)
+    this.usersService.updateUserToken(refresh_token);
     return refresh_token.refresh_token;
   }
 
-  async validRefreshToken(login: string, refresh_token: string): Promise<User> | null {
+  async validRefreshToken(
+    login: string,
+    refresh_token: string,
+  ): Promise<User> | null {
     const user: User = await this.usersService.getUserByLogin(login);
     if (user) {
       if (user.refresh_token === refresh_token) {
@@ -67,11 +86,15 @@ export class AuthService implements AuthProvider {
   public async generateTwoFASecret(user: User) {
     const secret = authenticator.generateSecret();
 
-    const otpauthUrl = authenticator.keyuri(user.username, process.env.APP_NAME, secret);
+    const otpauthUrl = authenticator.keyuri(
+      user.username,
+      process.env.APP_NAME,
+      secret,
+    );
 
     await this.usersService.saveTwoFASecret(secret, user.id);
 
-    return { secret, otpauthUrl }
+    return { secret, otpauthUrl };
   }
 
   public async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
@@ -81,8 +104,7 @@ export class AuthService implements AuthProvider {
   public isTwoFACodeValid(twoFactorAuthenticationCode: string, user: User) {
     return authenticator.verify({
       token: twoFactorAuthenticationCode,
-      secret: user.two_fa_secret
+      secret: user.two_fa_secret,
     });
   }
-
 }

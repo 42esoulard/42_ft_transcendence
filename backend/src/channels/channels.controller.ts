@@ -36,7 +36,7 @@ export class ChannelsController {
   /*
    * Lists all channels in database.
    * Only allowed for website ADMIN and OWNER
-  */
+   */
   @Get()
   @Roles(Role.ADMIN, Role.OWNER)
   @UseGuards(JwtTwoFactorGuard, RolesGuard)
@@ -51,7 +51,7 @@ export class ChannelsController {
   /*
    * Lists all channel names.
    * Only allowed for logged in users.
-  */
+   */
   @Get('/chan-names/')
   @UseGuards(JwtTwoFactorGuard)
   async getChannelsNames(@Req() request: Request): Promise<string[]> {
@@ -74,19 +74,17 @@ export class ChannelsController {
   @ApiBadRequestResponse({
     description: 'Invalid ID supplied',
   })
-  async getDefaultChannel(
-    @Req() request: Request,
-  ): Promise<Channel> {
+  async getDefaultChannel(@Req() request: Request): Promise<Channel> {
     const channel: Channel = await this.channelService.getChannelById(
       1,
       request.user.id,
     );
     if (channel == undefined) {
-        const generalChan: Channel = await this.channelService.seed();
-        if (generalChan == undefined) {
-          throw new NotFoundException("Couldn't initialize general channel");
-        }
-        return generalChan;
+      const generalChan: Channel = await this.channelService.seed();
+      if (generalChan == undefined) {
+        throw new NotFoundException("Couldn't initialize general channel");
+      }
+      return generalChan;
     }
     return channel;
   }
@@ -114,7 +112,7 @@ export class ChannelsController {
     const cm: ChannelMember = await this.channelService.getChannelMember(
       chanId,
       request.user.id,
-    )
+    );
     if (cm == undefined) {
       throw new ForbiddenException('You must be a member to access a channel');
     }
@@ -139,36 +137,36 @@ export class ChannelsController {
    * Returns a channel found in database by its id.
    * Used to fetch messages for non members of a channel
    */
-   @Get('/preview/:chanId')
-   @UseGuards(JwtTwoFactorGuard)
-   @ApiOkResponse({
-     description: 'The channel has been found in database',
-     type: Channel,
-   })
-   @ApiNotFoundResponse({
-     description: 'Channel not found',
-   })
-   @ApiBadRequestResponse({
-     description: 'Invalid ID supplied',
-   })
-   async getChannelPreview(
-     @Param('chanId') chanId: number,
-     @Req() request: Request,
-   ): Promise<Channel> {
-     const channel: Channel = await this.channelService.getChannelPreview(
-       chanId,
-       request.user.id,
-     )
-     if (channel == undefined) {
-       throw new NotFoundException('Channel not found');
-     }
-     return channel;
-   }
+  @Get('/preview/:chanId')
+  @UseGuards(JwtTwoFactorGuard)
+  @ApiOkResponse({
+    description: 'The channel has been found in database',
+    type: Channel,
+  })
+  @ApiNotFoundResponse({
+    description: 'Channel not found',
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid ID supplied',
+  })
+  async getChannelPreview(
+    @Param('chanId') chanId: number,
+    @Req() request: Request,
+  ): Promise<Channel> {
+    const channel: Channel = await this.channelService.getChannelPreview(
+      chanId,
+      request.user.id,
+    );
+    if (channel == undefined) {
+      throw new NotFoundException('Channel not found');
+    }
+    return channel;
+  }
 
   /*
    * Returns true if channel name was found in DB.
    * allowed for logged in users.
-  */
+   */
   @Get('/name/:name')
   @UseGuards(JwtTwoFactorGuard)
   @ApiOkResponse({
@@ -222,48 +220,70 @@ export class ChannelsController {
     @Req() request: Request,
   ): Promise<ChannelMember> {
     /*add type check :
-    ** "added": check that req is a chan admin/owner
-    ** "dm": check that req hasn't been blocked
-    ** "self": check that user_id == request.user.id
-    */
+     ** "added": check that req is a chan admin/owner
+     ** "dm": check that req hasn't been blocked
+     ** "self": check that user_id == request.user.id
+     */
     switch (type) {
-      case "added":
-        await this.channelService.checkBlocked(user_id, request.user.id)
-        .then((res) => {
-          if (res == true) {
-            throw new ForbiddenException('Failed to join channel: missing authorization to act for this user: active block');
-          }
-        })
-        await this.channelService.getChannelMember(channel_id, request.user.id)
-        .then(async (res) => {
-          if (!res) {
-            const user: User = await this.channelService.getUser(request.user.id);
-            if (user == undefined) {
-              throw new NotFoundException('Couldnt identify request account');
+      case 'added':
+        await this.channelService
+          .checkBlocked(user_id, request.user.id)
+          .then((res) => {
+            if (res == true) {
+              throw new ForbiddenException(
+                'Failed to join channel: missing authorization to act for this user: active block',
+              );
             }
-            if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
-              throw new ForbiddenException('Failed to join channel: missing authorization to act for this user');
+          });
+        await this.channelService
+          .getChannelMember(channel_id, request.user.id)
+          .then(async (res) => {
+            if (!res) {
+              const user: User = await this.channelService.getUser(
+                request.user.id,
+              );
+              if (user == undefined) {
+                throw new NotFoundException('Couldnt identify request account');
+              }
+              if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
+                throw new ForbiddenException(
+                  'Failed to join channel: missing authorization to act for this user',
+                );
+              }
+            } else if (
+              !res.is_admin &&
+              !res.is_owner &&
+              res.member.role !== Role.ADMIN &&
+              res.member.role != Role.OWNER
+            ) {
+              throw new ForbiddenException(
+                'Failed to join channel: missing authorization to act for this user',
+              );
             }
-          } else if (!res.is_admin && !res.is_owner && res.member.role !== Role.ADMIN && res.member.role != Role.OWNER) {
-            throw new ForbiddenException('Failed to join channel: missing authorization to act for this user');
-          }
-        })
+          });
         break;
-      case "dm":
-        await this.channelService.checkBlocked(user_id, request.user.id)
-        .then((res) => {
-          if (res == true) {
-            throw new ForbiddenException('Failed to join channel: missing authorization to act for this user');
-          }
-        })
+      case 'dm':
+        await this.channelService
+          .checkBlocked(user_id, request.user.id)
+          .then((res) => {
+            if (res == true) {
+              throw new ForbiddenException(
+                'Failed to join channel: missing authorization to act for this user',
+              );
+            }
+          });
         break;
-      case "self":
+      case 'self':
         if (request.user.id != user_id) {
-          throw new ForbiddenException('Failed to join channel: missing authorization to act for this user');
+          throw new ForbiddenException(
+            'Failed to join channel: missing authorization to act for this user',
+          );
         }
         break;
       default:
-        throw new BadRequestException('Failed to join channel: bad type for the add request');
+        throw new BadRequestException(
+          'Failed to join channel: bad type for the add request',
+        );
     }
     const cm: ChannelMember = await this.channelService.joinChannel(
       channel_id,
@@ -296,7 +316,9 @@ export class ChannelsController {
   @Get('/user-channels')
   @UseGuards(JwtTwoFactorGuard)
   async getUserChannels(@Req() request: Request): Promise<ChannelMember[]> {
-    const cm: ChannelMember[] = await this.channelService.getUserChannels(request.user.id);
+    const cm: ChannelMember[] = await this.channelService.getUserChannels(
+      request.user.id,
+    );
     if (cm == undefined) {
       throw new NotFoundException('No user channels found');
     }
@@ -343,48 +365,67 @@ export class ChannelsController {
   @Post('/leave-channel/:type/:cm_id')
   @UseGuards(JwtTwoFactorGuard)
   async leaveChannel(
-    @Param('type') type: string, 
+    @Param('type') type: string,
     @Param('cm_id') cm_id: number,
-    @Req() request: Request): Promise<DeleteResult> {
-      const cm: ChannelMember = await this.channelService.getCmById(
-        cm_id
-      );
-      if (cm == undefined) {
-        throw new NotFoundException('Channel Member not found');
-      }
-      if (cm.channel.id == 1) {
-        throw new NotFoundException('Thou shalt not leave General!!');
-      }
-      switch (type) {
-        case "kick":
-          await this.channelService.checkBlocked(cm.member.id, request.user.id)
+    @Req() request: Request,
+  ): Promise<DeleteResult> {
+    const cm: ChannelMember = await this.channelService.getCmById(cm_id);
+    if (cm == undefined) {
+      throw new NotFoundException('Channel Member not found');
+    }
+    if (cm.channel.id == 1) {
+      throw new NotFoundException('Thou shalt not leave General!!');
+    }
+    switch (type) {
+      case 'kick':
+        await this.channelService
+          .checkBlocked(cm.member.id, request.user.id)
           .then((res) => {
             if (res == true) {
-              throw new ForbiddenException('Failed to leave channel: missing authorization to act for this user: active block');
+              throw new ForbiddenException(
+                'Failed to leave channel: missing authorization to act for this user: active block',
+              );
             }
-          })
-          await this.channelService.getChannelMember(cm.channel.id, request.user.id)
+          });
+        await this.channelService
+          .getChannelMember(cm.channel.id, request.user.id)
           .then(async (res) => {
             if (!res) {
-              const user: User = await this.channelService.getUser(request.user.id);
+              const user: User = await this.channelService.getUser(
+                request.user.id,
+              );
               if (user == undefined) {
                 throw new NotFoundException('Couldnt identify request account');
               }
               if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
-                throw new ForbiddenException('Failed to leave channel: missing authorization to act for this user');              }
-            } else if (!res.is_admin && !res.is_owner && res.member.role !== Role.ADMIN && res.member.role != Role.OWNER) {
-              throw new ForbiddenException('Failed to leave channel: missing authorization to act for this user');
+                throw new ForbiddenException(
+                  'Failed to leave channel: missing authorization to act for this user',
+                );
+              }
+            } else if (
+              !res.is_admin &&
+              !res.is_owner &&
+              res.member.role !== Role.ADMIN &&
+              res.member.role != Role.OWNER
+            ) {
+              throw new ForbiddenException(
+                'Failed to leave channel: missing authorization to act for this user',
+              );
             }
-          })
-          break;
-        case "self":
-          if (request.user.id != cm.member.id) {
-            throw new ForbiddenException('Failed to leave channel: missing authorization to act for this user');
-          }
-          break;
-        default:
-          throw new BadRequestException('Failed to leave channel: bad type for the leave request');
-      }
+          });
+        break;
+      case 'self':
+        if (request.user.id != cm.member.id) {
+          throw new ForbiddenException(
+            'Failed to leave channel: missing authorization to act for this user',
+          );
+        }
+        break;
+      default:
+        throw new BadRequestException(
+          'Failed to leave channel: bad type for the leave request',
+        );
+    }
     const dr: DeleteResult = await this.channelService.leaveChannel(cm_id);
     if (dr == undefined) {
       throw new NotFoundException('Failed to leave channel');
@@ -398,9 +439,10 @@ export class ChannelsController {
     @Param('chan_id') chan_id: number,
     @Req() request: Request,
   ): Promise<DeleteResult> {
-    if (chan_id !== 1){
+    if (chan_id !== 1) {
       const cm: ChannelMember = await this.channelService.getChannelMember(
-        chan_id, request.user.id
+        chan_id,
+        request.user.id,
       );
       if (cm == undefined) {
         const user: User = await this.channelService.getUser(request.user.id);
@@ -408,10 +450,18 @@ export class ChannelsController {
           throw new NotFoundException('Couldnt identify request account');
         }
         if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
-          throw new ForbiddenException('You dont have the right to delete this channel');
+          throw new ForbiddenException(
+            'You dont have the right to delete this channel',
+          );
         }
-      } else if (!cm.is_owner && cm.member.role !== Role.OWNER  && cm.member.role !== Role.ADMIN) {
-        throw new ForbiddenException('You dont have the right to delete this channel');
+      } else if (
+        !cm.is_owner &&
+        cm.member.role !== Role.OWNER &&
+        cm.member.role !== Role.ADMIN
+      ) {
+        throw new ForbiddenException(
+          'You dont have the right to delete this channel',
+        );
       }
 
       const dr: DeleteResult = await this.channelService.deleteChannel(chan_id);
@@ -419,8 +469,7 @@ export class ChannelsController {
         throw new NotFoundException('Failed to leave channel');
       }
       return dr;
-    } else
-      throw new ForbiddenException('General can\'t be deleted');
+    } else throw new ForbiddenException("General can't be deleted");
   }
 
   @Get('/admin-action/:action/:cm_id/:end_date')
@@ -431,25 +480,33 @@ export class ChannelsController {
     @Param('end_date') end_date: number,
     @Req() request: Request,
   ): Promise<ChannelMember> {
-    const user_cm: ChannelMember = await this.channelService.getCmById(
-      cm_id
-    );
+    const user_cm: ChannelMember = await this.channelService.getCmById(cm_id);
     if (user_cm == undefined) {
       throw new NotFoundException('Failed to find member');
     }
     const req_cm: ChannelMember = await this.channelService.getChannelMember(
-      user_cm.channel.id, request.user.id
+      user_cm.channel.id,
+      request.user.id,
     );
-    if (req_cm == undefined ) {
+    if (req_cm == undefined) {
       const user: User = await this.channelService.getUser(request.user.id);
       if (user == undefined) {
         throw new NotFoundException('Couldnt identify request account');
       }
       if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
-        throw new ForbiddenException('You dont have the right to act on this channel\s members');
+        throw new ForbiddenException(
+          'You dont have the right to act on this channels members',
+        );
       }
-    } else if (!req_cm.is_admin && !req_cm.is_owner && req_cm.member.role !== Role.ADMIN && req_cm.member.role !== Role.OWNER) {
-      throw new ForbiddenException('You dont have the right to act on this channel\s members');
+    } else if (
+      !req_cm.is_admin &&
+      !req_cm.is_owner &&
+      req_cm.member.role !== Role.ADMIN &&
+      req_cm.member.role !== Role.OWNER
+    ) {
+      throw new ForbiddenException(
+        'You dont have the right to act on this channels members',
+      );
     }
 
     const cm: ChannelMember = await this.channelService.muteBanMember(
@@ -465,15 +522,17 @@ export class ChannelsController {
 
   @Get('/toggle-admin/:cm_id')
   @UseGuards(JwtTwoFactorGuard)
-  async toggleAdmin(@Param('cm_id') cm_id: number, @Req() request: Request): Promise<ChannelMember> {
-    const user_cm: ChannelMember = await this.channelService.getCmById(
-      cm_id
-    );
+  async toggleAdmin(
+    @Param('cm_id') cm_id: number,
+    @Req() request: Request,
+  ): Promise<ChannelMember> {
+    const user_cm: ChannelMember = await this.channelService.getCmById(cm_id);
     if (user_cm == undefined) {
       throw new NotFoundException('Failed to find member');
     }
     const req_cm: ChannelMember = await this.channelService.getChannelMember(
-      user_cm.channel.id, request.user.id
+      user_cm.channel.id,
+      request.user.id,
     );
     if (req_cm == undefined) {
       const user: User = await this.channelService.getUser(request.user.id);
@@ -481,12 +540,19 @@ export class ChannelsController {
         throw new NotFoundException('Couldnt identify request account');
       }
       if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
-        throw new ForbiddenException('You dont have the right to act on this channel\s members');
+        throw new ForbiddenException(
+          'You dont have the right to act on this channels members',
+        );
       }
-    } else if (!req_cm.is_owner && (!req_cm.is_admin || user_cm.member.id !== request.user.id)) {
-      throw new ForbiddenException('You dont have the right to act on this channel\s members');
+    } else if (
+      !req_cm.is_owner &&
+      (!req_cm.is_admin || user_cm.member.id !== request.user.id)
+    ) {
+      throw new ForbiddenException(
+        'You dont have the right to act on this channels members',
+      );
     }
-    
+
     const cm: ChannelMember = await this.channelService.toggleAdmin(cm_id);
     if (cm == undefined) {
       throw new NotFoundException("Failed to edit member's admin status");
@@ -502,12 +568,17 @@ export class ChannelsController {
     @Req() request: Request,
   ): Promise<Channel> {
     const req_cm: ChannelMember = await this.channelService.getChannelMember(
-      chan_id, request.user.id
+      chan_id,
+      request.user.id,
     );
     if (req_cm == undefined) {
-      throw new ForbiddenException('You dont have the right to edit this channel');
+      throw new ForbiddenException(
+        'You dont have the right to edit this channel',
+      );
     } else if (!req_cm.is_owner) {
-      throw new ForbiddenException('You dont have the right to edit this channel');
+      throw new ForbiddenException(
+        'You dont have the right to edit this channel',
+      );
     }
 
     const channel: Channel = await this.channelService.updateChannelPassword(

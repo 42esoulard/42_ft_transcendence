@@ -24,9 +24,9 @@ import { PresenceModule } from './presence/presence.module';
     RelationshipsModule,
     PassportModule.register({ session: true }),
     PongModule,
-    PresenceModule
+    PresenceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

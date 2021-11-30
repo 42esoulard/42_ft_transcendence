@@ -2,7 +2,7 @@
   <div class="toast-wrapper">
     <div class="toast-content">
       {{ toDisplay }}
-      <button class="button button--invitation" @click="accept">accept</button>
+      <button v-if="pongLink" class="button button--invitation" @click="accept">accept</button>
     </div>
   </div>
 </template>
