@@ -43,9 +43,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await this.channelsService.getNotifications(user.id)
       .then((res) => {
         if (res) {
+          console.log("found new notif!")
           client.emit('chatNotifications');
         }
       })
+    })
+
+    client.on('chat-message-on', async (data: Messages) => {
+      client.emit('chat-message-on', data);
     })
 
     client.on('chat-message-off', async (data: Messages, user: User) => {
@@ -57,6 +62,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       })
       .catch((err) => console.log("Caught error:", err.response.data.message))
     })
+
+    client.on('chat-message', async (message: Messages, onlineUsers: User[]) => {
+      client.broadcast.emit('chat-message', message);
+      await this.channelsService.notifyOfflineUsers(message, onlineUsers)
+      .catch((err) => console.log("Caught error:", err.response.data.message))
+    })
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
@@ -64,45 +75,46 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.disconnect();
   }
 
-  @SubscribeMessage('chat-message')
-  async onChat(@ConnectedSocket() client: Socket, @MessageBody() message) {
-    client.broadcast.emit('chat-message', message);
-  }
+  // @SubscribeMessage('chat-message')
+  // async onChat(@ConnectedSocket() client: Socket, message: Messages, onlineUsers: User[]) {
+  //   client.broadcast.emit('chat-message', message);
+  //   await this.channelsService.notifyOfflineUsers(message, onlineUsers);
+  // }
 
-  @SubscribeMessage('chat-message-on')
-  async onChatMessageOn(@ConnectedSocket() client: Socket, @MessageBody() message) {
-    client.emit('chat-message-on', message);
-  }
+  // @SubscribeMessage('chat-message-on')
+  // async onChatMessageOn(@ConnectedSocket() client: Socket, @MessageBody() message) {
+  //   client.emit('chat-message-on', message);
+  // }
 
-  @SubscribeMessage('chat-message-off')
-  async onChatMessageOff(@ConnectedSocket() client: Socket, @MessageBody() message, user: User) {
-    // await relApi.getBlockedByUser(user.value.id)
-    //     .then(async (blocked) => {
-    //       // console.log("blocked", blocked.data.map((blocked) => blocked.adresseeId));
-    //       // console.log(data.author.id)
-    //       if (blocked.data.map((blocked) => blocked.adresseeId).includes(data.author.id)) {
-    //         return;
-    //       }
-    //       if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
+  // @SubscribeMessage('chat-message-off')
+  // async onChatMessageOff(@ConnectedSocket() client: Socket, @MessageBody() message, user: User) {
+  //   // await relApi.getBlockedByUser(user.value.id)
+  //   //     .then(async (blocked) => {
+  //   //       // console.log("blocked", blocked.data.map((blocked) => blocked.adresseeId));
+  //   //       // console.log(data.author.id)
+  //   //       if (blocked.data.map((blocked) => blocked.adresseeId).includes(data.author.id)) {
+  //   //         return;
+  //   //       }
+  //   //       if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
           
-    //         channelMessages.value.push(data);
-    //         console.log("in get messages:", channelMessages.value);
-    //       } else if (activeChannel.value!.channel) {
-    //         console.log("set newMessage = true here");
-    //         await api.setNewMessage('true', data.channel.id, { withCredentials: true })
-    //         .then((res) => { 
-    //           store.state.chatNotification = true; 
-    //           console.log(res)
-    //           updateChannelsList();
-    //         })
-    //         .catch((err) => console.log("Caught error:", err.response.data.message));
-    //       }
-    //   // getMessagesUpdate(data.channel);
-    //   });
+  //   //         channelMessages.value.push(data);
+  //   //         console.log("in get messages:", channelMessages.value);
+  //   //       } else if (activeChannel.value!.channel) {
+  //   //         console.log("set newMessage = true here");
+  //   //         await api.setNewMessage('true', data.channel.id, { withCredentials: true })
+  //   //         .then((res) => { 
+  //   //           store.state.chatNotification = true; 
+  //   //           console.log(res)
+  //   //           updateChannelsList();
+  //   //         })
+  //   //         .catch((err) => console.log("Caught error:", err.response.data.message));
+  //   //       }
+  //   //   // getMessagesUpdate(data.channel);
+  //   //   });
     
-    client.emit('chatNotifications', message);
+  //   client.emit('chatNotifications', message);
   
-  }
+  // }
 
   @SubscribeMessage('createChannel')
   handleCreateChannel(@ConnectedSocket() client: Socket, @MessageBody() info) {

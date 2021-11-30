@@ -291,7 +291,7 @@ export const ChatComponent = defineComponent({
       .then(() => {
         getMessagesUpdate(newContent.channel.id);
           // chatSocket.emit('update-channels');        
-        chatSocket.emit("chat-message", newContent);
+        chatSocket.emit("chat-message", newContent, store.state.onlineUsers);
       })
       .catch(async (err: any) => {
         console.log("Caught error:", err.response.data.message)
@@ -453,11 +453,12 @@ export const ChatComponent = defineComponent({
     const switchChannel =  async (cm: ChannelMember) => {
       channelSettings.value = false;
       activeChannel.value = cm;
+      activeChannel.value.new_message = false;
       await api.setNewMessage('false', cm.channel.id, { withCredentials: true })
-      .then((res) => { 
-        updateChannelsList();
-        activeChannel.value = res.data;
-      })
+      // .then((res) => { 
+      //   updateChannelsList();
+      //   activeChannel.value = res.data;
+      // })
       .catch((err) => console.log("Caught error:", err.response.data.message));
       isMember.value = true;
       console.log("in switchChannel", cm)
@@ -553,7 +554,7 @@ export const ChatComponent = defineComponent({
 
     window.onbeforeunload = () => {
       // chatSocket.emit("leave", user.value.username);
-      chatSocket.off('chat-message');
+      chatSocket.off('chat-message-on');
       chatSocket.off('created-channel');
       chatSocket.off('join-channel');
       chatSocket.off('update-channels');

@@ -14,6 +14,7 @@ import { RelationshipsService } from 'src/relationships/relationships.service';
 import { Role } from 'src/auth/models/role.enum';
 import { ChannelMembers } from 'src/channel_members/entity/channel_members.entity';
 import { Messages } from 'src/messages/entity/messages.entity';
+import { User } from 'src/users/interfaces/user.interface';
 
 @Injectable()
 export class ChannelsService {
@@ -89,7 +90,7 @@ export class ChannelsService {
     // if (user == undefined) {
     //   return undefined;
     // }
-    console.log("IN GET NEW NOTIF", data.channel.id, userId)
+    // console.log("IN GET NEW NOTIF", data.channel.id, userId)
     let cms: ChannelMember = await this.getChannelMember(data.channel.id, userId);
     if (cms == undefined || cms.ban) {
       return false;
@@ -107,7 +108,7 @@ export class ChannelsService {
     //   channelMessages.value.push(data);
     //   console.log("in get messages:", channelMessages.value);
     // } else if (activeChannel.value!.channel) {
-      console.log("set newMessage = true here");
+      // console.log("set newMessage = true here");
       return await this.channelMemberService.setNewMessage(true, cms.id)
       .then((res) => { 
         return true
@@ -135,6 +136,20 @@ export class ChannelsService {
 
   async toggleNotification(cm: ChannelMember): Promise<ChannelMember> {
     return await this.channelMemberService.toggleNotification(cm.id);
+  }
+
+  async notifyOfflineUsers(message: Messages, onlineUsers: User[]) {
+    await this.channelsRepository.findOne(message.channel.id)
+    .then((channel) => {
+      const chanMembers = channel.channel_members;
+      const onlineMemberIds = onlineUsers.map((user) => user.id);
+      const offlineMembers = chanMembers.filter((cm) => !onlineMemberIds.includes(cm.member.id));
+      offlineMembers.forEach((cm) => {
+        // console.log("sending to offline", cm.id)
+        this.channelMemberService.setNewMessage(true, cm.id);
+      })
+    })
+    .catch((err) => console.log("Caught error:", err.response.data.message));
   }
 
   async getCmById(

@@ -168,13 +168,13 @@ export class ChannelMembersService {
   async setNewMessage(status: boolean, cmId: number): Promise<ChannelMember> {
     
     const cm: ChannelMembers = await this.getChannelMemberById(cmId);
-    console.log("wutwutwutwut", cm)
-    console.log(status, typeof cm.new_message, typeof status);
+    // console.log("wutwutwutwut", cm)
+    // console.log(status, typeof cm.new_message, typeof status);
     cm.new_message = status;
     return await this.channelMembersRepository
     .save(cm)
     .then((res) => {
-      console.log("heee", res);
+      // console.log("heee", res);
       return res;
     })
     .catch(() => {
@@ -192,6 +192,7 @@ export class ChannelMembersService {
       );
     }
     cm.notification = !cm.notification;
+    cm.new_message = false;
     
     return await this.channelMembersRepository
       .save(cm)

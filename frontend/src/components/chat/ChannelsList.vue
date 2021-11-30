@@ -8,8 +8,7 @@
           <button class='chat-channels__item' @click="switchChannel(cm)">
             <div class='chat-channels__name' :title="cm.channel.name">
               <div v-if="cm.new_message" class='chat-channels__notif'></div>
-              <div v-else>#</div>
-              {{ cm.channel.name }}
+              #{{ cm.channel.name }}
             </div>
             <!-- <div v-else class='chat-channels__name' :title="cm.channel.name">#{{ cm.channel.name }}</div> -->
             <div>

@@ -214,7 +214,7 @@ export class ChannelsController {
     @Param('chanId') chanId: number,
     @Req() request: Request,
   ): Promise<ChannelMember> {
-    console.log("hereeeee", status)
+    // console.log("hereeeee", status)
     const cm: ChannelMember = await this.channelService.getChannelMember(
       chanId, request.user.id
     );

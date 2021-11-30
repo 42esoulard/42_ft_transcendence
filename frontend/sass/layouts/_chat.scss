@@ -72,8 +72,10 @@
   width: 20px;
   height: 20px;
   border-radius: 20px;
-  right: 25%;
+  // right: 20%;
   // top: 34%;
+  margin-left: 42%;
+  margin-top: -80px;
   background-color: red;
   color: white;
   text-align: center;
@@ -86,15 +88,16 @@
 .chat-channels__notif {
   cursor: pointer;
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: 12px;
+  height: 12px;
   border-radius: 20px;
   // right: 25%;
   // top: 34%;
+  margin-top: 5px;
   background-color: red;
   color: white;
   text-align: center;
-  font-weight: 900;
+  font-weight: 400;
   &--off {
     background-color: grey;
   }
