@@ -16,6 +16,7 @@
           @update-channel="getMessagesUpdate(activeChannel.channel.id)" 
           @update-channels-list="updateChannelsList()" 
           @deleted-channel="deletedChannel()"
+          @post-message="postMessage"
           :activeChannel="activeChannel" 
         />
         <div v-else class="chat-box">
@@ -37,7 +38,7 @@
               <span v-if="isMember && activeChannel.channel.name !== 'General'" @click="toggleModal(4)" ><img class="fas fa-lg fa-sign-out-alt chat-channels__tag chat-channels__tag--leave" title="Leave Channel" /></span>
             </div>
 
-          <div v-if="isMember || (activeChannel && !activeChannel.channel.password)" class="chat-messages">
+          <div v-if="isMember || (activeChannel && !activeChannel.channel.password) || user.role !== 'user'" class="chat-messages">
             <div>
               <ul class="chat-messages__list" id="messages">
                 <!-- <small v-if="typing">{{ typing }} is typing</small> -->
@@ -65,7 +66,7 @@
               </ul>
             </div>
           </div>
-          <div v-if="!isMember && activeChannel && activeChannel.channel.password" class="chat-channels__locked-msg">
+          <div v-if="!isMember && activeChannel && activeChannel.channel.password && user.role == 'user'" class="chat-channels__locked-msg">
             <div @mouseover="hoveringLock = true" @mouseout="hoveringLock = false">
               <span v-if="!hoveringLock"><img class="fa fa-lock fa-10x chat-channels__lock-img" title="This channel is password-protected" /></span>
               <span v-else @click="applyForMembership(activeChannel.channel)"><img class="fa fa-unlock fa-10x chat-channels__lock-img chat-channels__lock-img--unlocked" title="This channel is password-protected" /></span>
@@ -275,6 +276,11 @@ export const ChatComponent = defineComponent({
         }
     }
 
+    const postMessage = async (message: string) => {
+      newMessage.value = message;
+      send();
+    }
+
     const send = async () => {
 
       if (!newMessage.value)
@@ -377,6 +383,8 @@ export const ChatComponent = defineComponent({
           getMessagesUpdate(res.data.channel.id);
           if (channel.id !== 1) {
             store.dispatch("setMessage", "You're now a member of channel [" + channel.name.substring(0, 15) + "]");
+            newMessage.value = " has joined";
+            send();
             chatSocket.emit('update-channels');
           }
           return res;
@@ -395,6 +403,8 @@ export const ChatComponent = defineComponent({
     const leaveChannel = async () => {
       toggleConfirmation.value = '';
       const name = activeChannel.value!.channel.name;
+      newMessage.value = " has left";
+      send();
       await api.leaveChannel("self", activeChannel.value!.id, { withCredentials: true })
       .then((res) => {
         store.dispatch("setMessage", "You're no longer a member of channel [" + name.substring(0, 15) + "]");
@@ -429,6 +439,8 @@ export const ChatComponent = defineComponent({
           // console.log(res)
           chatSocket.emit('update-channels', cm.data)
           chatSocket.emit('chat-action', 'added to', recipient.id, cm.data.channel.name);
+          newMessage.value = res.data.member.username + " has been added";
+          send();
           return res;
         })
         .catch((err) => console.log("Caught error:", err.response.data.message));
@@ -581,6 +593,7 @@ export const ChatComponent = defineComponent({
 
       send,
       newMessage,
+      postMessage,
       channelMessages,
       getMessagesUpdate,
       typing,

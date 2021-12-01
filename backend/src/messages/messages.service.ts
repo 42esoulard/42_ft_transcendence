@@ -68,13 +68,13 @@ export class MessagesService {
     await this.channelMemberService
       .getChannelMember(newMessage.channel, newMessage.author)
       .then((res) => {
-        if (res == undefined) {
+        if (newMessage.author.role == 'user' && res == undefined) {
           throw new ForbiddenException('not a member');
         }
-        if (this.channelMemberService.checkMute(res)) {
+        if (newMessage.author.role == 'user' && this.channelMemberService.checkMute(res)) {
           throw new ForbiddenException('muted');
         }
-        if (res.ban) {
+        if (newMessage.author.role == 'user' && res.ban) {
           throw new ForbiddenException('banned');
         }
       });

@@ -139,7 +139,7 @@ export default defineComponent({
   name: 'ChannelSettings',
   props: ['activeChannel'],
   components: { Modal, MuteBanTimer, Confirmation },
-  emits: ["close-settings", "update-channel", "update-channels-list", "deleted-channel"],
+  emits: ["close-settings", "update-channel", "update-channels-list", "deleted-channel", "post-message"],
   setup(props, context) {
     const api = new ChatApi();
     const userApi = new UserApi();
@@ -157,7 +157,7 @@ export default defineComponent({
   
     const askConfirmation = (cm: ChannelMember, action: string) => {
       targetCm.value = cm;
-      target.value = (action == 'delete' ? 'user' : 'channel');
+      target.value = (action == 'delete' ? 'channel' : 'user');
       toggleConfirmation.value = action;
     }
 
@@ -259,6 +259,7 @@ export default defineComponent({
         }
         chatSocket.emit('chat-action', action + ' from', res.data.member.id, res.data.channel.name)
         chatSocket.emit('update-channels');
+        context.emit('post-message', res.data.member.username + " has been " + action + " from this channel");
         store.dispatch("setMessage", res.data.member.username.substring(0, 15) + " has been " + action + " from [" + res.data.channel.name.substring(0, 15) + "]");
         if (action === 'muted') {
           setTimeout(() => updateMuteBan("unmute", cmId, 0), endDate - Date.now())
@@ -277,9 +278,11 @@ export default defineComponent({
         context.emit('update-channels-list');
         chatSocket.emit('update-channels');
         if (res.data.is_admin) {
+          context.emit('post-message', res.data.member.username + " is now an admin for this channel");
           chatSocket.emit('chat-action', 'made an admin for', res.data.member.id, res.data.channel.name)
           store.dispatch("setMessage",  "[" + res.data.member.username.substring(0, 15) + "] is now an admin in channel [" + res.data.channel.name.substring(0, 15) + "]");
         } else {
+          context.emit('post-message', res.data.member.username + " is no longer an admin for this channel");
           chatSocket.emit('chat-action', 'removed admin privileges from', res.data.member.id, res.data.channel.name)
           store.dispatch("setMessage",  "[" + res.data.member.username.substring(0, 15) + "] is no longer an admin in channel [" + res.data.channel.name.substring(0, 15) + "]");
         }
@@ -354,6 +357,7 @@ export default defineComponent({
       .then((res) => {
         context.emit('update-channels-list');
         chatSocket.emit('update-channels');
+        context.emit('post-message', res.data.member.username + " has been added");
         chatSocket.emit('chat-action', 'added to', userId, props.activeChannel.channel.name);
         username.value = '';
         wasSubmitted.value = false;
@@ -385,6 +389,7 @@ export default defineComponent({
         context.emit('update-channels-list');
         chatSocket.emit('update-channels');
         wasSubmitted.value = false;
+        context.emit('post-message',  exMemberName + " has been kicked from this channel");
         chatSocket.emit('chat-action', 'kicked from', exMemberId, props.activeChannel.channel.name);
         store.dispatch("setMessage",  "[" + exMemberName.substring(0, 15) + "] has been kicked from channel [" + props.activeChannel.channel.name.substring(0, 15) + "]");
       })
@@ -444,8 +449,10 @@ export default defineComponent({
         context.emit('update-channels-list');
         chatSocket.emit('update-channels');
         if (res.data.password) {
+          context.emit('post-message', "Channel password has been modified");
           store.dispatch("setMessage",  "[" + res.data.name.substring(0, 15) + "]'s password has been edited");
         } else {
+          context.emit('post-message', "Channel is now password-free");
           store.dispatch("setMessage",  "[" + res.data.name.substring(0, 15) + "] is now a password free community");
         }
         closeChannelSettings();
