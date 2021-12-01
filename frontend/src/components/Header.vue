@@ -12,14 +12,6 @@
           <SideBarLink
             class="menu__link"
             @click="isActive = !isActive"
-            to="/"
-            icon="fas fa-home"
-          >
-            home
-          </SideBarLink>
-          <SideBarLink
-            class="menu__link"
-            @click="isActive = !isActive"
             :to="userProfile"
             icon="fas fa-user-circle"
           >

@@ -25,6 +25,7 @@ export class AuthService implements AuthProvider {
       return user;
     } else {
       let { username, photo } = userProfile;
+      const tmpUsername = username;
       if (await this.usersService.getUserByUsername(username))
         username =
         (username.length < 8
@@ -32,7 +33,7 @@ export class AuthService implements AuthProvider {
           : username.substr(0, username.length - 1)) + '1';
       return this.usersService.saveUser({
         username: username,
-        forty_two_login: username,
+        forty_two_login: tmpUsername,
         two_fa_enabled: false,
         avatar: photo,
       });
