@@ -31,7 +31,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.on('newConnection', async (user: User) => {
       await this.channelsService.getNotifications(user.id).then((res) => {
         if (res) {
-          console.log('found new notif!');
           client.emit('chatNotifications');
         }
       });
