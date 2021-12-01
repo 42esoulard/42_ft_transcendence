@@ -303,14 +303,19 @@ export class ChannelsController {
       default:
         throw new BadRequestException('Failed to join channel: bad type for the add request');
     }
-    const cm: ChannelMember = await this.channelService.joinChannel(
+    return await this.channelService.joinChannel(
       channel_id,
       user_id,
-    );
-    if (cm == undefined) {
-      throw new NotFoundException('Failed to join channel');
-    }
-    return cm;
+    ).then(async (res) => {
+      if (res == undefined) {
+        throw new NotFoundException('Failed to join channel');
+      }
+      if (type == "dm") {
+        return await this.channelService.toggleNotification(res)
+      } else {
+        return res;
+      }
+    })
   }
 
   @Get('/join-protected/:channel/:attempt')
@@ -472,8 +477,9 @@ export class ChannelsController {
     const user_cm: ChannelMember = await this.channelService.getCmById(
       cm_id
     );
-    if (user_cm == undefined) {
-      throw new NotFoundException('Failed to find member');
+    if (user_cm == undefined || (action == 'unban' && !user_cm.ban) || 
+    (action == 'unmute' && !user_cm.mute)) {
+      throw new NotFoundException('Failed to find or act on member');
     }
     const req_cm: ChannelMember = await this.channelService.getChannelMember(
       user_cm.channel.id, request.user.id

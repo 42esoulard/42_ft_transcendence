@@ -68,6 +68,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await this.channelsService.notifyOfflineUsers(message, onlineUsers)
       .catch((err) => console.log("Caught error:", err.response.data.message))
     })
+
+    client.on('chat-action', async (action: string, userId: number, chanName: string) => {
+      client.broadcast.emit('chat-action', action, userId, chanName);
+    })
+
+    client.on('chat-action-del', async (message: string, members: number[]) => {
+      client.broadcast.emit('chat-action-del', message, members);
+    })
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {

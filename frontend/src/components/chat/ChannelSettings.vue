@@ -61,8 +61,9 @@
             'button--selector',
             selectedTab === 'ownerOptions' ? 'button--selector--on' : ''
           ]"
+          title="Owner Pannel"
         >
-          ...
+          <img class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Owner Pannel" />
         </button>
       </div>
       <div>
@@ -251,8 +252,14 @@ export default defineComponent({
       .then((res) => {
         targetCm.value = res.data;
         context.emit('update-channels-list');
+        if (action == 'unmute') {
+          action = 'unmuted';
+        } else if (action == 'unban') {
+          action = 'unbanned';
+        }
+        chatSocket.emit('chat-action', action + ' from', res.data.member.id, res.data.channel.name)
         chatSocket.emit('update-channels');
-
+        store.dispatch("setMessage", res.data.member.username.substring(0, 15) + " has been " + action + " from [" + res.data.channel.name.substring(0, 15) + "]");
         if (action === 'muted') {
           setTimeout(() => updateMuteBan("unmute", cmId, 0), endDate - Date.now())
         } else if (action === 'banned') {
@@ -265,10 +272,17 @@ export default defineComponent({
 
     const toggleAdmin = async (cm: ChannelMember) => {
       await api.toggleAdmin(cm.id, { withCredentials: true })
-      .then(() => {
+      .then((res) => {
         targetCm.value = cm;
         context.emit('update-channels-list');
         chatSocket.emit('update-channels');
+        if (res.data.is_admin) {
+          chatSocket.emit('chat-action', 'made an admin for', res.data.member.id, res.data.channel.name)
+          store.dispatch("setMessage",  "[" + res.data.member.username.substring(0, 15) + "] is now an admin in channel [" + res.data.channel.name.substring(0, 15) + "]");
+        } else {
+          chatSocket.emit('chat-action', 'removed admin privileges from', res.data.member.id, res.data.channel.name)
+          store.dispatch("setMessage",  "[" + res.data.member.username.substring(0, 15) + "] is no longer an admin in channel [" + res.data.channel.name.substring(0, 15) + "]");
+        }
         if (cm.id == props.activeChannel.id) {
           closeChannelSettings();
         }
@@ -277,9 +291,12 @@ export default defineComponent({
     }
 
     const deleteChannel = async () => {
+      const members = props.activeChannel.channel.channel_members.map((cm: ChannelMember) => cm.member.id)
+      const chanName = props.activeChannel.channel.name;
       await api.deleteChannel(props.activeChannel.channel.id, { withCredentials: true })
       .then(() => {
         context.emit('deleted-channel');
+        chatSocket.emit('chat-action-del', '[' + chanName.substring(0, 15) + '] has been deleted.', members)
         closeChannelSettings();
       })
       .catch((err) => console.log("Caught error:", err.response.data.message))
@@ -337,6 +354,7 @@ export default defineComponent({
       .then((res) => {
         context.emit('update-channels-list');
         chatSocket.emit('update-channels');
+        chatSocket.emit('chat-action', 'added to', userId, props.activeChannel.channel.name);
         username.value = '';
         wasSubmitted.value = false;
       })
@@ -358,6 +376,8 @@ export default defineComponent({
     const kickMember = async (cm: ChannelMember) => {
 
       wasSubmitted.value = true;
+      const exMemberName = cm.member.username;
+      const exMemberId = cm.member.id;
       const newMember = api.leaveChannel(
         "kick", cm.id,
         { withCredentials: true })
@@ -365,6 +385,8 @@ export default defineComponent({
         context.emit('update-channels-list');
         chatSocket.emit('update-channels');
         wasSubmitted.value = false;
+        chatSocket.emit('chat-action', 'kicked from', exMemberId, props.activeChannel.channel.name);
+        store.dispatch("setMessage",  "[" + exMemberName.substring(0, 15) + "] has been kicked from channel [" + props.activeChannel.channel.name.substring(0, 15) + "]");
       })
       .catch((err) => {
         console.log("Caught error:", err.response.data.message);
@@ -421,6 +443,11 @@ export default defineComponent({
         console.log("in updateChannel res", res)
         context.emit('update-channels-list');
         chatSocket.emit('update-channels');
+        if (res.data.password) {
+          store.dispatch("setMessage",  "[" + res.data.name.substring(0, 15) + "]'s password has been edited");
+        } else {
+          store.dispatch("setMessage",  "[" + res.data.name.substring(0, 15) + "] is now a password free community");
+        }
         closeChannelSettings();
       })
       .catch((err) => console.log("Caught error:", err.response.data.message))

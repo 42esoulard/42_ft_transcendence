@@ -428,6 +428,7 @@ export const ChatComponent = defineComponent({
         .then((res)=> {
           // console.log(res)
           chatSocket.emit('update-channels', cm.data)
+          chatSocket.emit('chat-action', 'added to', recipient.id, cm.data.channel.name);
           return res;
         })
         .catch((err) => console.log("Caught error:", err.response.data.message));
