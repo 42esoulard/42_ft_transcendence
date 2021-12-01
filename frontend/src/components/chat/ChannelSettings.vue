@@ -8,6 +8,7 @@
   -->
   <div class="chat-box">
     <div v-if="activeChannel" class='chat-header'>
+      <div class="chat-header__return" @click="toggleChannelsList"><i class="fa fa-list fa-2x"></i></div>
       <div class="chat-header__channel-name" :title="activeChannel.channel.name" @click="closeChannelSettings()">{{ activeChannel.channel.name }}</div>
       <div>
         <span v-if="activeChannel.channel.type === 'private'"><img class="fas fa-eye-slash chat-channels__tag chat-channels__tag--private" title="This community is private" /></span>
@@ -139,7 +140,7 @@ export default defineComponent({
   name: 'ChannelSettings',
   props: ['activeChannel'],
   components: { Modal, MuteBanTimer, Confirmation },
-  emits: ["close-settings", "update-channel", "update-channels-list", "deleted-channel", "post-message"],
+  emits: ["close-settings", "toggle-channels-list", "update-channel", "update-channels-list", "deleted-channel", "post-message"],
   setup(props, context) {
     const api = new ChatApi();
     const userApi = new UserApi();
@@ -231,6 +232,10 @@ export default defineComponent({
 
     const closeChannelSettings = () => {
       context.emit('close-settings')
+    }
+
+    const toggleChannelsList = () => {
+      context.emit('toggle-channels-list');
     }
 
     const toggleModal = (action: string, cm: ChannelMember) => {
@@ -485,6 +490,8 @@ export default defineComponent({
       checkUsername,
       considerMember,
       kickMember,
+
+      toggleChannelsList,
     }
   }
 });

@@ -8,6 +8,7 @@
       :availableChannels="availableChannels"
       :channelSettings="channelSettings"
       :activeChannel="activeChannel"
+      :channelsListOn="channelsListOn"
     />
 
     <ChannelSettings
@@ -17,27 +18,29 @@
       @update-channels-list="updateChannelsList()"
       @deleted-channel="deletedChannel()"
       @post-message="postMessage"
+      @toggle-channels-list="toggleChannelsList"
       :activeChannel="activeChannel"
     />
     <div v-else class="chat-box">
       <div v-if="activeChannel" class="chat-header">
+        <div class="chat-header__return" @click="toggleChannelsList"><i class="fa fa-list fa-2x"></i></div>
         <div
           v-if="activeChannel.notification"
           class="chat-header__notif"
           title="Turn off notifications"
           @click="toggleNotification()"
-        ></div>
+        ><i class="fa fa-bell"></i></div>
         <div
           v-else
           class="chat-header__notif chat-header__notif--off"
           title="Turn on notifications"
           @click="toggleNotification()"
-        ></div>
-
+        ><i class="fa fa-bell-slash"></i></div>
         <div
           class="chat-header__channel-name"
           :title="activeChannel.channel.name"
         >
+        
           {{ activeChannel.channel.name }}
         </div>
         <div>
@@ -127,15 +130,18 @@
                   >
                     <i class="fas fa-envelope link link--neutral" />
                   </button>
-                  <button class="button" title="Challenge">
-                    <i class="fas fa-table-tennis" />
+                  <button class="button" 
+                          title="Challenge"
+                          @click="challengeUser(message.author)"
+                  >
+                    <i class="fas fa-table-tennis link link--neutral" />
                   </button>
                   <button
                     class="button"
                     title="Block"
                     @click="toggleConfirmationModal('block', message.author)"
                   >
-                    <i class="fas fa-ban" />
+                    <i class="fas fa-ban link link--neutral" />
                   </button>
                 </div>
               </div>
@@ -273,6 +279,7 @@ import ChannelsList from "@/components/chat/ChannelsList.vue";
 import MuteBanPopup from "@/components/chat/MuteBanPopup.vue";
 import Confirmation from "@/components/chat/Confirmation.vue";
 import { chatSocket } from "@/App.vue";
+import { useRouter } from "vue-router";
 
 export const ChatComponent = defineComponent({
   name: "ChatComponent",
@@ -298,6 +305,7 @@ export const ChatComponent = defineComponent({
     const relApi = new RelationshipApi();
     const store = useStore();
     const user = computed(() => store.state.user);
+    const router = useRouter();
 
     const newMessage = ref("");
     const messageId = ref(0);
@@ -316,6 +324,7 @@ export const ChatComponent = defineComponent({
     const toggleConfirmation = ref("");
     const target = ref("");
     const targetUser = ref<User>();
+    const channelsListOn = ref(false);
 
     /*
      ** Default channel = id 1, "General". Automatically joined on connection, can't be left.
@@ -616,7 +625,13 @@ export const ChatComponent = defineComponent({
               console.log("Caught error:", err.response.data.message)
             );
         })
-        .catch(err => console.log("Caught error:", err.response.data.message));
+        .catch(err => {
+          store.dispatch(
+            "setMessage",
+            "This DM channel already exists!"
+          );
+          console.log("Caught error: This DM channel already exists!")
+        });
     };
 
     const block = async (user: User) => {
@@ -637,6 +652,47 @@ export const ChatComponent = defineComponent({
       }
     };
 
+    const challengeUser = (user: User) => {
+      if (user != undefined) {
+        const inGameUser = store.state.inGameUsers.find(
+          (u) => u === user.username
+        );
+        const onlineUser = store.state.onlineUsers.find(
+          (u) => u.id === user.id
+        );
+        if (inGameUser) {
+          store.dispatch(
+            "setMessage",
+            user.username.substring(0,15) + "is already in a game!"
+          );
+          return;
+        } else if (!onlineUser) {
+          store.dispatch(
+            "setMessage",
+            user.username.substring(0,15) + "is offline!"
+          );
+          return;
+        }
+      }
+      
+      for (const challenge of store.state.challengesReceived) {
+        if (challenge.challenger == user.username) {
+          store.dispatch(
+            "setMessage",
+            `Error: ${user.username} already invited you to play!`
+          );
+          return;
+        }
+      }
+      router.push({
+        name: "Pong",
+        params: {
+          challengeeId: user.id,
+          challengeeName: user.username,
+        },
+      });
+    };
+
     const executeAction = (action: string, user: User) => {
       if (action == "block") {
         block(user);
@@ -645,9 +701,14 @@ export const ChatComponent = defineComponent({
       }
     };
 
+    const toggleChannelsList = () => {
+      channelsListOn.value = !channelsListOn.value;
+    }
+
     const toggleModal = (idx: number) => {
       switch (idx) {
         case 0:
+          channelsListOn.value = false;
           newChannelForm.value = !newChannelForm.value;
           break;
         case 1:
@@ -680,6 +741,7 @@ export const ChatComponent = defineComponent({
     };
 
     const switchChannel = async (cm: ChannelMember) => {
+      channelsListOn.value = false;
       channelSettings.value = false;
       activeChannel.value = cm;
       activeChannel.value.new_message = false;
@@ -767,6 +829,7 @@ export const ChatComponent = defineComponent({
       toggleConfirmation,
       toggleConfirmationModal,
       executeAction,
+      challengeUser,
 
       newChannelForm,
       passwordPrompt,
@@ -779,7 +842,9 @@ export const ChatComponent = defineComponent({
       toastMessage: computed(() => store.state.message),
       hoveringLock: ref(false),
       userInfo: ref(false),
-      directMessage
+      directMessage,
+      channelsListOn,
+      toggleChannelsList,
     };
   }
 });

@@ -64,6 +64,7 @@ export class PresenceGateway
           (u) => u.id !== user.id,
         );
         client.broadcast.emit('leftUser', user.id);
+        client.emit('disconnected');
         // console.log("REMOVED USER", user);
         // console.log("ALL USERS", this.connectedUsers);
       }
@@ -83,6 +84,7 @@ export class PresenceGateway
           (u) => u.id !== user.id,
         );
         client.broadcast.emit('leftUser', user.id);
+        client.emit('disconnected');
         // console.log("LEFT USER", user);
       }
     }

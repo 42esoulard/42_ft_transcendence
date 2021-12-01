@@ -55,6 +55,9 @@ export default {
       store.commit("removeOnlineUser", id);
       // console.log("OnlineUsers(afterRemoved)", store.state.onlineUsers);
     });
+    presenceSocket.on('disconnected', () => {
+      store.state.isConnected = false;
+    })
 
     pongSocket.on("newInGameUsers", (players: string[]) => {
       store.commit("addInGameUsers", players);

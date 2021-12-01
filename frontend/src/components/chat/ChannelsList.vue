@@ -1,5 +1,9 @@
 <template>
-  <div class="chat-channels">
+  <div :class="['chat-channels',
+                channelsListOn == true ? 'chat-channels--on' : '']">
+    <div v-if="channelsListOn == true" @click="closeList()" class="close-cross">
+      &times;
+    </div>
     <button class="chat-channels__create" @click="toggleModal()">Create Channel</button>
     <div>
       <div class='chat-channels__title'>Joined channels</div>
@@ -42,16 +46,20 @@ export default defineComponent({
   name: 'ChannelsList',
   props: [ 'joinedChannels',
         'availableChannels',
-        'activeChannel'],
+        'activeChannel',
+        'channelsListOn'],
   methods: {
     switchChannel(cm){
-        this.$parent.switchChannel(cm);
+      this.$parent.switchChannel(cm);
     },
     previewChannel(chan){
         this.$parent.previewChannel(chan);
     },
     toggleModal(){
         this.$parent.toggleModal(0);
+    },
+    closeList(){
+        this.$parent.toggleChannelsList();
     }
   },
 });
