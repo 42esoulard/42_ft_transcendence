@@ -7,4 +7,5 @@ export class CreateChannelDto {
   readonly owner_id: number;
   readonly password: string;
   readonly type: string;
+  readonly notification: boolean;
 }

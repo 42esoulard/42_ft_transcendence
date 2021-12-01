@@ -91,7 +91,7 @@
     <button v-else class="button button--second" @click="deactivateTwoFactor">
       Disable 2FA
     </button>
-    <button class="button button--grey" @click="deleteAccount()">
+    <button v-if="user.role !== 'owner'" class="button button--grey" @click="deleteAccount()">
       Delete account
     </button>
     <teleport to="#modals">
@@ -220,13 +220,13 @@ export default defineComponent({
     const deleteAccount = async () => {
       if (store.state.user.id != 0) {
         if (confirm("Do you really want to delete?")) {
+          logOut();
           await userApi
             .removeUser(store.state.user.id, {
               withCredentials: true,
             })
             .then((res: any) => {
               console.log("account deleted");
-              logOut();
             })
             .catch((err: any) => console.log(err));
         }

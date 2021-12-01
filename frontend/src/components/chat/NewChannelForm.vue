@@ -40,7 +40,7 @@
 <script lang="ts">
 import { ref, defineComponent, computed, onMounted } from "vue";
 import { ChatApi } from "@/../sdk/typescript-axios-client-generated";
-import { socket } from "./ChatComponent.vue"
+import { chatSocket } from "@/App.vue";
 import { useStore } from '@/store'
  
 export default defineComponent({
@@ -99,7 +99,6 @@ export default defineComponent({
       .catch(() => {
         nameInput.setCustomValidity('');
         validName = true;
-        // console.log(channelName.value + "not found")
       })
       nameInput.reportValidity();
     }
@@ -144,17 +143,16 @@ export default defineComponent({
     }
 
     const createChannel = () => {
-      console.log(channelName.value, channelType.value, channelPassword.value)
       wasSubmitted.value = true;
       api.saveChannel({
         name: channelName.value,
         owner_id: user.id, 
         type: channelType.value,
-        password: channelPassword.value
+        password: channelPassword.value,
+        notification: false,
       }, { withCredentials: true })
       .then((res) => {
-        // console.log("in createChannel res", res)
-        socket.emit('createChannel', res.data);
+        chatSocket.emit('createChannel', res.data);
         closeModal();
       })
       .catch((err) => console.log("Caught error:", err.response.data.message))

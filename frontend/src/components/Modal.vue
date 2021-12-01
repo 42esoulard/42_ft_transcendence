@@ -7,6 +7,7 @@
     <slot name="settings-modal"></slot>
     <slot name="mute-ban-timer"></slot>
     <slot name="mute-ban-popup"></slot>
+    <slot name="confirmation"></slot>
   </div>
 </template>
 

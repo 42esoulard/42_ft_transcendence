@@ -24,6 +24,7 @@ import { useRouter } from "vue-router";
 
 export const pongSocket = io("http://localhost:3000/pong");
 export const presenceSocket = io("http://localhost:3000/presence");
+export const chatSocket = io("http://localhost:3000/chat");
 
 export default {
   components: { SideBar, Header, Toast },
@@ -35,6 +36,7 @@ export default {
         if (!store.state.isConnected) {
           // console.log("newConnection");
           presenceSocket.emit("newConnection", store.state.user);
+          chatSocket.emit("newConnection", store.state.user);
           store.state.isConnected = true;
         }
       }
@@ -115,6 +117,33 @@ export default {
 
     pongSocket.on("allPendingChallenges", (message: challengeExport[]) => {
       store.commit("allPendingChallenges", message);
+    });
+
+    chatSocket.on("chatNotifications", () => {
+      store.state.chatNotification = true;
+    });
+
+    chatSocket.on("chat-message", (data: any) => {
+      if (store.state.user.id != 0) {
+        if (store.state.chatOn) { 
+          //meow!
+          chatSocket.emit("chat-message-on", data);
+        } else if (store.state.isConnected) {
+          chatSocket.emit("chat-message-off", data, store.state.user);
+        }
+      }
+    });
+
+    chatSocket.on('chat-action', (action: string, userId: number, chanName: string) => {
+      if (store.state.user.id == userId) {
+        store.dispatch("setMessage", "You have been " + action + " [" + chanName.substring(0, 15) + "]");
+      }
+    });
+
+    chatSocket.on('chat-action-del', (message: string, members: number[]) => {
+      if (members.includes(store.state.user.id)) {
+        store.dispatch("setMessage", message);
+      }
     });
 
     return {

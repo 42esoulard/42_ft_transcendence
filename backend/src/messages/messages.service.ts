@@ -11,9 +11,6 @@ import { CreateMessageDto } from './dto/createMessage.dto';
 import { ChannelsService } from 'src/channels/channels.service';
 import { ChannelMembersService } from 'src/channel_members/channel_members.service';
 import { UsersService } from 'src/users/users.service';
-// import { timestamp } from 'rxjs';
-// import { UpdateMessageDto } from './dto/updateMessage.dto';
-// import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class MessagesService {
@@ -34,29 +31,10 @@ export class MessagesService {
   }
 
   /**
-   * Lists all messages in a particular channel
-   * nb: find() is a function from the typeORM library
-   */
-  // async getChannelMessages(channel: Channel): Promise<Message[]> {
-  //   return await this.messagesRepository.find({ channel: channel });
-  // }
-
-  /**
-   * Gets a message in database by its id
-   * nb: findOne(id) is a function from the typeORM library
-   */
-  async getMessageById(id: number): Promise<Message> {
-    const res = await this.messagesRepository.findOne(id);
-    // console.log('res', res);
-    return res;
-  }
-
-  /**
    * Saves a new message into db
    * nb: save(message) is a function from the typeORM library
    */
   async saveMessage(messageDto: CreateMessageDto): Promise<Message> {
-    // console.log(messageDto);
     const newMessage: Message = this.messagesRepository.create(messageDto);
     newMessage.channel = await this.channelService.getChannelById(
       messageDto.channel_id,
@@ -67,15 +45,24 @@ export class MessagesService {
     );
     await this.channelMemberService
       .getChannelMember(newMessage.channel, newMessage.author)
-      .then((res) => {
-        if (res == undefined) {
+      .then(async (res) => {
+        if (newMessage.author.role == 'user' && res == undefined) {
           throw new ForbiddenException('not a member');
         }
-        if (this.channelMemberService.checkMute(res)) {
+        if (newMessage.author.role == 'user' && this.channelMemberService.checkMute(res)) {
           throw new ForbiddenException('muted');
         }
-        if (res.ban) {
+        if (newMessage.author.role == 'user' && res.ban) {
           throw new ForbiddenException('banned');
+        }
+        if (newMessage.channel.messages.length > 50) {
+          await this.messagesRepository
+          .delete(newMessage.channel.messages[0].id)
+          .catch(() => {
+            throw new BadRequestException(
+              'Failed to purge messages from db',
+            );
+          });
         }
       });
 

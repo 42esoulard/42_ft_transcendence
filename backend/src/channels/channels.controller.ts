@@ -205,6 +205,48 @@ export class ChannelsController {
     return owner;
   }
 
+  @Get('/chat-message/:status/:chanId')
+  @UseGuards(JwtTwoFactorGuard)
+  async setNewMessage(
+    @Param('status') status: string,
+    @Param('chanId') chanId: number,
+    @Req() request: Request,
+  ): Promise<ChannelMember> {
+    const cm: ChannelMember = await this.channelService.getChannelMember(
+      chanId,
+      request.user.id,
+    );
+    if (cm == undefined) {
+      throw new NotFoundException('Not a member of this channel');
+    } else if (!cm.notification) {
+      throw new NotFoundException(
+        "Not subscribed to this channel's notifications",
+      );
+    }
+    const bool = status == 'true' ? true : false;
+    if (bool == cm.new_message) {
+      return cm;
+    }
+    return await this.channelService.setNewMessage(bool, cm.id);
+  }
+
+  @Get('/toggle-notification/:cmId')
+  @UseGuards(JwtTwoFactorGuard)
+  async toggleNotification(
+    @Param('cmId') cmId: number,
+    @Req() request: Request,
+  ): Promise<ChannelMember> {
+    const cm: ChannelMember = await this.channelService.getCmById(cmId);
+    if (cm == undefined) {
+      throw new NotFoundException('Not a member of this channel');
+    } else if (cm.member.id !== request.user.id) {
+      throw new ForbiddenException(
+        'Only subscribed users can change their own notification settings',
+      );
+    }
+    return await this.channelService.toggleNotification(cm);
+  }
+
   /**
    * Add a user as a member of a channel.
    * Logged in users only.
@@ -285,14 +327,18 @@ export class ChannelsController {
           'Failed to join channel: bad type for the add request',
         );
     }
-    const cm: ChannelMember = await this.channelService.joinChannel(
-      channel_id,
-      user_id,
-    );
-    if (cm == undefined) {
-      throw new NotFoundException('Failed to join channel');
-    }
-    return cm;
+    return await this.channelService
+      .joinChannel(channel_id, user_id)
+      .then(async (res) => {
+        if (res == undefined) {
+          throw new NotFoundException('Failed to join channel');
+        }
+        if (type == 'dm') {
+          return await this.channelService.toggleNotification(res);
+        } else {
+          return res;
+        }
+      });
   }
 
   @Get('/join-protected/:channel/:attempt')
@@ -481,8 +527,12 @@ export class ChannelsController {
     @Req() request: Request,
   ): Promise<ChannelMember> {
     const user_cm: ChannelMember = await this.channelService.getCmById(cm_id);
-    if (user_cm == undefined) {
-      throw new NotFoundException('Failed to find member');
+    if (
+      user_cm == undefined ||
+      (action == 'unban' && !user_cm.ban) ||
+      (action == 'unmute' && !user_cm.mute)
+    ) {
+      throw new NotFoundException('Failed to find or act on member');
     }
     const req_cm: ChannelMember = await this.channelService.getChannelMember(
       user_cm.channel.id,
@@ -546,7 +596,9 @@ export class ChannelsController {
       }
     } else if (
       !req_cm.is_owner &&
-      (!req_cm.is_admin || user_cm.member.id !== request.user.id)
+      (!req_cm.is_admin || user_cm.member.id !== request.user.id) &&
+      req_cm.member.role !== Role.ADMIN &&
+      req_cm.member.role !== Role.OWNER
     ) {
       throw new ForbiddenException(
         'You dont have the right to act on this channels members',

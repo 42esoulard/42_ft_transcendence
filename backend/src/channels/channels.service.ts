@@ -9,9 +9,11 @@ import * as bcrypt from 'bcrypt';
 import { Users } from 'src/users/entity/users.entity';
 import { ChannelMembersService } from 'src/channel_members/channel_members.service';
 import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
-import { reduce } from 'rxjs';
 import { RelationshipsService } from 'src/relationships/relationships.service';
 import { Role } from 'src/auth/models/role.enum';
+import { ChannelMembers } from 'src/channel_members/entity/channel_members.entity';
+import { Messages } from 'src/messages/entity/messages.entity';
+import { User } from 'src/users/interfaces/user.interface';
 
 @Injectable()
 export class ChannelsService {
@@ -65,6 +67,53 @@ export class ChannelsService {
     return await this.userService.getUserbyId(user_id);
   }
 
+  async getNotifications(userId: number): Promise<boolean> {
+    const user: Users = await this.userService.getUserbyId(userId);
+    if (user == undefined) {
+      return undefined;
+    }
+    let cms: ChannelMembers[] = await this.channelMemberService.getUserChannels(
+      user,
+    );
+    if (cms == undefined) {
+      return undefined;
+    }
+    cms = cms.filter((cms) => cms.new_message);
+    if (cms.length) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  async getNewNotification(data: Messages, userId: number): Promise<boolean> {
+    let cms: ChannelMember = await this.getChannelMember(
+      data.channel.id,
+      userId,
+    );
+    if (cms == undefined || cms.ban) {
+      return false;
+    }
+
+    await this.relationshipService
+      .getBlockedByUser(userId)
+      .then(async (blocked) => {
+        if (
+          blocked.map((blocked) => blocked.adresseeId).includes(data.author.id)
+        ) {
+          return false;
+        }
+        return await this.channelMemberService
+          .setNewMessage(true, cms.id)
+          .then((res) => {
+            return true;
+          })
+          .catch((err) =>
+            console.log('Caught error:', err.response.data.message),
+          );
+      });
+  }
+
   async getChannelMember(
     channel_id: number,
     user_id: number,
@@ -73,6 +122,30 @@ export class ChannelsService {
     const user: Users = await this.userService.getUserbyId(user_id);
 
     return await this.channelMemberService.getChannelMember(channel, user);
+  }
+
+  async setNewMessage(status: boolean, cmId: number): Promise<ChannelMember> {
+    return await this.channelMemberService.setNewMessage(status, cmId);
+  }
+
+  async toggleNotification(cm: ChannelMember): Promise<ChannelMember> {
+    return await this.channelMemberService.toggleNotification(cm.id);
+  }
+
+  async notifyOfflineUsers(message: Messages, onlineUsers: User[]) {
+    await this.channelsRepository
+      .findOne(message.channel.id)
+      .then((channel) => {
+        const chanMembers = channel.channel_members;
+        const onlineMemberIds = onlineUsers.map((user) => user.id);
+        const offlineMembers = chanMembers.filter(
+          (cm) => !onlineMemberIds.includes(cm.member.id),
+        );
+        offlineMembers.forEach((cm) => {
+          this.channelMemberService.setNewMessage(true, cm.id);
+        });
+      })
+      .catch((err) => console.log('Caught error:', err.response.data.message));
   }
 
   async getCmById(cm_id: number): Promise<ChannelMember> {
@@ -331,6 +404,7 @@ export class ChannelsService {
       owner,
       true,
       true,
+      channelDto.notification,
     );
   }
 

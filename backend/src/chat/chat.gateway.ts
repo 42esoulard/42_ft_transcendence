@@ -8,6 +8,9 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { ChannelsService } from 'src/channels/channels.service';
+import { Messages } from 'src/messages/entity/messages.entity';
+import { User } from 'src/users/interfaces/user.interface';
 
 @WebSocketGateway({
   namespace: '/chat',
@@ -17,82 +20,88 @@ import { Server, Socket } from 'socket.io';
   },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  constructor(private readonly channelsService: ChannelsService) {}
+
   @WebSocketServer()
   server: Server;
 
-  connections = 0;
+  async handleConnection(@ConnectedSocket() client: Socket) {
+    console.log('A client has connected to the chat');
 
-  async handleConnection() {
-    console.log('A client has connected');
-    this.connections++;
-    // Notify connected clients of current users
-    this.server.emit('connections', this.connections);
+    client.on('newConnection', async (user: User) => {
+      await this.channelsService.getNotifications(user.id).then((res) => {
+        if (res) {
+          console.log('found new notif!');
+          client.emit('chatNotifications');
+        }
+      });
+    });
+
+    client.on('chat-message-on', async (data: Messages) => {
+      client.emit('chat-message-on', data);
+    });
+
+    client.on('chat-message-off', async (data: Messages, user: User) => {
+      await this.channelsService
+        .getNewNotification(data, user.id)
+        .then((res) => {
+          if (res) {
+            client.emit('chatNotifications');
+          }
+        })
+        .catch((err) =>
+          console.log('Caught error:', err.response.data.message),
+        );
+    });
+
+    client.on(
+      'chat-message',
+      async (message: Messages, onlineUsers: User[]) => {
+        client.broadcast.emit('chat-message', message);
+        await this.channelsService
+          .notifyOfflineUsers(message, onlineUsers)
+          .catch((err) =>
+            console.log('Caught error:', err.response.data.message),
+          );
+      },
+    );
+
+    client.on(
+      'chat-action',
+      async (action: string, userId: number, chanName: string) => {
+        client.broadcast.emit('chat-action', action, userId, chanName);
+      },
+    );
+
+    client.on('chat-action-del', async (message: string, members: number[]) => {
+      client.broadcast.emit('chat-action-del', message, members);
+    });
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
     console.log('A client has disconnected');
-    this.connections--;
     client.disconnect();
-    // Notify connected clients of current users
-    this.server.emit('connections', this.connections);
-  }
-
-  @SubscribeMessage('get-connections')
-  async getConnections(@ConnectedSocket() client: Socket) {
-    client.broadcast.emit('connections', this.connections);
-  }
-
-  @SubscribeMessage('chat-message')
-  async onChat(@ConnectedSocket() client: Socket, @MessageBody() message) {
-    client.broadcast.emit('chat-message', message);
   }
 
   @SubscribeMessage('createChannel')
   handleCreateChannel(@ConnectedSocket() client: Socket, @MessageBody() info) {
-    // User has created a new chatroom
-    client.emit('createdChannel', info);
-
-    //Notify other users of chatroom creation
-    client.broadcast.emit('updateChannels', info);
+    client.emit('created-channel', info);
+    client.broadcast.emit('update-channels', info);
   }
 
-  @SubscribeMessage('updateChannels')
+  @SubscribeMessage('update-channels')
   handleUpdateChannels(@ConnectedSocket() client: Socket, @MessageBody() info) {
-    //Notify other users of chatroom creation
-    client.broadcast.emit('updateChannels', info);
+    client.broadcast.emit('update-channels', info);
   }
 
   @SubscribeMessage('joinChannel')
   handleJoinChannel(client: Socket, channel: string) {
-    // User has joined a chatroom
     client.join(channel);
   }
 
   @SubscribeMessage('leaveChannel')
   handleLeaveChannel(client: Socket, channel: string) {
-    // User has left a chatroom
     client.leave(channel);
-  }
-
-  @SubscribeMessage('typing')
-  async onTyping(
-    @MessageBody() TypingUser: string,
-    @ConnectedSocket() client: Socket,
-  ) {
-    client.broadcast.emit('typing', TypingUser);
-    // console.log(TypingUser);
-  }
-
-  @SubscribeMessage('stopTyping')
-  async onStopTyping(@ConnectedSocket() client: Socket) {
-    client.broadcast.emit('stopTyping');
-  }
-
-  @SubscribeMessage('join')
-  async onJoin(@MessageBody() user: string, @ConnectedSocket() client: Socket) {
-    console.log(user, ' joined');
-    // User has joined the chat
-    client.broadcast.emit('join', user, this.connections);
   }
 
   @SubscribeMessage('leave')
@@ -101,7 +110,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ) {
     console.log(user, ' left');
-    // User has left the chat
     client.broadcast.emit('leave', user);
   }
 }

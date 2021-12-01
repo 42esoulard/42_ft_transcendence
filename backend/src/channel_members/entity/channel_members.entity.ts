@@ -31,6 +31,12 @@ export class ChannelMembers {
   @Column({ default: false })
   is_admin: boolean;
 
+  @Column({ default: false })
+  notification: boolean;
+
+  @Column({ default: false })
+  new_message: boolean;
+
   @Column({ length: 15, nullable: true, default: null })
   ban: string;
 

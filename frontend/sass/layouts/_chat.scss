@@ -65,6 +65,43 @@
   cursor: pointer;
 }
 
+
+.chat-header__notif {
+  cursor: pointer;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+  // right: 20%;
+  // top: 34%;
+  margin-left: 42%;
+  margin-top: -80px;
+  background-color: red;
+  color: white;
+  text-align: center;
+  font-weight: 900;
+  &--off {
+    background-color: grey;
+  }
+}
+
+.chat-channels__notif {
+  cursor: pointer;
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 20px;
+  // right: 25%;
+  // top: 34%;
+  margin-top: 5px;
+  background-color: red;
+  color: white;
+  text-align: center;
+  font-weight: 400;
+  &--off {
+    background-color: grey;
+  }
+}
 // .chat-header__tag {
 //   border-style: solid;
 //   border-radius: $chat-header-border-radius;
@@ -171,7 +208,7 @@
   flex-direction: row;
   justify-content: space-between;
   &:hover,
-  &:focus {
+  &:focus, &--on {
     background-color: $chans-item-hover-bg;
     color: $chat-font-dark;
     border-style: none;
@@ -283,6 +320,18 @@
   text-align: center;
 }
 
+.chat-channel-form__add-member {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.chat-channel-form__add-member-input {
+  margin-top: 8px;
+}
+
 .chat-channel-form__form {
   display: flex;
   flex-direction: column;
@@ -305,6 +354,7 @@
 .chat-user__card {
   background-color: rgba(59, 59, 59, 0.466);
   display: none;
+  flex-direction: row;
   position: absolute;
   height: 2.75rem;
   width: 300px;
@@ -321,7 +371,7 @@
   > .chat-messages__author:hover
   + .chat-user__card,
 .chat-messages__author-container > .chat-user__card:hover {
-  display: block;
+  display: flex;
 }
 
 // .chat-user__card {

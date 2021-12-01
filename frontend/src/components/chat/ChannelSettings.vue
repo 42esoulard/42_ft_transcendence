@@ -61,8 +61,9 @@
             'button--selector',
             selectedTab === 'ownerOptions' ? 'button--selector--on' : ''
           ]"
+          title="Owner Pannel"
         >
-          ...
+          <img class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Owner Pannel" />
         </button>
       </div>
       <div>
@@ -76,23 +77,23 @@
               <span v-if="cm.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
             </div>
             <div v-else-if="((activeChannel.is_owner || user.role == 'owner' || user.role == 'admin') && cm.is_admin) || (activeChannel.is_admin && activeChannel.id == cm.id)" class="chat-channels__tag-container">
-              <span @click="toggleAdmin(cm)"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin-togglable" title="Remove from Admins" /></span>
+              <span @click="askConfirmation(cm, 'deadminize')"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin-togglable" title="Remove from Admins" /></span>
             </div>
             <div v-if="!cm.is_admin">
-              <span v-if="activeChannel.is_owner || user.role == 'owner' || user.role == 'admin'" @click="toggleAdmin(cm)"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--greyed" title="Promote to Admin" /></span>
+              <span v-if="activeChannel.is_owner || user.role == 'owner' || user.role == 'admin'" @click="askConfirmation(cm, 'adminize')"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--greyed" title="Promote to Admin" /></span>
               <span v-if="cm.mute" @click="toggleModal('unmute', cm)"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--mute" title="Unmute user" /></span>
               <span v-else @click="toggleModal('muted', cm)"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--greyed" title="Mute user" /></span>
               <span v-if="cm.ban" @click="toggleModal('unban', cm)"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--ban" title="Unban user" /></span>
               <span v-else @click="toggleModal('banned', cm)"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--greyed" title="Ban user" /></span>
-              <span @click="kickMember(cm)"><img class="fas fa-user-times chat-channels__tag chat-channels__tag--greyed" title="Kick user" /></span>
+              <span @click="askConfirmation(cm, 'kick')"><img class="fas fa-user-times chat-channels__tag chat-channels__tag--greyed" title="Kick user" /></span>
             </div>
           </li>
-          <form v-if="selectedTab == 'all'" @submit.prevent='considerMember()'>
-            <input class="chat-channel-form__input" required type="text" name='name' id='usernameInput' placeholder="Enter the user's username" minlength="1" maxlength="200" v-model="username" @input="checkUsername()">
+          <form v-if="selectedTab == 'all'" class ="chat-channel-form__add-member" @submit.prevent='considerMember()'>
+            <input class="chat-channel-form__input chat-channel-form__add-member-input" required type="text" name='name' id='usernameInput' placeholder="Enter the user's username" minlength="1" maxlength="200" v-model="username" @input="checkUsername()">
             <button class="button button--create-chan" for='name'><i class="fa fa-user-plus"></i></button>
           </form>
         </div>
-        <div v-else>
+        <div v-else class="chat-channel-form__form">
           <form class="chat-channel-form__form" @submit.prevent='submitInputs()'>
             <label class="chat-channel-form__subtitle" for='password'>New Channel Password (leave empty to for no password):</label>
             <input class="chat-channel-form__input" type="text" name='password' id='password' placeholder="Password" minlength="8" maxlength="20" v-model="channelPassword" @input="checkPassword()">
@@ -101,19 +102,24 @@
 
             <button class="button button--create-chan" type='submit'>Submit</button>
           </form>
-          <button class="button button--delete-chan" type='submit' @click="deleteChannel()">Delete Channel</button>
+          <button class="button button--delete-chan" @click="askConfirmation(activeChannel, 'delete')">Delete Channel</button>
         </div>
       </div>
     </div>
   </div>
   <teleport to="#modals">
       <transition name="fade--error">
-        <div v-if="toggleTimer" class="backdrop"></div>
+        <div v-if="toggleTimer || toggleConfirmation" class="backdrop"></div>
       </transition>
       <transition-group name="zoomin">
         <Modal v-if="toggleTimer && activeChannel" @close="closeModal()">
           <template v-slot:mute-ban-timer>
             <MuteBanTimer :action="toggleTimer" :targetCm="targetCm" :activeChannel="activeChannel" @close="closeModal()" @update-mute-ban="updateMuteBan" />
+          </template>
+        </Modal>
+        <Modal v-if="toggleConfirmation && activeChannel" @close="closeModal()">
+          <template v-slot:confirmation>
+            <Confirmation :action="toggleConfirmation" :targetCm="targetCm" :target='target' :activeChannel="activeChannel" @close="closeModal()" @confirm="executeAction" />
           </template>
         </Modal>
       </transition-group>
@@ -123,16 +129,17 @@
 <script lang="ts">
 import { ref, defineComponent, computed } from "vue";
 import { ChannelMember, ChatApi, UserApi } from "@/../sdk/typescript-axios-client-generated";
-import { socket } from "./ChatComponent.vue"
+import { chatSocket } from "@/App.vue";
 import { useStore } from '@/store';
 import Modal from "@/components/Modal.vue";
 import MuteBanTimer from "@/components/chat/MuteBanTimer.vue";
+import Confirmation from "@/components/chat/Confirmation.vue"
 
 export default defineComponent({
   name: 'ChannelSettings',
   props: ['activeChannel'],
-  components: { Modal, MuteBanTimer },
-  emits: ["close-settings", "update-channel", "update-channels-list", "deleted-channel"],
+  components: { Modal, MuteBanTimer, Confirmation },
+  emits: ["close-settings", "update-channel", "update-channels-list", "deleted-channel", "post-message"],
   setup(props, context) {
     const api = new ChatApi();
     const userApi = new UserApi();
@@ -140,14 +147,42 @@ export default defineComponent({
     const user = computed(() => store.state.user);
 
     const toggleTimer = ref('');
+    const toggleConfirmation = ref('');
+    const target = ref('');
     const username = ref('');
     const targetCm = ref();
     const selectedTab = ref('all');
     const allMembers = ref(computed(() => props.activeChannel.channel.channel_members
     .sort((a: ChannelMember, b: ChannelMember) => a.id - b.id )));
   
+    const askConfirmation = (cm: ChannelMember, action: string) => {
+      targetCm.value = cm;
+      target.value = (action == 'delete' ? 'channel' : 'user');
+      toggleConfirmation.value = action;
+    }
+
+    const executeAction = (cm: ChannelMember, action: string) => {
+      toggleConfirmation.value = '';
+      switch (action) {
+        case "adminize":
+          toggleAdmin(cm);
+          break;
+        case "deadminize":
+          toggleAdmin(cm);
+          break;
+        case "kick":
+          kickMember(cm);
+          break;
+        case "delete":
+          deleteChannel();
+          break;
+        default:
+          console.log("You can't do that!!!")
+
+      }
+    }
+
     let selectedMembers = computed(() => {
-      console.log("in selected", props.activeChannel)
       const list = ref();
       if (selectedTab.value === 'banned') {
         list.value = allMembers.value.filter((cm: ChannelMember) => cm.ban)
@@ -171,16 +206,13 @@ export default defineComponent({
           }
           break;
         case 'muted':
-          console.log("bef", tab, selectedTab.value);
           if (selectedTab.value === 'muted') {
             selectedTab.value = 'all';
           } else {
             selectedTab.value = 'muted';
           }
-          console.log("aft", tab, selectedTab.value);
           break;
         case 'admins':
-          console.log("bef", tab, selectedTab.value);
           if (selectedTab.value === 'admins') {
             selectedTab.value = 'all';
           } else {
@@ -208,6 +240,7 @@ export default defineComponent({
 
     const closeModal = () => {
       toggleTimer.value = '';
+      toggleConfirmation.value = '';
     }
 
     const updateMuteBan = async (action: string, cmId: number, endDate: number) => {
@@ -215,8 +248,15 @@ export default defineComponent({
       .then((res) => {
         targetCm.value = res.data;
         context.emit('update-channels-list');
-        socket.emit('updateChannels');
-
+        if (action == 'unmute') {
+          action = 'unmuted';
+        } else if (action == 'unban') {
+          action = 'unbanned';
+        }
+        chatSocket.emit('chat-action', action + ' from', res.data.member.id, res.data.channel.name)
+        chatSocket.emit('update-channels');
+        context.emit('post-message', res.data.member.username + " has been " + action + " from this channel");
+        store.dispatch("setMessage", res.data.member.username.substring(0, 15) + " has been " + action + " from [" + res.data.channel.name.substring(0, 15) + "]");
         if (action === 'muted') {
           setTimeout(() => updateMuteBan("unmute", cmId, 0), endDate - Date.now())
         } else if (action === 'banned') {
@@ -229,10 +269,19 @@ export default defineComponent({
 
     const toggleAdmin = async (cm: ChannelMember) => {
       await api.toggleAdmin(cm.id, { withCredentials: true })
-      .then(() => {
+      .then((res) => {
         targetCm.value = cm;
         context.emit('update-channels-list');
-        socket.emit('updateChannels');
+        chatSocket.emit('update-channels');
+        if (res.data.is_admin) {
+          context.emit('post-message', res.data.member.username + " is now an admin for this channel");
+          chatSocket.emit('chat-action', 'made an admin for', res.data.member.id, res.data.channel.name)
+          store.dispatch("setMessage",  "[" + res.data.member.username.substring(0, 15) + "] is now an admin in channel [" + res.data.channel.name.substring(0, 15) + "]");
+        } else {
+          context.emit('post-message', res.data.member.username + " is no longer an admin for this channel");
+          chatSocket.emit('chat-action', 'removed admin privileges from', res.data.member.id, res.data.channel.name)
+          store.dispatch("setMessage",  "[" + res.data.member.username.substring(0, 15) + "] is no longer an admin in channel [" + res.data.channel.name.substring(0, 15) + "]");
+        }
         if (cm.id == props.activeChannel.id) {
           closeChannelSettings();
         }
@@ -241,9 +290,12 @@ export default defineComponent({
     }
 
     const deleteChannel = async () => {
+      const members = props.activeChannel.channel.channel_members.map((cm: ChannelMember) => cm.member.id)
+      const chanName = props.activeChannel.channel.name;
       await api.deleteChannel(props.activeChannel.channel.id, { withCredentials: true })
       .then(() => {
         context.emit('deleted-channel');
+        chatSocket.emit('chat-action-del', '[' + chanName.substring(0, 15) + '] has been deleted.', members)
         closeChannelSettings();
       })
       .catch((err) => console.log("Caught error:", err.response.data.message))
@@ -268,7 +320,6 @@ export default defineComponent({
         usernameInput.setCustomValidity('');
         validUsername = true;
       } else {
-        console.log("here username doesnt exist", username.value)
         usernameInput.setCustomValidity("User doesn't exist")
         validUsername = false;
       }
@@ -300,7 +351,9 @@ export default defineComponent({
       , { withCredentials: true })
       .then((res) => {
         context.emit('update-channels-list');
-        socket.emit('updateChannels');
+        chatSocket.emit('update-channels');
+        context.emit('post-message', res.data.member.username + " has been added");
+        chatSocket.emit('chat-action', 'added to', userId, props.activeChannel.channel.name);
         username.value = '';
         wasSubmitted.value = false;
       })
@@ -322,13 +375,18 @@ export default defineComponent({
     const kickMember = async (cm: ChannelMember) => {
 
       wasSubmitted.value = true;
+      const exMemberName = cm.member.username;
+      const exMemberId = cm.member.id;
       const newMember = api.leaveChannel(
         "kick", cm.id,
         { withCredentials: true })
       .then((res) => {
         context.emit('update-channels-list');
-        socket.emit('updateChannels');
+        chatSocket.emit('update-channels');
         wasSubmitted.value = false;
+        context.emit('post-message',  exMemberName + " has been kicked from this channel");
+        chatSocket.emit('chat-action', 'kicked from', exMemberId, props.activeChannel.channel.name);
+        store.dispatch("setMessage",  "[" + exMemberName.substring(0, 15) + "] has been kicked from channel [" + props.activeChannel.channel.name.substring(0, 15) + "]");
       })
       .catch((err) => {
         console.log("Caught error:", err.response.data.message);
@@ -382,9 +440,15 @@ export default defineComponent({
         { withCredentials: true }
       )
       .then((res) => {
-        console.log("in updateChannel res", res)
         context.emit('update-channels-list');
-        socket.emit('updateChannels');
+        chatSocket.emit('update-channels');
+        if (res.data.password) {
+          context.emit('post-message', "Channel password has been modified");
+          store.dispatch("setMessage",  "[" + res.data.name.substring(0, 15) + "]'s password has been edited");
+        } else {
+          context.emit('post-message', "Channel is now password-free");
+          store.dispatch("setMessage",  "[" + res.data.name.substring(0, 15) + "] is now a password free community");
+        }
         closeChannelSettings();
       })
       .catch((err) => console.log("Caught error:", err.response.data.message))
@@ -405,9 +469,13 @@ export default defineComponent({
       selectedMembers,
 
       toggleTimer,
+      toggleConfirmation,
+      askConfirmation,
+      executeAction,
       toggleModal,
       closeChannelSettings,
       targetCm,
+      target,
       toggleTab,
       toggleAdmin,
       updateMuteBan,
