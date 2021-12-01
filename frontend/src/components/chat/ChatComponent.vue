@@ -34,7 +34,7 @@
                 <span v-if="activeChannel.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
                 <span @click="channelSettings = true"><img class="fas fa-lg fa-cogs chat-channels__tag chat-channels__tag--settings" title="Channel Settings"  /></span>
               </div>
-              <span v-if="isMember && activeChannel.channel.name !== 'General'" @click="leaveChannel()" ><img class="fas fa-lg fa-sign-out-alt chat-channels__tag chat-channels__tag--leave" title="Leave Channel" /></span>
+              <span v-if="isMember && activeChannel.channel.name !== 'General'" @click="toggleModal(4)" ><img class="fas fa-lg fa-sign-out-alt chat-channels__tag chat-channels__tag--leave" title="Leave Channel" /></span>
             </div>
 
           <div v-if="isMember || (activeChannel && !activeChannel.channel.password)" class="chat-messages">
@@ -52,7 +52,7 @@
                             <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: message.author.username} }">
                             <i class="fas fa-user-circle" /></router-link>
                           </button>
-                          <button class="button link link--neutral" title="DM" @click="directMessage(message.author)"><i class="fas fa-envelope" /></button>
+                          <button class="button" title="DM" @click="directMessage(message.author)"><i class="fas fa-envelope link link--neutral" /></button>
                           <button class="button" title="Challenge"><i class="fas fa-table-tennis" /></button>
                           <button class="button" title="Block"><i class="fas fa-ban" /></button>
                           <!-- <button v-if="activeChannel && activeChannel.is_admin || user.role == 'admin' || user.role == 'owner'" class="button" title="Admin Actions"><i class="fas fa-cog" /></button> -->
@@ -109,7 +109,7 @@
 
     <teleport to="#modals">
       <transition name="fade--error">
-        <div v-if="newChannelForm || passwordPrompt" class="backdrop"></div>
+        <div v-if="newChannelForm || passwordPrompt || toggleConfirmation" class="backdrop"></div>
       </transition>
       <transition-group name="zoomin">
         <Modal v-if="newChannelForm" @close="toggleModal(0)">
@@ -125,6 +125,11 @@
         <Modal v-if="mutePopup && activeChannel" @close="toggleModal(3)">
           <template v-slot:mute-ban-popup>
             <MuteBanPopup :cm="activeChannel" @close="toggleModal(3)" />
+          </template>
+        </Modal>
+        <Modal v-if="toggleConfirmation && activeChannel" @close="toggleModal(4)">
+          <template v-slot:confirmation>
+            <Confirmation :action="toggleConfirmation" :targetCm="activeChannel" target='channel' @close="toggleModal(4)" @confirm="leaveChannel" />
           </template>
         </Modal>
       </transition-group>
@@ -144,14 +149,15 @@ import LockedChannelForm from "@/components/chat/LockedChannelForm.vue";
 import ChannelSettings from "@/components/chat/ChannelSettings.vue";
 import ChannelsList from "@/components/chat/ChannelsList.vue";
 import MuteBanPopup from "@/components/chat/MuteBanPopup.vue";
-import { chatSocket } from "@/App.vue"
+import Confirmation from "@/components/chat/Confirmation.vue";
+import { chatSocket } from "@/App.vue";
 /*
 ** chatSocket is defined here to be able to import it from other chat related components
 */
 
 export const ChatComponent = defineComponent({
   name: "ChatComponent",
-  components: { NewChannelForm, LockedChannelForm, ChannelSettings, ChannelsList, MuteBanPopup, Modal, Toast },
+  components: { NewChannelForm, LockedChannelForm, ChannelSettings, ChannelsList, MuteBanPopup, Modal, Toast, Confirmation },
 
   beforePageLeave() {
     chatSocket.emit("leave", 'a user');
@@ -182,6 +188,7 @@ export const ChatComponent = defineComponent({
     const channelSettings = ref(false);
     const isMember = ref(false);
     const mutePopup = ref(false);
+    const toggleConfirmation = ref('');
     // const refresh = ref(false);
 
     /*
@@ -386,7 +393,7 @@ export const ChatComponent = defineComponent({
     }
 
     const leaveChannel = async () => {
-
+      toggleConfirmation.value = '';
       const name = activeChannel.value!.channel.name;
       await api.leaveChannel("self", activeChannel.value!.id, { withCredentials: true })
       .then((res) => {
@@ -445,6 +452,13 @@ export const ChatComponent = defineComponent({
           break;
         case 3:
           mutePopup.value = !mutePopup.value;
+          break;
+        case 4:
+          if (toggleConfirmation.value) {
+            toggleConfirmation.value = '';
+          } else {
+            toggleConfirmation.value = 'leave';
+          }
           break;
       }
       // console.log("channelSettings", channelSettings)
@@ -586,6 +600,7 @@ export const ChatComponent = defineComponent({
       leaveChannel,
       isMember,
       mutePopup,
+      toggleConfirmation,
 
       newChannelForm,
       passwordPrompt,

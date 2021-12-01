@@ -76,23 +76,23 @@
               <span v-if="cm.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
             </div>
             <div v-else-if="((activeChannel.is_owner || user.role == 'owner' || user.role == 'admin') && cm.is_admin) || (activeChannel.is_admin && activeChannel.id == cm.id)" class="chat-channels__tag-container">
-              <span @click="toggleAdmin(cm)"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin-togglable" title="Remove from Admins" /></span>
+              <span @click="askConfirmation(cm, 'deadminize')"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin-togglable" title="Remove from Admins" /></span>
             </div>
             <div v-if="!cm.is_admin">
-              <span v-if="activeChannel.is_owner || user.role == 'owner' || user.role == 'admin'" @click="toggleAdmin(cm)"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--greyed" title="Promote to Admin" /></span>
+              <span v-if="activeChannel.is_owner || user.role == 'owner' || user.role == 'admin'" @click="askConfirmation(cm, 'adminize')"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--greyed" title="Promote to Admin" /></span>
               <span v-if="cm.mute" @click="toggleModal('unmute', cm)"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--mute" title="Unmute user" /></span>
               <span v-else @click="toggleModal('muted', cm)"><img class="fas fa-comment-slash chat-channels__tag chat-channels__tag--greyed" title="Mute user" /></span>
               <span v-if="cm.ban" @click="toggleModal('unban', cm)"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--ban" title="Unban user" /></span>
               <span v-else @click="toggleModal('banned', cm)"><img class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--greyed" title="Ban user" /></span>
-              <span @click="kickMember(cm)"><img class="fas fa-user-times chat-channels__tag chat-channels__tag--greyed" title="Kick user" /></span>
+              <span @click="askConfirmation(cm, 'kick')"><img class="fas fa-user-times chat-channels__tag chat-channels__tag--greyed" title="Kick user" /></span>
             </div>
           </li>
-          <form v-if="selectedTab == 'all'" @submit.prevent='considerMember()'>
-            <input class="chat-channel-form__input" required type="text" name='name' id='usernameInput' placeholder="Enter the user's username" minlength="1" maxlength="200" v-model="username" @input="checkUsername()">
+          <form v-if="selectedTab == 'all'" class ="chat-channel-form__add-member" @submit.prevent='considerMember()'>
+            <input class="chat-channel-form__input chat-channel-form__add-member-input" required type="text" name='name' id='usernameInput' placeholder="Enter the user's username" minlength="1" maxlength="200" v-model="username" @input="checkUsername()">
             <button class="button button--create-chan" for='name'><i class="fa fa-user-plus"></i></button>
           </form>
         </div>
-        <div v-else>
+        <div v-else class="chat-channel-form__form">
           <form class="chat-channel-form__form" @submit.prevent='submitInputs()'>
             <label class="chat-channel-form__subtitle" for='password'>New Channel Password (leave empty to for no password):</label>
             <input class="chat-channel-form__input" type="text" name='password' id='password' placeholder="Password" minlength="8" maxlength="20" v-model="channelPassword" @input="checkPassword()">
@@ -101,19 +101,24 @@
 
             <button class="button button--create-chan" type='submit'>Submit</button>
           </form>
-          <button class="button button--delete-chan" type='submit' @click="deleteChannel()">Delete Channel</button>
+          <button class="button button--delete-chan" @click="askConfirmation(activeChannel, 'delete')">Delete Channel</button>
         </div>
       </div>
     </div>
   </div>
   <teleport to="#modals">
       <transition name="fade--error">
-        <div v-if="toggleTimer" class="backdrop"></div>
+        <div v-if="toggleTimer || toggleConfirmation" class="backdrop"></div>
       </transition>
       <transition-group name="zoomin">
         <Modal v-if="toggleTimer && activeChannel" @close="closeModal()">
           <template v-slot:mute-ban-timer>
             <MuteBanTimer :action="toggleTimer" :targetCm="targetCm" :activeChannel="activeChannel" @close="closeModal()" @update-mute-ban="updateMuteBan" />
+          </template>
+        </Modal>
+        <Modal v-if="toggleConfirmation && activeChannel" @close="closeModal()">
+          <template v-slot:confirmation>
+            <Confirmation :action="toggleConfirmation" :targetCm="targetCm" :target='target' :activeChannel="activeChannel" @close="closeModal()" @confirm="executeAction" />
           </template>
         </Modal>
       </transition-group>
@@ -127,11 +132,12 @@ import { chatSocket } from "@/App.vue";
 import { useStore } from '@/store';
 import Modal from "@/components/Modal.vue";
 import MuteBanTimer from "@/components/chat/MuteBanTimer.vue";
+import Confirmation from "@/components/chat/Confirmation.vue"
 
 export default defineComponent({
   name: 'ChannelSettings',
   props: ['activeChannel'],
-  components: { Modal, MuteBanTimer },
+  components: { Modal, MuteBanTimer, Confirmation },
   emits: ["close-settings", "update-channel", "update-channels-list", "deleted-channel"],
   setup(props, context) {
     const api = new ChatApi();
@@ -140,12 +146,41 @@ export default defineComponent({
     const user = computed(() => store.state.user);
 
     const toggleTimer = ref('');
+    const toggleConfirmation = ref('');
+    const target = ref('');
     const username = ref('');
     const targetCm = ref();
     const selectedTab = ref('all');
     const allMembers = ref(computed(() => props.activeChannel.channel.channel_members
     .sort((a: ChannelMember, b: ChannelMember) => a.id - b.id )));
   
+    const askConfirmation = (cm: ChannelMember, action: string) => {
+      targetCm.value = cm;
+      target.value = (action == 'delete' ? 'user' : 'channel');
+      toggleConfirmation.value = action;
+    }
+
+    const executeAction = (cm: ChannelMember, action: string) => {
+      toggleConfirmation.value = '';
+      switch (action) {
+        case "adminize":
+          toggleAdmin(cm);
+          break;
+        case "deadminize":
+          toggleAdmin(cm);
+          break;
+        case "kick":
+          kickMember(cm);
+          break;
+        case "delete":
+          deleteChannel();
+          break;
+        default:
+          console.log("You can't do that!!!")
+
+      }
+    }
+
     let selectedMembers = computed(() => {
       console.log("in selected", props.activeChannel)
       const list = ref();
@@ -208,6 +243,7 @@ export default defineComponent({
 
     const closeModal = () => {
       toggleTimer.value = '';
+      toggleConfirmation.value = '';
     }
 
     const updateMuteBan = async (action: string, cmId: number, endDate: number) => {
@@ -405,9 +441,13 @@ export default defineComponent({
       selectedMembers,
 
       toggleTimer,
+      toggleConfirmation,
+      askConfirmation,
+      executeAction,
       toggleModal,
       closeChannelSettings,
       targetCm,
+      target,
       toggleTab,
       toggleAdmin,
       updateMuteBan,

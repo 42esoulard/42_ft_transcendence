@@ -519,10 +519,11 @@ export class ChannelsController {
         throw new NotFoundException('Couldnt identify request account');
       }
       if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
-        throw new ForbiddenException('You dont have the right to act on this channel\s members');
+        throw new ForbiddenException('1You dont have the right to act on this channel\s members');
       }
-    } else if (!req_cm.is_owner && (!req_cm.is_admin || user_cm.member.id !== request.user.id)) {
-      throw new ForbiddenException('You dont have the right to act on this channel\s members');
+    } else if (!req_cm.is_owner && (!req_cm.is_admin || user_cm.member.id !== request.user.id) &&
+        req_cm.member.role !== Role.ADMIN && req_cm.member.role !== Role.OWNER) {
+      throw new ForbiddenException('2You dont have the right to act on this channel\s members');
     }
     
     const cm: ChannelMember = await this.channelService.toggleAdmin(cm_id);

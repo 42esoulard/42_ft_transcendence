@@ -320,6 +320,18 @@
   text-align: center;
 }
 
+.chat-channel-form__add-member {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.chat-channel-form__add-member-input {
+  margin-top: 8px;
+}
+
 .chat-channel-form__form {
   display: flex;
   flex-direction: column;
@@ -342,6 +354,7 @@
 .chat-user__card {
   background-color: rgba(59, 59, 59, 0.466);
   display: none;
+  flex-direction: row;
   position: absolute;
   height: 2.75rem;
   width: 300px;
@@ -358,7 +371,7 @@
   > .chat-messages__author:hover
   + .chat-user__card,
 .chat-messages__author-container > .chat-user__card:hover {
-  display: block;
+  display: flex;
 }
 
 // .chat-user__card {
