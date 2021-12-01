@@ -35,7 +35,7 @@
                 <span v-if="activeChannel.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin" /></span>
                 <span @click="channelSettings = true"><img class="fas fa-lg fa-cogs chat-channels__tag chat-channels__tag--settings" title="Channel Settings"  /></span>
               </div>
-              <span v-if="isMember && activeChannel.channel.name !== 'General'" @click="toggleModal(4)" ><img class="fas fa-lg fa-sign-out-alt chat-channels__tag chat-channels__tag--leave" title="Leave Channel" /></span>
+              <span v-if="isMember && activeChannel.channel.name !== 'General'" @click="toggleConfirmationModal('leave', null)" ><img class="fas fa-lg fa-sign-out-alt chat-channels__tag chat-channels__tag--leave" title="Leave Channel" /></span>
             </div>
 
           <div v-if="isMember || (activeChannel && !activeChannel.channel.password) || user.role !== 'user'" class="chat-messages">
@@ -55,7 +55,7 @@
                           </button>
                           <button class="button" title="DM" @click="directMessage(message.author)"><i class="fas fa-envelope link link--neutral" /></button>
                           <button class="button" title="Challenge"><i class="fas fa-table-tennis" /></button>
-                          <button class="button" title="Block"><i class="fas fa-ban" /></button>
+                          <button class="button" title="Block" @click="toggleConfirmationModal('block', message.author)"><i class="fas fa-ban" /></button>
                           <!-- <button v-if="activeChannel && activeChannel.is_admin || user.role == 'admin' || user.role == 'owner'" class="button" title="Admin Actions"><i class="fas fa-cog" /></button> -->
                       </div>
                     </div>
@@ -130,7 +130,7 @@
         </Modal>
         <Modal v-if="toggleConfirmation && activeChannel" @close="toggleModal(4)">
           <template v-slot:confirmation>
-            <Confirmation :action="toggleConfirmation" :targetCm="activeChannel" target='channel' @close="toggleModal(4)" @confirm="leaveChannel" />
+            <Confirmation :action="toggleConfirmation" :targetCm="activeChannel" :target='target' :targetUser='targetUser' @close="toggleModal(4)" @confirm="executeAction" />
           </template>
         </Modal>
       </transition-group>
@@ -190,6 +190,8 @@ export const ChatComponent = defineComponent({
     const isMember = ref(false);
     const mutePopup = ref(false);
     const toggleConfirmation = ref('');
+    const target = ref('');
+    const targetUser = ref<User>()
     // const refresh = ref(false);
 
     /*
@@ -449,6 +451,32 @@ export const ChatComponent = defineComponent({
       .catch((err) => console.log("Caught error:", err.response.data.message))
     }
 
+    const block = async (user: User) => {
+      if (store.state.user.id != 0) {
+        await relApi
+          .saveRelationship(
+            {
+              requesterId: store.state.user.id,
+              adresseeId: user.id,
+              nature: "blocked",
+            },
+            {
+              withCredentials: true,
+            }
+          )
+          .then((res: any) => window.location.reload())
+          .catch((err: any) => console.log(err));
+      }
+    };
+
+    const executeAction = (action: string, user: User) => {
+      if (action == 'block') {
+        block(user);
+      } else if (action == 'leave') {
+        leaveChannel();
+      }
+    }
+
     const toggleModal = (idx: number) => {
       switch(idx) {
         case 0:
@@ -467,14 +495,21 @@ export const ChatComponent = defineComponent({
           mutePopup.value = !mutePopup.value;
           break;
         case 4:
-          if (toggleConfirmation.value) {
-            toggleConfirmation.value = '';
-          } else {
-            toggleConfirmation.value = 'leave';
-          }
+          toggleConfirmation.value = '';
           break;
       }
       // console.log("channelSettings", channelSettings)
+    }
+
+    const toggleConfirmationModal = (action: string, user: User | null) => {
+      target.value = 'channel';
+      if (action == 'block') {
+        target.value = 'user';
+        if (user) {
+          targetUser.value = user;
+        }
+      }
+      toggleConfirmation.value = action;
     }
 
     const switchChannel =  async (cm: ChannelMember) => {
@@ -615,12 +650,16 @@ export const ChatComponent = defineComponent({
       isMember,
       mutePopup,
       toggleConfirmation,
+      toggleConfirmationModal,
+      executeAction,
 
       newChannelForm,
       passwordPrompt,
       channelSettings,
       // toggleAdminSettings,
       toggleModal,
+      target, 
+      targetUser,
 
       toggleNotification,
       toastMessage: computed(() => store.state.message),

@@ -15,11 +15,17 @@ import { ref, defineComponent, computed, onMounted } from "vue";
 
 export default defineComponent({
   name: 'Confirmation',
-  props: ['targetCm', 'action', 'target'],
+  props: ['targetCm', 'action', 'target', 'targetUser'],
   emits: ['close', 'confirm'],
   setup(props, context) {
     const confirm = () => {
-      context.emit('confirm', props.targetCm, props.action);
+      if (props.action == 'block') {
+        context.emit('confirm', 'block', props.targetUser);
+      } else if (props.action == 'leave') {
+        context.emit('confirm', 'leave', props.targetCm.member);
+      } else {
+        context.emit('confirm', props.targetCm, props.action);
+      }
     }
     const closeModal = () => {
       context.emit("close");
