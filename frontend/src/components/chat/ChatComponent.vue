@@ -127,15 +127,18 @@
                   >
                     <i class="fas fa-envelope link link--neutral" />
                   </button>
-                  <button class="button" title="Challenge">
-                    <i class="fas fa-table-tennis" />
+                  <button class="button" 
+                          title="Challenge"
+                          @click="challengeUser(message.author)"
+                  >
+                    <i class="fas fa-table-tennis link link--neutral" />
                   </button>
                   <button
                     class="button"
                     title="Block"
                     @click="toggleConfirmationModal('block', message.author)"
                   >
-                    <i class="fas fa-ban" />
+                    <i class="fas fa-ban link link--neutral" />
                   </button>
                 </div>
               </div>
@@ -273,6 +276,7 @@ import ChannelsList from "@/components/chat/ChannelsList.vue";
 import MuteBanPopup from "@/components/chat/MuteBanPopup.vue";
 import Confirmation from "@/components/chat/Confirmation.vue";
 import { chatSocket } from "@/App.vue";
+import { useRouter } from "vue-router";
 
 export const ChatComponent = defineComponent({
   name: "ChatComponent",
@@ -298,6 +302,7 @@ export const ChatComponent = defineComponent({
     const relApi = new RelationshipApi();
     const store = useStore();
     const user = computed(() => store.state.user);
+    const router = useRouter();
 
     const newMessage = ref("");
     const messageId = ref(0);
@@ -637,6 +642,47 @@ export const ChatComponent = defineComponent({
       }
     };
 
+    const challengeUser = (user: User) => {
+      if (user != undefined) {
+        const inGameUser = store.state.inGameUsers.find(
+          (u) => u === user.username
+        );
+        const onlineUser = store.state.onlineUsers.find(
+          (u) => u.id === user.id
+        );
+        if (inGameUser) {
+          store.dispatch(
+            "setMessage",
+            user.username.substring(0,15) + "is already in a game!"
+          );
+          return;
+        } else if (!onlineUser) {
+          store.dispatch(
+            "setMessage",
+            user.username.substring(0,15) + "is offline!"
+          );
+          return;
+        }
+      }
+      
+      for (const challenge of store.state.challengesReceived) {
+        if (challenge.challenger == user.username) {
+          store.dispatch(
+            "setMessage",
+            `Error: ${user.username} already invited you to play!`
+          );
+          return;
+        }
+      }
+      router.push({
+        name: "Pong",
+        params: {
+          challengeeId: user.id,
+          challengeeName: user.username,
+        },
+      });
+    };
+
     const executeAction = (action: string, user: User) => {
       if (action == "block") {
         block(user);
@@ -767,6 +813,7 @@ export const ChatComponent = defineComponent({
       toggleConfirmation,
       toggleConfirmationModal,
       executeAction,
+      challengeUser,
 
       newChannelForm,
       passwordPrompt,
