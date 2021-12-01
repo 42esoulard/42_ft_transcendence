@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { ref, defineComponent, computed, onMounted } from "vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   name: 'Confirmation',
@@ -34,14 +34,6 @@ export default defineComponent({
       confirm,
       closeModal
     }
-    // endDate(cm) {
-    //   const rawDate = new Date(Number(cm.mute));
-    //   const locale = rawDate.toLocaleString("sv-SE");
-    //   return locale.substring(0, 16);
-    // },
-    // toggleModal(){
-    //     this.$parent.toggleModal(0);
-    // }
   },
 });
 </script>

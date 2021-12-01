@@ -2,14 +2,8 @@
   <transition name="toast">
     <Toast v-if="toastMessage" :message="toastMessage" />
   </transition>
-  <!-- <h1>Chat Room</h1> -->
     <div class="chat">
-      <ChannelsList :joinedChannels="joinedChannels" :availableChannels="availableChannels" :channelSettings="channelSettings" />
-        <!-- <div>
-          <p v-for="(user, i) in info" :key="i">
-            {{ user.username }} {{ user.action }}
-          </p>
-        </div> -->
+      <ChannelsList :joinedChannels="joinedChannels" :availableChannels="availableChannels" :channelSettings="channelSettings" :activeChannel="activeChannel" />
 
         <ChannelSettings v-if="channelSettings"  
           @close-settings="channelSettings = false" 
@@ -41,14 +35,11 @@
           <div v-if="isMember || (activeChannel && !activeChannel.channel.password) || user.role !== 'user'" class="chat-messages">
             <div>
               <ul class="chat-messages__list" id="messages">
-                <!-- <small v-if="typing">{{ typing }} is typing</small> -->
                 <li class="chat-messages__item" v-for="(message) in channelMessages" :key="message.id">
                     <div class="chat-messages__author-container">
                       <div class='chat-messages__author'>{{ message.author.username }}</div>
                       <div v-if="message.author.id !== activeChannel.member.id" class="chat-user__card">
-                          <!-- <div class="chat-user__username"> {{ message.author.username }} </div>
-                          <div class="chat-user__login"> {{ message.author.forty_two_login }} </div>
-                          <img class="chat-user__avatar" :src="message.author.avatar"> -->
+                      
                           <button class="button" title="Profile" >
                             <router-link class="link link--neutral" :to="{ name: 'UserProfile', params: {username: message.author.username} }">
                             <i class="fas fa-user-circle" /></router-link>
@@ -56,13 +47,11 @@
                           <button class="button" title="DM" @click="directMessage(message.author)"><i class="fas fa-envelope link link--neutral" /></button>
                           <button class="button" title="Challenge"><i class="fas fa-table-tennis" /></button>
                           <button class="button" title="Block" @click="toggleConfirmationModal('block', message.author)"><i class="fas fa-ban" /></button>
-                          <!-- <button v-if="activeChannel && activeChannel.is_admin || user.role == 'admin' || user.role == 'owner'" class="button" title="Admin Actions"><i class="fas fa-cog" /></button> -->
                       </div>
                     </div>
                     <div>: </div>
                     <div class="chat-messages__content">{{ message.content }}</div>
                 </li>
-
               </ul>
             </div>
           </div>
@@ -72,7 +61,6 @@
               <span v-else @click="applyForMembership(activeChannel.channel)"><img class="fa fa-unlock fa-10x chat-channels__lock-img chat-channels__lock-img--unlocked" title="This channel is password-protected" /></span>
             </div>
           </div>
-
 
           <div>
             <form @submit.prevent="send">
@@ -138,7 +126,6 @@
 </template>
 
 <script lang="ts">
-// import { io } from "socket.io-client";
 import { useStore } from '@/store';
 import { defineComponent, reactive, ref, watch, computed } from "vue";
 import { Info } from "@/types/Info";
@@ -152,9 +139,6 @@ import ChannelsList from "@/components/chat/ChannelsList.vue";
 import MuteBanPopup from "@/components/chat/MuteBanPopup.vue";
 import Confirmation from "@/components/chat/Confirmation.vue";
 import { chatSocket } from "@/App.vue";
-/*
-** chatSocket is defined here to be able to import it from other chat related components
-*/
 
 export const ChatComponent = defineComponent({
   name: "ChatComponent",
@@ -172,8 +156,6 @@ export const ChatComponent = defineComponent({
     const relApi = new RelationshipApi();
     const store = useStore();
     const user = computed(() => store.state.user);
-    // const firstTimeConnect = computed(() => store.state.firstTimeConnect);
-    // const connections = ref(1);
 
     const newMessage = ref("");
     const messageId = ref(0);
@@ -192,7 +174,6 @@ export const ChatComponent = defineComponent({
     const toggleConfirmation = ref('');
     const target = ref('');
     const targetUser = ref<User>()
-    // const refresh = ref(false);
 
     /*
     ** Default channel = id 1, "General". Automatically joined on connection, can't be left.
@@ -201,7 +182,6 @@ export const ChatComponent = defineComponent({
     store.state.chatOn = true;
 
     const getDefaultChannel = async () => {
-      // console.log("IN DEFAULT CHANNEL BEFORE GCBI", 1, user.value.id)
       await api.getDefaultChannel({ withCredentials: true })
       .then(async (chan) => {
         await joinChannel(chan.data)
@@ -229,13 +209,12 @@ export const ChatComponent = defineComponent({
       await api.getUserChannels({ withCredentials: true })
       .then(async (res) => {
         joinedChannels.value = res.data;
-        console.log("in  channels list", joinedChannels.value)
         await api.getChannelMember(activeChannel.value!.channel.id, activeChannel.value!.member.id, { withCredentials: true })
         .then((res) => {
           activeChannel.value = res.data;
           if (!activeChannel.value.is_admin && user.value.role !== 'admin' && user.value.role !== 'owner')
             channelSettings.value = false;
-          console.log(res.data)
+          // console.log(res.data)
         })
         .catch(async (err) => {
           console.log("Caught error:", err.response.data.message);
@@ -246,7 +225,6 @@ export const ChatComponent = defineComponent({
             .then((res) => {
               activeChannel.value!.channel = res.data;
               channelMessages.value = res.data.messages;
-              // console.log("in get messages:", channelMessages.value);
               return res;
             })
             .catch((err) => console.log("Caught error:", err.response.data.message));
@@ -256,7 +234,6 @@ export const ChatComponent = defineComponent({
         await api.getAvailableChannels({ withCredentials: true })
         .then((res) => {
           availableChannels.value = res.data;
-          console.log("avail", availableChannels.value);
         })
         .catch((err) => console.log("Caught error:", err.response.data.message));
       })
@@ -264,14 +241,11 @@ export const ChatComponent = defineComponent({
     }
 
     const getMessagesUpdate = async (channelId: number) => {
-      console.log("in get messages channel", channelId)
       if (activeChannel.value!.channel && activeChannel.value!.channel.id === channelId) {
-        // console.log("IN GET MESSAGES UPDATE BEFORE GCBI", channelId, user.value.id)
         await api.getChannelById(channelId, { withCredentials: true })
         .then((res) => {
           activeChannel.value!.channel = res.data;
           channelMessages.value = res.data.messages;
-          // console.log("in get messages:", channelMessages.value);
           return res;
         })
         .catch((err) => console.log("Caught error:", err.response.data.message));
@@ -294,7 +268,6 @@ export const ChatComponent = defineComponent({
         id: messageId.value,
         created_at: Date.now().toString(),
       }
-
       newMessage.value = "";
       messageId.value++;
 
@@ -305,18 +278,14 @@ export const ChatComponent = defineComponent({
       }, { withCredentials: true })
       .then(() => {
         getMessagesUpdate(newContent.channel.id);
-          // chatSocket.emit('update-channels');        
         chatSocket.emit("chat-message", newContent, store.state.onlineUsers);
       })
       .catch(async (err: any) => {
         console.log("Caught error:", err.response.data.message)
-        // await updateChannelsList()
-        // .then(() => {
-          if (err.response.data.message == 'muted') {
-            mutePopup.value = true;
-          }
-          return;
-        // })
+        if (err.response.data.message == 'muted') {
+          mutePopup.value = true;
+        }
+        return;
       });
     }
 
@@ -342,7 +311,6 @@ export const ChatComponent = defineComponent({
         .then((res) => {
           activeChannel.value!.channel = res.data;
           channelMessages.value = res.data.messages;
-          // console.log("in get messages:", channelMessages.value);
           return res;
         })
         .catch((err) => console.log("Caught error:", err.response.data.message));
@@ -350,11 +318,9 @@ export const ChatComponent = defineComponent({
     }
 
     const toggleNotification = async () => {
-      // activeChannel.value = cm;
-      console.log(activeChannel.value!.notification)
       await api.toggleNotification(activeChannel.value!.id, { withCredentials: true })
       .then((res) => { 
-        console.log("after toggle notif", res.data)
+        updateChannelsList();
         activeChannel.value = res.data;
       })
       .catch((err) => console.log("Caught error:", err.response.data.message));
@@ -369,7 +335,6 @@ export const ChatComponent = defineComponent({
     }
 
     chatSocket.on("join-channel", (chan: Channel) => {
-      console.log("IN JOIN CHANNEL")
       joinChannel(chan);
     });
 
@@ -377,11 +342,9 @@ export const ChatComponent = defineComponent({
 
       await api.joinChannel("self", channel.id, user.value.id, { withCredentials: true })
         .then((res)=> {
-          // console.log(res)
           updateChannelsList();
           activeChannel.value = res.data;
           isMember.value = true;
-          // console.log("ACTIVECHANNEL", activeChannel)
           getMessagesUpdate(res.data.channel.id);
           if (channel.id !== 1) {
             store.dispatch("setMessage", "You're now a member of channel [" + channel.name.substring(0, 15) + "]");
@@ -417,10 +380,6 @@ export const ChatComponent = defineComponent({
       .catch((err) => console.log("Caught error:", err.response.data.message));
     }
 
-    // const sendInvite = (channel: Channel, recipient: User) => {
-
-    // }
-
     const directMessage = (recipient: User) => {
 
       const newChannel = api.saveChannel({
@@ -438,7 +397,6 @@ export const ChatComponent = defineComponent({
         store.dispatch("setMessage", "You're now a member of channel [" + cm.data.channel.name.substring(0, 15) + "]");
         await api.joinChannel("dm", cm.data.channel.id, recipient.id, { withCredentials: true })
         .then((res)=> {
-          // console.log(res)
           chatSocket.emit('update-channels', cm.data)
           chatSocket.emit('chat-action', 'added to', recipient.id, cm.data.channel.name);
           newMessage.value = res.data.member.username + " has been added";
@@ -446,7 +404,6 @@ export const ChatComponent = defineComponent({
           return res;
         })
         .catch((err) => console.log("Caught error:", err.response.data.message));
-        // console.log("in createChannel res", res)
       })
       .catch((err) => console.log("Caught error:", err.response.data.message))
     }
@@ -498,7 +455,6 @@ export const ChatComponent = defineComponent({
           toggleConfirmation.value = '';
           break;
       }
-      // console.log("channelSettings", channelSettings)
     }
 
     const toggleConfirmationModal = (action: string, user: User | null) => {
@@ -517,10 +473,6 @@ export const ChatComponent = defineComponent({
       activeChannel.value = cm;
       activeChannel.value.new_message = false;
       await api.setNewMessage('false', cm.channel.id, { withCredentials: true })
-      // .then((res) => { 
-      //   updateChannelsList();
-      //   activeChannel.value = res.data;
-      // })
       .catch((err) => console.log("Caught error:", err.response.data.message));
       isMember.value = true;
       console.log("in switchChannel", cm)
@@ -528,42 +480,26 @@ export const ChatComponent = defineComponent({
     }
 
     chatSocket.on("chat-message-on", async (data: any) => {
-      console.log("0RECEIVED CHAT MESSAGE, data:", data)
       await relApi.getBlockedByUser(user.value.id)
         .then(async (blocked) => {
-          // console.log("blocked", blocked.data.map((blocked) => blocked.adresseeId));
-          // console.log(data.author.id)
           if (blocked.data.map((blocked) => blocked.adresseeId).includes(data.author.id)) {
             return;
           }
           if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
-          
             channelMessages.value.push(data);
-            console.log("in get messages:", channelMessages.value);
           } else if (activeChannel.value!.channel) {
-            console.log("set newMessage = true here");
             await api.setNewMessage('true', data.channel.id, { withCredentials: true })
             .then((res) => { 
               store.state.chatNotification = true; 
-              console.log(res)
+              // console.log(res)
               updateChannelsList();
             })
           .catch((err) => console.log("Caught error:", err.response.data.message));
           }
-      // getMessagesUpdate(data.channel);
       });
     });
 
-    // chatSocket.on("typing", (user: string) => {
-    //   typing.value = user;
-    // });
-
-    // chatSocket.on("stopTyping", () => {
-    //   typing.value = "";
-    // });
-
     chatSocket.on('created-channel', async (cm: ChannelMember) => {
-      // toggleModal(0);
       await updateChannelsList()
       .then(() => {
         switchChannel(cm);
@@ -575,52 +511,11 @@ export const ChatComponent = defineComponent({
       updateChannelsList();
     })
 
-    // chatSocket.on('update-notifications', () => {
-    //   refresh.value = true;
-    //   console.log("refresh true")
-    // })
-    // chatSocket.on("join", (username: string, connectionsNb: number) => {
-    //   info.push({
-    //     username: username,
-    //     action: "joined",
-    //   });
-
-    //   //updating connection nb for newcomer
-    //   // chatSocket.emit("get-connections")
-
-    //   setTimeout(() => {
-    //     info.length = 0;
-    //   }, 5000);
-    // });
-
-    // chatSocket.on("leave", (user: string) => {
-    //   info.push({
-    //     username: user,
-    //     action: "left",
-    //   });
-
-    //   setTimeout(() => {
-    //     info.length = 0;
-    //   }, 5000);
-    // });
-
-    // chatSocket.on("connections", (data: number) => {
-    //   connections.value = data;
-    // });
-
-    // watch(newMessage, (newMessage) => {
-    //   newMessage
-    //     ? chatSocket.emit("typing", user.value.username)
-    //     : chatSocket.emit("stopTyping");
-    // });
-
     window.onbeforeunload = () => {
-      // chatSocket.emit("leave", user.value.username);
       chatSocket.off('chat-message-on');
       chatSocket.off('created-channel');
       chatSocket.off('join-channel');
       chatSocket.off('update-channels');
-      // chatSocket.off('leave');
     };
 
     return {
@@ -635,7 +530,6 @@ export const ChatComponent = defineComponent({
 
       user,
       info,
-      // connections,
 
       updateChannelsList,
       joinedChannels,
@@ -656,7 +550,6 @@ export const ChatComponent = defineComponent({
       newChannelForm,
       passwordPrompt,
       channelSettings,
-      // toggleAdminSettings,
       toggleModal,
       target, 
       targetUser,

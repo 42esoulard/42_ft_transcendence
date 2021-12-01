@@ -183,7 +183,6 @@ export default defineComponent({
     }
 
     let selectedMembers = computed(() => {
-      console.log("in selected", props.activeChannel)
       const list = ref();
       if (selectedTab.value === 'banned') {
         list.value = allMembers.value.filter((cm: ChannelMember) => cm.ban)
@@ -207,16 +206,13 @@ export default defineComponent({
           }
           break;
         case 'muted':
-          console.log("bef", tab, selectedTab.value);
           if (selectedTab.value === 'muted') {
             selectedTab.value = 'all';
           } else {
             selectedTab.value = 'muted';
           }
-          console.log("aft", tab, selectedTab.value);
           break;
         case 'admins':
-          console.log("bef", tab, selectedTab.value);
           if (selectedTab.value === 'admins') {
             selectedTab.value = 'all';
           } else {
@@ -324,7 +320,6 @@ export default defineComponent({
         usernameInput.setCustomValidity('');
         validUsername = true;
       } else {
-        console.log("here username doesnt exist", username.value)
         usernameInput.setCustomValidity("User doesn't exist")
         validUsername = false;
       }
@@ -445,7 +440,6 @@ export default defineComponent({
         { withCredentials: true }
       )
       .then((res) => {
-        console.log("in updateChannel res", res)
         context.emit('update-channels-list');
         chatSocket.emit('update-channels');
         if (res.data.password) {

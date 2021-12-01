@@ -5,12 +5,13 @@
       <div class='chat-channels__title'>Joined channels</div>
       <ul class='chat-channels__list'>
         <li v-for="(cm) in joinedChannels" :key="cm.channel.name">
-          <button class='chat-channels__item' @click="switchChannel(cm)">
+          <button :class="['chat-channels__item',
+            activeChannel.id === cm.id ? 'chat-channels__item--on' : ''
+          ]" @click="switchChannel(cm)">
             <div class='chat-channels__name' :title="cm.channel.name">
               <div v-if="cm.new_message" class='chat-channels__notif'></div>
               #{{ cm.channel.name }}
             </div>
-            <!-- <div v-else class='chat-channels__name' :title="cm.channel.name">#{{ cm.channel.name }}</div> -->
             <div>
               <span v-if="cm.is_owner"><img class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner" title="Channel Owner"/></span>
               <span v-if="cm.is_admin"><img class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin" title="Channel Admin"/></span>
@@ -35,12 +36,13 @@
 </template>
 
 <script>
-import { ref, defineComponent, computed, onMounted } from "vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   name: 'ChannelsList',
   props: [ 'joinedChannels',
-        'availableChannels'],
+        'availableChannels',
+        'activeChannel'],
   methods: {
     switchChannel(cm){
         this.$parent.switchChannel(cm);

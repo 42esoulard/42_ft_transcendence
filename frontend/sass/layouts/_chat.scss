@@ -208,7 +208,7 @@
   flex-direction: row;
   justify-content: space-between;
   &:hover,
-  &:focus {
+  &:focus, &--on {
     background-color: $chans-item-hover-bg;
     color: $chat-font-dark;
     border-style: none;

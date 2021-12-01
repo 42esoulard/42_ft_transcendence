@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { ref, defineComponent, computed, onMounted } from "vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   name: 'MuteBanPopup',

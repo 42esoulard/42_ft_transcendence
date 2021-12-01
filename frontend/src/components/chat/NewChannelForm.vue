@@ -99,7 +99,6 @@ export default defineComponent({
       .catch(() => {
         nameInput.setCustomValidity('');
         validName = true;
-        // console.log(channelName.value + "not found")
       })
       nameInput.reportValidity();
     }
@@ -144,7 +143,6 @@ export default defineComponent({
     }
 
     const createChannel = () => {
-      console.log(channelName.value, channelType.value, channelPassword.value)
       wasSubmitted.value = true;
       api.saveChannel({
         name: channelName.value,
@@ -154,7 +152,6 @@ export default defineComponent({
         notification: false,
       }, { withCredentials: true })
       .then((res) => {
-        // console.log("in createChannel res", res)
         chatSocket.emit('createChannel', res.data);
         closeModal();
       })

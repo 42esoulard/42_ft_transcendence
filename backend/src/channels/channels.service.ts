@@ -9,7 +9,6 @@ import * as bcrypt from 'bcrypt';
 import { Users } from 'src/users/entity/users.entity';
 import { ChannelMembersService } from 'src/channel_members/channel_members.service';
 import { ChannelMember } from 'src/channel_members/interfaces/channel_member.interface';
-import { reduce } from 'rxjs';
 import { RelationshipsService } from 'src/relationships/relationships.service';
 import { Role } from 'src/auth/models/role.enum';
 import { ChannelMembers } from 'src/channel_members/entity/channel_members.entity';
@@ -86,11 +85,6 @@ export class ChannelsService {
   }
 
   async getNewNotification(data: Messages, userId: number): Promise<boolean> {
-    // const user: Users = await this.userService.getUserbyId(userId);
-    // if (user == undefined) {
-    //   return undefined;
-    // }
-    // console.log("IN GET NEW NOTIF", data.channel.id, userId)
     let cms: ChannelMember = await this.getChannelMember(data.channel.id, userId);
     if (cms == undefined || cms.ban) {
       return false;
@@ -98,26 +92,15 @@ export class ChannelsService {
 
     await this.relationshipService.getBlockedByUser(userId)
     .then(async (blocked) => {
-    // console.log("blocked", blocked.data.map((blocked) => blocked.adresseeId));
-    // console.log(data.author.id)
       if (blocked.map((blocked) => blocked.adresseeId).includes(data.author.id)) {
         return false;
       }
-    // if (activeChannel.value!.channel && activeChannel.value!.channel.id === data.channel.id) {
-    
-    //   channelMessages.value.push(data);
-    //   console.log("in get messages:", channelMessages.value);
-    // } else if (activeChannel.value!.channel) {
-      // console.log("set newMessage = true here");
       return await this.channelMemberService.setNewMessage(true, cms.id)
       .then((res) => { 
         return true
       })
       .catch((err) => console.log("Caught error:", err.response.data.message));
-    // }
-    // return false;
   })
-// getMessagesUpdate(data.channel);
 };
 
   async getChannelMember(
@@ -145,7 +128,6 @@ export class ChannelsService {
       const onlineMemberIds = onlineUsers.map((user) => user.id);
       const offlineMembers = chanMembers.filter((cm) => !onlineMemberIds.includes(cm.member.id));
       offlineMembers.forEach((cm) => {
-        // console.log("sending to offline", cm.id)
         this.channelMemberService.setNewMessage(true, cm.id);
       })
     })

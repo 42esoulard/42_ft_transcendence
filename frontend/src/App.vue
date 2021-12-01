@@ -34,7 +34,7 @@ export default {
     onUpdated(() => {
       if (store.state.user.id != 0) {
         if (!store.state.isConnected) {
-          console.log("newConnection");
+          // console.log("newConnection");
           presenceSocket.emit("newConnection", store.state.user);
           chatSocket.emit("newConnection", store.state.user);
           store.state.isConnected = true;
@@ -124,13 +124,11 @@ export default {
     });
 
     chatSocket.on("chat-message", (data: any) => {
-      // console.log("HERE", store.state.chatOn)
       if (store.state.user.id != 0) {
         if (store.state.chatOn) { 
           //meow!
           chatSocket.emit("chat-message-on", data);
         } else if (store.state.isConnected) {
-          // store.state.chatNotification = true;
           chatSocket.emit("chat-message-off", data, store.state.user);
         }
       }

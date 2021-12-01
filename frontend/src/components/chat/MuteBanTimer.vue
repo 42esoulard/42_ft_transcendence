@@ -7,9 +7,6 @@
 
     <form class="chat-channel-form__form" @submit.prevent='unmuteUnban()'>
       <div class="chat-channel-form__subtitle">[{{ targetCm.member.username }}] is {{ state }} until {{ getEndDate() }}</div>
-      <!-- <div class="chat-channel-form__subtitle">To join, please enter the channel's password:</div> -->
-
-      <!-- <input class="chat-channel-form__input" required type="datetime-local" v-model="endDate"> -->
       <button class="button button--join-locked-chan" type='submit'> {{ action }} </button>
     </form>
   </div>
@@ -20,7 +17,6 @@
 
     <form class="chat-channel-form__form" @submit.prevent='checkEndDate()'>
       <div class="chat-channel-form__subtitle">[{{ targetCm.member.username }}] will be {{ action }} until...</div>
-      <!-- <div class="chat-channel-form__subtitle">To join, please enter the channel's password:</div> -->
 
       <input class="chat-channel-form__input" required type="datetime-local" v-model="endDate">
       <button class="button button--join-locked-chan" type='submit'> Confirm </button>
@@ -30,8 +26,6 @@
 
 <script lang="ts">
 import { ref, defineComponent, computed } from "vue";
-import { ChatApi } from "@/../sdk/typescript-axios-client-generated";
-import { useStore } from '@/store'
  
 export default defineComponent({
   name: 'MuteBanTimer',
