@@ -199,6 +199,7 @@ export class UsersController {
    */
   @ApiCookieAuth()
   @Post('upload')
+  @UseGuards(JwtTwoFactorGuard)
   @UseInterceptors(FileInterceptor('avatar', saveImageToStorage))
   async uploadFile(
     @Req() req: Request,
