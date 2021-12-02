@@ -25,13 +25,13 @@
       <div v-if="activeChannel" class="chat-header">
         <div class="chat-header__return" @click="toggleChannelsList"><i class="fa fa-list fa-2x"></i></div>
         <div
-          v-if="activeChannel.notification"
+          v-if="isMember && activeChannel.notification"
           class="chat-header__notif"
           title="Turn off notifications"
           @click="toggleNotification()"
         ><i class="fa fa-bell"></i></div>
         <div
-          v-else
+          v-if="isMember && !activeChannel.notification"
           class="chat-header__notif chat-header__notif--off"
           title="Turn on notifications"
           @click="toggleNotification()"

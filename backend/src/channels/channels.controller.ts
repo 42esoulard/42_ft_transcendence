@@ -219,9 +219,7 @@ export class ChannelsController {
     if (cm == undefined) {
       throw new NotFoundException('Not a member of this channel');
     } else if (!cm.notification) {
-      throw new NotFoundException(
-        "Not subscribed to this channel's notifications",
-      );
+      return cm;
     }
     const bool = status == 'true' ? true : false;
     if (bool == cm.new_message) {
