@@ -54,7 +54,7 @@
     margin: 10px;
     @include hover-modifier($button-grey-bg);
   }
-  &--delete-chan {
+  &--fourth {
     background-color: rgb(163, 0, 0);
     @include hover-modifier(red);
   }

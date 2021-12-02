@@ -169,7 +169,7 @@
             <button
               v-if="channel.id != 1"
               class="link link--neutral"
-              @click="deleteChannel(channel)"
+              @click="toggleConfirmModal('delete channel', channel)"
               title="delete"
             >
               <i class="fas fa-trash" />
@@ -301,30 +301,37 @@ export default defineComponent({
       privatelist.value = !privatelist.value;
     };
 
-    const toggleConfirmModal = (action: string, user: User | null) => {
+    const toggleConfirmModal = (action: string, user?: User, channel?: Channel) => {
       if (user)
         target.value = user;
+      else if (channel)
+        target.value = channel;
+      else
+        target.value = null;
       toggleConfirm.value = action;
     };
 
-    const toggleModal = (idx: number) => {
+    const toggleModal = () => {
       toggleConfirm.value = "";
     };
 
-    const executeAction = (action: string, user: User) => {
-      if (action == "ban") {
-        banUser(user);
-      } else if (action == "unban") {
-        unbanUser(user);
-      } else if (action == "delete") {
-        deleteUser(user);
-      } else if (action == "promote") {
-        promote(user);
-      } else if (action == "demote") {
-        demote(user);
-      } else if (action == "promote owner") {
-        changeOwner(user);
-      }
+    const executeAction = (action: string, entity: User | Channel | null) => {
+      toggleModal();
+        if (action == "ban") {
+          banUser(<User>entity);
+        } else if (action == "unban") {
+          unbanUser(<User>entity);
+        } else if (action == "delete") {
+          deleteUser(<User>entity);
+        } else if (action == "promote") {
+          promote(<User>entity);
+        } else if (action == "demote") {
+          demote(<User>entity);
+        } else if (action == "promote owner") {
+          changeOwner(<User>entity);
+        } else if (action == "delete channel") {
+        deleteChannel(<Channel>entity);
+        }
     };
 
     const selectList = computed((): User[] => {
@@ -389,7 +396,7 @@ export default defineComponent({
               (usr: User) => usr.id != user.id
             );
           })
-          .catch((err: any) => console.log(err));
+          .catch((err: any) => toggleConfirmModal(err.response.data.msg));
     };
 
     const deleteChannel = async (channel: Channel) => {
@@ -401,7 +408,7 @@ export default defineComponent({
               (chan: Channel) => chan.id != channel.id
             );
           })
-          .catch((err: any) => console.log(err));
+          .catch((err: any) => toggleConfirmModal(err.response.data.msg));
     };
 
     const promote = async (user: User) => {
@@ -411,7 +418,7 @@ export default defineComponent({
             console.log("user promoted");
             user.role = "admin";
           })
-          .catch((err: any) => console.log(err));
+          .catch((err: any) => toggleConfirmModal(err.response.data.msg));
     };
 
     const demote = async (user: User) => {
@@ -421,7 +428,7 @@ export default defineComponent({
             console.log("user demoted");
             user.role = "user";
           })
-          .catch((err: any) => console.log(err));
+          .catch((err: any) => toggleConfirmModal(err.response.data.msg));
     };
 
     const changeOwner = async (user: User) => {
@@ -432,7 +439,7 @@ export default defineComponent({
             user.role = "owner";
             logOut();
           })
-          .catch((err: any) => console.log(err));
+          .catch((err: any) => toggleConfirmModal(err.response.data.msg));
     };
 
     const logOut = () => {
@@ -458,7 +465,7 @@ export default defineComponent({
             );
             user.role == "user";
           })
-          .catch((err: any) => console.log(err));
+          .catch((err: any) => toggleConfirmModal(err.response.data.msg));
     };
 
     const unbanUser = async (user: User) => {
@@ -471,7 +478,7 @@ export default defineComponent({
             (usr: User) => usr.id != user.id
           );
         })
-        .catch((err: any) => console.log(err));
+        .catch((err: any) => toggleConfirmModal(err.response.data.msg));
     };
 
     const printChannelName = (channelName: string) => {

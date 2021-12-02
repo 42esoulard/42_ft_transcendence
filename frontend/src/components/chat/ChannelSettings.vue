@@ -104,7 +104,7 @@
 
             <button class="button button--create-chan" type='submit'>Submit</button>
           </form>
-          <button class="button button--delete-chan" @click="askConfirmation(activeChannel, 'delete')">Delete Channel</button>
+          <button class="button button--fourth" @click="askConfirmation(activeChannel, 'delete')">Delete Channel</button>
         </div>
       </div>
     </div>
@@ -156,7 +156,7 @@ export default defineComponent({
     const selectedTab = ref('all');
     const allMembers = ref(computed(() => props.activeChannel.channel.channel_members
     .sort((a: ChannelMember, b: ChannelMember) => a.id - b.id )));
-  
+
     const askConfirmation = (cm: ChannelMember, action: string) => {
       targetCm.value = cm;
       target.value = (action == 'delete' ? 'channel' : 'user');
@@ -317,7 +317,7 @@ export default defineComponent({
       .catch((err) => { console.log("Caught error:", err.response.data.message) })
     }
     getUserNames();
-    
+
     let validUsername = true;
     const checkUsername = () => {
       const usernameInput =  <HTMLInputElement>document.querySelector('input[id=\'usernameInput\']')!;
@@ -336,7 +336,7 @@ export default defineComponent({
       const usernameInput =  <HTMLInputElement>document.querySelector('input[id=\'usernameInput\']')!;
 
       return userApi.getUserByUsername(username.value, { withCredentials: true })
-      .then((res) => { 
+      .then((res) => {
         usernameInput.setCustomValidity('');
         validUsername = true;
         usernameInput.reportValidity();

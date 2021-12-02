@@ -324,10 +324,7 @@
   color: $chat-font-light;
   width: $channel-form-width;
   padding: $channel-form-padding;
-  left: $channel-form-position;
-  top: $channel-form-position;
-  margin-top: $channel-form-margin;
-  margin-left: $channel-form-margin;
+  margin: auto;
   border-radius: $channel-form-border-radius;
   font-family: $chat-main-font;
   &--popup {
@@ -335,10 +332,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 1rem;
     min-height: 140px;
     width: 400px;
     text-align: center;
+    z-index: 3;
   }
 }
 
