@@ -4,7 +4,7 @@
     <div @click="closeModal()" class="close-cross">
       &times;
     </div>
-    Do you really want to {{ action }} this {{ target }} ?
+    Do you really want to {{ action }} {{ target.username }} ?
     <button class="button button--third" type='submit' @click="confirm"> Confirm </button>
   </div>
 
@@ -14,18 +14,12 @@
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: 'Confirmation',
-  props: ['targetCm', 'action', 'target', 'targetUser'],
+  name: 'Confirm',
+  props: ['action', 'target'],
   emits: ['close', 'confirm'],
   setup(props, context) {
     const confirm = () => {
-      if (props.action == 'block') {
-        context.emit('confirm', 'block', props.targetUser);
-      } else if (props.action == 'leave') {
-        context.emit('confirm', 'leave', props.targetCm.member);
-      } else {
-        context.emit('confirm', props.targetCm, props.action);
-      }
+      context.emit("confirm", props.action, props.target);
     }
     const closeModal = () => {
       context.emit("close");
@@ -37,7 +31,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss">
-  @import "../../../sass/main.scss";
-</style>

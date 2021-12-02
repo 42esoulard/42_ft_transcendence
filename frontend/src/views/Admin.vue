@@ -71,7 +71,7 @@
             <button
               v-if="bannedlist"
               class="link link--neutral"
-              @click="unbanUser(member)"
+              @click="toggleConfirmModal('unban', member)"
               title="unban"
             >
               <i class="fas fa-user-slash" />
@@ -79,7 +79,7 @@
             <button
               v-else-if="member.role == 'user'"
               class="link link--neutral"
-              @click="banUser(member)"
+              @click="toggleConfirmModal('ban', member)"
               title="ban"
             >
               <i class="fas fa-ban" />
@@ -87,7 +87,7 @@
             <button
               class="link link--neutral"
               v-if="member.role == 'user'"
-              @click="deleteUser(member)"
+              @click="toggleConfirmModal('delete', member)"
               title="delete"
             >
               <i class="fas fa-trash" />
@@ -95,7 +95,7 @@
             <button
               v-if="!bannedlist && user.role == 'owner' && !isAdmin(member)"
               class="link link--neutral"
-              @click="promote(member)"
+              @click="toggleConfirmModal('promote', member)"
               title="promote"
             >
               <i class="fas fa-crown" />
@@ -103,7 +103,7 @@
             <button
               v-if="!bannedlist && user.role == 'owner' && isAdmin(member)"
               class="link link--neutral"
-              @click="changeOwner(member)"
+              @click="toggleConfirmModal('promote owner', member)"
               title="promote owner"
             >
               <i class="fas fa-chess-king" />
@@ -111,7 +111,7 @@
             <button
               v-if="isAdmin(member) && user.role == 'owner'"
               class="link link--neutral"
-              @click="demote(member)"
+              @click="toggleConfirmModal('demote', member)"
               title="demote"
             >
               <i class="fas fa-arrow-down" />
@@ -187,6 +187,27 @@
       </div>
     </div>
   </div>
+
+  <teleport to="#modals">
+    <transition name="fade--error">
+      <div
+        v-if="toggleConfirm"
+        class="backdrop"
+      ></div>
+    </transition>
+    <transition-group name="zoomin">
+      <Modal v-if="toggleConfirm" @close="toggleModal">
+        <template v-slot:confirmation>
+          <Confirm
+            :action="toggleConfirm"
+            :target="target"
+            @close="toggleModal"
+            @confirm="executeAction"
+          />
+        </template>
+      </Modal>
+    </transition-group>
+  </teleport>
 </template>
 
 <script lang="ts">
@@ -197,10 +218,12 @@ import { io } from "socket.io-client";
 import { useUserApi, useChatApi, useAuthApi } from "@/plugins/api.plugin";
 import { useRouter } from "vue-router";
 import { presenceSocket } from "@/App.vue";
+import Confirm from "@/components/Confirm.vue";
+import Modal from "@/components/Modal.vue";
 
 export default defineComponent({
   name: "Admin",
-  components: {},
+  components: { Confirm, Modal },
   setup() {
     const store = useStore();
     const userApi = useUserApi();
@@ -217,6 +240,8 @@ export default defineComponent({
     const adminlist = ref(false);
     const searchQuery = ref("");
     const searchQueryChat = ref("");
+    const toggleConfirm = ref("");
+    const target = ref();
 
     const isOnline = (user: User): boolean => {
       if (user != undefined) {
@@ -276,6 +301,32 @@ export default defineComponent({
       privatelist.value = !privatelist.value;
     };
 
+    const toggleConfirmModal = (action: string, user: User | null) => {
+      if (user)
+        target.value = user;
+      toggleConfirm.value = action;
+    };
+
+    const toggleModal = (idx: number) => {
+      toggleConfirm.value = "";
+    };
+
+    const executeAction = (action: string, user: User) => {
+      if (action == "ban") {
+        banUser(user);
+      } else if (action == "unban") {
+        unbanUser(user);
+      } else if (action == "delete") {
+        deleteUser(user);
+      } else if (action == "promote") {
+        promote(user);
+      } else if (action == "demote") {
+        demote(user);
+      } else if (action == "promote owner") {
+        changeOwner(user);
+      }
+    };
+
     const selectList = computed((): User[] => {
       const list = ref();
       if (bannedlist.value) {
@@ -327,7 +378,6 @@ export default defineComponent({
     });
 
     const deleteUser = async (user: User) => {
-      if (confirm(`Do you really want to delete ${user.username}?`)) {
         await userApi
           .removeUser(user.id, { withCredentials: true })
           .then((res: any) => {
@@ -340,11 +390,9 @@ export default defineComponent({
             );
           })
           .catch((err: any) => console.log(err));
-      }
     };
 
     const deleteChannel = async (channel: Channel) => {
-      if (confirm(`Do you really want to delete ${channel.name}?`)) {
         await chatApi
           .deleteChannel(channel.id, { withCredentials: true })
           .then((res: any) => {
@@ -354,11 +402,9 @@ export default defineComponent({
             );
           })
           .catch((err: any) => console.log(err));
-      }
     };
 
     const promote = async (user: User) => {
-      if (confirm(`Do you really want to promote ${user.username}?`)) {
         await userApi
           .promoteUser(user.id, { withCredentials: true })
           .then((res: any) => {
@@ -366,11 +412,9 @@ export default defineComponent({
             user.role = "admin";
           })
           .catch((err: any) => console.log(err));
-      }
     };
 
     const demote = async (user: User) => {
-      if (confirm(`Do you really want to demote ${user.username}?`)) {
         await userApi
           .demoteUser(user.id, { withCredentials: true })
           .then((res: any) => {
@@ -378,11 +422,9 @@ export default defineComponent({
             user.role = "user";
           })
           .catch((err: any) => console.log(err));
-      }
     };
 
     const changeOwner = async (user: User) => {
-      if (confirm(`Do you really want to promote ${user.username} owner?`)) {
         await userApi
           .changeOwner(user.id, { withCredentials: true })
           .then((res: any) => {
@@ -391,7 +433,6 @@ export default defineComponent({
             logOut();
           })
           .catch((err: any) => console.log(err));
-      }
     };
 
     const logOut = () => {
@@ -407,7 +448,6 @@ export default defineComponent({
     };
 
     const banUser = async (user: User) => {
-      if (confirm(`Do you really want to ban ${user.username}?`)) {
         await userApi
           .banUser(user.id, { withCredentials: true })
           .then((res: any) => {
@@ -419,7 +459,6 @@ export default defineComponent({
             user.role == "user";
           })
           .catch((err: any) => console.log(err));
-      }
     };
 
     const unbanUser = async (user: User) => {
@@ -469,6 +508,11 @@ export default defineComponent({
       channelList,
       printChannelName,
       changeOwner,
+      toggleConfirm,
+      toggleModal,
+      toggleConfirmModal,
+      target,
+      executeAction
     };
   },
 });

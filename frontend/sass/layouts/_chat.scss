@@ -331,7 +331,13 @@
   border-radius: $channel-form-border-radius;
   font-family: $chat-main-font;
   &--popup {
-    width: 10rem;
+    background-color: rgb(41, 41, 41);;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 140px;
+    width: 400px;
     text-align: center;
   }
 }

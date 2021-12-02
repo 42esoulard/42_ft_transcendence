@@ -84,6 +84,7 @@ export default defineComponent({
             } else if (res.status === 200) {
               if (res.data.newlyCreated == true) {
                 store.commit("setFirstTimeConnect", true);
+                router.push(`/profile/${store.state.user.username}`);
               }
               router.push("/");
             }
