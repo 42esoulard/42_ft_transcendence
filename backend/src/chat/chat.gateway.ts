@@ -29,39 +29,48 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log('A client has connected to the chat');
 
     client.on('newConnection', async (user: User) => {
-      await this.channelsService.getNotifications(user.id).then((res) => {
-        if (res) {
-          client.emit('chatNotifications');
-        }
-      });
-    });
-
-    client.on('chat-message-on', async (data: Messages) => {
-      client.emit('chat-message-on', data);
-    });
-
-    client.on('chat-message-off', async (data: Messages, user: User) => {
-      await this.channelsService
-        .getNewNotification(data, user.id)
-        .then((res) => {
+      if (user) {
+        await this.channelsService.getNotifications(user.id).then((res) => {
           if (res) {
             client.emit('chatNotifications');
           }
-        })
-        .catch((err) =>
-          console.log('Caught error:', err.response.data.message),
-        );
+        });
+      }
+    });
+
+    client.on('chat-message-on', async (data: Messages) => {
+      if (data) {
+        client.emit('chat-message-on', data);
+      }
+    });
+
+    client.on('chat-message-off', async (data: Messages, user: User) => {
+      if (data) {
+        await this.channelsService
+          .getNewNotification(data, user.id)
+          .then((res) => {
+            if (res) {
+              client.emit('chatNotifications');
+            }
+          })
+          .catch((err) =>
+            console.log('Caught error:', err),
+          );
+        }
     });
 
     client.on(
       'chat-message',
       async (message: Messages, onlineUsers: User[]) => {
-        client.broadcast.emit('chat-message', message);
-        await this.channelsService
-          .notifyOfflineUsers(message, onlineUsers)
-          .catch((err) =>
-            console.log('Caught error:', err.response.data.message),
-          );
+        if (message && onlineUsers) {
+          client.broadcast.emit('chat-message', message);
+          await this.channelsService
+            .notifyOfflineUsers(message, onlineUsers)
+            .catch((err) => {
+              console.log('Caught error:', err);
+            }
+            );
+        }
       },
     );
 

@@ -43,6 +43,9 @@ export class MessagesService {
     newMessage.author = await this.userService.getUserbyId(
       messageDto.author_id,
     );
+    if (!newMessage.channel || !newMessage.author) {
+      return undefined;
+    }
     await this.channelMemberService
       .getChannelMember(newMessage.channel, newMessage.author)
       .then(async (res) => {

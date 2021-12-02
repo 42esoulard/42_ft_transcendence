@@ -473,9 +473,6 @@ export class ChannelsController {
         );
     }
     const dr: DeleteResult = await this.channelService.leaveChannel(cm_id);
-    if (dr == undefined) {
-      throw new NotFoundException('Failed to leave channel');
-    }
     return dr;
   }
 
@@ -511,9 +508,6 @@ export class ChannelsController {
       }
 
       const dr: DeleteResult = await this.channelService.deleteChannel(chan_id);
-      if (dr == undefined) {
-        throw new NotFoundException('Failed to leave channel');
-      }
       return dr;
     } else throw new ForbiddenException("General can't be deleted");
   }
