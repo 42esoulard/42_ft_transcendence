@@ -12,6 +12,7 @@ interface ChallengeReceived {
 export interface State {
   user: User;
   message: string;
+  errorMessage: string;
   error: boolean;
   firstTimeConnect: boolean;
   isConnected: boolean;
@@ -36,6 +37,7 @@ export const store = createStore<State>({
       username: "0",
     },
     message: "",
+    errorMessage: "",
     error: false,
     firstTimeConnect: false,
     isConnected: false,
@@ -74,6 +76,10 @@ export const store = createStore<State>({
 
     setMessage(state: State, payload: string) {
       state.message = payload;
+    },
+
+    setErrorMessage(state: State, payload: string) {
+      state.errorMessage = payload;
     },
 
     setFirstTimeConnect(state: State, payload: boolean) {
@@ -128,17 +134,18 @@ export const store = createStore<State>({
       );
     },
     allPendingChallenges(state: State, challenges: challengeExport[]) {
-      console.log('allPendingChallenges')
-      if (challenges.length)
-        state.allPendingChallenges = challenges;
+      console.log("allPendingChallenges");
+      if (challenges.length) state.allPendingChallenges = challenges;
     },
     userPendingChallenges(state: State) {
-      // console.log(' user pending challenges')
       state.allPendingChallenges.forEach((challenge) => {
         if (challenge.challengeeName === state.user.username)
-          state.challengesReceived.push({challenger: challenge.challengerName, expiry_date: challenge.expiry_date})
-      })
-    }
+          state.challengesReceived.push({
+            challenger: challenge.challengerName,
+            expiry_date: challenge.expiry_date,
+          });
+      });
+    },
   },
   actions: {
     setMessage(context, payload: string) {
@@ -153,14 +160,20 @@ export const store = createStore<State>({
         context.commit("setMessage", "");
       }, 10000);
     },
+    setErrorMessage(context, payload: string) {
+      context.commit("setErrorMessage", payload);
+      setTimeout(() => {
+        context.commit("setErrorMessage", "");
+      }, 3000);
+    },
 
     // we call setPendingChallenges once store.user has been set
     // we wait one second before commiting, to be sure that store.allPendingChallenges has been set too
     setPendingChallenges(context) {
       setTimeout(() => {
-        context.commit('userPendingChallenges')
-      }, 1000)
-    }
+        context.commit("userPendingChallenges");
+      }, 1000);
+    },
   },
 });
 

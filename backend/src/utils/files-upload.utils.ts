@@ -43,11 +43,9 @@ export const saveImageToStorage = {
 export const IsFileExtensionSafe = async (
   filePath: string,
 ): Promise<boolean> => {
-  // console.log('FILEPATH', filePath);
   try {
     const fileType = await fromFile(filePath);
     if (!validMimeTypes.includes(fileType.mime)) {
-      // console.log('FILETYPE', fileType);
       return false;
     }
   } catch (error) {

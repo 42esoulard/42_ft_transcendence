@@ -1,8 +1,15 @@
 <template>
-  <div class="toast-wrapper">
+  <div class="toast-wrapper" v-if="message != undefined">
     <div class="toast-content">
       {{ toDisplay }}
-      <button v-if="pongLink" class="button button--invitation" @click="accept">accept</button>
+      <button v-if="pongLink" class="button button--invitation" @click="accept">
+        accept
+      </button>
+    </div>
+  </div>
+  <div class="toast-wrapper" v-else>
+    <div class="toast-content toast-content--error">
+      {{ toDisplayError }}
     </div>
   </div>
 </template>
@@ -14,10 +21,12 @@ import { computed, defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "Toast",
-  props: ["message"],
+  props: ["message", "errorMessage"],
   setup(props) {
     const message = props.message;
-    const pongLink = ref(message.includes("[PONG-LINK]"));
+    const errorMessage = props.errorMessage;
+    const pongLink =
+      message != undefined ? ref(message.includes("[PONG-LINK]")) : ref();
 
     const accept = () => {
       store.commit("removeChallenge", message.substr(0, message.indexOf(" ")));
@@ -31,7 +40,11 @@ export default defineComponent({
       return message.replace("[PONG-LINK]", "");
     });
 
-    return { toDisplay, pongLink, accept };
+    const toDisplayError = computed(() => {
+      return `Error: ${errorMessage}`;
+    });
+
+    return { toDisplay, toDisplayError, pongLink, accept };
   },
 });
 </script>

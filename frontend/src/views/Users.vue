@@ -157,7 +157,9 @@ export default defineComponent({
           userList.value = res.data;
           userList.value.sort((a, b) => a.username.localeCompare(b.username));
         })
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
       if (store.state.user.id != 0) {
         relationshipApi
           .getUserFriendships(store.state.user.id)
@@ -168,7 +170,9 @@ export default defineComponent({
               else friendList.value.push(friendship.requesterId);
             }
           })
-          .catch((err: any) => console.log(err.message));
+          .catch((err: any) =>
+            store.dispatch("setErrorMessage", err.response.data.message)
+          );
         relationshipApi
           .getUserBlocked(store.state.user.id)
           .then((res: any) => {
@@ -181,7 +185,9 @@ export default defineComponent({
                 !res.data.find((rs: Relationship) => rs.requesterId === user.id)
             );
           })
-          .catch((err: any) => console.log(err.message));
+          .catch((err: any) =>
+            store.dispatch("setErrorMessage", err.response.data.message)
+          );
       }
     });
 
@@ -248,7 +254,7 @@ export default defineComponent({
       for (const challenge of store.state.challengesReceived) {
         if (challenge.challenger == usr.username) {
           store.dispatch(
-            "setMessage",
+            "setErrorMessage",
             `Error: ${usr.username} already invited you to play!`
           );
           return;

@@ -12,6 +12,7 @@ import {
   UseGuards,
   BadRequestException,
   Req,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './interfaces/user.interface';
@@ -114,7 +115,7 @@ export class UsersController {
     if (request.user.id !== id) {
       const reqUser = await this.userService.getUserbyId(request.user.id);
       if (reqUser && reqUser.role == 'user') {
-        throw new BadRequestException("not authorized to delete other users");
+        throw new ForbiddenException('not authorized to delete other users');
       }
     }
     return await this.userService.removeUser(id);
@@ -197,7 +198,6 @@ export class UsersController {
    * Recieve user picture from frontend
    * @param file picture
    */
-  @ApiCookieAuth()
   @Post('upload')
   @UseGuards(JwtTwoFactorGuard)
   @UseInterceptors(FileInterceptor('avatar', saveImageToStorage))
@@ -249,7 +249,6 @@ export class UsersController {
   /**
    * Returns an avatar from its finename
    */
-  @ApiCookieAuth()
   @Get('/avatars/:filename')
   @UseGuards(JwtTwoFactorGuard)
   getAvatar(

@@ -78,31 +78,6 @@ export default defineComponent({
       }
     };
 
-    // const sendTwoFactorCode = async () => {
-    //   // console.log(otp.value);
-    //   checkOtp(); // some checks over the code
-    //   if (!error.value) {
-    //     await axios
-    //       .post(`http://localhost:3000/auth/2fa/${codeSendToUrl}`, {
-    //         code: otp.value
-    //       })
-    //       .then(res => {
-    //         // console.log(res);
-    //         if (codeSendToUrl === "turn-on") {
-    //           store.commit("toggleTwoFactor", true);
-    //           store.dispatch("setMessage", res.data.message);
-    //           emit("close");
-    //         } else {
-    //           router.push("account");
-    //         }
-    //       })
-    //       .catch(err => (error.value = err.response.data.message));
-    //   }
-    //   if (error.value) {
-    //     setTimeout(() => (error.value = ""), 2000);
-    //   }
-    // };
-
     return {
       sendTwoFactorCode,
       otp,

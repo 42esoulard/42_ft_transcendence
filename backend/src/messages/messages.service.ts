@@ -52,7 +52,10 @@ export class MessagesService {
         if (newMessage.author.role == 'user' && res == undefined) {
           throw new ForbiddenException('not a member');
         }
-        if (newMessage.author.role == 'user' && this.channelMemberService.checkMute(res)) {
+        if (
+          newMessage.author.role == 'user' &&
+          this.channelMemberService.checkMute(res)
+        ) {
           throw new ForbiddenException('muted');
         }
         if (newMessage.author.role == 'user' && res.ban) {
@@ -60,14 +63,12 @@ export class MessagesService {
         }
         if (newMessage.channel.messages.length > 50) {
           await this.messagesRepository
-          .delete(newMessage.channel.messages[0].id)
-          .catch(() => {
-            throw new BadRequestException(
-              'Failed to purge messages from db',
-            );
-          });
+            .delete(newMessage.channel.messages[0].id)
+            .catch(() => {
+              throw new BadRequestException('Failed to purge messages from db');
+            });
         }
-      })
+      });
 
     return await this.messagesRepository
       .save(newMessage)

@@ -23,30 +23,39 @@
     />
     <div v-else class="chat-box">
       <div v-if="activeChannel" class="chat-header">
-        <div class="chat-header__return" @click="toggleChannelsList"><i class="fa fa-list fa-2x"></i></div>
+        <div class="chat-header__return" @click="toggleChannelsList">
+          <i class="fa fa-list fa-2x"></i>
+        </div>
         <div
           v-if="isMember && activeChannel.notification"
           class="chat-header__notif"
           title="Turn off notifications"
           @click="toggleNotification()"
-        ><i class="fa fa-bell"></i></div>
+        >
+          <i class="fa fa-bell"></i>
+        </div>
         <div
           v-if="isMember && !activeChannel.notification"
           class="chat-header__notif chat-header__notif--off"
           title="Turn on notifications"
           @click="toggleNotification()"
-        ><i class="fa fa-bell-slash"></i></div>
+        >
+          <i class="fa fa-bell-slash"></i>
+        </div>
         <div
           class="chat-header__channel-name"
           :title="activeChannel.channel.name"
         >
-        
           {{ activeChannel.channel.name }}
         </div>
         <div>
           <span v-if="activeChannel.channel.type === 'private'"
             ><img
-              class="fas fa-eye-slash chat-channels__tag chat-channels__tag--private"
+              class="
+                fas
+                fa-eye-slash
+                chat-channels__tag chat-channels__tag--private
+              "
               title="This community is private"
           /></span>
           <span v-if="activeChannel.channel.password"
@@ -58,25 +67,37 @@
         <div
           v-if="
             activeChannel.is_admin ||
-              activeChannel.is_owner ||
-              user.role == 'admin' ||
-              user.role == 'owner'
+            activeChannel.is_owner ||
+            user.role == 'admin' ||
+            user.role == 'owner'
           "
           class="chat-channels__tag-container"
         >
           <span v-if="activeChannel.is_owner"
             ><img
-              class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner"
+              class="
+                fas
+                fa-user-tie
+                chat-channels__tag chat-channels__tag--owner
+              "
               title="Channel Owner"
           /></span>
           <span v-if="activeChannel.is_admin"
             ><img
-              class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin"
+              class="
+                fas
+                fa-user-shield
+                chat-channels__tag chat-channels__tag--admin
+              "
               title="Channel Admin"
           /></span>
           <span @click="channelSettings = true"
             ><img
-              class="fas fa-lg fa-cogs chat-channels__tag chat-channels__tag--settings"
+              class="
+                fas
+                fa-lg fa-cogs
+                chat-channels__tag chat-channels__tag--settings
+              "
               title="Channel Settings"
           /></span>
         </div>
@@ -84,7 +105,11 @@
           v-if="isMember && activeChannel.channel.name !== 'General'"
           @click="toggleConfirmationModal('leave', null)"
           ><img
-            class="fas fa-lg fa-sign-out-alt chat-channels__tag chat-channels__tag--leave"
+            class="
+              fas
+              fa-lg fa-sign-out-alt
+              chat-channels__tag chat-channels__tag--leave
+            "
             title="Leave Channel"
         /></span>
       </div>
@@ -92,8 +117,8 @@
       <div
         v-if="
           isMember ||
-            (activeChannel && !activeChannel.channel.password) ||
-            user.role !== 'user'
+          (activeChannel && !activeChannel.channel.password) ||
+          user.role !== 'user'
         "
         class="chat-messages"
       >
@@ -117,7 +142,7 @@
                       class="link link--neutral"
                       :to="{
                         name: 'UserProfile',
-                        params: { username: message.author.username }
+                        params: { username: message.author.username },
                       }"
                     >
                       <i class="fas fa-user-circle"
@@ -130,9 +155,10 @@
                   >
                     <i class="fas fa-envelope link link--neutral" />
                   </button>
-                  <button class="button" 
-                          title="Challenge"
-                          @click="challengeUser(message.author)"
+                  <button
+                    class="button"
+                    title="Challenge"
+                    @click="challengeUser(message.author)"
                   >
                     <i class="fas fa-table-tennis link link--neutral" />
                   </button>
@@ -154,9 +180,9 @@
       <div
         v-if="
           !isMember &&
-            activeChannel &&
-            activeChannel.channel.password &&
-            user.role == 'user'
+          activeChannel &&
+          activeChannel.channel.password &&
+          user.role == 'user'
         "
         class="chat-channels__locked-msg"
       >
@@ -168,7 +194,10 @@
           /></span>
           <span v-else @click="applyForMembership(activeChannel.channel)"
             ><img
-              class="fa fa-unlock fa-10x chat-channels__lock-img chat-channels__lock-img--unlocked"
+              class="
+                fa fa-unlock fa-10x
+                chat-channels__lock-img chat-channels__lock-img--unlocked
+              "
               title="This channel is password-protected"
           /></span>
         </div>
@@ -268,7 +297,7 @@ import {
   Message,
   Channel,
   ChannelMember,
-  RelationshipApi
+  RelationshipApi,
 } from "@/../sdk/typescript-axios-client-generated";
 import Modal from "@/components/Modal.vue";
 import Toast from "@/components/Toast.vue";
@@ -291,7 +320,7 @@ export const ChatComponent = defineComponent({
     MuteBanPopup,
     Modal,
     Toast,
-    Confirmation
+    Confirmation,
   },
 
   beforePageLeave() {
@@ -335,24 +364,26 @@ export const ChatComponent = defineComponent({
     const getDefaultChannel = async () => {
       await api
         .getDefaultChannel({ withCredentials: true })
-        .then(async chan => {
+        .then(async (chan) => {
           await joinChannel(chan.data)
             .then(async () => {
               await api
                 .setNewMessage("false", chan.data.id, { withCredentials: true })
-                .then(res => {
+                .then((res) => {
                   updateChannelsList();
                   activeChannel.value = res.data;
                 })
-                .catch(err =>
-                  console.log("Caught error:", err.response.data.message)
+                .catch((err) =>
+                  store.dispatch("setErrorMessage", err.response.data.message)
                 );
             })
-            .catch(err =>
-              console.log("Caught error:", err.response.data.message)
+            .catch((err) =>
+              store.dispatch("setErrorMessage", err.response.data.message)
             );
         })
-        .catch(err => console.log("Caught error:", err.response.data.message));
+        .catch((err) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     };
     getDefaultChannel();
 
@@ -365,7 +396,7 @@ export const ChatComponent = defineComponent({
       passwordPrompt.value = false;
       await api
         .getUserChannels({ withCredentials: true })
-        .then(async res => {
+        .then(async (res) => {
           joinedChannels.value = res.data;
           await api
             .getChannelMember(
@@ -373,7 +404,7 @@ export const ChatComponent = defineComponent({
               activeChannel.value!.member.id,
               { withCredentials: true }
             )
-            .then(res => {
+            .then((res) => {
               activeChannel.value = res.data;
               if (
                 !activeChannel.value.is_admin &&
@@ -381,37 +412,38 @@ export const ChatComponent = defineComponent({
                 user.value.role !== "owner"
               )
                 channelSettings.value = false;
-              // console.log(res.data)
             })
-            .catch(async err => {
-              console.log("Caught error:", err.response.data.message);
+            .catch(async (err) => {
+              store.dispatch("setErrorMessage", err.response.data.message);
               if (user.value.role !== "admin" && user.value.role !== "owner") {
                 getDefaultChannel();
               } else {
                 await api
                   .getChannelPreview(activeChannel.value!.channel.id, {
-                    withCredentials: true
+                    withCredentials: true,
                   })
-                  .then(res => {
+                  .then((res) => {
                     activeChannel.value!.channel = res.data;
                     channelMessages.value = res.data.messages;
                     return res;
                   })
-                  .catch(err =>
-                    console.log("Caught error:", err.response.data.message)
+                  .catch((err) =>
+                    store.dispatch("setErrorMessage", err.response.data.message)
                   );
               }
             });
           await api
             .getAvailableChannels({ withCredentials: true })
-            .then(res => {
+            .then((res) => {
               availableChannels.value = res.data;
             })
-            .catch(err =>
-              console.log("Caught error:", err.response.data.message)
+            .catch((err) =>
+              store.dispatch("setErrorMessage", err.response.data.message)
             );
         })
-        .catch(err => console.log("Caught error:", err.response.data.message));
+        .catch((err) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     };
 
     const getMessagesUpdate = async (channelId: number) => {
@@ -421,13 +453,13 @@ export const ChatComponent = defineComponent({
       ) {
         await api
           .getChannelById(channelId, { withCredentials: true })
-          .then(res => {
+          .then((res) => {
             activeChannel.value!.channel = res.data;
             channelMessages.value = res.data.messages;
             return res;
           })
-          .catch(err =>
-            console.log("Caught error:", err.response.data.message)
+          .catch((err) =>
+            store.dispatch("setErrorMessage", err.response.data.message)
           );
       }
     };
@@ -444,7 +476,7 @@ export const ChatComponent = defineComponent({
         author: user.value,
         channel: activeChannel.value!.channel,
         id: messageId.value,
-        created_at: Date.now().toString()
+        created_at: Date.now().toString(),
       };
       newMessage.value = "";
       messageId.value++;
@@ -454,7 +486,7 @@ export const ChatComponent = defineComponent({
           {
             channel_id: newContent.channel.id,
             author_id: newContent.author.id,
-            content: newContent.content
+            content: newContent.content,
           },
           { withCredentials: true }
         )
@@ -463,7 +495,7 @@ export const ChatComponent = defineComponent({
           chatSocket.emit("chat-message", newContent, store.state.onlineUsers);
         })
         .catch(async (err: any) => {
-          console.log("Caught error:", err.response.data.message);
+          store.dispatch("setErrorMessage", err.response.data.message);
           if (err.response.data.message == "muted") {
             mutePopup.value = true;
           }
@@ -484,29 +516,33 @@ export const ChatComponent = defineComponent({
         new_message: false,
         member: user.value,
         ban: null,
-        mute: null
+        mute: null,
       };
       isMember.value = false;
       channelSettings.value = false;
       channelMessages.value = channel.messages;
       await api
         .getChannelPreview(channel.id, { withCredentials: true })
-        .then(res => {
+        .then((res) => {
           activeChannel.value!.channel = res.data;
           channelMessages.value = res.data.messages;
           return res;
         })
-        .catch(err => console.log("Caught error:", err.response.data.message));
+        .catch((err) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     };
 
     const toggleNotification = async () => {
       await api
         .toggleNotification(activeChannel.value!.id, { withCredentials: true })
-        .then(res => {
+        .then((res) => {
           updateChannelsList();
           activeChannel.value = res.data;
         })
-        .catch(err => console.log("Caught error:", err.response.data.message));
+        .catch((err) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     };
 
     const applyForMembership = async (channel: Channel) => {
@@ -524,9 +560,9 @@ export const ChatComponent = defineComponent({
     const joinChannel = async (channel: Channel) => {
       await api
         .joinChannel("self", channel.id, user.value.id, {
-          withCredentials: true
+          withCredentials: true,
         })
-        .then(res => {
+        .then((res) => {
           updateChannelsList();
           activeChannel.value = res.data;
           isMember.value = true;
@@ -544,7 +580,9 @@ export const ChatComponent = defineComponent({
           }
           return res;
         })
-        .catch(err => console.log("Caught error:", err.response.data.message));
+        .catch((err) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     };
 
     const deletedChannel = async () => {
@@ -566,9 +604,9 @@ export const ChatComponent = defineComponent({
       send();
       await api
         .leaveChannel("self", activeChannel.value!.id, {
-          withCredentials: true
+          withCredentials: true,
         })
-        .then(res => {
+        .then((res) => {
           store.dispatch(
             "setMessage",
             "You're no longer a member of channel [" +
@@ -579,7 +617,9 @@ export const ChatComponent = defineComponent({
           switchChannel(joinedChannels.value[0]);
           chatSocket.emit("update-channels");
         })
-        .catch(err => console.log("Caught error:", err.response.data.message));
+        .catch((err) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     };
 
     const directMessage = (recipient: User) => {
@@ -590,11 +630,11 @@ export const ChatComponent = defineComponent({
             owner_id: user.value.id,
             type: "private",
             notification: true,
-            password: ""
+            password: "",
           },
           { withCredentials: true }
         )
-        .then(async cm => {
+        .then(async (cm) => {
           updateChannelsList();
           activeChannel.value = cm.data;
           isMember.value = true;
@@ -607,9 +647,9 @@ export const ChatComponent = defineComponent({
           );
           await api
             .joinChannel("dm", cm.data.channel.id, recipient.id, {
-              withCredentials: true
+              withCredentials: true,
             })
-            .then(res => {
+            .then((res) => {
               chatSocket.emit("update-channels", cm.data);
               chatSocket.emit(
                 "chat-action",
@@ -621,16 +661,13 @@ export const ChatComponent = defineComponent({
               send();
               return res;
             })
-            .catch(err =>
-              console.log("Caught error:", err.response.data.message)
+            .catch((err) =>
+              store.dispatch("setErrorMessage", err.response.data.message)
             );
         })
-        .catch(err => {
-          store.dispatch(
-            "setMessage",
-            "This DM channel already exists!"
-          );
-          console.log("Caught error: This DM channel already exists!")
+        .catch((err) => {
+          store.dispatch("setMessage", "This DM channel already exists!");
+          console.log("Caught error: This DM channel already exists!");
         });
     };
 
@@ -641,14 +678,16 @@ export const ChatComponent = defineComponent({
             {
               requesterId: store.state.user.id,
               adresseeId: user.id,
-              nature: "blocked"
+              nature: "blocked",
             },
             {
-              withCredentials: true
+              withCredentials: true,
             }
           )
           .then((res: any) => window.location.reload())
-          .catch((err: any) => console.log(err));
+          .catch((err: any) =>
+            store.dispatch("setErrorMessage", err.response.data.message)
+          );
       }
     };
 
@@ -663,22 +702,22 @@ export const ChatComponent = defineComponent({
         if (inGameUser) {
           store.dispatch(
             "setMessage",
-            user.username.substring(0,15) + "is already in a game!"
+            user.username.substring(0, 15) + "is already in a game!"
           );
           return;
         } else if (!onlineUser) {
           store.dispatch(
             "setMessage",
-            user.username.substring(0,15) + "is offline!"
+            user.username.substring(0, 15) + "is offline!"
           );
           return;
         }
       }
-      
+
       for (const challenge of store.state.challengesReceived) {
         if (challenge.challenger == user.username) {
           store.dispatch(
-            "setMessage",
+            "setErrorMessage",
             `Error: ${user.username} already invited you to play!`
           );
           return;
@@ -703,7 +742,7 @@ export const ChatComponent = defineComponent({
 
     const toggleChannelsList = () => {
       channelsListOn.value = !channelsListOn.value;
-    }
+    };
 
     const toggleModal = (idx: number) => {
       switch (idx) {
@@ -747,17 +786,19 @@ export const ChatComponent = defineComponent({
       activeChannel.value.new_message = false;
       await api
         .setNewMessage("false", cm.channel.id, { withCredentials: true })
-        .catch(err => console.log("Caught error:", err.response.data.message));
+        .catch((err) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
       isMember.value = true;
       console.log("in switchChannel", cm);
       getMessagesUpdate(cm.channel.id);
     };
 
     chatSocket.on("chat-message-on", async (data: any) => {
-      await relApi.getBlockedByUser(user.value.id).then(async blocked => {
+      await relApi.getBlockedByUser(user.value.id).then(async (blocked) => {
         if (
           blocked.data
-            .map(blocked => blocked.adresseeId)
+            .map((blocked) => blocked.adresseeId)
             .includes(data.author.id)
         ) {
           return;
@@ -770,13 +811,12 @@ export const ChatComponent = defineComponent({
         } else if (activeChannel.value!.channel) {
           await api
             .setNewMessage("true", data.channel.id, { withCredentials: true })
-            .then(res => {
+            .then((res) => {
               store.state.chatNotification = true;
-              // console.log(res)
               updateChannelsList();
             })
-            .catch(err =>
-              console.log("Caught error:", err.response.data.message)
+            .catch((err) =>
+              store.dispatch("setErrorMessage", err.response.data.message)
             );
         }
       });
@@ -787,7 +827,9 @@ export const ChatComponent = defineComponent({
         .then(() => {
           switchChannel(cm);
         })
-        .catch(err => console.log("Caught error:", err.response.data.message));
+        .catch((err) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     });
 
     chatSocket.on("update-channels", () => {
@@ -846,7 +888,7 @@ export const ChatComponent = defineComponent({
       channelsListOn,
       toggleChannelsList,
     };
-  }
+  },
 });
 
 export default ChatComponent;
@@ -855,4 +897,3 @@ export default ChatComponent;
 <style lang="scss">
 @import "../../../sass/main.scss";
 </style>
-

@@ -53,10 +53,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
               client.emit('chatNotifications');
             }
           })
-          .catch((err) =>
-            console.log('Caught error:', err),
-          );
-        }
+          .catch((err) => console.log('Caught error:', err));
+      }
     });
 
     client.on(
@@ -68,8 +66,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             .notifyOfflineUsers(message, onlineUsers)
             .catch((err) => {
               console.log('Caught error:', err);
-            }
-            );
+            });
         }
       },
     );

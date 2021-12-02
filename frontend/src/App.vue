@@ -9,6 +9,9 @@
   <transition name="toast">
     <Toast v-if="message" :message="message" />
   </transition>
+  <transition name="toast">
+    <Toast v-if="errorMessage" :errorMessage="errorMessage" />
+  </transition>
 </template>
 
 <script lang="ts">
@@ -34,7 +37,6 @@ export default {
     onUpdated(() => {
       if (store.state.user.id != 0) {
         if (!store.state.isConnected) {
-          // console.log("newConnection");
           presenceSocket.emit("newConnection", store.state.user);
           chatSocket.emit("newConnection", store.state.user);
           store.state.isConnected = true;
@@ -44,20 +46,16 @@ export default {
 
     presenceSocket.on("newUser", (user: User) => {
       store.commit("addOnlineUser", user);
-      // console.log("onlineUsers", store.state.onlineUsers);
     });
     presenceSocket.on("allConnectedUsers", (user: User[]) => {
       store.commit("allConnectedUsers", user);
-      // console.log("onlineUsers", store.state.onlineUsers);
     });
     presenceSocket.on("leftUser", (id: number) => {
-      // console.log("removedUser", id);
       store.commit("removeOnlineUser", id);
-      // console.log("OnlineUsers(afterRemoved)", store.state.onlineUsers);
     });
-    presenceSocket.on('disconnected', () => {
+    presenceSocket.on("disconnected", () => {
       store.state.isConnected = false;
-    })
+    });
 
     pongSocket.on("newInGameUsers", (players: string[]) => {
       store.commit("addInGameUsers", players);
@@ -128,7 +126,7 @@ export default {
 
     chatSocket.on("chat-message", (data: any) => {
       if (store.state.user.id != 0) {
-        if (store.state.chatOn) { 
+        if (store.state.chatOn) {
           //meow!
           chatSocket.emit("chat-message-on", data);
         } else if (store.state.isConnected) {
@@ -137,13 +135,19 @@ export default {
       }
     });
 
-    chatSocket.on('chat-action', (action: string, userId: number, chanName: string) => {
-      if (store.state.user.id == userId) {
-        store.dispatch("setMessage", "You have been " + action + " [" + chanName.substring(0, 15) + "]");
+    chatSocket.on(
+      "chat-action",
+      (action: string, userId: number, chanName: string) => {
+        if (store.state.user.id == userId) {
+          store.dispatch(
+            "setMessage",
+            "You have been " + action + " [" + chanName.substring(0, 15) + "]"
+          );
+        }
       }
-    });
+    );
 
-    chatSocket.on('chat-action-del', (message: string, members: number[]) => {
+    chatSocket.on("chat-action-del", (message: string, members: number[]) => {
       if (members.includes(store.state.user.id)) {
         store.dispatch("setMessage", message);
       }
@@ -152,6 +156,7 @@ export default {
     return {
       user: computed(() => store.state.user),
       message: computed(() => store.state.message),
+      errorMessage: computed(() => store.state.errorMessage),
     };
   },
 };

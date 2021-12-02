@@ -91,7 +91,11 @@
     <button v-else class="button button--second" @click="deactivateTwoFactor">
       Disable 2FA
     </button>
-    <button v-if="user.role !== 'owner'" class="button button--grey" @click="deleteAccount()">
+    <button
+      v-if="user.role !== 'owner'"
+      class="button button--grey"
+      @click="toggleConfirmModal('delete', user)"
+    >
       Delete account
     </button>
     <teleport to="#modals">
@@ -121,6 +125,24 @@
   <div v-else-if="relationState(user) == -3" class="profile-left__blocked-msg">
     {{ user.username }} has been banned
   </div>
+
+  <teleport to="#modals">
+    <transition name="fade--error">
+      <div v-if="toggleConfirm" class="backdrop"></div>
+    </transition>
+    <transition-group name="zoomin">
+      <Modal v-if="toggleConfirm" @close="toggleModal">
+        <template v-slot:confirmation>
+          <Confirm
+            :action="toggleConfirm"
+            :target="target"
+            @close="toggleModalBis"
+            @confirm="executeAction"
+          />
+        </template>
+      </Modal>
+    </transition-group>
+  </teleport>
 </template>
 
 <script lang="ts">
@@ -136,6 +158,7 @@ import { useStore } from "@/store";
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import EditUser from "@/components/EditUser.vue";
 import Modal from "@/components/Modal.vue";
+import Confirm from "@/components/Confirm.vue";
 import { presenceSocket } from "@/App.vue";
 import { useRouter } from "vue-router";
 
@@ -147,7 +170,7 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { Modal, InitTwoFactor, EditUser },
+  components: { Modal, InitTwoFactor, EditUser, Confirm },
   setup(props) {
     const store = useStore();
     const router = useRouter();
@@ -159,6 +182,8 @@ export default defineComponent({
     const userApi = useUserApi();
     const showModal = ref(false);
     const showModal2 = ref(false);
+    const toggleConfirm = ref("");
+    const target = ref();
     const formatedDate = computed(() => {
       return moment(user.created_at).format("MM-DD-YYYY");
     });
@@ -185,11 +210,15 @@ export default defineComponent({
         relationshipApi
           .getAllUserFriendships(store.state.user.id)
           .then((res: any) => (userFriendships.value = res.data))
-          .catch((err: any) => console.log(err.message));
+          .catch((err: any) =>
+            store.dispatch("setErrorMessage", err.response.data.message)
+          );
         relationshipApi
           .getUserBlocked(store.state.user.id)
           .then((res: any) => (userBlocked.value = res.data))
-          .catch((err: any) => console.log(err.message));
+          .catch((err: any) =>
+            store.dispatch("setErrorMessage", err.response.data.message)
+          );
       }
     });
 
@@ -219,17 +248,17 @@ export default defineComponent({
 
     const deleteAccount = async () => {
       if (store.state.user.id != 0) {
-        if (confirm("Do you really want to delete?")) {
-          logOut();
-          await userApi
-            .removeUser(store.state.user.id, {
-              withCredentials: true,
-            })
-            .then((res: any) => {
-              console.log("account deleted");
-            })
-            .catch((err: any) => console.log(err));
-        }
+        logOut();
+        await userApi
+          .removeUser(store.state.user.id, {
+            withCredentials: true,
+          })
+          .then((res: any) => {
+            console.log("account deleted");
+          })
+          .catch((err: any) =>
+            store.dispatch("setErrorMessage", err.response.data.message)
+          );
       }
     };
 
@@ -242,7 +271,9 @@ export default defineComponent({
           store.commit("resetUser"); //store.state.user = null;
           router.push("/login");
         })
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     };
 
     const addFriend = async (user: User) => {
@@ -260,7 +291,9 @@ export default defineComponent({
           .then((res: any) => {
             userFriendships.value.push(res.data);
           })
-          .catch((err: any) => console.log(err));
+          .catch((err: any) =>
+            store.dispatch("setErrorMessage", err.response.data.message)
+          );
       }
     };
 
@@ -289,7 +322,9 @@ export default defineComponent({
               index++;
             }
           })
-          .catch((err: any) => console.log(err));
+          .catch((err: any) =>
+            store.dispatch("setErrorMessage", err.response.data.message)
+          );
       }
     };
 
@@ -312,7 +347,9 @@ export default defineComponent({
               }
             }
           })
-          .catch((err: any) => console.log(err));
+          .catch((err: any) =>
+            store.dispatch("setErrorMessage", err.response.data.message)
+          );
       }
     };
 
@@ -361,7 +398,9 @@ export default defineComponent({
             }
           )
           .then((res: any) => window.location.reload())
-          .catch((err: any) => console.log(err));
+          .catch((err: any) =>
+            store.dispatch("setErrorMessage", err.response.data.message)
+          );
       }
     };
 
@@ -378,7 +417,9 @@ export default defineComponent({
             }
           )
           .then((res: any) => window.location.reload())
-          .catch((err: any) => console.log(err));
+          .catch((err: any) =>
+            store.dispatch("setErrorMessage", err.response.data.message)
+          );
       }
     };
 
@@ -386,7 +427,7 @@ export default defineComponent({
       for (const challenge of store.state.challengesReceived) {
         if (challenge.challenger == user.username) {
           store.dispatch(
-            "setMessage",
+            "setErrorMessage",
             `Error: ${user.username} already invited you to play!`
           );
           return;
@@ -399,6 +440,22 @@ export default defineComponent({
           challengeeName: user.username,
         },
       });
+    };
+
+    const toggleConfirmModal = (action: string, user: User) => {
+      if (user) target.value = user;
+      toggleConfirm.value = action;
+    };
+
+    const toggleModalBis = () => {
+      toggleConfirm.value = "";
+    };
+
+    const executeAction = (action: string, entity: User) => {
+      toggleModalBis();
+      if (action == "delete") {
+        deleteAccount();
+      }
     };
 
     return {
@@ -420,6 +477,11 @@ export default defineComponent({
       unblock,
       deleteAccount,
       challengeUser,
+      toggleConfirmModal,
+      toggleConfirm,
+      target,
+      executeAction,
+      toggleModalBis,
     };
   },
 });

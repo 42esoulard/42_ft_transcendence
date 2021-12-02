@@ -1,44 +1,56 @@
 <template>
+  <div
+    v-if="action === 'unmute' || action === 'unban'"
+    class="chat-channel-form"
+  >
+    <div @click="closeModal()" class="close-cross">&times;</div>
 
-  <div v-if="action === 'unmute' || action === 'unban'" class='chat-channel-form'>
-    <div @click="closeModal()" class="close-cross">
-      &times;
-    </div>
-
-    <form class="chat-channel-form__form" @submit.prevent='unmuteUnban()'>
-      <div class="chat-channel-form__subtitle">[{{ targetCm.member.username }}] is {{ state }} until {{ getEndDate() }}</div>
-      <button class="button button--join-locked-chan" type='submit'> {{ action }} </button>
+    <form class="chat-channel-form__form" @submit.prevent="unmuteUnban()">
+      <div class="chat-channel-form__subtitle">
+        [{{ targetCm.member.username }}] is {{ state }} until {{ getEndDate() }}
+      </div>
+      <button class="button button--join-locked-chan" type="submit">
+        {{ action }}
+      </button>
     </form>
   </div>
-  <div v-else class='chat-channel-form'>
-    <div @click="closeModal()" class="close-cross">
-      &times;
-    </div>
+  <div v-else class="chat-channel-form">
+    <div @click="closeModal()" class="close-cross">&times;</div>
 
-    <form class="chat-channel-form__form" @submit.prevent='checkEndDate()'>
-      <div class="chat-channel-form__subtitle">[{{ targetCm.member.username }}] will be {{ action }} until...</div>
+    <form class="chat-channel-form__form" @submit.prevent="checkEndDate()">
+      <div class="chat-channel-form__subtitle">
+        [{{ targetCm.member.username }}] will be {{ action }} until...
+      </div>
 
-      <input class="chat-channel-form__input" required type="datetime-local" v-model="endDate">
-      <button class="button button--join-locked-chan" type='submit'> Confirm </button>
+      <input
+        class="chat-channel-form__input"
+        required
+        type="datetime-local"
+        v-model="endDate"
+      />
+      <button class="button button--join-locked-chan" type="submit">
+        Confirm
+      </button>
     </form>
   </div>
 </template>
 
 <script lang="ts">
 import { ref, defineComponent, computed } from "vue";
- 
-export default defineComponent({
-  name: 'MuteBanTimer',
-  props: [ 'action', 'targetCm', 'activeChannel' ],
-  emits: ['close', 'update-mute-ban'],
-  setup(props, context) {
 
-    const dateInput = computed(() => <HTMLInputElement>document.querySelector('input')!);
+export default defineComponent({
+  name: "MuteBanTimer",
+  props: ["action", "targetCm", "activeChannel"],
+  emits: ["close", "update-mute-ban"],
+  setup(props, context) {
+    const dateInput = computed(
+      () => <HTMLInputElement>document.querySelector("input")!
+    );
     const curDate = new Date(Date.now() + 3600000);
     const tz = curDate.toLocaleString("sv-SE");
     const endDate = ref(tz.substring(0, 16));
-    
-    const state = (props.action === 'unmute'? 'muted': 'banned');
+
+    const state = props.action === "unmute" ? "muted" : "banned";
 
     const closeModal = () => {
       context.emit("close");
@@ -51,19 +63,24 @@ export default defineComponent({
         dateInput.value.reportValidity();
         return;
       }
-      context.emit("update-mute-ban", props.action, props.targetCm.id, Date.parse(endDate.value));
-    }
+      context.emit(
+        "update-mute-ban",
+        props.action,
+        props.targetCm.id,
+        Date.parse(endDate.value)
+      );
+    };
 
     const getEndDate = () => {
-      const property = (props.action === 'unmute'? 'mute': 'ban');
+      const property = props.action === "unmute" ? "mute" : "ban";
       const rawDate = new Date(Number(props.targetCm[property]));
       const locale = rawDate.toLocaleString("sv-SE");
       return locale.substring(0, 16);
-    }
+    };
 
     const unmuteUnban = async () => {
       context.emit("update-mute-ban", props.action, props.targetCm.id, 0);
-    }
+    };
 
     return {
       closeModal,
@@ -72,11 +89,11 @@ export default defineComponent({
       getEndDate,
       unmuteUnban,
       state,
-    }
-  }
+    };
+  },
 });
 </script>
 
 <style lang="scss">
-  @import "../../../sass/main.scss";
+@import "../../../sass/main.scss";
 </style>

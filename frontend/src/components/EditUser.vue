@@ -31,7 +31,9 @@
         <p v-if="error_avatar" class="error">{{ error_avatar }}</p>
       </transition-group>
       <hr />
-      <button class="button button--primary" style="margin: auto">Update your info</button>
+      <button class="button button--primary" style="margin: auto">
+        Update your info
+      </button>
     </form>
   </div>
 </template>
@@ -63,7 +65,9 @@ export default defineComponent({
       userApi
         .getUsers()
         .then((res: any) => (users.value = res.data))
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     });
 
     const closeModal = () => {
@@ -74,7 +78,6 @@ export default defineComponent({
       const files = avatarInput.value.files;
       if (files.length !== 0) {
         avatar.value = files[0];
-        // console.log("avatar value", avatar.value);
       }
     };
 
@@ -96,7 +99,6 @@ export default defineComponent({
             }
           )
           .then((res) => {
-            // console.log(res);
             store.commit("updateUsername", username.value);
             ret = true;
           })
@@ -128,16 +130,11 @@ export default defineComponent({
       let avatarUpdated = true;
       if (username.value) {
         usernameUpdated = await updateUsername();
-        // console.log("Update username to", username.value);
       } else {
-        // console.log("username is unchanged");
       }
       if (avatar.value) {
         avatarUpdated = await postAvatar();
-        // console.log("Update avatar to", avatar.value.name);
-        // console.log("Update avatar to", avatar.value);
       } else {
-        // console.log("avatar is unchanged");
       }
       if (usernameUpdated) {
         username.value = "";

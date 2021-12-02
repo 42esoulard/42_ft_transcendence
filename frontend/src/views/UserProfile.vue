@@ -40,7 +40,7 @@ export default defineComponent({
           userRef.value = res.data;
         })
         .catch((err: any) => {
-          console.log(err.message);
+          store.dispatch("setErrorMessage", err.response.data.message);
           router.push("/notfound");
         });
     });

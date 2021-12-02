@@ -28,9 +28,9 @@ export class AuthService implements AuthProvider {
       const tmpUsername = username;
       if (await this.usersService.getUserByUsername(username))
         username =
-        (username.length < 8
-          ? username
-          : username.substr(0, username.length - 1)) + '1';
+          (username.length < 8
+            ? username
+            : username.substr(0, username.length - 1)) + '1';
       return this.usersService.saveUser({
         username: username,
         forty_two_login: tmpUsername,

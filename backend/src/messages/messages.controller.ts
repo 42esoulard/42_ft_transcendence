@@ -10,9 +10,7 @@ import {
 import { MessagesService } from './messages.service';
 import { Message } from './interfaces/message.interface';
 import { CreateMessageDto } from './dto/createMessage.dto';
-import {
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { JwtTwoFactorGuard } from 'src/auth/guards/jwtTwoFactor.guard';
 
 @ApiTags('Chat')
@@ -32,5 +30,4 @@ export class MessagesController {
     }
     return msg;
   }
-
 }

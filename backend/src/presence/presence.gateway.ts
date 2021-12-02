@@ -30,15 +30,11 @@ export class PresenceGateway
   private connectedUsers: ConnectedUser[] = [];
 
   async handleConnection(client: Socket, ...args: any[]) {
-    // console.log("CONNEXION", client.id);
-    // console.log("ALL USERS", this.connectedUsers);
-
     if (this.connectedUsers.length != 0) {
       client.emit('allConnectedUsers', this.connectedUsers as User[]);
     }
 
     client.on('newConnection', (newUser: User) => {
-      // console.log('NEW APP CONNECTION', newUser.username);
       const currentUser: ConnectedUser = {
         id: newUser.id,
         username: newUser.username,
@@ -54,7 +50,6 @@ export class PresenceGateway
         client.broadcast.emit('newUser', newUser);
         client.emit('newUser', newUser); // for the user himself...
       }
-      // console.log("ALL USERS", this.connectedUsers);
     });
 
     client.on('closeConnection', (leftUser: User) => {
@@ -65,15 +60,11 @@ export class PresenceGateway
         );
         client.broadcast.emit('leftUser', user.id);
         client.emit('disconnected');
-        // console.log("REMOVED USER", user);
-        // console.log("ALL USERS", this.connectedUsers);
       }
     });
   }
 
   async handleDisconnect(client: Socket) {
-    // console.log("DISCONNECT", client.id);
-
     let user = this.connectedUsers.find((u) =>
       u.socket_ids.find((s) => s === client.id),
     );
@@ -85,13 +76,9 @@ export class PresenceGateway
         );
         client.broadcast.emit('leftUser', user.id);
         client.emit('disconnected');
-        // console.log("LEFT USER", user);
       }
     }
-    // console.log("ALL USERS", this.connectedUsers);
   }
 
-  afterInit(server: Server) {
-    // console.log('Socket is live')
-  }
+  afterInit(server: Server) {}
 }

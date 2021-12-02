@@ -13,7 +13,12 @@
 
         <button
           @click="toggleAnimations"
-          :class="['button',  'button--log-in', animations ? 'button--third' : '', 'pong-btn']"
+          :class="[
+            'button',
+            'button--log-in',
+            animations ? 'button--third' : '',
+            'pong-btn',
+          ]"
         >
           <h1><i class="fas fa-meteor" /></h1>
           <h1 v-if="animations">on</h1>
@@ -94,7 +99,10 @@
       </div>
       <div v-if="gameIsOver" class="pong-result">
         <h2 class="pong-score">{{ winningPlayer }} won !</h2>
-        <button class="button button--log-in pong-btn" @click="$router.push('/pong')">
+        <button
+          class="button button--log-in pong-btn"
+          @click="$router.push('/pong')"
+        >
           <h1><i class="fas fa-door-open" /></h1>
           <h1>exit</h1>
         </button>
@@ -147,7 +155,6 @@ export default defineComponent({
 
     // lifecycle hooks
     onMounted(() => {
-
       if (props.userType === "player")
         window.addEventListener("keydown", onKeyDown);
       window.addEventListener("resize", onResize);
@@ -242,7 +249,7 @@ export default defineComponent({
 
     const toggleAnimations = () => {
       animations.value = !animations.value;
-    }
+    };
 
     return {
       score,
@@ -252,7 +259,7 @@ export default defineComponent({
       canvas,
       SendMoveMsg,
       animations,
-      toggleAnimations
+      toggleAnimations,
     };
   },
 });

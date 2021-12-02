@@ -363,18 +363,20 @@ export class ChannelsService {
   }
 
   async leaveChannel(cm_id: number): Promise<DeleteResult> {
-    const cm = await this.channelMemberService.getChannelMemberById(cm_id)
+    const cm = await this.channelMemberService.getChannelMemberById(cm_id);
     if (cm == undefined) {
       return;
     }
-    return await this.channelMemberService.deleteChannelMember(cm_id)
-    .then(async (res) => {
-      if (cm.channel.channel_members.length == 1 && cm.channel.type == 'private') {
-        return await this.deleteChannel(cm.channel.id);
-      }
-
-    })
-    
+    return await this.channelMemberService
+      .deleteChannelMember(cm_id)
+      .then(async (res) => {
+        if (
+          cm.channel.channel_members.length == 1 &&
+          cm.channel.type == 'private'
+        ) {
+          return await this.deleteChannel(cm.channel.id);
+        }
+      });
   }
 
   async deleteChannel(chan_id: number): Promise<DeleteResult> {

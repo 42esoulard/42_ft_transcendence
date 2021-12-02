@@ -108,7 +108,9 @@ export default defineComponent({
         .then((res: any) => {
           userList.value = res.data;
         })
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     });
 
     const selectList = computed((): User[] => {

@@ -89,7 +89,9 @@ export default defineComponent({
               router.push("/");
             }
           })
-          .catch((err: any) => console.log(err.message));
+          .catch((err: any) =>
+            store.dispatch("setErrorMessage", err.response.data.message)
+          );
       }
     });
 
@@ -97,15 +99,21 @@ export default defineComponent({
       userApi
         .getUsers()
         .then((res: any) => (nbUsers.value = res.data.length))
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
       pongApi
         .getAll()
         .then((res: any) => (nbGames.value = res.data.length))
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
       pongApi
         .getOnGoingGames()
         .then((res: any) => (nbOngoing.value = res.data.length))
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     });
 
     const getProfile = async () => {

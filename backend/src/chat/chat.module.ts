@@ -9,7 +9,7 @@ import { ChatGateway } from './chat.gateway';
 import { ChannelsModule } from 'src/channels/channels.module';
 
 @Module({
-  imports: [ ChannelsModule ],
+  imports: [ChannelsModule],
   providers: [ChatGateway],
 })
 export class ChatModule {}

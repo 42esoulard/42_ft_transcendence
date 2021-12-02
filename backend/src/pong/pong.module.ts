@@ -10,7 +10,10 @@ import { GameUser } from './entity/gameUser.entity';
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Game, GameStats, Users, GameUser]), UsersModule],
+  imports: [
+    TypeOrmModule.forFeature([Game, GameStats, Users, GameUser]),
+    UsersModule,
+  ],
   providers: [PongGateway, PongService],
   controllers: [PongController],
   exports: [PongService],

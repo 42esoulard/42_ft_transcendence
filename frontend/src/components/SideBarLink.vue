@@ -22,20 +22,13 @@ export default {
     const hasNotification = computed(
       () =>
         ((store.state.challengesReceived.length > 0 && props.to === "/pong") || // test à faire sur le tableau de challenges
-          (store.state.chatNotification && props.to === "/chat")) && 
+          (store.state.chatNotification && props.to === "/chat")) &&
         !isActive.value
     );
-
-    // console.log("inGameUsers", store.state.inGameUsers);
-    // console.log("hasLives", hasLives.value);
 
     return {
       isActive,
       hasNotification,
-      // hasChallenges,
-      // hasLives,
-      // challenges: computed(() => store.state.onlineUsers.length),
-      // liveGames: computed(() => store.state.inGameUsers.length / 2),
     };
   },
 };

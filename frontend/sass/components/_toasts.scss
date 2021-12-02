@@ -16,4 +16,7 @@
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
+  &--error {
+    background: darken($fourth-color, 15);
+  }
 }

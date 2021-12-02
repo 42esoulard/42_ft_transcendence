@@ -38,7 +38,6 @@ export class FortyTwoStrategy extends PassportStrategy(
     cb: Function,
   ): Promise<User> {
     const { username, provider, firstname, lastname, photo } = profile;
-    // console.log(profile);
     const userProfile: FortyTwoUser = { username, photo };
     const user = await this.authService.validateUser(userProfile);
     if (!user) {

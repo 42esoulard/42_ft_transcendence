@@ -80,9 +80,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Body() { username }: { username: string },
   ) {
-    // console.log(username);
     const user: User = await this.userService.getUserByUsername(username);
-    // console.log('user', user);
     if (user == undefined) {
       throw new NotFoundException('User not found');
     }
@@ -171,7 +169,6 @@ export class AuthController {
   @UseGuards(JwtTwoFactorGuard)
   getKey(@Req() request: Request) {
     let key = 'No available key';
-    // console.log('KEY:', request.user.two_fa_secret);
     if (request.user.two_fa_secret) {
       key = request.user.two_fa_secret;
     }

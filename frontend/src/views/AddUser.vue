@@ -3,7 +3,7 @@
     <h1>ADD USER</h1>
     <form @submit.prevent="handleSubmit">
       <label>username</label>
-      <input type="text" v-model="username" maxlength="8"/>
+      <input type="text" v-model="username" maxlength="8" />
       <div>
         <button>Save User</button>
       </div>
@@ -33,7 +33,9 @@ export default defineComponent({
         .saveUser({
           username: username.value,
           two_fa_enabled: false,
-          forty_two_login: (Math.floor(Math.random() * (99999999 - 10000000 +1)) + 10000000).toString(),
+          forty_two_login: (
+            Math.floor(Math.random() * (99999999 - 10000000 + 1)) + 10000000
+          ).toString(),
         })
         .then((res: any) => (responseData.value = res.data))
         .catch((err: any) => console.log(err.response.data.message));

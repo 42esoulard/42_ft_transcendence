@@ -44,7 +44,9 @@ export default defineComponent({
             selectedUser.value = users.value[0].username;
           }
         })
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
       userApi
         .getBannedUsers()
         .then((res: any) => {
@@ -59,7 +61,6 @@ export default defineComponent({
     });
 
     const Fakelogin = async () => {
-      // console.log(selectedUser.value);
       await axios
         .post("http://localhost:3000/auth/fake-login", {
           username: selectedUser.value,
@@ -76,9 +77,8 @@ export default defineComponent({
       await authApi
         .profile({ withCredentials: true })
         .then((response) => {
-          // console.log('get Profile')
           store.state.user = response.data;
-          store.dispatch('setPendingChallenges')
+          store.dispatch("setPendingChallenges");
         })
         .catch((err: Error) => {
           console.log("ERROR GET PROFILE");
@@ -87,7 +87,6 @@ export default defineComponent({
 
     const sendConnection = () => {
       presenceSocket.emit("newConnection", store.state.user);
-      // console.log("NEWLY CONNECTED USER", store.state.user);
     };
     presenceSocket.on("newUser", (user: User) => {
       store.commit("addOnlineUser", user);

@@ -2,25 +2,28 @@
   <div class="users-main users-main--watch">
     <div class="users-div">
       <div class="users users--ladder">
-          <div class="users__title">Ongoing games</div>
-          <div class="users-list users-list--watch">
-            <tr v-for="game in games" :key="game.id" class="users-list__elt">
-              <div class="pong-watch__td">
-                <td>
-                  <span class="link link--user-list">
-                    {{ game.users[0].user.username }} vs
-                    {{ game.users[1].user.username }}
-                  </span>
-                  </td>
-                  <td>
-                  <button class="button button--third button--invitation" v-on:click="WatchGame(game.id)">
-                    <i class="fas fa-eye" /> watch
-                  </button>
-                </td>
-              </div>
-            </tr>
-          </div>
+        <div class="users__title">Ongoing games</div>
+        <div class="users-list users-list--watch">
+          <tr v-for="game in games" :key="game.id" class="users-list__elt">
+            <div class="pong-watch__td">
+              <td>
+                <span class="link link--user-list">
+                  {{ game.users[0].user.username }} vs
+                  {{ game.users[1].user.username }}
+                </span>
+              </td>
+              <td>
+                <button
+                  class="button button--third button--invitation"
+                  v-on:click="WatchGame(game.id)"
+                >
+                  <i class="fas fa-eye" /> watch
+                </button>
+              </td>
+            </div>
+          </tr>
         </div>
+      </div>
     </div>
   </div>
 </template>
@@ -31,6 +34,7 @@ import { pongSocket } from "@/App.vue";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import { usePongApi } from "@/plugins/api.plugin";
 import { Game } from "sdk/typescript-axios-client-generated";
+import { store } from "@/store";
 
 export default defineComponent({
   setup() {
@@ -41,7 +45,9 @@ export default defineComponent({
       api
         .getOnGoingGames()
         .then((res: any) => (games.value = res.data))
-        .catch((err) => console.log(err));
+        .catch((err) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     });
 
     const WatchGame = (id: number) => {

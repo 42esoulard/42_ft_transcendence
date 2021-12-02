@@ -15,8 +15,6 @@ export class FortyTwoAuthGuard extends AuthGuard('FortyTwoStrategy') {
 export class AuthenticatedGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    // console.log("isAuthenticated", req.isAuthenticated());
-    // console.log("request", req);
     return req.isAuthenticated();
   }
 }

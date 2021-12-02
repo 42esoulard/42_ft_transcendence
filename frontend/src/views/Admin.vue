@@ -190,10 +190,7 @@
 
   <teleport to="#modals">
     <transition name="fade--error">
-      <div
-        v-if="toggleConfirm"
-        class="backdrop"
-      ></div>
+      <div v-if="toggleConfirm" class="backdrop"></div>
     </transition>
     <transition-group name="zoomin">
       <Modal v-if="toggleConfirm" @close="toggleModal">
@@ -264,21 +261,27 @@ export default defineComponent({
           userList.value = res.data;
           userList.value.sort((a, b) => a.username.localeCompare(b.username));
         })
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
       userApi
         .getBannedUsers()
         .then((res: any) => {
           bannedList.value = res.data;
           bannedList.value.sort((a, b) => a.username.localeCompare(b.username));
         })
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
       chatApi
         .getChannels({ withCredentials: true })
         .then((res: any) => {
           channelList.value = res.data;
           channelList.value.sort((a, b) => a.name.localeCompare(b.name));
         })
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     });
 
     const toggleOnline = () => {
@@ -301,13 +304,14 @@ export default defineComponent({
       privatelist.value = !privatelist.value;
     };
 
-    const toggleConfirmModal = (action: string, user?: User, channel?: Channel) => {
-      if (user)
-        target.value = user;
-      else if (channel)
-        target.value = channel;
-      else
-        target.value = null;
+    const toggleConfirmModal = (
+      action: string,
+      user?: User,
+      channel?: Channel
+    ) => {
+      console.log("COUCOU", user, channel, action);
+      if (user) target.value = user;
+      else if (channel) target.value = channel;
       toggleConfirm.value = action;
     };
 
@@ -315,23 +319,23 @@ export default defineComponent({
       toggleConfirm.value = "";
     };
 
-    const executeAction = (action: string, entity: User | Channel | null) => {
+    const executeAction = (action: string, entity: User | Channel) => {
       toggleModal();
-        if (action == "ban") {
-          banUser(<User>entity);
-        } else if (action == "unban") {
-          unbanUser(<User>entity);
-        } else if (action == "delete") {
-          deleteUser(<User>entity);
-        } else if (action == "promote") {
-          promote(<User>entity);
-        } else if (action == "demote") {
-          demote(<User>entity);
-        } else if (action == "promote owner") {
-          changeOwner(<User>entity);
-        } else if (action == "delete channel") {
+      if (action == "ban") {
+        banUser(<User>entity);
+      } else if (action == "unban") {
+        unbanUser(<User>entity);
+      } else if (action == "delete") {
+        deleteUser(<User>entity);
+      } else if (action == "promote") {
+        promote(<User>entity);
+      } else if (action == "demote") {
+        demote(<User>entity);
+      } else if (action == "promote owner") {
+        changeOwner(<User>entity);
+      } else if (action == "delete channel") {
         deleteChannel(<Channel>entity);
-        }
+      }
     };
 
     const selectList = computed((): User[] => {
@@ -385,61 +389,71 @@ export default defineComponent({
     });
 
     const deleteUser = async (user: User) => {
-        await userApi
-          .removeUser(user.id, { withCredentials: true })
-          .then((res: any) => {
-            console.log("account deleted");
-            userList.value = userList.value.filter(
-              (usr: User) => usr.id != user.id
-            );
-            bannedList.value = bannedList.value.filter(
-              (usr: User) => usr.id != user.id
-            );
-          })
-          .catch((err: any) => toggleConfirmModal(err.response.data.msg));
+      await userApi
+        .removeUser(user.id, { withCredentials: true })
+        .then((res: any) => {
+          console.log("account deleted");
+          userList.value = userList.value.filter(
+            (usr: User) => usr.id != user.id
+          );
+          bannedList.value = bannedList.value.filter(
+            (usr: User) => usr.id != user.id
+          );
+        })
+        .catch((err: any) => {
+          store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const deleteChannel = async (channel: Channel) => {
-        await chatApi
-          .deleteChannel(channel.id, { withCredentials: true })
-          .then((res: any) => {
-            console.log("channel deleted");
-            channelList.value = channelList.value.filter(
-              (chan: Channel) => chan.id != channel.id
-            );
-          })
-          .catch((err: any) => toggleConfirmModal(err.response.data.msg));
+      await chatApi
+        .deleteChannel(channel.id, { withCredentials: true })
+        .then((res: any) => {
+          console.log("channel deleted");
+          channelList.value = channelList.value.filter(
+            (chan: Channel) => chan.id != channel.id
+          );
+        })
+        .catch((err: any) => {
+          store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const promote = async (user: User) => {
-        await userApi
-          .promoteUser(user.id, { withCredentials: true })
-          .then((res: any) => {
-            console.log("user promoted");
-            user.role = "admin";
-          })
-          .catch((err: any) => toggleConfirmModal(err.response.data.msg));
+      await userApi
+        .promoteUser(user.id, { withCredentials: true })
+        .then((res: any) => {
+          console.log("user promoted");
+          user.role = "admin";
+        })
+        .catch((err: any) => {
+          store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const demote = async (user: User) => {
-        await userApi
-          .demoteUser(user.id, { withCredentials: true })
-          .then((res: any) => {
-            console.log("user demoted");
-            user.role = "user";
-          })
-          .catch((err: any) => toggleConfirmModal(err.response.data.msg));
+      await userApi
+        .demoteUser(user.id, { withCredentials: true })
+        .then((res: any) => {
+          console.log("user demoted");
+          user.role = "user";
+        })
+        .catch((err: any) => {
+          store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const changeOwner = async (user: User) => {
-        await userApi
-          .changeOwner(user.id, { withCredentials: true })
-          .then((res: any) => {
-            console.log("owner changed");
-            user.role = "owner";
-            logOut();
-          })
-          .catch((err: any) => toggleConfirmModal(err.response.data.msg));
+      await userApi
+        .changeOwner(user.id, { withCredentials: true })
+        .then((res: any) => {
+          console.log("owner changed");
+          user.role = "owner";
+          logOut();
+        })
+        .catch((err: any) => {
+          store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const logOut = () => {
@@ -451,21 +465,25 @@ export default defineComponent({
           store.commit("resetUser"); //store.state.user = null;
           router.push("/login");
         })
-        .catch((err: any) => console.log(err.message));
+        .catch((err: any) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
     };
 
     const banUser = async (user: User) => {
-        await userApi
-          .banUser(user.id, { withCredentials: true })
-          .then((res: any) => {
-            console.log("user banned");
-            bannedList.value.push(user);
-            userList.value = userList.value.filter(
-              (usr: User) => usr.id != user.id
-            );
-            user.role == "user";
-          })
-          .catch((err: any) => toggleConfirmModal(err.response.data.msg));
+      await userApi
+        .banUser(user.id, { withCredentials: true })
+        .then((res: any) => {
+          console.log("user banned");
+          bannedList.value.push(user);
+          userList.value = userList.value.filter(
+            (usr: User) => usr.id != user.id
+          );
+          user.role == "user";
+        })
+        .catch((err: any) => {
+          store.dispatch("setErrorMessage", err.message);
+        });
     };
 
     const unbanUser = async (user: User) => {
@@ -478,7 +496,9 @@ export default defineComponent({
             (usr: User) => usr.id != user.id
           );
         })
-        .catch((err: any) => toggleConfirmModal(err.response.data.msg));
+        .catch((err: any) => {
+          store.dispatch("setErrorMessage", err.message);
+        });
     };
 
     const printChannelName = (channelName: string) => {
@@ -519,7 +539,7 @@ export default defineComponent({
       toggleModal,
       toggleConfirmModal,
       target,
-      executeAction
+      executeAction,
     };
   },
 });
