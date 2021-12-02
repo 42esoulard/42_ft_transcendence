@@ -2,7 +2,6 @@
   <transition name="fade--log">
     <div v-if="user && user.id != 0 && !user.banned">
       <div class="sidebar">
-        <SideBarLink to="/" icon="fas fa-home">home</SideBarLink>
         <SideBarLink :to="userProfile" icon="fas fa-user-circle"
           >profile</SideBarLink
         >

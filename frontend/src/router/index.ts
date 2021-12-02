@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import Home from "../views/Home.vue";
 import AddUser from "../views/AddUser.vue";
 import Users from "../views/Users.vue";
 import Chat from "../views/Chat.vue";
@@ -24,8 +23,7 @@ import { EmoticonSadOutline } from "mdue";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    name: "Home",
-    component: Home,
+    redirect: { name: 'Pong' },
     meta: {
       requiresAuth: true,
     },
