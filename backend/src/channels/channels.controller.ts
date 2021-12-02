@@ -497,10 +497,10 @@ export class ChannelsController {
             'You dont have the right to delete this channel',
           );
         }
-      } else if (
-        !cm.is_owner &&
+      } else if ((cm.channel.name == "General") || 
+        (!cm.is_owner &&
         cm.member.role !== Role.OWNER &&
-        cm.member.role !== Role.ADMIN
+        cm.member.role !== Role.ADMIN)
       ) {
         throw new ForbiddenException(
           'You dont have the right to delete this channel',
@@ -527,6 +527,9 @@ export class ChannelsController {
       (action == 'unmute' && !user_cm.mute)
     ) {
       throw new NotFoundException('Failed to find or act on member');
+    }
+    if (action == 'banned' && user_cm.channel.name == 'General') {
+      throw new NotFoundException('Can\'t ban a user from General!');
     }
     const req_cm: ChannelMember = await this.channelService.getChannelMember(
       user_cm.channel.id,

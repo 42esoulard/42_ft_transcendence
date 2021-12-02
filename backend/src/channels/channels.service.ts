@@ -136,6 +136,9 @@ export class ChannelsService {
     await this.channelsRepository
       .findOne(message.channel.id)
       .then((channel) => {
+        if (channel == undefined) {
+          return;
+        }
         const chanMembers = channel.channel_members;
         const onlineMemberIds = onlineUsers.map((user) => user.id);
         const offlineMembers = chanMembers.filter(
@@ -145,7 +148,7 @@ export class ChannelsService {
           this.channelMemberService.setNewMessage(true, cm.id);
         });
       })
-      .catch((err) => console.log('Caught error:', err.response.data.message));
+      .catch((err) => console.log('Caught error:', err));
   }
 
   async getCmById(cm_id: number): Promise<ChannelMember> {

@@ -56,7 +56,8 @@
         </button>
         <button
           @click="toggleTab('ownerOptions')"
-          v-if="activeChannel.is_owner || user.role == 'admin' || user.role == 'owner'"
+          v-if="activeChannel.channel.name !== 'General' && 
+            (activeChannel.is_owner || user.role == 'admin' || user.role == 'owner')"
           :class="[
             'button',
             'button--selector',

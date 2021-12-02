@@ -36,14 +36,14 @@ export class MessagesService {
    */
   async saveMessage(messageDto: CreateMessageDto): Promise<Message> {
     const newMessage: Message = this.messagesRepository.create(messageDto);
+    newMessage.author = await this.userService.getUserbyId(
+      messageDto.author_id,
+    );
     newMessage.channel = await this.channelService.getChannelById(
       messageDto.channel_id,
       messageDto.author_id,
     );
-    newMessage.author = await this.userService.getUserbyId(
-      messageDto.author_id,
-    );
-    if (!newMessage.channel || !newMessage.author) {
+    if (newMessage.channel == undefined || newMessage.author == undefined) {
       return undefined;
     }
     await this.channelMemberService
@@ -67,7 +67,7 @@ export class MessagesService {
             );
           });
         }
-      });
+      })
 
     return await this.messagesRepository
       .save(newMessage)
