@@ -108,9 +108,15 @@ export class UsersController {
 
   @UseGuards(JwtTwoFactorGuard)
   @Get('delete/:id')
-  async removeUser(@Param('id') id: number) {
+  async removeUser(@Param('id') id: number, @Req() request: Request) {
     const currentUser = await this.userService.getUserbyId(id);
     if (!currentUser) throw new BadRequestException("user doesn't exist");
+    if (request.user.id !== id) {
+      const reqUser = await this.userService.getUserbyId(request.user.id);
+      if (reqUser && reqUser.role == 'user') {
+        throw new BadRequestException("not authorized to delete other users");
+      }
+    }
     return await this.userService.removeUser(id);
   }
 
