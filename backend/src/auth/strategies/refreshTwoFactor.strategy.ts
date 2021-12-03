@@ -41,7 +41,6 @@ export class RefreshTwoFactorStrategy extends PassportStrategy(
       cookie.refresh_token,
     );
     if (!user) {
-      console.log('oups: token expired');
       throw new BadRequestException('token expired');
     }
     if (!user.two_fa_enabled) {

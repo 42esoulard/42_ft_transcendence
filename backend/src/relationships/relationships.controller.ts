@@ -34,6 +34,13 @@ export class RelationshipsController {
     return await this.relationshipService.getUserFriendships(id);
   }
 
+  @Get('/pending/:id')
+  async getPendingRelationships(@Param('id') id: number): Promise<Relationship[]> {
+    const currentUser = await this.userService.getUserbyId(id);
+    if (!currentUser) throw new BadRequestException("user doesn't exist");
+    return await this.relationshipService.getPendingRelationships(id);
+  }
+
   @Get('/allfriendships/:id')
   async getAllUserFriendships(
     @Param('id') id: number,

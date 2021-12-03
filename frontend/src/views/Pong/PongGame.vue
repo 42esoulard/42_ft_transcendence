@@ -156,7 +156,6 @@ export default defineComponent({
       if (props.userType === "player")
         window.addEventListener("keydown", onKeyDown);
       window.addEventListener("resize", onResize);
-      console.log("mounted");
       if (canvas.value) context.value = canvas.value.getContext("2d");
       initCanvas();
     });

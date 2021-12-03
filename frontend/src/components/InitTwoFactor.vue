@@ -49,6 +49,7 @@
 import { defineComponent, onMounted, onUpdated, ref } from "vue";
 import OtpInput from "@/components/OtpInput.vue";
 import { useAuthApi } from "@/plugins/api.plugin";
+import { store } from "@/store";
 
 export default defineComponent({
   name: "InitTwoFactor",
@@ -75,7 +76,7 @@ export default defineComponent({
         .then((res: any) => {
           key.value = res.data.key;
         })
-        .catch((error) => console.log(error));
+        .catch((error) => store.dispatch("setErrorMessage", error.response.data.message));
     };
 
     return {

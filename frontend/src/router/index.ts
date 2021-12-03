@@ -113,7 +113,6 @@ const routes: Array<RouteRecordRaw> = [
       if (to.params.authorized) {
         next();
       } else {
-        console.log("redirected to Pong");
         next({ name: "Pong" });
       }
     },
@@ -135,7 +134,6 @@ const routes: Array<RouteRecordRaw> = [
       if (to.params.authorized) {
         next();
       } else {
-        console.log("redirected to PongWatch");
         next({ name: "PongWatch" });
       }
     },
@@ -154,7 +152,6 @@ const routes: Array<RouteRecordRaw> = [
       if (to.params.authorized) {
         next();
       } else {
-        console.log("redirected to Pong");
         next({ name: "Pong" });
       }
     },

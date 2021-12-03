@@ -22,6 +22,7 @@ export interface State {
   allPendingChallenges: challengeExport[];
   chatNotification: boolean;
   chatOn: boolean;
+  toggleFriendship: boolean;
 }
 
 // define injection key
@@ -47,6 +48,7 @@ export const store = createStore<State>({
     allPendingChallenges: [],
     chatNotification: false,
     chatOn: false,
+    toggleFriendship: false,
   },
   getters: {},
   mutations: {

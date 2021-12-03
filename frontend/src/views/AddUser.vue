@@ -18,6 +18,7 @@
 import { defineComponent, ref } from "vue";
 import SubmitSuccess from "@/components/SubmitSuccess.vue";
 import { useUserApi } from "@/plugins/api.plugin";
+import { store } from "@/store";
 
 export default defineComponent({
   components: {
@@ -38,7 +39,7 @@ export default defineComponent({
           ).toString(),
         })
         .then((res: any) => (responseData.value = res.data))
-        .catch((err: any) => console.log(err.response.data.message));
+        .catch((err: any) => store.dispatch("setErrorMessage", err.response.data.message));
     };
 
     return { username, responseData, handleSubmit };

@@ -142,13 +142,12 @@ export default defineComponent({
       authApi
         .logout({ withCredentials: true })
         .then((response) => {
-          console.log(response);
           presenceSocket.emit("closeConnection", store.state.user);
+          presenceSocket.emit("leftUser", store.state.user.id);
           store.commit("resetUser");
           router.push("/login");
         })
         .catch((err: any) => {
-          console.log("You are already disconnected");
           store.commit("resetUser");
           router.push("/login");
         });

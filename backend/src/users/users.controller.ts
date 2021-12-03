@@ -111,7 +111,6 @@ export class UsersController {
   @Get('delete/:id')
   async removeUser(@Param('id') id: number, @Req() request: Request) {
     const currentUser = await this.userService.getUserbyId(id);
-    console.log("REQ", request.user.id, "USR", id)
     if (!currentUser) throw new BadRequestException("user doesn't exist");
     if (request.user.id != id) {
       const reqUser = await this.userService.getUserbyId(request.user.id);
@@ -182,7 +181,14 @@ export class UsersController {
 
   @Post('update-user')
   @UseGuards(JwtTwoFactorGuard)
-  async updateUser(@Body() updatedUser: UpdateUserDto) {
+  async updateUser(@Body() updatedUser: UpdateUserDto, @Req() request: Request) {
+    const id = updatedUser.id;
+    if (request.user.id != id) {
+      const reqUser = await this.userService.getUserbyId(request.user.id);
+      if (reqUser && reqUser.role == 'user') {
+        throw new ForbiddenException('not authorized to update other users');
+      }
+    }
     if (!/^[a-zA-Z]+$/.test(updatedUser.username)) {
       throw new BadRequestException('invalid username');
     }

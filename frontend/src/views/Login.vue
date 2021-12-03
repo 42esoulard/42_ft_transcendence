@@ -48,7 +48,7 @@ import { defineComponent, onBeforeMount, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import OtpInput from "@/components/OtpInput.vue";
 import { useStore } from "@/store";
-import { useAuthApi } from "@/plugins/api.plugin";
+import { useAuthApi, useRelationshipApi } from "@/plugins/api.plugin";
 import { useUserApi } from "@/plugins/api.plugin";
 import { usePongApi } from "@/plugins/api.plugin";
 import { User } from "sdk/typescript-axios-client-generated";
@@ -63,6 +63,7 @@ export default defineComponent({
     const authApi = useAuthApi();
     const userApi = useUserApi();
     const pongApi = usePongApi();
+    const relationshipApi = useRelationshipApi();
     const nbUsers = ref();
     const nbGames = ref();
     const nbOngoing = ref();
@@ -79,11 +80,11 @@ export default defineComponent({
         await authApi
           .login({ params: { code: code }, withCredentials: true })
           .then((res: any) => {
+            getProfile();
             if (res.status === 206) {
               isTwoFactorEnabled.value = true;
             } else if (res.status === 200) {
               if (res.data.newlyCreated == true) {
-                console.log(res.data);
                 store.commit("setFirstTimeConnect", true);
                 router.push(`/profile/${res.data.username}`);
               }
@@ -94,6 +95,19 @@ export default defineComponent({
           .catch((err: any) =>
             store.dispatch("setErrorMessage", err.response.data.message)
           );
+
+        await getProfile();
+        if (store.state.user.id != 0){
+          relationshipApi
+            .getPendingRelationships(store.state.user.id)
+            .then((res: any) => {
+              if (res.data.length > 0)
+                store.state.toggleFriendship = true;
+            })
+            .catch((err: any) =>
+              store.dispatch("setErrorMessage", err.response.data.message)
+            );
+        }
       }
     });
 
@@ -124,8 +138,8 @@ export default defineComponent({
         .then((response) => {
           store.state.user = response.data;
         })
-        .catch((err: Error) => {
-          console.log("ERROR GET PROFILE");
+        .catch((err) => {
+          store.dispatch("setErrorMessage", err.response.data.message)
         });
     };
 

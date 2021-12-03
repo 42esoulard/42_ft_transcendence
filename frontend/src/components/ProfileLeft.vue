@@ -31,38 +31,35 @@
     <button
       v-if="relationState(user) == 0"
       @click="addFriend(user)"
-      class="button button--second"
+      class="button button--third"
     >
       <i class="upload-icon fas fa-user-plus" /> add friend
     </button>
     <button
       v-else-if="relationState(user) == 1"
       @click="removeFriend(user)"
-      class="button button--second"
+      class="button button--third"
     >
       <i class="upload-icon fas fa-user-minus" /> remove friend
     </button>
     <button
       v-else-if="relationState(user) == 2"
       @click="acceptFriend(user)"
-      class="button button--second"
+      class="button button--third"
     >
       <i class="upload-icon fas fa-user-plus" /> accept invitation
     </button>
     <button
       v-else-if="relationState(user) == 3"
       @click="removeFriend(user)"
-      class="button button--second"
+      class="button button--third"
     >
       <i class="upload-icon fas fa-user-times" /> cancel invitation
-    </button>
-    <button v-if="user.id != self.id" class="button button--primary">
-      <i class="upload-icon fas fa-envelope" /> send message
     </button>
     <button
       v-if="user.id != self.id && userStatus == 'online'"
       @click="challengeUser"
-      class="button button--third"
+      class="button button--primary"
     >
       <i class="upload-icon fas fa-table-tennis" /> invite game
     </button>
@@ -88,7 +85,7 @@
     >
       Enable 2FA
     </button>
-    <button v-else class="button button--second" @click="deactivateTwoFactor">
+    <button v-else class="button button--third" @click="deactivateTwoFactor">
       Disable 2FA
     </button>
     <button
@@ -159,7 +156,7 @@ import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import EditUser from "@/components/EditUser.vue";
 import Modal from "@/components/Modal.vue";
 import Confirm from "@/components/Confirm.vue";
-import { presenceSocket } from "@/App.vue";
+import { chatSocket, presenceSocket } from "@/App.vue";
 import { useRouter } from "vue-router";
 
 export default defineComponent({
@@ -229,7 +226,7 @@ export default defineComponent({
           store.commit("toggleTwoFactor", false);
           store.dispatch("setMessage", res.data.message);
         })
-        .catch((error) => console.log(error));
+        .catch((error) => store.dispatch("setErrorMessage", error.response.data.message));
     };
 
     const toggleModal = (nbr: number) => {
@@ -248,13 +245,13 @@ export default defineComponent({
 
     const deleteAccount = async () => {
       if (store.state.user.id != 0) {
+        chatSocket.emit("selfDeletedUser", store.state.user);
         logOut();
         await userApi
           .removeUser(store.state.user.id, {
             withCredentials: true,
           })
           .then((res: any) => {
-            console.log("account deleted");
           })
           .catch((err: any) =>
             store.dispatch("setErrorMessage", err.response.data.message)
@@ -266,7 +263,6 @@ export default defineComponent({
       authApi
         .logout({ withCredentials: true })
         .then((response) => {
-          console.log(response);
           presenceSocket.emit("closeConnection", store.state.user);
           store.commit("resetUser"); //store.state.user = null;
           router.push("/login");
@@ -290,6 +286,7 @@ export default defineComponent({
           )
           .then((res: any) => {
             userFriendships.value.push(res.data);
+            chatSocket.emit("newFriendshipRequest", user);
           })
           .catch((err: any) =>
             store.dispatch("setErrorMessage", err.response.data.message)

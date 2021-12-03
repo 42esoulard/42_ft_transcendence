@@ -38,7 +38,6 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
       cookie.refresh_token,
     );
     if (!user) {
-      console.log('oups: token expired');
       throw new BadRequestException('token expired');
     }
     return user;

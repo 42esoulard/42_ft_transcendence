@@ -102,8 +102,8 @@ export default defineComponent({
             store.commit("updateUsername", username.value);
             ret = true;
           })
-          .catch((error_username) => {
-            console.log(error_username);
+          .catch((err) => {
+            store.dispatch("setErrorMessage", err.response.data.message)
           });
       return ret;
     };

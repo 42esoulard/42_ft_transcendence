@@ -73,12 +73,10 @@ export default defineComponent({
     );
 
     pongSocket.on("newGame", (game: Game) => {
-      console.log("new game received " + game.id);
       games.value.push(game);
     });
 
     pongSocket.on("endGame", (game: Game) => {
-      console.log("game ended " + game.id);
       games.value = games.value.filter((elem) => elem.id != game.id);
     });
 

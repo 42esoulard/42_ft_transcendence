@@ -98,10 +98,6 @@ export default defineComponent({
     const classicMode = ref(true);
     const challengee = { id: props.challengeeId, name: props.challengeeName };
 
-    onMounted(() => {
-      console.log(challengee);
-    });
-
     const store = useStore();
     const JoinQueue = () => {
       pongSocket.emit("joinGame", {
@@ -117,10 +113,9 @@ export default defineComponent({
 
     const alreadyInQueue = ref(false);
     pongSocket.on("alreadyInQueue", () => {
-      console.log("already in queue !");
       alreadyInQueue.value = true;
       setTimeout(() => {
-        router.push({ name: "Home" });
+        router.push({ name: "Pong" });
       }, 3000);
     });
 

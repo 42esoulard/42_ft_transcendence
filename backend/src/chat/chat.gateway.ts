@@ -109,6 +109,36 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.leave(channel);
   }
 
+  @SubscribeMessage('bannedUser')
+  handleBannedUser(client: Socket, user: User) {
+    client.broadcast.emit('bannedUser', user);
+  }
+
+  @SubscribeMessage('deletedUser')
+  handleDeletedUser(client: Socket, user: User) {
+    client.broadcast.emit('deletedUser', user);
+  }
+
+  @SubscribeMessage('selfdeletedUser')
+  handleSelfDeletedUser(client: Socket, user: User) {
+    client.broadcast.emit('selfdeletedUser', user);
+  }
+
+  @SubscribeMessage('demotedUser')
+  handleDemotedUser(client: Socket, user: User) {
+    client.broadcast.emit('demotedUser', user);
+  }
+
+  @SubscribeMessage('promotedUser')
+  handlePromotedUser(client: Socket, user: User) {
+    client.broadcast.emit('promotedUser', user);
+  }
+
+  @SubscribeMessage('newFriendshipRequest')
+  handleNewFriendshipRequest(client: Socket, adressee: User) {
+    client.broadcast.emit('newFriendshipRequest', adressee);
+  }
+
   @SubscribeMessage('leave')
   async onLeave(
     @MessageBody() user: string,

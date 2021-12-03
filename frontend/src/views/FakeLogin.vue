@@ -57,7 +57,7 @@ export default defineComponent({
             selectedUser.value = users.value[0].username;
           }
         })
-        .catch((err: any) => console.log("ERR", err.message));
+        .catch((err: any) => store.dispatch("setErrorMessage", err.response.data.message));
     });
 
     const Fakelogin = async () => {
@@ -70,7 +70,7 @@ export default defineComponent({
           sendConnection();
           router.push(`/`);
         })
-        .catch((error) => console.log(error));
+        .catch((error) => store.dispatch("setErrorMessage", error.response.data.message));
     };
 
     const getProfile = async () => {
@@ -80,8 +80,7 @@ export default defineComponent({
           store.state.user = response.data;
           store.dispatch("setPendingChallenges");
         })
-        .catch((err: Error) => {
-          console.log("ERROR GET PROFILE");
+        .catch((err) => {store.dispatch("setErrorMessage", err.response.data.message)
         });
     };
 
@@ -90,7 +89,6 @@ export default defineComponent({
     };
     presenceSocket.on("newUser", (user: User) => {
       store.commit("addOnlineUser", user);
-      console.log("onlineUsers", store.state.onlineUsers);
     });
 
     return { Fakelogin, users, selectedUser };

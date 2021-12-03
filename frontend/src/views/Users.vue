@@ -70,7 +70,6 @@
               </router-link>
             </td>
             <td class="users-list__interactions">
-              <i class="link link--neutral fas fa-envelope" />
               <button
                 v-if="userStatus(user) == 'online'"
                 class="link link--neutral"
@@ -124,15 +123,6 @@ export default defineComponent({
     const blockedlist = ref(false);
     const searchQuery = ref("");
 
-    // const isOnline = (user: User): boolean => {
-    //   if (user != undefined) {
-    //     const isonline = store.state.onlineUsers.find((u) => u.id === user.id);
-    //     console.log(isonline != undefined);
-    //     return isonline != undefined;
-    //   }
-    //   return false;
-    // };
-
     const userStatus = (user: User): "online" | "offline" | "ingame" => {
       if (user != undefined) {
         const inGameUser = store.state.inGameUsers.find(
@@ -151,6 +141,7 @@ export default defineComponent({
     };
 
     onMounted(() => {
+      store.state.toggleFriendship = false;
       userApi
         .getUsers()
         .then((res: any) => {

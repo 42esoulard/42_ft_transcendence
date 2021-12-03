@@ -69,7 +69,6 @@ export default defineComponent({
       if (
         store.state.inGameUsers.find((u) => u === store.state.user.username)
       ) {
-        console.log("COUCOU");
         return;
       }
       pongSocket.emit("cancelChallenge", store.state.user.username);
@@ -80,7 +79,6 @@ export default defineComponent({
     };
 
     pongSocket.on("challengeDeclined", () => {
-      console.log("declined");
       challengeStatus.value = "challenge has been declined!";
       setTimeout(() => {
         history.go();

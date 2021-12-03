@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   OnGatewayConnection,
@@ -130,10 +130,8 @@ export class PongGateway
   async handleAcceptChallenge(client: Socket, challengerName: string) {
     const challenge = this.pendingChallenges.get(challengerName);
     if (!challenge) {
-      this.logger.error('challenge does not exist');
-      return;
+      throw new BadRequestException('challenge does not exist');
     }
-    // this.logger.log('challenge accepted ', message)
     const player1 = new player(
       challenge.challengeeId,
       challenge.challengeeName,
@@ -153,8 +151,7 @@ export class PongGateway
   async handleDeclineChallenge(client: Socket, challengerName: string) {
     const challenge = this.pendingChallenges.get(challengerName);
     if (!challenge) {
-      this.logger.error('challenge does not exist');
-      return;
+      throw new BadRequestException('challenge does not exist');
     }
     challenge.challengerSocket.emit('challengeDeclined');
     this.pendingChallenges.delete(challengerName);
@@ -165,7 +162,6 @@ export class PongGateway
     client: Socket,
     message: joinGameMessage,
   ): Promise<void> {
-    // this.logger.log('client joined game. userID: ' + message.userId + ' gameMode: ' + message.gameMode)
 
     if (this.userIsAlreadyInQueue(client, message.userId)) return;
 
@@ -214,8 +210,7 @@ export class PongGateway
     this.logger.log('watchGame received');
     const game: pongGame = this.games.get(gameId);
     if (!game) {
-      this.logger.error('watchGame: game doesnt exist');
-      return;
+      throw new BadRequestException('game does not exist');
     }
     game.addSpectator(client);
   }
@@ -234,8 +229,7 @@ export class PongGateway
   handleEnlargeRacquet(client: Socket, room: string) {
     const game: pongGame = this.games.get(room);
     if (!game) {
-      this.logger.error('moveRacquet: game doesnt exist');
-      return;
+      throw new BadRequestException('game does not exist');
     }
     game.enlargeRacquet(client);
   }
@@ -247,8 +241,7 @@ export class PongGateway
   ): void {
     const game: pongGame = this.games.get(message.room);
     if (!game) {
-      this.logger.error('moveRacquet: game doesnt exist');
-      return;
+      throw new BadRequestException('game does not exist');
     }
     game.moveRacquet(client, message.text);
   }

@@ -214,7 +214,7 @@ import { User, Channel } from "sdk/typescript-axios-client-generated";
 import { io } from "socket.io-client";
 import { useUserApi, useChatApi, useAuthApi } from "@/plugins/api.plugin";
 import { useRouter } from "vue-router";
-import { presenceSocket } from "@/App.vue";
+import { chatSocket, presenceSocket } from "@/App.vue";
 import Confirm from "@/components/Confirm.vue";
 import Modal from "@/components/Modal.vue";
 
@@ -243,7 +243,6 @@ export default defineComponent({
     const isOnline = (user: User): boolean => {
       if (user != undefined) {
         const isonline = store.state.onlineUsers.find((u) => u.id === user.id);
-        console.log(isonline != undefined);
         return isonline != undefined;
       }
       return false;
@@ -309,7 +308,6 @@ export default defineComponent({
       user?: User,
       channel?: Channel
     ) => {
-      console.log("COUCOU", user, channel, action);
       if (user) target.value = user;
       else if (channel) target.value = channel;
       toggleConfirm.value = action;
@@ -389,6 +387,7 @@ export default defineComponent({
     });
 
     const deleteUser = async (user: User) => {
+      chatSocket.emit("deletedUser", user);
       await userApi
         .removeUser(user.id, { withCredentials: true })
         .then((res: any) => {
@@ -408,7 +407,6 @@ export default defineComponent({
       await chatApi
         .deleteChannel(channel.id, { withCredentials: true })
         .then((res: any) => {
-          console.log("channel deleted");
           channelList.value = channelList.value.filter(
             (chan: Channel) => chan.id != channel.id
           );
@@ -422,8 +420,8 @@ export default defineComponent({
       await userApi
         .promoteUser(user.id, { withCredentials: true })
         .then((res: any) => {
-          console.log("user promoted");
           user.role = "admin";
+          chatSocket.emit("promotedUser", user);
         })
         .catch((err: any) => {
           store.dispatch("setErrorMessage", err.response.data.message);
@@ -435,9 +433,9 @@ export default defineComponent({
         .demoteUser(user.id, { withCredentials: true })
         .then((res: any) => {
           user.role = "user";
+          chatSocket.emit("demotedUser", user);
         })
         .catch((err: any) => {
-          console.log("USR", user, "SELF", store.state.user);
           store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
@@ -446,7 +444,6 @@ export default defineComponent({
       await userApi
         .changeOwner(user.id, { withCredentials: true })
         .then((res: any) => {
-          console.log("owner changed");
           user.role = "owner";
           logOut();
         })
@@ -459,7 +456,6 @@ export default defineComponent({
       authApi
         .logout({ withCredentials: true })
         .then((response) => {
-          console.log(response);
           presenceSocket.emit("closeConnection", store.state.user);
           store.commit("resetUser"); //store.state.user = null;
           router.push("/login");
@@ -473,12 +469,12 @@ export default defineComponent({
       await userApi
         .banUser(user.id, { withCredentials: true })
         .then((res: any) => {
-          console.log("user banned");
           bannedList.value.push(user);
           userList.value = userList.value.filter(
             (usr: User) => usr.id != user.id
           );
           user.role == "user";
+          chatSocket.emit("bannedUser", user);
         })
         .catch((err: any) => {
           store.dispatch("setErrorMessage", err.message);
@@ -489,7 +485,6 @@ export default defineComponent({
       await userApi
         .unbanUser(user.id, { withCredentials: true })
         .then((res: any) => {
-          console.log("user unbanned");
           userList.value.push(user);
           bannedList.value = bannedList.value.filter(
             (usr: User) => usr.id != user.id

@@ -12,7 +12,7 @@
         <SideBarLink to="/pong/watch" icon="fas fa-play-circle"
           >live</SideBarLink
         >
-        <SideBarLink v-if="user.role != 'user'" to="/admin" icon="fas fa-crown"
+        <SideBarLink v-if="role != 'user'" :key="role" to="/admin" icon="fas fa-crown"
           >admin</SideBarLink
         >
         <SideBarLink to="/adduser" icon="fas fa-toolbox">add</SideBarLink>
@@ -38,6 +38,7 @@ export default {
     });
     return {
       user: computed(() => store.state.user),
+      role: computed(() => store.state.user.role),
       userProfile,
     };
   },

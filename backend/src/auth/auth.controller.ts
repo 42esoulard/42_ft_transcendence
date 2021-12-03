@@ -107,7 +107,6 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log('User:', req.user);
     let access_token: string;
     if (req.user.two_fa_enabled) {
       access_token = await this.authService.generateAccessToken(req.user, true);
@@ -184,8 +183,6 @@ export class AuthController {
     @Req() request: Request,
     @Body() { code: twoFACode }: TwoFactorDto,
   ) {
-    console.log('twoFACode', twoFACode);
-    console.log('USER:', request.user);
 
     const isCodeValid = this.authService.isTwoFACodeValid(
       twoFACode,
@@ -231,7 +228,6 @@ export class AuthController {
     @Req() request: Request,
     @Body() { code: twoFACode }: TwoFactorDto,
   ) {
-    console.log('twoFACode', twoFACode);
     const isCodeValid = this.authService.isTwoFACodeValid(
       twoFACode,
       request.user,
@@ -260,7 +256,6 @@ export class AuthController {
         sameSite: true,
       },
     );
-    console.log('authenticate', access_token);
     return request.user;
   }
 }

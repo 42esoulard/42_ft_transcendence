@@ -21,10 +21,10 @@ import Toast from "@/components/Toast.vue";
 import { io } from "socket.io-client";
 import { useStore } from "@/store";
 import { computed, onUpdated } from "vue";
-import { Relationship, User } from "sdk/typescript-axios-client-generated";
+import { User } from "sdk/typescript-axios-client-generated";
 import { challengeExport, challengeMessage, gameMode } from "./types/PongGame";
 import { useRouter } from "vue-router";
-
+import { useAuthApi } from "@/plugins/api.plugin";
 export const pongSocket = io("http://localhost:3000/pong");
 export const presenceSocket = io("http://localhost:3000/presence");
 export const chatSocket = io("http://localhost:3000/chat");
@@ -33,6 +33,8 @@ export default {
   components: { SideBar, Header, Toast },
   setup() {
     const store = useStore();
+    const router = useRouter();
+    const authApi = useAuthApi();
 
     onUpdated(() => {
       if (store.state.user.id != 0) {
@@ -59,19 +61,14 @@ export default {
 
     pongSocket.on("newInGameUsers", (players: string[]) => {
       store.commit("addInGameUsers", players);
-      console.log("new Ingame Users", players);
-      console.log("inGameUsers", store.state.inGameUsers);
     });
 
     pongSocket.on("removeInGameUsers", (players: string[]) => {
       store.commit("removeInGameUsers", players);
-      console.log("removed Ingame Users", players);
-      console.log("inGameUsers", store.state.inGameUsers);
     });
 
     pongSocket.on("allPlayingUsers", (playersUserNames: string[]) => {
       store.commit("allPlayingUsers", playersUserNames);
-      console.log("allPlayingUsers", store.state.inGameUsers);
     });
 
     pongSocket.on(
@@ -96,14 +93,7 @@ export default {
       }
     );
 
-    const router = useRouter();
     pongSocket.on("challengeRequest", (message: challengeMessage) => {
-      console.log(
-        "challenge received from " +
-          message.challengerName +
-          " to " +
-          message.challengeeName
-      );
       if (message.challengeeId === store.state.user.id) {
         store.commit("addChallenge", {
           challenger: message.challengerName,
@@ -135,6 +125,61 @@ export default {
       }
     });
 
+    chatSocket.on("bannedUser", (user: User) => {
+      if (store.state.user.id == user.id) {
+        logOut();
+      }
+      store.commit("removeOnlineUser", user.id);
+    });
+
+    chatSocket.on("deletedUser", (user: User) => {
+      if (store.state.user.id == user.id) {
+        logOut();
+      }
+      store.commit("removeOnlineUser", user.id);
+    });
+
+    chatSocket.on("selfdeletedUser", (user: User) => {
+      store.commit("removeOnlineUser", user.id);
+    });
+
+    chatSocket.on("demotedUser", (user: User) => {
+      if (store.state.user.id == user.id) {
+        store.state.user.role = "user";
+        router.push("/pong");
+      }
+    });
+
+    chatSocket.on("promotedUser", (user: User) => {
+      if (store.state.user.id == user.id) {
+        store.state.user.role = "admin";
+      }
+    });
+
+    pongSocket.on("challengeRequest", (message: challengeMessage) => {
+      if (message.challengeeId === store.state.user.id) {
+        store.commit("addChallenge", {
+          challenger: message.challengerName,
+          expiry_date: message.expiry_date,
+        });
+        store.dispatch(
+          "setChallenge",
+          `${message.challengerName} challenged you! [PONG-LINK]`
+        );
+      }
+    });
+
+    chatSocket.on("newFriendshipRequest", (adressee: User) => {
+      if (store.state.user.id == adressee.id) {
+        store.state.toggleFriendship = true;
+        store.dispatch(
+          "setMessage",
+          `${adressee.username} sent you a friend request!`
+        );
+      }
+
+    });
+
     chatSocket.on(
       "chat-action",
       (action: string, userId: number, chanName: string) => {
@@ -152,6 +197,19 @@ export default {
         store.dispatch("setMessage", message);
       }
     });
+
+    const logOut = () => {
+      authApi
+        .logout({ withCredentials: true })
+        .then((response) => {
+          presenceSocket.emit("closeConnection", store.state.user);
+          store.commit("resetUser"); //store.state.user = null;
+          router.push("/login");
+        })
+        .catch((err: any) =>
+          store.dispatch("setErrorMessage", err.response.data.message)
+        );
+    };
 
     return {
       user: computed(() => store.state.user),

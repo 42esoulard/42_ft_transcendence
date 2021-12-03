@@ -67,6 +67,7 @@ import { defineComponent, inject, ref, computed, onMounted } from "vue";
 import moment from "moment";
 import { GameUser, Game } from "sdk/typescript-axios-client-generated";
 import { useUserApi, usePongApi } from "@/plugins/api.plugin";
+import { store } from "@/store";
 
 export default defineComponent({
   name: "Stats",
@@ -94,7 +95,7 @@ export default defineComponent({
           gameHistory.value.reverse();
         })
         .catch((err: any) => {
-          console.log("not found");
+          store.dispatch("setErrorMessage", err.response.data.message)
         });
     });
 
