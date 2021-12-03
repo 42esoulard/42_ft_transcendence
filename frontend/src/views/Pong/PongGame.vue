@@ -113,7 +113,7 @@
 
 <script lang="ts">
 import { pongSocket } from "@/App.vue";
-import { computed, defineComponent, onMounted, PropType, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import getDraw from "@/composables/draw";
 import {
@@ -127,14 +127,12 @@ import {
 export default defineComponent({
   props: {
     gameMode: { type: String as () => gameMode, required: true },
-    // ou {type: String as PropType<gameMode>}
-    // cf https://frontendsociety.com/using-a-typescript-interfaces-and-types-as-a-prop-type-in-vuejs-508ab3f83480
     userType: { type: String as () => userType, required: true },
     player1UserName: { type: String, required: true },
     player2UserName: { type: String, required: true },
     room: { type: String, required: true },
   },
-  inheritAttrs: false, // we dont need it, and not setting it to false a warning: "extraneous non prop attributes (authorized) were passed to component but could not be automatically inherited..."
+  inheritAttrs: false,
 
   setup(props) {
     const {
@@ -151,7 +149,7 @@ export default defineComponent({
       initCanvas,
       draw,
     } = getDraw(props.gameMode);
-    const animations = ref(true);
+    const animations = ref(false);
 
     // lifecycle hooks
     onMounted(() => {
@@ -264,7 +262,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss">
-@import "../../../sass/main.scss";
-</style>

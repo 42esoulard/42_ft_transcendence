@@ -392,7 +392,6 @@ export default defineComponent({
       await userApi
         .removeUser(user.id, { withCredentials: true })
         .then((res: any) => {
-          console.log("account deleted");
           userList.value = userList.value.filter(
             (usr: User) => usr.id != user.id
           );
@@ -435,10 +434,10 @@ export default defineComponent({
       await userApi
         .demoteUser(user.id, { withCredentials: true })
         .then((res: any) => {
-          console.log("user demoted");
           user.role = "user";
         })
         .catch((err: any) => {
+          console.log("USR", user, "SELF", store.state.user);
           store.dispatch("setErrorMessage", err.response.data.message);
         });
     };

@@ -18,7 +18,7 @@ import { UsersService } from './users.service';
 import { User } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
-import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   saveImageToStorage,
@@ -111,8 +111,9 @@ export class UsersController {
   @Get('delete/:id')
   async removeUser(@Param('id') id: number, @Req() request: Request) {
     const currentUser = await this.userService.getUserbyId(id);
+    console.log("REQ", request.user.id, "USR", id)
     if (!currentUser) throw new BadRequestException("user doesn't exist");
-    if (request.user.id !== id) {
+    if (request.user.id != id) {
       const reqUser = await this.userService.getUserbyId(request.user.id);
       if (reqUser && reqUser.role == 'user') {
         throw new ForbiddenException('not authorized to delete other users');

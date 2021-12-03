@@ -69,6 +69,7 @@ export class AuthController {
     } else {
       return {
         message: 'Logged in successfully',
+        username: req.user.username,
         newlyCreated: true,
       };
     }

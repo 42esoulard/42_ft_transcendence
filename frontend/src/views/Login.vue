@@ -83,10 +83,12 @@ export default defineComponent({
               isTwoFactorEnabled.value = true;
             } else if (res.status === 200) {
               if (res.data.newlyCreated == true) {
+                console.log(res.data);
                 store.commit("setFirstTimeConnect", true);
-                router.push(`/profile/${store.state.user.username}`);
+                router.push(`/profile/${res.data.username}`);
               }
-              router.push("/");
+              else
+                router.push("/");
             }
           })
           .catch((err: any) =>
