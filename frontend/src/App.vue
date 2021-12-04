@@ -125,46 +125,32 @@ export default {
       }
     });
 
-    chatSocket.on("bannedUser", (user: User) => {
-      if (store.state.user.id == user.id) {
-        logOut();
-      }
-      store.commit("removeOnlineUser", user.id);
-    });
+    chatSocket.on("profile-dm", (recipient: User) => {
+      router.push({
+        name: "Chat",
+      });
+      console.log("in app recipient", recipient)
+      chatSocket.emit("create-direct-message", recipient);
+    })
 
-    chatSocket.on("deletedUser", (user: User) => {
-      if (store.state.user.id == user.id) {
-        logOut();
-      }
-      store.commit("removeOnlineUser", user.id);
-    });
-
-    chatSocket.on("selfdeletedUser", (user: User) => {
-      store.commit("removeOnlineUser", user.id);
-    });
-
-    chatSocket.on("demotedUser", (user: User) => {
-      if (store.state.user.id == user.id) {
-        store.state.user.role = "user";
-        router.push("/pong");
+    chatSocket.on('chat-action', (action: string, userId: number, chanName: string) => {
+      if (store.state.user.id == userId) {
+        store.dispatch("setMessage", "You have been " + action + " [" + chanName.substring(0, 15) + "]");
       }
     });
 
-    chatSocket.on("promotedUser", (user: User) => {
-      if (store.state.user.id == user.id) {
-        store.state.user.role = "admin";
-      }
-    });
+    chatSocket.on("profile-dm", (recipient: User) => {
+      router.push({
+        name: "Chat",
+      });
+      console.log("in app recipient", recipient)
+      chatSocket.emit("create-direct-message", recipient);
+    })
 
-    chatSocket.on("newFriendshipRequest", (adressee: User) => {
-      if (store.state.user.id == adressee.id) {
-        store.state.toggleFriendship = true;
-        store.dispatch(
-          "setMessage",
-          `${adressee.username} sent you a friend request!`
-        );
+    chatSocket.on('chat-action', (action: string, userId: number, chanName: string) => {
+      if (store.state.user.id == userId) {
+        store.dispatch("setMessage", "You have been " + action + " [" + chanName.substring(0, 15) + "]");
       }
-
     });
 
     chatSocket.on(

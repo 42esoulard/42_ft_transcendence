@@ -56,6 +56,12 @@
     >
       <i class="upload-icon fas fa-user-times" /> cancel invitation
     </button>
+    <button 
+      v-if="user.id != self.id" 
+      @click="sendDM(user)"
+      class="button button--primary">
+      <i class="upload-icon fas fa-envelope" /> send message
+    </button>
     <button
       v-if="user.id != self.id && userStatus == 'online'"
       @click="challengeUser"
@@ -454,6 +460,10 @@ export default defineComponent({
         deleteAccount();
       }
     };
+    
+    const sendDM = (recipient: User) => {
+      chatSocket.emit("profile-dm", recipient)
+    }
 
     return {
       user,
@@ -479,6 +489,7 @@ export default defineComponent({
       target,
       executeAction,
       toggleModalBis,
+      sendDM,
     };
   },
 });
