@@ -156,19 +156,6 @@ export default {
       }
     });
 
-    pongSocket.on("challengeRequest", (message: challengeMessage) => {
-      if (message.challengeeId === store.state.user.id) {
-        store.commit("addChallenge", {
-          challenger: message.challengerName,
-          expiry_date: message.expiry_date,
-        });
-        store.dispatch(
-          "setChallenge",
-          `${message.challengerName} challenged you! [PONG-LINK]`
-        );
-      }
-    });
-
     chatSocket.on("newFriendshipRequest", (adressee: User) => {
       if (store.state.user.id == adressee.id) {
         store.state.toggleFriendship = true;
