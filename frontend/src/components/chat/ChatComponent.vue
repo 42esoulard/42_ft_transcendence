@@ -582,6 +582,10 @@ export const ChatComponent = defineComponent({
         .catch(err => console.log("Caught error:", err.response.data.message));
     };
 
+    chatSocket.on("create-direct-message", (recipient: User) => {
+      directMessage(recipient);
+    })
+
     const directMessage = (recipient: User) => {
       const newChannel = api
         .saveChannel(

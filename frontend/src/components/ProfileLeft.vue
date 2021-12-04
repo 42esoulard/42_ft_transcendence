@@ -56,7 +56,10 @@
     >
       <i class="upload-icon fas fa-user-times" /> cancel invitation
     </button>
-    <button v-if="user.id != self.id" class="button button--primary">
+    <button 
+      v-if="user.id != self.id" 
+      @click="sendDM(user)"
+      class="button button--primary">
       <i class="upload-icon fas fa-envelope" /> send message
     </button>
     <button
@@ -136,7 +139,7 @@ import { useStore } from "@/store";
 import InitTwoFactor from "@/components/InitTwoFactor.vue";
 import EditUser from "@/components/EditUser.vue";
 import Modal from "@/components/Modal.vue";
-import { presenceSocket } from "@/App.vue";
+import { presenceSocket, chatSocket } from "@/App.vue";
 import { useRouter } from "vue-router";
 
 export default defineComponent({
@@ -401,6 +404,10 @@ export default defineComponent({
       });
     };
 
+    const sendDM = (recipient: User) => {
+      chatSocket.emit("profile-dm", recipient)
+    }
+
     return {
       user,
       addFriend,
@@ -420,6 +427,7 @@ export default defineComponent({
       unblock,
       deleteAccount,
       challengeUser,
+      sendDM,
     };
   },
 });

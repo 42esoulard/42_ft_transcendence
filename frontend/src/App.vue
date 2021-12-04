@@ -137,6 +137,14 @@ export default {
       }
     });
 
+    chatSocket.on("profile-dm", (recipient: User) => {
+      router.push({
+        name: "Chat",
+      });
+      console.log("in app recipient", recipient)
+      chatSocket.emit("create-direct-message", recipient);
+    })
+
     chatSocket.on('chat-action', (action: string, userId: number, chanName: string) => {
       if (store.state.user.id == userId) {
         store.dispatch("setMessage", "You have been " + action + " [" + chanName.substring(0, 15) + "]");

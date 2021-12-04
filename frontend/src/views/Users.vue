@@ -70,7 +70,13 @@
               </router-link>
             </td>
             <td class="users-list__interactions">
-              <i class="link link--neutral fas fa-envelope" />
+              <button
+                class="link link--neutral"
+                @click="sendDM(user)"
+                title="dm"
+              >
+                <i class="link link--neutral fas fa-envelope" />
+              </button>
               <button
                 v-if="userStatus(user) == 'online'"
                 class="link link--neutral"
@@ -106,6 +112,7 @@ import { User, Relationship } from "sdk/typescript-axios-client-generated";
 import { useStore } from "@/store";
 import { useUserApi, useRelationshipApi } from "@/plugins/api.plugin";
 import { useRouter } from "vue-router";
+import { chatSocket } from "@/App.vue";
 import Pending from "../components/Pending.vue";
 
 export default defineComponent({
@@ -263,6 +270,10 @@ export default defineComponent({
       });
     };
 
+    const sendDM = (recipient: User) => {
+      chatSocket.emit("profile-dm", recipient)
+    }
+
     return {
       userList,
       toggleFriends,
@@ -275,6 +286,7 @@ export default defineComponent({
       searchQuery,
       userStatus,
       challengeUser,
+      sendDM,
     };
   },
 });
