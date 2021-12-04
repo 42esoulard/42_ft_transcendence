@@ -150,9 +150,9 @@ export default {
       }
     });
 
-    chatSocket.on("promotedUser", (user: User) => {
-      if (store.state.user.id == user.id) {
-        store.state.user.role = "admin";
+    chatSocket.on('chat-action', (action: string, userId: number, chanName: string) => {
+      if (store.state.user.id == userId) {
+        store.dispatch("setMessage", "You have been " + action + " [" + chanName.substring(0, 15) + "]");
       }
     });
 
