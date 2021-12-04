@@ -622,6 +622,10 @@ export const ChatComponent = defineComponent({
         );
     };
 
+    chatSocket.on("create-direct-message", (recipient: User) => {
+      directMessage(recipient);
+    })
+
     const directMessage = (recipient: User) => {
       const newChannel = api
         .saveChannel(
