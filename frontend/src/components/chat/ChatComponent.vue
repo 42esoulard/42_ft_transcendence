@@ -817,9 +817,11 @@ export const ChatComponent = defineComponent({
               store.state.chatNotification = true;
               updateChannelsList();
             })
-            .catch((err) =>
-              store.dispatch("setErrorMessage", err.response.data.message)
-            );
+            .catch((err) => {
+              if (err && err.response.data.message !== 'Not a member of this channel') {
+                store.dispatch("setErrorMessage", err.response.data.message);
+              }
+            });
         }
       });
     });
