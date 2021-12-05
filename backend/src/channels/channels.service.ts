@@ -405,23 +405,27 @@ export class ChannelsService {
       newChannel.password = await bcrypt.hash(channelDto.password, salt); //must be crypted
     }
 
-    await this.channelsRepository
-      .save(newChannel)
-      .then((res) => {
-        return res;
-      })
-      .catch(() => {
-        throw new BadRequestException(
-          'Channel did not comply database requirements',
-        );
-      });
-    return await this.channelMemberService.createChannelMember(
-      newChannel,
-      owner,
-      true,
-      true,
-      channelDto.notification,
-    );
+    return await this.getChannelByName(channelDto.name).then(async (res) => {
+      if (res) {
+        throw new BadRequestException('Channel name already exists!');
+      }
+      return await this.channelsRepository
+        .save(newChannel)
+        .then(async (res) => {
+          return await this.channelMemberService.createChannelMember(
+            res,
+            owner,
+            true,
+            true,
+            channelDto.notification,
+          );
+        })
+        .catch(() => {
+          throw new BadRequestException(
+            'Channel did not comply database requirements',
+          );
+        });
+    });
   }
 
   async muteBanMember(
