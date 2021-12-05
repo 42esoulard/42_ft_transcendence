@@ -205,6 +205,20 @@ export class ChannelsController {
     return owner;
   }
 
+  @Post('/dm')
+  @UseGuards(JwtTwoFactorGuard)
+  async saveDmChannel(
+    @Body() newChannel: CreateChannelDto,
+  ): Promise<ChannelMember> {
+    const owner: ChannelMember = await this.channelService.saveDmChannel(
+      newChannel,
+    );
+    if (owner == undefined) {
+      throw new NotFoundException('Failed to create channel');
+    }
+    return owner;
+  }
+
   @Get('/chat-message/:status/:chanId')
   @UseGuards(JwtTwoFactorGuard)
   async setNewMessage(

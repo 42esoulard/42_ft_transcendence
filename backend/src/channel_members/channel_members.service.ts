@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { ChannelMembers } from './entity/channel_members.entity';
-import * as bcrypt from 'bcrypt';
 import { Users } from 'src/users/entity/users.entity';
 import { Channels } from 'src/channels/entity/channels.entity';
 import { ChannelMember } from './interfaces/channel_member.interface';
@@ -15,11 +14,17 @@ export class ChannelMembersService {
   ) {}
 
   async getUserChannels(user: Users): Promise<ChannelMembers[]> {
-    return await this.channelMembersRepository.find({
-      where: { member: user },
-      relations: ['channel', 'member'],
-      order: { id: 'ASC' },
-    });
+    return await this.channelMembersRepository
+      .find({
+        where: { member: user },
+        relations: ['channel', 'member'],
+      })
+      .then((res) => {
+        if (res == undefined) {
+          return undefined;
+        }
+        return res.sort((a, b) => a.channel.id - b.channel.id);
+      });
   }
 
   async getChannelMember(

@@ -330,6 +330,13 @@ export const ChatComponent = defineComponent({
     chatSocket.emit("leave", "a user");
   },
   setup() {
+    chatSocket.off("chat-message-on");
+    chatSocket.off("created-channel");
+    chatSocket.off("join-channel");
+    chatSocket.off("update-channels");
+    chatSocket.off("create-direct-message");
+    chatSocket.off("init-direct-message");
+
     const api = new ChatApi();
     const relApi = new RelationshipApi();
     const store = useStore();
@@ -606,19 +613,20 @@ export const ChatComponent = defineComponent({
         .leaveChannel("self", activeChannel.value!.id, {
           withCredentials: true,
         })
-        .then((res) => {
+        .then(async (res) => {
           store.dispatch(
             "setMessage",
             "You're no longer a member of channel [" +
               name.substring(0, 15) +
               "]"
           );
-          updateChannelsList();
-          switchChannel(joinedChannels.value[0]);
+          await switchChannel(joinedChannels.value[0])
+          .then(() => updateChannelsList());
           chatSocket.emit("update-channels");
         })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
+        .catch((err) => {
+          console.log("in leave catch!!")
+          store.dispatch("setErrorMessage", err.response.data.message)}
         );
     };
 
@@ -626,52 +634,42 @@ export const ChatComponent = defineComponent({
       directMessage(recipient);
     })
 
-    const directMessage = (recipient: User) => {
-      const newChannel = api
-        .saveChannel(
-          {
-            name: user.value.username + " to " + recipient.username,
-            owner_id: user.value.id,
-            type: "private",
-            notification: true,
-            password: "",
-          },
-          { withCredentials: true }
-        )
-        .then(async (cm) => {
+    const directMessage = async (recipient: User) => {
+      await api.saveDmChannel(
+        {
+          name: user.value.username + " to " + recipient.username,
+          owner_id: user.value.id,
+          type: "private",
+          notification: true,
+          password: "",
+          recipient_id: recipient.id,
+        }, {
+          withCredentials: true,
+        }
+      ).then(async (cm) => {
           updateChannelsList();
           activeChannel.value = cm.data;
           isMember.value = true;
-          getMessagesUpdate(cm.data.channel.id);
+          newMessage.value = recipient.username + " has been added";
+          send();
           store.dispatch(
             "setMessage",
             "You're now a member of channel [" +
               cm.data.channel.name.substring(0, 15) +
               "]"
           );
-          await api
-            .joinChannel("dm", cm.data.channel.id, recipient.id, {
-              withCredentials: true,
-            })
-            .then((res) => {
-              chatSocket.emit("update-channels", cm.data);
-              chatSocket.emit(
-                "chat-action",
-                "added to",
-                recipient.id,
-                cm.data.channel.name
-              );
-              newMessage.value = res.data.member.username + " has been added";
-              send();
-              return res;
-            })
-            .catch((err) =>
-              store.dispatch("setErrorMessage", err.response.data.message)
-            );
+          chatSocket.emit("update-channels", cm.data);
+          chatSocket.emit(
+            "chat-action",
+            "added to",
+            recipient.id,
+            cm.data.channel.name
+          );    
         })
         .catch((err) => {
-          store.dispatch("setMessage", "This DM channel already exists!");
-          console.log("Caught error: This DM channel already exists!");
+          if (err) {
+            store.dispatch("setErrorMessage", err.response.data.message);
+          }
         });
     };
 
@@ -845,6 +843,8 @@ export const ChatComponent = defineComponent({
       chatSocket.off("created-channel");
       chatSocket.off("join-channel");
       chatSocket.off("update-channels");
+      chatSocket.off("create-direct-message");
+      chatSocket.off("init-direct-message");
     };
 
     return {

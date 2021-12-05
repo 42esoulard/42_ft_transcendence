@@ -269,7 +269,7 @@ export default defineComponent({
     };
 
     const sendDM = (recipient: User) => {
-      chatSocket.emit("profile-dm", recipient)
+      chatSocket.emit("userlist-dm", recipient)
     }
 
     return {

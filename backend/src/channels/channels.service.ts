@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { Channel } from './interfaces/channel.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
@@ -61,6 +65,13 @@ export class ChannelsService {
       where: { name: name },
     });
     return channel;
+  }
+
+  async getChannelsByName(name: string): Promise<Channel[]> {
+    const channels = await this.channelsRepository.find({
+      where: { name: name },
+    });
+    return channels;
   }
 
   async getUser(user_id: number): Promise<Users> {
@@ -390,6 +401,86 @@ export class ChannelsService {
           'Channel did not comply database requirements',
         );
       });
+  }
+
+  async saveDmChannel(dmInfo: CreateChannelDto): Promise<ChannelMember> {
+    if (dmInfo.owner_id == dmInfo.recipient_id) {
+      throw new BadRequestException("You can't dm yourself!");
+    }
+    const split = dmInfo.name.split(' ');
+    if (split.length !== 3) {
+      throw new BadRequestException('Bad dm name format!');
+    }
+
+    return await this.getChannelsByName(dmInfo.name).then(async (res) => {
+      if (res) {
+        res.forEach((chan) => {
+          if (
+            chan.channel_members.length == 2 &&
+            ((chan.channel_members[0].member.id == dmInfo.owner_id &&
+              chan.channel_members[1].member.id == dmInfo.recipient_id) ||
+              (chan.channel_members[1].member.id == dmInfo.owner_id &&
+                chan.channel_members[0].member.id == dmInfo.recipient_id))
+          ) {
+            throw new BadRequestException('DM channel already exists!');
+          }
+        });
+      }
+      const altName: string = split[2] + ' ' + split[1] + ' ' + split[0];
+      return await this.getChannelsByName(altName).then(async (res) => {
+        if (res) {
+          res.forEach((chan) => {
+            if (
+              chan.channel_members.length == 2 &&
+              ((chan.channel_members[0].member.id == dmInfo.owner_id &&
+                chan.channel_members[1].member.id == dmInfo.recipient_id) ||
+                (chan.channel_members[1].member.id == dmInfo.owner_id &&
+                  chan.channel_members[0].member.id == dmInfo.recipient_id))
+            ) {
+              throw new BadRequestException('DM channel already exists!');
+            }
+          });
+        }
+
+        return await this.checkBlocked(
+          dmInfo.owner_id,
+          dmInfo.recipient_id,
+        ).then(async (res) => {
+          if (res == true) {
+            throw new ForbiddenException(
+              'Failed to create DM: this user has blocked you',
+            );
+          }
+          const recipient = await this.userService.getUserbyId(
+            dmInfo.recipient_id,
+          );
+          const owner = await this.userService.getUserbyId(dmInfo.owner_id);
+          return await this.channelsRepository
+            .save(dmInfo)
+            .then(async (res) => {
+              await this.channelMemberService.createChannelMember(
+                res,
+                recipient,
+                true,
+                true,
+                dmInfo.notification,
+              );
+              return await this.channelMemberService.createChannelMember(
+                res,
+                owner,
+                true,
+                true,
+                dmInfo.notification,
+              );
+            })
+            .catch(() => {
+              throw new BadRequestException(
+                'Channel did not comply database requirements',
+              );
+            });
+        });
+      });
+    });
   }
 
   /**

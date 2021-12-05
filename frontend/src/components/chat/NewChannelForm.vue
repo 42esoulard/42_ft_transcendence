@@ -230,6 +230,7 @@ export default defineComponent({
             type: channelType.value,
             password: channelPassword.value,
             notification: false,
+            recipient_id: 0,
           },
           { withCredentials: true }
         )

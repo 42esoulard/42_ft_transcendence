@@ -24,7 +24,7 @@ services:
     env_file:
     - credentials.env
     - game.env
-    command: sh -c "rm -rf ./dist && npm install --loglevel=error && npm run start:dev:db:seed && npm run start:dev"
+    command: sh -c "rm -rf ./dist && npm install --loglevel=error && npm run start:dev:db:seed && npm run start:dev:db:seedChannels && npm run start:dev"
     # command: sh -c "npm install && npm run start:dev:db:seed && npm run start"
     depends_on:
       - postgres

@@ -84,11 +84,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     client.on('profile-dm', (recipient: User) => {
       if (recipient) {
-        client.emit('profile-dm', recipient);
+        client.emit('app-dm', recipient);
       }
     });
 
-    client.on('create-direct-message', (recipient: User) => {
+    client.on('userlist-dm', (recipient: User) => {
+      if (recipient) {
+        client.emit('app-dm', recipient);
+      }
+    });
+
+    client.on('init-direct-message', (recipient: User) => {
       if (recipient) {
         client.emit('create-direct-message', recipient);
       }

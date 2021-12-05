@@ -143,7 +143,8 @@
                 (!activeChannel.is_owner &&
                   user.role == 'user' &&
                   (cm.is_owner || cm.is_admin) &&
-                  activeChannel.id != cm.id)
+                  activeChannel.id != cm.id) ||
+                (activeChannel.is_owner && cm.is_owner)
               "
               class="chat-channels__tag-container"
             >
