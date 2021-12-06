@@ -40,7 +40,7 @@ export default defineComponent({
         })
         .then((res: any) => (responseData.value = res.data))
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };

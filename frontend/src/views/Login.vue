@@ -91,7 +91,7 @@ export default defineComponent({
             }
           })
           .catch((err: any) => {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
 
@@ -103,7 +103,7 @@ export default defineComponent({
               if (res.data.length > 0) store.state.toggleFriendship = true;
             })
             .catch((err: any) => {
-              if (err.response.data)
+              if (err && err.response)
                 store.dispatch("setErrorMessage", err.response.data.message);
             });
         }
@@ -115,21 +115,21 @@ export default defineComponent({
         .getUsers()
         .then((res: any) => (nbUsers.value = res.data.length))
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
       pongApi
         .getAll()
         .then((res: any) => (nbGames.value = res.data.length))
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
       pongApi
         .getOnGoingGames()
         .then((res: any) => (nbOngoing.value = res.data.length))
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     });
@@ -142,7 +142,7 @@ export default defineComponent({
         })
         .catch((err) => {
           {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           }
         });

@@ -215,14 +215,14 @@ export default defineComponent({
           .getAllUserFriendships(store.state.user.id)
           .then((res: any) => (userFriendships.value = res.data))
           .catch((err: any) => {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
         relationshipApi
           .getUserBlocked(store.state.user.id)
           .then((res: any) => (userBlocked.value = res.data))
           .catch((err: any) => {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
       }
@@ -236,7 +236,7 @@ export default defineComponent({
           store.dispatch("setMessage", res.data.message);
         })
         .catch((err) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
@@ -265,7 +265,7 @@ export default defineComponent({
           })
           .then((res: any) => {})
           .catch((err: any) => {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
       }
@@ -280,7 +280,7 @@ export default defineComponent({
           router.push("/login");
         })
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
@@ -302,7 +302,7 @@ export default defineComponent({
             chatSocket.emit("newFriendshipRequest", user);
           })
           .catch((err: any) => {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
       }
@@ -334,7 +334,7 @@ export default defineComponent({
             }
           })
           .catch((err: any) => {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
       }
@@ -360,7 +360,7 @@ export default defineComponent({
             }
           })
           .catch((err: any) => {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
       }
@@ -412,7 +412,7 @@ export default defineComponent({
           )
           .then((res: any) => window.location.reload())
           .catch((err: any) => {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
       }
@@ -432,7 +432,7 @@ export default defineComponent({
           )
           .then((res: any) => window.location.reload())
           .catch((err: any) => {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
       }

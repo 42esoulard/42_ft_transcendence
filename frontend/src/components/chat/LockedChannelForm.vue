@@ -70,7 +70,7 @@ export default defineComponent({
           }
         })
         .catch((err) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };

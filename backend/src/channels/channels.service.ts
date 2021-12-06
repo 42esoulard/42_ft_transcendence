@@ -98,7 +98,7 @@ export class ChannelsService {
   }
 
   async getNewNotification(data: Messages, userId: number): Promise<boolean> {
-    let cms: ChannelMember = await this.getChannelMember(
+    const cms: ChannelMember = await this.getChannelMember(
       data.channel.id,
       userId,
     );
@@ -106,7 +106,7 @@ export class ChannelsService {
       return false;
     }
 
-    await this.relationshipService
+    return await this.relationshipService
       .getBlockedByUser(userId)
       .then(async (blocked) => {
         if (
@@ -116,12 +116,12 @@ export class ChannelsService {
         }
         return await this.channelMemberService
           .setNewMessage(true, cms.id)
-          .then((res) => {
+          .then(() => {
             return true;
           })
-          .catch((err) =>
-            console.log('Caught error:', err.response.data.message),
-          );
+          .catch((err) => {
+            return false;
+          });
       });
   }
 

@@ -40,7 +40,7 @@ export default defineComponent({
           userRef.value = res.data;
         })
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
           router.push("/notfound");
         });

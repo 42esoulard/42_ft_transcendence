@@ -261,7 +261,7 @@ export default defineComponent({
           userList.value.sort((a, b) => a.username.localeCompare(b.username));
         })
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
       userApi
@@ -271,7 +271,7 @@ export default defineComponent({
           bannedList.value.sort((a, b) => a.username.localeCompare(b.username));
         })
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
       chatApi
@@ -281,7 +281,7 @@ export default defineComponent({
           channelList.value.sort((a, b) => a.name.localeCompare(b.name));
         })
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     });
@@ -403,7 +403,7 @@ export default defineComponent({
         })
         .catch((err: any) => {
           {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           }
         });
@@ -419,7 +419,7 @@ export default defineComponent({
         })
         .catch((err: any) => {
           {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           }
         });
@@ -434,7 +434,7 @@ export default defineComponent({
         })
         .catch((err: any) => {
           {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           }
         });
@@ -449,7 +449,7 @@ export default defineComponent({
         })
         .catch((err: any) => {
           {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           }
         });
@@ -464,7 +464,7 @@ export default defineComponent({
         })
         .catch((err: any) => {
           {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           }
         });
@@ -479,7 +479,7 @@ export default defineComponent({
           router.push("/login");
         })
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
@@ -496,7 +496,7 @@ export default defineComponent({
           chatSocket.emit("bannedUser", user);
         })
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
@@ -511,7 +511,7 @@ export default defineComponent({
           );
         })
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };

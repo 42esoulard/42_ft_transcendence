@@ -46,7 +46,7 @@ export default defineComponent({
         .getOnGoingGames()
         .then((res: any) => (games.value = res.data))
         .catch((err) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     });

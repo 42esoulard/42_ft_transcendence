@@ -95,7 +95,7 @@ export default defineComponent({
           gameHistory.value.reverse();
         })
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     });

@@ -157,7 +157,7 @@ export default defineComponent({
           userList.value.sort((a, b) => a.username.localeCompare(b.username));
         })
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
       if (store.state.user.id != 0) {
@@ -171,7 +171,7 @@ export default defineComponent({
             }
           })
           .catch((err: any) => {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
         relationshipApi
@@ -187,7 +187,7 @@ export default defineComponent({
             );
           })
           .catch((err: any) => {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
       }

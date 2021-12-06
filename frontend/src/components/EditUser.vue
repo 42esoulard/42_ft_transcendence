@@ -66,7 +66,7 @@ export default defineComponent({
         .getUsers()
         .then((res: any) => (users.value = res.data))
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     });
@@ -105,7 +105,7 @@ export default defineComponent({
           })
           .catch((err) => {
             {
-              if (err.response.data)
+              if (err && err.response)
                 store.dispatch("setErrorMessage", err.response.data.message);
             }
           });

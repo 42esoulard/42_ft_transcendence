@@ -110,6 +110,10 @@ export default {
       store.commit("allPendingChallenges", message);
     });
 
+    chatSocket.on("chatOff", (user: User) => {
+      store.state.chatOn = false;
+    });
+
     chatSocket.on("chatNotifications", () => {
       store.state.chatNotification = true;
     });
@@ -204,7 +208,7 @@ export default {
           router.push("/login");
         })
         .catch((err: any) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };

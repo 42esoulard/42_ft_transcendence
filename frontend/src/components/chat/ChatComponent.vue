@@ -381,7 +381,7 @@ export const ChatComponent = defineComponent({
                   activeChannel.value = res.data;
                 })
                 .catch((err) => {
-                  if (err.response.data)
+                  if (err && err.response)
                     store.dispatch(
                       "setErrorMessage",
                       err.response.data.message
@@ -389,12 +389,12 @@ export const ChatComponent = defineComponent({
                 });
             })
             .catch((err) => {
-              if (err.response.data)
+              if (err && err.response)
                 store.dispatch("setErrorMessage", err.response.data.message);
             });
         })
         .catch((err) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
@@ -428,7 +428,7 @@ export const ChatComponent = defineComponent({
             })
             .catch(async (err) => {
               {
-                if (err.response.data)
+                if (err && err.response)
                   store.dispatch("setErrorMessage", err.response.data.message);
               }
               if (user.value.role !== "admin" && user.value.role !== "owner") {
@@ -444,7 +444,7 @@ export const ChatComponent = defineComponent({
                     return res;
                   })
                   .catch((err) => {
-                    if (err.response.data)
+                    if (err && err.response)
                       store.dispatch(
                         "setErrorMessage",
                         err.response.data.message
@@ -458,12 +458,12 @@ export const ChatComponent = defineComponent({
               availableChannels.value = res.data;
             })
             .catch((err) => {
-              if (err.response.data)
+              if (err && err.response)
                 store.dispatch("setErrorMessage", err.response.data.message);
             });
         })
         .catch((err) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
@@ -481,7 +481,7 @@ export const ChatComponent = defineComponent({
             return res;
           })
           .catch((err) => {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
       }
@@ -519,7 +519,7 @@ export const ChatComponent = defineComponent({
         })
         .catch(async (err: any) => {
           {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           }
           if (err.response.data.message == "muted") {
@@ -555,7 +555,7 @@ export const ChatComponent = defineComponent({
           return res;
         })
         .catch((err) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
@@ -568,7 +568,7 @@ export const ChatComponent = defineComponent({
           activeChannel.value = res.data;
         })
         .catch((err) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
@@ -609,7 +609,7 @@ export const ChatComponent = defineComponent({
           return res;
         })
         .catch((err) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
@@ -647,7 +647,7 @@ export const ChatComponent = defineComponent({
           chatSocket.emit("update-channels");
         })
         .catch((err) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
@@ -710,7 +710,7 @@ export const ChatComponent = defineComponent({
           )
           .then((res: any) => window.location.reload())
           .catch((err: any) => {
-            if (err.response.data)
+            if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
       }
@@ -812,7 +812,7 @@ export const ChatComponent = defineComponent({
       await api
         .setNewMessage("false", cm.channel.id, { withCredentials: true })
         .catch((err) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
       isMember.value = true;
@@ -842,8 +842,9 @@ export const ChatComponent = defineComponent({
               updateChannelsList();
             })
             .catch((err) => {
-              if (err.response.data)
+              if (err.response.data && err.response.data.message !== 'Not a member of this channel') {
                 store.dispatch("setErrorMessage", err.response.data.message);
+              }
             });
         }
       });
@@ -855,7 +856,7 @@ export const ChatComponent = defineComponent({
           switchChannel(cm);
         })
         .catch((err) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     });

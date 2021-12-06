@@ -77,7 +77,7 @@ export default defineComponent({
           key.value = res.data.key;
         })
         .catch((err) => {
-          if (err.response.data)
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
