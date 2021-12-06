@@ -153,6 +153,13 @@ export default {
       store.commit("removeOnlineUser", user.id);
     });
 
+    chatSocket.on("promotedUser", (user: User) => {
+      if (store.state.user.id == user.id) {
+        store.state.user.role = user.role;
+        router.push("/pong");
+      }
+    });
+
     chatSocket.on("demotedUser", (user: User) => {
       if (store.state.user.id == user.id) {
         store.state.user.role = "user";
@@ -168,6 +175,9 @@ export default {
             "setMessage",
             "You have been " + action + " [" + chanName.substring(0, 15) + "]"
           );
+          // if (action == 'banned') {
+          //   chatSocket.emit("get-default");
+          // }
         }
       }
     );
@@ -198,12 +208,6 @@ export default {
         }
       }
     );
-
-    chatSocket.on("chat-action-del", (message: string, members: number[]) => {
-      if (members.includes(store.state.user.id)) {
-        store.dispatch("setMessage", message);
-      }
-    });
 
     const logOut = () => {
       authApi
