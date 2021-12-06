@@ -91,7 +91,6 @@ const getDraw = (mode: gameMode) => {
     if (mode == "transcendence") {
       racquetLenghtRatio.value.player1 = RACQUET_LENGTH_RATIO_TRANSCENDENCE;
       racquetLenghtRatio.value.player2 = RACQUET_LENGTH_RATIO_TRANSCENDENCE;
-      console.log(RACQUET_LENGTH_RATIO_TRANSCENDENCE)
     }
   };
 
