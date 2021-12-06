@@ -38,6 +38,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     });
 
+    client.on('chatOff', () => {
+      client.emit('chatOff');
+    });
+
     client.on('chat-message-on', async (data: Messages) => {
       if (data) {
         client.emit('chat-message-on', data);

@@ -625,7 +625,6 @@ export const ChatComponent = defineComponent({
           chatSocket.emit("update-channels");
         })
         .catch((err) => {
-          console.log("in leave catch!!")
           store.dispatch("setErrorMessage", err.response.data.message)}
         );
     };

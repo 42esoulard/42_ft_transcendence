@@ -679,6 +679,10 @@ export default defineComponent({
 
     const addMember = async (userId: number) => {
       wasSubmitted.value = true;
+      if (props.activeChannel.channel.channel_members.map((cm: ChannelMember) => cm.member.id).includes(userId)) {
+        store.dispatch("setErrorMessage", "Already a member!")
+        return;
+      }
       const newMember = api
         .joinChannel("added", props.activeChannel.channel.id, userId, {
           withCredentials: true,

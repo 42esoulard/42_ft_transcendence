@@ -110,6 +110,10 @@ export default {
       store.commit("allPendingChallenges", message);
     });
 
+    chatSocket.on("chatOff", (user: User) => {
+      store.state.chatOn = false;
+    });
+
     chatSocket.on("chatNotifications", () => {
       store.state.chatNotification = true;
     });
