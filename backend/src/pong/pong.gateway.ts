@@ -130,7 +130,7 @@ export class PongGateway
   async handleAcceptChallenge(client: Socket, challengerName: string) {
     const challenge = this.pendingChallenges.get(challengerName);
     if (!challenge) {
-      throw new BadRequestException('challenge does not exist');
+      this.logger.log('challenge does not exist');
     }
     const player1 = new player(
       challenge.challengeeId,
@@ -151,7 +151,7 @@ export class PongGateway
   async handleDeclineChallenge(client: Socket, challengerName: string) {
     const challenge = this.pendingChallenges.get(challengerName);
     if (!challenge) {
-      throw new BadRequestException('challenge does not exist');
+      this.logger.log('challenge does not exist');
     }
     challenge.challengerSocket.emit('challengeDeclined');
     this.pendingChallenges.delete(challengerName);
@@ -210,7 +210,7 @@ export class PongGateway
     this.logger.log('watchGame received');
     const game: pongGame = this.games.get(gameId);
     if (!game) {
-      throw new BadRequestException('game does not exist');
+      this.logger.log('game does not exist');
     }
     game.addSpectator(client);
   }
@@ -229,7 +229,7 @@ export class PongGateway
   handleEnlargeRacquet(client: Socket, room: string) {
     const game: pongGame = this.games.get(room);
     if (!game) {
-      throw new BadRequestException('game does not exist');
+      this.logger.log('game does not exist');
     }
     game.enlargeRacquet(client);
   }
@@ -241,7 +241,7 @@ export class PongGateway
   ): void {
     const game: pongGame = this.games.get(message.room);
     if (!game) {
-      throw new BadRequestException('game does not exist');
+      this.logger.log('game does not exist');
     }
     game.moveRacquet(client, message.text);
   }
