@@ -46,7 +46,7 @@ export class PongGateway
   private pendingChallenges = new Map<string, challenge>(); // key = challenger name
 
   afterInit(server: Server): void {
-    this.logger.log('Initialized');
+    // this.logger.log('Initialized');
   }
 
   handleDisconnect(client: Socket): void {
@@ -84,8 +84,6 @@ export class PongGateway
     this.games.forEach((game: pongGame) => {
       playingUsers.push(game.player1.userName, game.player2.userName);
     });
-    this.logger.log('hey')
-    this.logger.log(playingUsers);
     if (playingUsers.length) client.emit('allPlayingUsers', playingUsers);
   }
 
@@ -208,7 +206,6 @@ export class PongGateway
 
   @SubscribeMessage('watchGame')
   async handleWatchGame(client: Socket, gameId: string) {
-    this.logger.log('watchGame received');
     const game: pongGame = this.games.get(gameId);
     if (!game) {
       this.logger.log('game does not exist');
