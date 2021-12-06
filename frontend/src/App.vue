@@ -169,6 +169,9 @@ export default {
             "setMessage",
             "You have been " + action + " [" + chanName.substring(0, 15) + "]"
           );
+          // if (action == 'banned') {
+          //   chatSocket.emit("get-default");
+          // }
         }
       }
     );
@@ -199,12 +202,6 @@ export default {
         }
       }
     );
-
-    chatSocket.on("chat-action-del", (message: string, members: number[]) => {
-      if (members.includes(store.state.user.id)) {
-        store.dispatch("setMessage", message);
-      }
-    });
 
     const logOut = () => {
       authApi

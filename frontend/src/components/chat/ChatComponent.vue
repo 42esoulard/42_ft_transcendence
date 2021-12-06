@@ -336,6 +336,7 @@ export const ChatComponent = defineComponent({
     chatSocket.off("update-channels");
     chatSocket.off("create-direct-message");
     chatSocket.off("init-direct-message");
+    chatSocket.off("chat-action-del");
 
     const api = new ChatApi();
     const relApi = new RelationshipApi();
@@ -433,7 +434,7 @@ export const ChatComponent = defineComponent({
             })
             .catch(async (err) => {
               {
-                if (err && err.response)
+                if (err && err.response && err.response.data.message !== 'banned')
                   store.dispatch("setErrorMessage", err.response.data.message);
               }
               if (user.value.role !== "admin" && user.value.role !== "owner") {
@@ -618,6 +619,18 @@ export const ChatComponent = defineComponent({
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
+
+    chatSocket.on("chat-action-del", async (message: string, members: number[]) => {
+      if (members.includes(store.state.user.id)) {
+        store.dispatch("setMessage", message);
+        await switchChannel(joinedChannels.value[0])
+          .then(() => updateChannelsList());
+      }
+    });
+
+    // chatSocket.on("get-default", () => {
+    //   getDefaultChannel();
+    // })
 
     const deletedChannel = async () => {
       store.dispatch(

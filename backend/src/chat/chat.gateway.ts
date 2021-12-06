@@ -96,6 +96,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.broadcast.emit('chat-action-del', message, members);
     });
 
+    // client.on('get-default', () => {
+    //   client.emit('get-default');
+    // });
+
     client.on('profile-dm', (recipient: User) => {
       if (recipient) {
         client.emit('app-dm', recipient);

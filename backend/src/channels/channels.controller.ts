@@ -415,7 +415,7 @@ export class ChannelsController {
     if (cm == undefined) {
       throw new NotFoundException('Channel Member not found');
     } else if (cm.ban) {
-      throw new NotFoundException('banned');
+      throw new ForbiddenException('banned');
     }
     return cm;
   }
@@ -432,10 +432,13 @@ export class ChannelsController {
       throw new NotFoundException('Channel Member not found');
     }
     if (cm.channel.id == 1) {
-      throw new NotFoundException('Thou shalt not leave General!!');
+      throw new ForbiddenException('Thou shalt not leave General!!');
     }
     switch (type) {
       case 'kick':
+        if (cm.member.id == request.user.id) {
+          throw new ForbiddenException("You can't kick yourself..!");
+        }
         await this.channelService
           .getChannelMember(cm.channel.id, request.user.id)
           .then(async (res) => {
@@ -532,8 +535,14 @@ export class ChannelsController {
     ) {
       throw new NotFoundException('Failed to find or act on member');
     }
+    if (
+      (action == 'banned' || action == 'muted') &&
+      user_cm.member.id == request.user.id
+    ) {
+      throw new ForbiddenException("You can't mute or ban yourself..!");
+    }
     if (action == 'banned' && user_cm.channel.name == 'General') {
-      throw new NotFoundException("Can't ban a user from General!");
+      throw new ForbiddenException("Can't ban a user from General!");
     }
     const req_cm: ChannelMember = await this.channelService.getChannelMember(
       user_cm.channel.id,
