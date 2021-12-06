@@ -94,7 +94,6 @@ export class pongGame {
   }
 
   async createGame(): Promise<void> {
-    this.logger.log('game created');
 
     // push Game and GameUsers intoDB
     await this.pushGameintoDB();
@@ -157,7 +156,6 @@ export class pongGame {
   }
 
   async endGame(player1Won: boolean): Promise<void> {
-    this.logger.log('endgame');
     this.isOver = true;
     clearTimeout(this.timeout);
     clearInterval(this.interval);

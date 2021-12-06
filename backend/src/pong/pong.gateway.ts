@@ -84,6 +84,7 @@ export class PongGateway
     this.games.forEach((game: pongGame) => {
       playingUsers.push(game.player1.userName, game.player2.userName);
     });
+    this.logger.log('hey')
     this.logger.log(playingUsers);
     if (playingUsers.length) client.emit('allPlayingUsers', playingUsers);
   }
