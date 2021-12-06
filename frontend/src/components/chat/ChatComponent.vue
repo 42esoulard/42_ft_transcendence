@@ -367,6 +367,7 @@ export const ChatComponent = defineComponent({
      */
     store.state.chatNotification = false;
     store.state.chatOn = true;
+    const chatReady = ref(false);
 
     const getDefaultChannel = async () => {
       await api
@@ -376,8 +377,12 @@ export const ChatComponent = defineComponent({
             .then(async () => {
               await api
                 .setNewMessage("false", chan.data.id, { withCredentials: true })
-                .then((res) => {
-                  updateChannelsList();
+                .then(async (res) => {
+                  await updateChannelsList()
+                  .then (() => {
+                    chatSocket.emit('ready');
+                    chatReady.value = true;
+                  })
                   activeChannel.value = res.data;
                 })
                 .catch((err) => {
@@ -398,7 +403,7 @@ export const ChatComponent = defineComponent({
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
-    getDefaultChannel();
+    getDefaultChannel()
 
     /*
      ** Called upon connection or when channels list update is triggered,
@@ -653,45 +658,81 @@ export const ChatComponent = defineComponent({
     };
 
     chatSocket.on("create-direct-message", (recipient: User) => {
-      directMessage(recipient);
+      if (!chatReady.value) {
+        chatSocket.on('ready', () => { 
+          directMessage(recipient);
+          chatSocket.off('ready')
+        });
+      } else {
+        directMessage(recipient);
+      }
     });
 
     const directMessage = async (recipient: User) => {
-      await api.saveDmChannel(
-        {
-          name: user.value.username + " to " + recipient.username,
-          owner_id: user.value.id,
-          type: "private",
-          notification: true,
-          password: "",
-          recipient_id: recipient.id,
-        }, {
-          withCredentials: true,
-        }
-      ).then(async (cm) => {
-          updateChannelsList();
-          activeChannel.value = cm.data;
-          isMember.value = true;
-          newMessage.value = recipient.username + " has been added";
-          send();
-          store.dispatch(
-            "setMessage",
-            "You're now a member of channel [" +
-              cm.data.channel.name.substring(0, 15) +
-              "]"
-          );
-          chatSocket.emit("update-channels", cm.data);
-          chatSocket.emit(
-            "chat-action",
-            "added to",
-            recipient.id,
-            cm.data.channel.name
-          );
+      let exists = false;
+      await api
+        .getUserChannels({ withCredentials: true })
+        .then(async (res) => {
+          joinedChannels.value = res.data;
+          if (joinedChannels.value.length) {
+            joinedChannels.value.forEach(async (cm) => {
+              if ((cm.channel.name == user.value.username + " to " + recipient.username ||
+              cm.channel.name == recipient.username + " to " + user.value.username) &&
+              cm.channel.channel_members.length == 2 &&
+              ((cm.channel.channel_members[0].member.id == user.value.id &&
+              cm.channel.channel_members[1].member.id == recipient.id) || 
+              (cm.channel.channel_members[1].member.id == user.value.id &&
+              cm.channel.channel_members[0].member.id == recipient.id))) {
+                exists = true;
+                switchChannel(cm);
+                activeChannel.value = cm;
+              }
+            })
+          }
+          if (exists) {
+            return;
+          }
+
+          await api.saveDmChannel(
+          {
+            name: user.value.username + " to " + recipient.username,
+            owner_id: user.value.id,
+            type: "private",
+            notification: true,
+            password: "",
+            recipient_id: recipient.id,
+          }, {
+            withCredentials: true,
+          }
+          ).then(async (cm) => {
+            updateChannelsList();
+            activeChannel.value = cm.data;
+            isMember.value = true;
+            newMessage.value = recipient.username + " has been added";
+            send();
+            store.dispatch(
+              "setMessage",
+              "You're now a member of channel [" +
+                cm.data.channel.name.substring(0, 15) +
+                "]"
+            );
+            chatSocket.emit("update-channels", cm.data);
+            chatSocket.emit(
+              "chat-action",
+              "added to",
+              recipient.id,
+              cm.data.channel.name
+            );
+          })
+          .catch((err) => {
+            if (err) {
+              store.dispatch("setErrorMessage", err.response.data.message);
+            }
+          });
         })
         .catch((err) => {
-          if (err) {
+          if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
-          }
         });
     };
 
@@ -811,6 +852,10 @@ export const ChatComponent = defineComponent({
       activeChannel.value.new_message = false;
       await api
         .setNewMessage("false", cm.channel.id, { withCredentials: true })
+        .then(() => {
+          store.state.chatNotification = false;
+          chatSocket.emit('get-notifications', user.value.id)
+        })
         .catch((err) => {
           if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);

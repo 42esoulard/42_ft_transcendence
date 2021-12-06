@@ -38,6 +38,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     });
 
+    client.on('get-notifications', async (user: User) => {
+      if (user) {
+        await this.channelsService.getNotifications(user.id).then((res) => {
+          if (res) {
+            client.emit('chatNotifications');
+          }
+        });
+      }
+    });
+
     client.on('chatOff', () => {
       client.emit('chatOff');
     });
@@ -96,6 +106,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (recipient) {
         client.emit('app-dm', recipient);
       }
+    });
+
+    client.on('ready', () => {
+      client.emit('ready');
     });
 
     client.on('init-direct-message', (recipient: User) => {
