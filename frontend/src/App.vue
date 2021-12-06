@@ -129,6 +129,12 @@ export default {
       }
     });
 
+    chatSocket.on("isAlreadyConnected", (user: User) => {
+      if (store.state.user.id == user.id) {
+        logOut();
+      }
+    });
+
     chatSocket.on("bannedUser", (user: User) => {
       if (store.state.user.id == user.id) {
         logOut();
