@@ -65,9 +65,10 @@ export default defineComponent({
       userApi
         .getUsers()
         .then((res: any) => (users.value = res.data))
-        .catch((err: any) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err: any) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     });
 
     const closeModal = () => {
@@ -103,7 +104,10 @@ export default defineComponent({
             ret = true;
           })
           .catch((err) => {
-            store.dispatch("setErrorMessage", err.response.data.message)
+            {
+              if (err.response.data)
+                store.dispatch("setErrorMessage", err.response.data.message);
+            }
           });
       return ret;
     };

@@ -87,26 +87,25 @@ export default defineComponent({
               if (res.data.newlyCreated == true) {
                 store.commit("setFirstTimeConnect", true);
                 router.push(`/profile/${res.data.username}`);
-              }
-              else
-                router.push("/");
+              } else router.push("/");
             }
           })
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
 
         await getProfile();
-        if (store.state.user.id != 0){
+        if (store.state.user.id != 0) {
           relationshipApi
             .getPendingRelationships(store.state.user.id)
             .then((res: any) => {
-              if (res.data.length > 0)
-                store.state.toggleFriendship = true;
+              if (res.data.length > 0) store.state.toggleFriendship = true;
             })
-            .catch((err: any) =>
-              store.dispatch("setErrorMessage", err.response.data.message)
-            );
+            .catch((err: any) => {
+              if (err.response.data)
+                store.dispatch("setErrorMessage", err.response.data.message);
+            });
         }
       }
     });
@@ -115,21 +114,24 @@ export default defineComponent({
       userApi
         .getUsers()
         .then((res: any) => (nbUsers.value = res.data.length))
-        .catch((err: any) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err: any) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
       pongApi
         .getAll()
         .then((res: any) => (nbGames.value = res.data.length))
-        .catch((err: any) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err: any) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
       pongApi
         .getOnGoingGames()
         .then((res: any) => (nbOngoing.value = res.data.length))
-        .catch((err: any) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err: any) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     });
 
     const getProfile = async () => {
@@ -139,7 +141,10 @@ export default defineComponent({
           store.state.user = response.data;
         })
         .catch((err) => {
-          store.dispatch("setErrorMessage", err.response.data.message)
+          {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          }
         });
     };
 

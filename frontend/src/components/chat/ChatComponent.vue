@@ -380,17 +380,23 @@ export const ChatComponent = defineComponent({
                   updateChannelsList();
                   activeChannel.value = res.data;
                 })
-                .catch((err) =>
-                  store.dispatch("setErrorMessage", err.response.data.message)
-                );
+                .catch((err) => {
+                  if (err.response.data)
+                    store.dispatch(
+                      "setErrorMessage",
+                      err.response.data.message
+                    );
+                });
             })
-            .catch((err) =>
-              store.dispatch("setErrorMessage", err.response.data.message)
-            );
+            .catch((err) => {
+              if (err.response.data)
+                store.dispatch("setErrorMessage", err.response.data.message);
+            });
         })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
     getDefaultChannel();
 
@@ -421,7 +427,10 @@ export const ChatComponent = defineComponent({
                 channelSettings.value = false;
             })
             .catch(async (err) => {
-              store.dispatch("setErrorMessage", err.response.data.message);
+              {
+                if (err.response.data)
+                  store.dispatch("setErrorMessage", err.response.data.message);
+              }
               if (user.value.role !== "admin" && user.value.role !== "owner") {
                 getDefaultChannel();
               } else {
@@ -434,9 +443,13 @@ export const ChatComponent = defineComponent({
                     channelMessages.value = res.data.messages;
                     return res;
                   })
-                  .catch((err) =>
-                    store.dispatch("setErrorMessage", err.response.data.message)
-                  );
+                  .catch((err) => {
+                    if (err.response.data)
+                      store.dispatch(
+                        "setErrorMessage",
+                        err.response.data.message
+                      );
+                  });
               }
             });
           await api
@@ -444,13 +457,15 @@ export const ChatComponent = defineComponent({
             .then((res) => {
               availableChannels.value = res.data;
             })
-            .catch((err) =>
-              store.dispatch("setErrorMessage", err.response.data.message)
-            );
+            .catch((err) => {
+              if (err.response.data)
+                store.dispatch("setErrorMessage", err.response.data.message);
+            });
         })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const getMessagesUpdate = async (channelId: number) => {
@@ -465,9 +480,10 @@ export const ChatComponent = defineComponent({
             channelMessages.value = res.data.messages;
             return res;
           })
-          .catch((err) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
       }
     };
 
@@ -502,7 +518,10 @@ export const ChatComponent = defineComponent({
           chatSocket.emit("chat-message", newContent, store.state.onlineUsers);
         })
         .catch(async (err: any) => {
-          store.dispatch("setErrorMessage", err.response.data.message);
+          {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          }
           if (err.response.data.message == "muted") {
             mutePopup.value = true;
           }
@@ -535,9 +554,10 @@ export const ChatComponent = defineComponent({
           channelMessages.value = res.data.messages;
           return res;
         })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const toggleNotification = async () => {
@@ -547,9 +567,10 @@ export const ChatComponent = defineComponent({
           updateChannelsList();
           activeChannel.value = res.data;
         })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const applyForMembership = async (channel: Channel) => {
@@ -587,9 +608,10 @@ export const ChatComponent = defineComponent({
           }
           return res;
         })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const deletedChannel = async () => {
@@ -625,14 +647,14 @@ export const ChatComponent = defineComponent({
           chatSocket.emit("update-channels");
         })
         .catch((err) => {
-          console.log("in leave catch!!")
-          store.dispatch("setErrorMessage", err.response.data.message)}
-        );
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     chatSocket.on("create-direct-message", (recipient: User) => {
       directMessage(recipient);
-    })
+    });
 
     const directMessage = async (recipient: User) => {
       await api.saveDmChannel(
@@ -658,13 +680,36 @@ export const ChatComponent = defineComponent({
               cm.data.channel.name.substring(0, 15) +
               "]"
           );
+<<<<<<< HEAD
           chatSocket.emit("update-channels", cm.data);
           chatSocket.emit(
             "chat-action",
             "added to",
             recipient.id,
             cm.data.channel.name
-          );    
+          );
+=======
+          await api
+            .joinChannel("dm", cm.data.channel.id, recipient.id, {
+              withCredentials: true,
+            })
+            .then((res) => {
+              chatSocket.emit("update-channels", cm.data);
+              chatSocket.emit(
+                "chat-action",
+                "added to",
+                recipient.id,
+                cm.data.channel.name
+              );
+              newMessage.value = res.data.member.username + " has been added";
+              send();
+              return res;
+            })
+            .catch((err) => {
+              if (err.response.data)
+                store.dispatch("setErrorMessage", err.response.data.message);
+            });
+>>>>>>> error handling improvements
         })
         .catch((err) => {
           if (err) {
@@ -687,9 +732,10 @@ export const ChatComponent = defineComponent({
             }
           )
           .then((res: any) => window.location.reload())
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
       }
     };
 
@@ -788,9 +834,10 @@ export const ChatComponent = defineComponent({
       activeChannel.value.new_message = false;
       await api
         .setNewMessage("false", cm.channel.id, { withCredentials: true })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
       isMember.value = true;
       console.log("in switchChannel", cm);
       getMessagesUpdate(cm.channel.id);
@@ -817,9 +864,10 @@ export const ChatComponent = defineComponent({
               store.state.chatNotification = true;
               updateChannelsList();
             })
-            .catch((err) =>
-              store.dispatch("setErrorMessage", err.response.data.message)
-            );
+            .catch((err) => {
+              if (err.response.data)
+                store.dispatch("setErrorMessage", err.response.data.message);
+            });
         }
       });
     });
@@ -829,9 +877,10 @@ export const ChatComponent = defineComponent({
         .then(() => {
           switchChannel(cm);
         })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     });
 
     chatSocket.on("update-channels", () => {

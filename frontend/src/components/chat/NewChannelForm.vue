@@ -128,7 +128,10 @@ export default defineComponent({
           channelNames = res.data;
         })
         .catch((err) => {
-          store.dispatch("setErrorMessage", err.response.data.message);
+          {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          }
         });
     };
     getChannelNames();
@@ -238,9 +241,10 @@ export default defineComponent({
           chatSocket.emit("createChannel", res.data);
           closeModal();
         })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     return {

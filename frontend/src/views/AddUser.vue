@@ -39,7 +39,10 @@ export default defineComponent({
           ).toString(),
         })
         .then((res: any) => (responseData.value = res.data))
-        .catch((err: any) => store.dispatch("setErrorMessage", err.response.data.message));
+        .catch((err: any) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     return { username, responseData, handleSubmit };

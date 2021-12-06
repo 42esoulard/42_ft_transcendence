@@ -100,9 +100,10 @@ export default defineComponent({
               relationships.value.push(relationship);
           }
         })
-        .catch((err: any) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err: any) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     });
 
     const acceptFriend = async (user: User) => {
@@ -126,9 +127,10 @@ export default defineComponent({
                 );
             }
           })
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
       }
     };
 
@@ -157,9 +159,10 @@ export default defineComponent({
               index++;
             }
           })
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
       }
     };
 

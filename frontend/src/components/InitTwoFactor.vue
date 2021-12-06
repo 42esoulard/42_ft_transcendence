@@ -76,7 +76,10 @@ export default defineComponent({
         .then((res: any) => {
           key.value = res.data.key;
         })
-        .catch((error) => store.dispatch("setErrorMessage", error.response.data.message));
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     return {

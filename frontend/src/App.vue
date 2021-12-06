@@ -150,11 +150,17 @@ export default {
       }
     });
 
-    chatSocket.on('chat-action', (action: string, userId: number, chanName: string) => {
-      if (store.state.user.id == userId) {
-        store.dispatch("setMessage", "You have been " + action + " [" + chanName.substring(0, 15) + "]");
+    chatSocket.on(
+      "chat-action",
+      (action: string, userId: number, chanName: string) => {
+        if (store.state.user.id == userId) {
+          store.dispatch(
+            "setMessage",
+            "You have been " + action + " [" + chanName.substring(0, 15) + "]"
+          );
+        }
       }
-    });
+    );
 
     chatSocket.on("newFriendshipRequest", (adressee: User) => {
       if (store.state.user.id == adressee.id) {
@@ -197,9 +203,10 @@ export default {
           store.commit("resetUser"); //store.state.user = null;
           router.push("/login");
         })
-        .catch((err: any) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err: any) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     return {

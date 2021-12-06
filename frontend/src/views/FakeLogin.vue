@@ -44,9 +44,10 @@ export default defineComponent({
             selectedUser.value = users.value[0].username;
           }
         })
-        .catch((err: any) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err: any) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
       userApi
         .getBannedUsers()
         .then((res: any) => {
@@ -57,7 +58,10 @@ export default defineComponent({
             selectedUser.value = users.value[0].username;
           }
         })
-        .catch((err: any) => store.dispatch("setErrorMessage", err.response.data.message));
+        .catch((err: any) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     });
 
     const Fakelogin = async () => {
@@ -70,7 +74,10 @@ export default defineComponent({
           sendConnection();
           router.push(`/`);
         })
-        .catch((error) => store.dispatch("setErrorMessage", error.response.data.message));
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const getProfile = async () => {
@@ -80,7 +87,11 @@ export default defineComponent({
           store.state.user = response.data;
           store.dispatch("setPendingChallenges");
         })
-        .catch((err) => {store.dispatch("setErrorMessage", err.response.data.message)
+        .catch((err) => {
+          {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          }
         });
     };
 

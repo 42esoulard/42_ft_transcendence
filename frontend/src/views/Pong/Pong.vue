@@ -131,9 +131,10 @@ export default defineComponent({
       api
         .getUsers()
         .then((res: any) => (users.value = res.data))
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     });
 
     const toggleClassic = () => (classicMode.value = true);

@@ -45,9 +45,10 @@ export default defineComponent({
       api
         .getOnGoingGames()
         .then((res: any) => (games.value = res.data))
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     });
 
     const WatchGame = (id: number) => {

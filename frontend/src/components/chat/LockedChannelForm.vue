@@ -69,9 +69,10 @@ export default defineComponent({
             return;
           }
         })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     return {

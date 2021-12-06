@@ -99,9 +99,10 @@ export default defineComponent({
         .then((res: any) => {
           userList.value = res.data;
         })
-        .catch((err: any) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err: any) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     });
 
     const selectList = computed((): User[] => {

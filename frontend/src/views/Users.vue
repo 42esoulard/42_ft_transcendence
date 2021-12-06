@@ -156,9 +156,10 @@ export default defineComponent({
           userList.value = res.data;
           userList.value.sort((a, b) => a.username.localeCompare(b.username));
         })
-        .catch((err: any) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err: any) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
       if (store.state.user.id != 0) {
         relationshipApi
           .getUserFriendships(store.state.user.id)
@@ -169,9 +170,10 @@ export default defineComponent({
               else friendList.value.push(friendship.requesterId);
             }
           })
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
         relationshipApi
           .getUserBlocked(store.state.user.id)
           .then((res: any) => {
@@ -184,9 +186,10 @@ export default defineComponent({
                 !res.data.find((rs: Relationship) => rs.requesterId === user.id)
             );
           })
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
       }
     });
 

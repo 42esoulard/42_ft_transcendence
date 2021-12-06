@@ -56,10 +56,11 @@
     >
       <i class="upload-icon fas fa-user-times" /> cancel invitation
     </button>
-    <button 
-      v-if="user.id != self.id" 
+    <button
+      v-if="user.id != self.id"
       @click="sendDM(user)"
-      class="button button--primary">
+      class="button button--primary"
+    >
       <i class="upload-icon fas fa-envelope" /> send message
     </button>
     <button
@@ -213,15 +214,17 @@ export default defineComponent({
         relationshipApi
           .getAllUserFriendships(store.state.user.id)
           .then((res: any) => (userFriendships.value = res.data))
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
         relationshipApi
           .getUserBlocked(store.state.user.id)
           .then((res: any) => (userBlocked.value = res.data))
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
       }
     });
 
@@ -232,7 +235,10 @@ export default defineComponent({
           store.commit("toggleTwoFactor", false);
           store.dispatch("setMessage", res.data.message);
         })
-        .catch((error) => store.dispatch("setErrorMessage", error.response.data.message));
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const toggleModal = (nbr: number) => {
@@ -257,11 +263,11 @@ export default defineComponent({
           .removeUser(store.state.user.id, {
             withCredentials: true,
           })
-          .then((res: any) => {
-          })
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .then((res: any) => {})
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
       }
     };
 
@@ -273,9 +279,10 @@ export default defineComponent({
           store.commit("resetUser"); //store.state.user = null;
           router.push("/login");
         })
-        .catch((err: any) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err: any) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const addFriend = async (user: User) => {
@@ -294,9 +301,10 @@ export default defineComponent({
             userFriendships.value.push(res.data);
             chatSocket.emit("newFriendshipRequest", user);
           })
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
       }
     };
 
@@ -325,9 +333,10 @@ export default defineComponent({
               index++;
             }
           })
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
       }
     };
 
@@ -350,9 +359,10 @@ export default defineComponent({
               }
             }
           })
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
       }
     };
 
@@ -401,9 +411,10 @@ export default defineComponent({
             }
           )
           .then((res: any) => window.location.reload())
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
       }
     };
 
@@ -420,9 +431,10 @@ export default defineComponent({
             }
           )
           .then((res: any) => window.location.reload())
-          .catch((err: any) =>
-            store.dispatch("setErrorMessage", err.response.data.message)
-          );
+          .catch((err: any) => {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
       }
     };
 
@@ -460,10 +472,10 @@ export default defineComponent({
         deleteAccount();
       }
     };
-    
+
     const sendDM = (recipient: User) => {
-      chatSocket.emit("profile-dm", recipient)
-    }
+      chatSocket.emit("profile-dm", recipient);
+    };
 
     return {
       user,

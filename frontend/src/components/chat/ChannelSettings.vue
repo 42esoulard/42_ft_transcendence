@@ -542,9 +542,10 @@ export default defineComponent({
           }
           closeModal();
         })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const toggleAdmin = async (cm: ChannelMember) => {
@@ -598,9 +599,10 @@ export default defineComponent({
             closeChannelSettings();
           }
         })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     const deleteChannel = async () => {
@@ -621,9 +623,10 @@ export default defineComponent({
           );
           closeChannelSettings();
         })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     let usernames = <string[]>[];
@@ -635,7 +638,10 @@ export default defineComponent({
           usernames = res.data.map((user) => user.username);
         })
         .catch((err) => {
-          store.dispatch("setErrorMessage", err.response.data.message);
+          {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          }
         });
     };
     getUserNames();
@@ -700,7 +706,10 @@ export default defineComponent({
           wasSubmitted.value = false;
         })
         .catch((err) => {
-          store.dispatch("setErrorMessage", err.response.data.message);
+          {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          }
           wasSubmitted.value = false;
         });
     };
@@ -742,7 +751,10 @@ export default defineComponent({
           );
         })
         .catch((err) => {
-          store.dispatch("setErrorMessage", err.response.data.message);
+          {
+            if (err.response.data)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          }
           wasSubmitted.value = false;
         });
     };
@@ -820,9 +832,10 @@ export default defineComponent({
           }
           closeChannelSettings();
         })
-        .catch((err) =>
-          store.dispatch("setErrorMessage", err.response.data.message)
-        );
+        .catch((err) => {
+          if (err.response.data)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     };
 
     return {
