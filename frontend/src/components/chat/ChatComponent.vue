@@ -680,7 +680,6 @@ export const ChatComponent = defineComponent({
               cm.data.channel.name.substring(0, 15) +
               "]"
           );
-<<<<<<< HEAD
           chatSocket.emit("update-channels", cm.data);
           chatSocket.emit(
             "chat-action",
@@ -688,28 +687,6 @@ export const ChatComponent = defineComponent({
             recipient.id,
             cm.data.channel.name
           );
-=======
-          await api
-            .joinChannel("dm", cm.data.channel.id, recipient.id, {
-              withCredentials: true,
-            })
-            .then((res) => {
-              chatSocket.emit("update-channels", cm.data);
-              chatSocket.emit(
-                "chat-action",
-                "added to",
-                recipient.id,
-                cm.data.channel.name
-              );
-              newMessage.value = res.data.member.username + " has been added";
-              send();
-              return res;
-            })
-            .catch((err) => {
-              if (err.response.data)
-                store.dispatch("setErrorMessage", err.response.data.message);
-            });
->>>>>>> error handling improvements
         })
         .catch((err) => {
           if (err) {
