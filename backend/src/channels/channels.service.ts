@@ -451,7 +451,7 @@ export class ChannelsService {
         ).then(async (res) => {
           if (res == true) {
             throw new ForbiddenException(
-              'Failed to create DM: this user has blocked you',
+              'Failed to create DM: active block',
             );
           }
           const recipient = await this.userService.getUserbyId(

@@ -437,15 +437,6 @@ export class ChannelsController {
     switch (type) {
       case 'kick':
         await this.channelService
-          .checkBlocked(cm.member.id, request.user.id)
-          .then((res) => {
-            if (res == true) {
-              throw new ForbiddenException(
-                'Failed to leave channel: missing authorization to act for this user: active block',
-              );
-            }
-          });
-        await this.channelService
           .getChannelMember(cm.channel.id, request.user.id)
           .then(async (res) => {
             if (!res) {

@@ -147,6 +147,13 @@ export default {
       store.commit("removeOnlineUser", user.id);
     });
 
+    chatSocket.on("promotedUser", (user: User) => {
+      if (store.state.user.id == user.id) {
+        store.state.user.role = user.role;
+        router.push("/pong");
+      }
+    });
+
     chatSocket.on("demotedUser", (user: User) => {
       if (store.state.user.id == user.id) {
         store.state.user.role = "user";
