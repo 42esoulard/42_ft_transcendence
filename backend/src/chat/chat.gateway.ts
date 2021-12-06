@@ -161,6 +161,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.broadcast.emit('newFriendshipRequest', adressee);
   }
 
+  @SubscribeMessage('isAlreadyConnected')
+  handleIsAlreadyConnected(client: Socket, user: User) {
+    client.broadcast.emit('isAlreadyConnected', user);
+  }
+
   @SubscribeMessage('leave')
   async onLeave(
     @MessageBody() user: string,

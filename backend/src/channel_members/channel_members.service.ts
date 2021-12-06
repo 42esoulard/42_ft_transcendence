@@ -172,6 +172,12 @@ export class ChannelMembersService {
 
   async setNewMessage(status: boolean, cmId: number): Promise<ChannelMember> {
     const cm: ChannelMembers = await this.getChannelMemberById(cmId);
+    if (!cm.notification) {
+      if (cm.new_message == false) {
+        return cm;
+      }
+      status = false;
+    }
     cm.new_message = status;
     return await this.channelMembersRepository
       .save(cm)

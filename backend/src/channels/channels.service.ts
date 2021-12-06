@@ -102,7 +102,7 @@ export class ChannelsService {
       data.channel.id,
       userId,
     );
-    if (cms == undefined || cms.ban) {
+    if (cms == undefined || cms.ban || !cms.notification) {
       return false;
     }
 
@@ -116,8 +116,11 @@ export class ChannelsService {
         }
         return await this.channelMemberService
           .setNewMessage(true, cms.id)
-          .then(() => {
-            return true;
+          .then((res) => {
+            if (res) {
+              return res.new_message;
+            }
+            return false;
           })
           .catch((err) => {
             return false;

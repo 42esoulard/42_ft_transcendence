@@ -52,6 +52,7 @@ import { useAuthApi, useRelationshipApi } from "@/plugins/api.plugin";
 import { useUserApi } from "@/plugins/api.plugin";
 import { usePongApi } from "@/plugins/api.plugin";
 import { User } from "sdk/typescript-axios-client-generated";
+import { chatSocket } from "@/App.vue";
 
 export default defineComponent({
   name: "Login",
@@ -93,6 +94,7 @@ export default defineComponent({
           .catch((err: any) => {
             if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
+              return ;
           });
 
         await getProfile();
@@ -138,6 +140,7 @@ export default defineComponent({
       await authApi
         .profile({ withCredentials: true })
         .then((response) => {
+          chatSocket.emit("isAlreadyConnected", response.data);
           store.state.user = response.data;
         })
         .catch((err) => {
