@@ -299,7 +299,7 @@ export default defineComponent({
           )
           .then((res: any) => {
             userFriendships.value.push(res.data);
-            chatSocket.emit("newFriendshipRequest", user);
+            chatSocket.emit("newFriendshipRequest", res.data);
           })
           .catch((err: any) => {
             if (err && err.response)

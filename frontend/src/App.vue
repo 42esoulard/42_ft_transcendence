@@ -21,7 +21,7 @@ import Toast from "@/components/Toast.vue";
 import { io } from "socket.io-client";
 import { useStore } from "@/store";
 import { computed, onUpdated } from "vue";
-import { User } from "sdk/typescript-axios-client-generated";
+import { Relationship, User } from "sdk/typescript-axios-client-generated";
 import { challengeExport, challengeMessage, gameMode } from "./types/PongGame";
 import { useRouter } from "vue-router";
 import { useAuthApi } from "@/plugins/api.plugin";
@@ -182,13 +182,32 @@ export default {
       }
     );
 
-    chatSocket.on("newFriendshipRequest", (adressee: User) => {
-      if (store.state.user.id == adressee.id) {
-        store.state.toggleFriendship = true;
-        store.dispatch(
-          "setMessage",
-          `${adressee.username} sent you a friend request!`
-        );
+    chatSocket.on("newFriendshipRequest", (friendship: Relationship) => {
+      if (store.state.user.id == friendship.adresseeId) {
+        if (friendship.requester) {
+          store.state.toggleFriendship = true;
+          store.dispatch(
+            "setMessage",
+            `${friendship.requester.username} sent you a friend request!`
+          );
+        }
+      }
+    });
+
+    chatSocket.on("friendshipAccepted", (friendship: Relationship) => {
+      if (store.state.user.id == friendship.adresseeId) {
+        if (friendship.requester)
+          store.dispatch(
+            "setMessage",
+            `You're now friends with ${friendship.requester.username}`
+          );
+      }
+      else if (store.state.user.id == friendship.requesterId) {
+        if (friendship.adressee)
+          store.dispatch(
+            "setMessage",
+            `You're now friends with ${friendship.adressee.username}`
+          );
       }
     });
 

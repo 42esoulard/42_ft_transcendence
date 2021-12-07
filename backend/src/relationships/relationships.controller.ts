@@ -70,7 +70,7 @@ export class RelationshipsController {
   @UseGuards(JwtTwoFactorGuard)
   async saveRelationship(
     @Body() newRelationship: CreateRelationshipDto,
-  ): Promise<Relationship> {
+  ) {
     const user1 = await this.userService.getUserbyId(
       newRelationship.requesterId,
     );
@@ -79,6 +79,13 @@ export class RelationshipsController {
       newRelationship.adresseeId,
     );
     if (!user2) throw new BadRequestException("user doesn't exist");
+    const relationship = await this.relationshipService.getRelationship(
+      newRelationship.requesterId,
+      newRelationship.adresseeId,
+    );
+    if (relationship){
+      return await this.relationshipService.validateRelationship(relationship);
+    }
     return await this.relationshipService.saveRelationship(newRelationship);
   }
 
