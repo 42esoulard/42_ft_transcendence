@@ -920,9 +920,9 @@ export const ChatComponent = defineComponent({
     });
 
     chatSocket.on("created-channel", async (cm: ChannelMember) => {
-      await updateChannelsList()
+      await switchChannel(cm)
         .then(() => {
-          switchChannel(cm);
+          updateChannelsList()
         })
         .catch((err) => {
           if (err && err.response)

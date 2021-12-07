@@ -90,7 +90,6 @@
       </router-link>
       <div
         v-if="width >= 950 && user.id != 0 && !user.banned"
-        :key="user.id"
         class="header-bloc"
       >
         <router-link
