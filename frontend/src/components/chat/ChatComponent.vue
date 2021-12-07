@@ -644,8 +644,8 @@ export const ChatComponent = defineComponent({
           activeChannel.value!.channel.name.substring(0, 15) +
           "] has been deleted"
       );
-      updateChannelsList();
-      switchChannel(joinedChannels.value[0]);
+      await switchChannel(joinedChannels.value[0])
+      .then(() => updateChannelsList());
       chatSocket.emit("update-channels");
     };
 
