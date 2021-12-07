@@ -101,7 +101,7 @@
 
 .chat-channels__notif {
   cursor: pointer;
-  position: absolute;
+  display:inline-block;
   width: 12px;
   height: 12px;
   border-radius: 20px;
@@ -115,6 +115,10 @@
   &--off {
     background-color: grey;
   }
+}
+
+.chat-channels__sharp {
+  display: inline-block;
 }
 // .chat-header__tag {
 //   border-style: solid;
@@ -239,7 +243,7 @@
   flex-direction: row;
   justify-content: space-between;
   &:hover,
-  &:focus, &--on {
+  &--on {
     background-color: $chans-item-hover-bg;
     color: $chat-font-dark;
     border-style: none;

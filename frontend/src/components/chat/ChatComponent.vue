@@ -289,7 +289,7 @@
 
 <script lang="ts">
 import { useStore } from "@/store";
-import { defineComponent, reactive, ref, watch, computed } from "vue";
+import { defineComponent, reactive, ref, watch, computed, onMounted } from "vue";
 import { Info } from "@/types/Info";
 import {
   ChatApi,
@@ -370,6 +370,8 @@ export const ChatComponent = defineComponent({
     store.state.chatOn = true;
     const chatReady = ref(false);
 
+    
+
     const getDefaultChannel = async () => {
       await api
         .getDefaultChannel({ withCredentials: true })
@@ -404,7 +406,8 @@ export const ChatComponent = defineComponent({
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
-    getDefaultChannel()
+    onMounted(() => getDefaultChannel())
+    // getDefaultChannel()
 
     /*
      ** Called upon connection or when channels list update is triggered,
@@ -859,10 +862,14 @@ export const ChatComponent = defineComponent({
     };
 
     const switchChannel = async (cm: ChannelMember) => {
+      if (!chatReady.value) {
+        return;
+      }
+      chatReady.value = false;
       channelsListOn.value = false;
       channelSettings.value = false;
-      activeChannel.value = cm;
-      activeChannel.value.new_message = false;
+      // activeChannel.value = cm;
+      // activeChannel.value.new_message = false;
       await api
         .setNewMessage("false", cm.channel.id, { withCredentials: true })
         .then(() => {
@@ -875,7 +882,9 @@ export const ChatComponent = defineComponent({
         });
       isMember.value = true;
       console.log("in switchChannel", cm);
-      getMessagesUpdate(cm.channel.id);
+      activeChannel.value = cm;
+      activeChannel.value.new_message = false;
+      await getMessagesUpdate(cm.channel.id).then(() => { chatReady.value = true; })
     };
 
     chatSocket.on("chat-message-on", async (data: any) => {

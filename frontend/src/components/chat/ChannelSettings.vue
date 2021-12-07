@@ -501,6 +501,7 @@ export default defineComponent({
         .then((res) => {
           targetCm.value = res.data;
           context.emit("update-channels-list");
+          
           if (action == "unmute") {
             action = "unmuted";
           } else if (action == "unban") {

@@ -24,7 +24,8 @@
           >
             <div class="chat-channels__name" :title="cm.channel.name">
               <div v-if="cm.new_message" class="chat-channels__notif"></div>
-              #{{ cm.channel.name }}
+              <div v-else class="chat-channels__sharp">#</div>
+              {{ cm.channel.name }}
             </div>
             <div>
               <span v-if="cm.is_owner"
