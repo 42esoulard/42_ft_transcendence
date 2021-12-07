@@ -16,7 +16,7 @@ services:
     networks:
       - network
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       MODE: DEV
       PORT: 3000
       FRONT_URL: ${FRONT_URL}
@@ -24,7 +24,8 @@ services:
     env_file:
     - credentials.env
     - game.env
-    command: sh -c "rm -rf ./dist && npm install --loglevel=error && npm run start:dev:db:seed && npm run start:dev"
+    # command: sh -c "npm install --loglevel=error && npm run start:dev:db:seed && npm run start:dev"
+    command: sh -c "npm install && npm run start:dev:db:seed && npm run start:prod"
     # command: sh -c "npm install && npm run start:dev:db:seed && npm run start"
     depends_on:
       - postgres
@@ -43,16 +44,18 @@ services:
     networks:
       - network
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       VUE_APP_API_URL: ${API_URL}
       VUE_APP_42_AUTH_URL: ${AUTH_URL}
       NODE_OPTIONS: --openssl-legacy-provider
     env_file:
     - game.env
-    command: sh -c "npm install --loglevel=error && npm run serve"
+    # command: sh -c "npm install --loglevel=error && npm run serve"
+    command: sh -c "npm install && http-server --cors --proxy http://localhost:8080? dist"
     depends_on:
       - postgres
-      - sdk
+      - backend
+      # - sdk
 
   # PostgreSQL Service
   postgres:
@@ -89,14 +92,14 @@ services:
       
     # container_name: "${ADMINER_NAME}"
 
-  # API watcher and SDK rebuilder
-  sdk:
-    build:
-      context: "./frontend/sdk"
-    volumes:
-      - ./:/usr/src/app/
-    depends_on:
-      - backend
+  # # API watcher and SDK rebuilder
+  # sdk:
+  #   build:
+  #     context: "./frontend/sdk"
+  #   volumes:
+  #     - ./:/usr/src/app/
+  #   depends_on:
+  #     - backend
     
 
 

@@ -9,8 +9,8 @@ ENV PATH /usr/src/app/node_modules/.bin:$PATH
 
 COPY package.json ./
 
-# RUN npm install -g npm@7
-USER node
+# RUN npm install
+# USER node
 
 ## Ressource pour installer un nouveau projet nestjs
 # npm install -g @nestjs/cli
