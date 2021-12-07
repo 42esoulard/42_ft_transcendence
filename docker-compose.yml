@@ -51,7 +51,8 @@ services:
     env_file:
     - game.env
     # command: sh -c "npm install --loglevel=error && npm run serve"
-    command: sh -c "npm install && http-server --cors --proxy http://localhost:8080? dist"
+    # command: sh -c "npm install && http-server --cors --proxy http://localhost:8080? dist"
+    # command: sh -c "nginx -g daemon off;"
     depends_on:
       - postgres
       - backend
