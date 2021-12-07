@@ -193,6 +193,28 @@ export default defineComponent({
       }
     });
 
+    chatSocket.on('updateFriendshipList', (friendsInfo) => {
+      if (friendsInfo.length == 4) {
+        const newFriend = (friendsInfo[0] == store.state.user.id 
+                        ? friendsInfo[2] 
+                        : friendsInfo[0])
+        if (Number(newFriend)) {
+          friendList.value.push(newFriend);
+        }
+      } else if (Number(friendsInfo)) {
+        friendList.value.push(friendsInfo);
+      }
+    })
+
+    chatSocket.on('rmFromFriendshipList', (friendsInfo) => {
+      if (Number(friendsInfo)) {
+        const index = friendList.value.indexOf(friendsInfo);
+        if (index >= 0) {
+          friendList.value.splice(index, 1);
+        }
+      }
+    })
+
     const toggleFriends = () => {
       friendlist.value = !friendlist.value;
     };
