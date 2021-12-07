@@ -24,7 +24,8 @@
           >
             <div class="chat-channels__name" :title="cm.channel.name">
               <div v-if="cm.new_message" class="chat-channels__notif"></div>
-              #{{ cm.channel.name }}
+              <div v-else class="chat-channels__sharp">#</div>
+              {{ cm.channel.name }}
             </div>
             <div>
               <span v-if="cm.is_owner"
@@ -55,7 +56,10 @@
       <div class="chat-channels__title">More channels</div>
       <ul class="chat-channels__list">
         <li v-for="chan in availableChannels" :key="chan.name">
-          <button class="chat-channels__item" @click="previewChannel(chan)">
+          <button :class="[
+              'chat-channels__item',
+              activeChannel.channel.id === chan.id ? 'chat-channels__item--on' : '',
+            ]" @click="previewChannel(chan)">
             <div class="chat-channels__name" :title="chan.name">
               #{{ chan.name }}
             </div>

@@ -54,9 +54,14 @@ services:
     # command: sh -c "npm install && http-server --cors --proxy http://localhost:8080? dist"
     # command: sh -c "nginx -g daemon off;"
     depends_on:
+<<<<<<< HEAD
       - postgres
       - backend
       # - sdk
+=======
+      - backend
+      - sdk
+>>>>>>> main
 
   # PostgreSQL Service
   postgres:

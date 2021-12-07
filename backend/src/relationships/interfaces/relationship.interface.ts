@@ -1,4 +1,4 @@
-import { User } from 'src/users/interfaces/user.interface';
+import { Users } from 'src/users/entity/users.entity';
 
 export class Relationship {
   id: number;
@@ -7,4 +7,6 @@ export class Relationship {
   requesterId: number;
   adresseeId: number;
   nature?: string;
+  adressee?: Users;
+  requester?: Users;
 }

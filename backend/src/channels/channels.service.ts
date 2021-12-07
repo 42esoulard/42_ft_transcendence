@@ -201,6 +201,7 @@ export class ChannelsService {
               (msg) =>
                 !res.map((res) => res.adresseeId).includes(msg.author.id),
             );
+            cm.channel.messages.sort((a, b) => a.id - b.id);
           }
           if (res && cm.channel.channel_members) {
             cm.channel.channel_members = cm.channel.channel_members.filter(
@@ -268,6 +269,8 @@ export class ChannelsService {
       channels.forEach((channel) => {
         if (channel.password) {
           channel.messages = [];
+        } else if (channel.messages) {
+          channel.messages.sort((a, b) => a.id - b.id);
         }
       });
       return await this.filterBlockedInAvail(user_id, channels);
@@ -305,6 +308,9 @@ export class ChannelsService {
                     .map((blocked) => blocked.adresseeId)
                     .includes(member.member.id),
               );
+            }
+            if (channel.messages) {
+              channel.messages.sort((a, b) => a.id - b.id);
             }
             return channel;
           });
@@ -346,6 +352,9 @@ export class ChannelsService {
                     .map((blocked) => blocked.adresseeId)
                     .includes(member.member.id),
               );
+            }
+            if (channel.messages) {
+              channel.messages.sort((a, b) => a.id - b.id);
             }
             return channel;
           });
@@ -451,7 +460,7 @@ export class ChannelsService {
         ).then(async (res) => {
           if (res == true) {
             throw new ForbiddenException(
-              'Failed to create DM: this user has blocked you',
+              'Failed to create DM: active block',
             );
           }
           const recipient = await this.userService.getUserbyId(

@@ -38,6 +38,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     });
 
+    client.on('get-notifications', async (userId: number) => {
+      if (userId) {
+        await this.channelsService.getNotifications(userId).then((res) => {
+          if (res) {
+            client.emit('chatNotifications');
+          }
+        });
+      }
+    });
+
     client.on('chatOff', () => {
       client.emit('chatOff');
     });
@@ -86,6 +96,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.broadcast.emit('chat-action-del', message, members);
     });
 
+    // client.on('get-default', () => {
+    //   client.emit('get-default');
+    // });
+
     client.on('profile-dm', (recipient: User) => {
       if (recipient) {
         client.emit('app-dm', recipient);
@@ -96,6 +110,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (recipient) {
         client.emit('app-dm', recipient);
       }
+    });
+
+    client.on('ready', () => {
+      client.emit('ready');
     });
 
     client.on('init-direct-message', (recipient: User) => {

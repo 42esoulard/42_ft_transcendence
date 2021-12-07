@@ -62,6 +62,7 @@ export default defineComponent({
 
     const cancelChallenge = () => {
       pongSocket.emit("cancelChallenge", store.state.user.username);
+      pongSocket.emit("challengeCanceled", Number(props.challengeeId));
       history.go();
     };
 

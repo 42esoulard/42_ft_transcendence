@@ -81,7 +81,6 @@ export default defineComponent({
         await authApi
           .login({ params: { code: code }, withCredentials: true })
           .then((res: any) => {
-            getProfile();
             if (res.status === 206) {
               isTwoFactorEnabled.value = true;
             } else if (res.status === 200) {

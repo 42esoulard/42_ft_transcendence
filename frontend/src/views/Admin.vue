@@ -2,7 +2,7 @@
   <div class="user-account" v-if="user.id != 0">
     <div class="users users--admin">
       <div class="users__title">Manage users</div>
-      <div class="users-list-selectors" :key="userList">
+      <div class="users-list-selectors">
         <button
           @click="toggleOnline"
           :class="[
@@ -129,63 +129,6 @@
         />
       </div>
     </div>
-
-    <div class="users users--admin">
-      <div class="users__title">Manage channels</div>
-      <div class="users-list-selectors" :key="channelList">
-        <button
-          @click="togglePublic"
-          :class="[
-            'button',
-            'button--selector',
-            publiclist ? 'button--selector--on' : '',
-          ]"
-        >
-          public
-        </button>
-        <button
-          @click="togglePrivate"
-          :class="[
-            'button',
-            'button--selector',
-            privatelist ? 'button--selector--on' : '',
-          ]"
-        >
-          private
-        </button>
-      </div>
-      <div class="users-list">
-        <tr
-          v-for="channel in selectChannelList"
-          :key="channel.id"
-          class="users-list__elt"
-        >
-          <td>
-            <span class="link link--user-list">
-              {{ printChannelName(channel.name) }}
-            </span>
-          </td>
-          <td class="users-list__interactions">
-            <button
-              v-if="channel.id != 1"
-              class="link link--neutral"
-              @click="toggleConfirmModal('delete channel', channel)"
-              title="delete"
-            >
-              <i class="fas fa-trash" />
-            </button>
-          </td>
-        </tr>
-      </div>
-
-      <div class="users-search">
-        <input
-          class="users-search__bar"
-          type="text"
-          v-model="searchQueryChat"
-        />
-      </div>
-    </div>
   </div>
 
   <teleport to="#modals">
@@ -212,7 +155,7 @@ import { computed, defineComponent, onMounted, ref } from "vue";
 import { useStore } from "@/store";
 import { User, Channel } from "sdk/typescript-axios-client-generated";
 import { io } from "socket.io-client";
-import { useUserApi, useChatApi, useAuthApi } from "@/plugins/api.plugin";
+import { useUserApi, useAuthApi } from "@/plugins/api.plugin";
 import { useRouter } from "vue-router";
 import { chatSocket, presenceSocket } from "@/App.vue";
 import Confirm from "@/components/Confirm.vue";
@@ -224,7 +167,6 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const userApi = useUserApi();
-    const chatApi = useChatApi();
     const authApi = useAuthApi();
     const router = useRouter();
     const userList = ref<User[]>([]);
@@ -236,7 +178,6 @@ export default defineComponent({
     const bannedlist = ref(false);
     const adminlist = ref(false);
     const searchQuery = ref("");
-    const searchQueryChat = ref("");
     const toggleConfirm = ref("");
     const target = ref();
 
@@ -269,16 +210,6 @@ export default defineComponent({
         .then((res: any) => {
           bannedList.value = res.data;
           bannedList.value.sort((a, b) => a.username.localeCompare(b.username));
-        })
-        .catch((err: any) => {
-          if (err && err.response)
-            store.dispatch("setErrorMessage", err.response.data.message);
-        });
-      chatApi
-        .getChannels({ withCredentials: true })
-        .then((res: any) => {
-          channelList.value = res.data;
-          channelList.value.sort((a, b) => a.name.localeCompare(b.name));
         })
         .catch((err: any) => {
           if (err && err.response)
@@ -334,8 +265,6 @@ export default defineComponent({
         demote(<User>entity);
       } else if (action == "promote owner") {
         changeOwner(<User>entity);
-      } else if (action == "delete channel") {
-        deleteChannel(<Channel>entity);
       }
     };
 
@@ -366,29 +295,6 @@ export default defineComponent({
       );
     });
 
-    const selectChannelList = computed((): Channel[] => {
-      const list = ref();
-
-      if (publiclist.value) {
-        if (privatelist.value) return list.value;
-        list.value = channelList.value.filter(
-          (chan: Channel) => chan.type == "public"
-        );
-      } else if (privatelist.value)
-        list.value = channelList.value.filter(
-          (chan: Channel) => chan.type == "private"
-        );
-      else list.value = channelList.value;
-      if (searchQueryChat.value.length) {
-        list.value = list.value.filter((entity: Channel) =>
-          entity.name
-            .toLowerCase()
-            .startsWith(searchQueryChat.value.toLowerCase())
-        );
-      }
-      return list.value;
-    });
-
     const deleteUser = async (user: User) => {
       chatSocket.emit("deletedUser", user);
       await userApi
@@ -399,22 +305,6 @@ export default defineComponent({
           );
           bannedList.value = bannedList.value.filter(
             (usr: User) => usr.id != user.id
-          );
-        })
-        .catch((err: any) => {
-          {
-            if (err && err.response)
-              store.dispatch("setErrorMessage", err.response.data.message);
-          }
-        });
-    };
-
-    const deleteChannel = async (channel: Channel) => {
-      await chatApi
-        .deleteChannel(channel.id, { withCredentials: true })
-        .then((res: any) => {
-          channelList.value = channelList.value.filter(
-            (chan: Channel) => chan.id != channel.id
           );
         })
         .catch((err: any) => {
@@ -516,17 +406,10 @@ export default defineComponent({
         });
     };
 
-    const printChannelName = (channelName: string) => {
-      return channelName.length > 15
-        ? channelName.slice(0, 15) + "..."
-        : channelName;
-    };
-
     return {
       user: computed(() => store.state.user),
       selectList,
       searchQuery,
-      searchQueryChat,
       onlinelist,
       bannedlist,
       adminlist,
@@ -541,14 +424,11 @@ export default defineComponent({
       banUser,
       deleteUser,
       demote,
-      selectChannelList,
       togglePublic,
       togglePrivate,
       privatelist,
       publiclist,
-      deleteChannel,
       channelList,
-      printChannelName,
       changeOwner,
       toggleConfirm,
       toggleModal,
