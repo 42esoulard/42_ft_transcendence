@@ -38,9 +38,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     });
 
-    client.on('get-notifications', async (user: User) => {
-      if (user) {
-        await this.channelsService.getNotifications(user.id).then((res) => {
+    client.on('get-notifications', async (userId: number) => {
+      if (userId) {
+        await this.channelsService.getNotifications(userId).then((res) => {
           if (res) {
             client.emit('chatNotifications');
           }
