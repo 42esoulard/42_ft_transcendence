@@ -370,7 +370,7 @@ export const ChatComponent = defineComponent({
     store.state.chatOn = true;
     const chatReady = ref(false);
 
-    
+
 
     const getDefaultChannel = async () => {
       await api
@@ -676,7 +676,7 @@ export const ChatComponent = defineComponent({
 
     chatSocket.on("create-direct-message", (recipient: User) => {
       if (!chatReady.value) {
-        chatSocket.on('ready', () => { 
+        chatSocket.on('ready', () => {
           directMessage(recipient);
           chatSocket.off('ready')
         });
@@ -697,7 +697,7 @@ export const ChatComponent = defineComponent({
               cm.channel.name == recipient.username + " to " + user.value.username) &&
               cm.channel.channel_members.length == 2 &&
               ((cm.channel.channel_members[0].member.id == user.value.id &&
-              cm.channel.channel_members[1].member.id == recipient.id) || 
+              cm.channel.channel_members[1].member.id == recipient.id) ||
               (cm.channel.channel_members[1].member.id == user.value.id &&
               cm.channel.channel_members[0].member.id == recipient.id))) {
                 exists = true;
@@ -785,13 +785,13 @@ export const ChatComponent = defineComponent({
         if (inGameUser) {
           store.dispatch(
             "setMessage",
-            user.username.substring(0, 15) + "is already in a game!"
+            user.username.substring(0, 15) + " is already in a game!"
           );
           return;
         } else if (!onlineUser) {
           store.dispatch(
             "setMessage",
-            user.username.substring(0, 15) + "is offline!"
+            user.username.substring(0, 15) + " is offline!"
           );
           return;
         }
