@@ -299,7 +299,7 @@ export default defineComponent({
           )
           .then((res: any) => {
             userFriendships.value.push(res.data);
-            chatSocket.emit("newFriendshipRequest", res.data);
+            chatSocket.emit("newFriendshipRequest", res.data, user.username);
           })
           .catch((err: any) => {
             if (err && err.response)
@@ -327,7 +327,8 @@ export default defineComponent({
                 friendship.requesterId == user.id ||
                 friendship.adresseeId == user.id
               ) {
-                if (friendship.pending) userFriendships.value.splice(index, 1);
+                userFriendships.value.splice(index, 1);
+                chatSocket.emit("removeFriendship", user.id, store.state.user.id);
                 break;
               }
               index++;
@@ -356,6 +357,8 @@ export default defineComponent({
             for (const friendship of userFriendships.value) {
               if (friendship.requesterId == user.id) {
                 friendship.pending = false;
+                chatSocket.emit('acceptFriendship', user.id, user.username, 
+                store.state.user.id, store.state.user.username)
               }
             }
           })
@@ -365,6 +368,34 @@ export default defineComponent({
           });
       }
     };
+
+    chatSocket.on('addFriendship', (relationship: Relationship) => {
+      userFriendships.value.push(relationship);
+    })
+
+    chatSocket.on('updateFriendship', (friendId: number) => {
+      let index = 0;
+      for (const friendship of userFriendships.value) {
+        if (friendship.adresseeId == friendId || 
+          friendship.requesterId == friendId) {
+          friendship.pending = !friendship.pending;
+          break;
+        }
+        index++;
+      }
+    })
+
+    chatSocket.on('rmFriendship', (friendId: number) => {
+      let index = 0;
+      for (const friendship of userFriendships.value) {
+        if (friendship.adresseeId == friendId || 
+          friendship.requesterId == friendId) {
+          userFriendships.value.splice(index, 1);
+          break;
+        }
+        index++;
+      }
+    })
 
     // 1 == friends, 2 == self invited, 3 == other invited, 0 == no relationship
     // 4 == blocked && self is requester, -2 == blocked && self is adressee

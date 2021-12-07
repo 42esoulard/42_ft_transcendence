@@ -47,7 +47,7 @@
       </div>
     </div>
     <div class="friendships-panel">
-      <h1 class="friendships-panel__title">Friendships requests</h1>
+      <h1 class="friendships-panel__title">Friendship requests</h1>
       <div class="table__body">
         <div
           v-for="friendship in getAdressedList"
@@ -83,6 +83,7 @@ import { defineComponent, inject, ref, computed, onMounted } from "vue";
 import { useStore } from "@/store";
 import { useRelationshipApi } from "@/plugins/api.plugin";
 import { Relationship, User } from "sdk/typescript-axios-client-generated";
+import { chatSocket } from "@/App.vue";
 
 export default defineComponent({
   name: "Pending",
@@ -106,6 +107,29 @@ export default defineComponent({
         });
     });
 
+    chatSocket.on('addFriendship', async (relationship: Relationship) => {
+      await relationshipApi.getRelationship(relationship.requesterId, relationship.adresseeId)
+      .then((res) => {
+        relationships.value.push(res.data);
+      })
+      .catch((err: any) => {
+          if (err && err.response)
+            store.dispatch("setErrorMessage", err.response.data.message);
+      });
+    })
+
+    chatSocket.on('rmFriendship', (friendId: number) => {
+      let index = 0;
+      for (const friendship of relationships.value) {
+        if (friendship.adresseeId == friendId || 
+          friendship.requesterId == friendId) {
+          relationships.value.splice(index, 1);
+          break;
+        }
+        index++;
+      }
+    })
+
     const acceptFriend = async (user: User) => {
       if (store.state.user.id != 0) {
         await relationshipApi
@@ -125,6 +149,8 @@ export default defineComponent({
                   relationships.value.indexOf(friendship),
                   1
                 );
+                chatSocket.emit('acceptFriendship', user.id, user.username, 
+                store.state.user.id, store.state.user.username)
             }
           })
           .catch((err: any) => {
@@ -133,6 +159,24 @@ export default defineComponent({
           });
       }
     };
+
+    chatSocket.on('updateFriendship', (friendId: number) => {
+      let index = 0;
+      for (const friendship of relationships.value) {
+        if (friendship.adresseeId == friendId || 
+          friendship.requesterId == friendId) {
+          friendship.pending = !friendship.pending;
+          if (!friendship.pending) {
+            relationships.value.splice(
+                  relationships.value.indexOf(friendship),
+                  1
+                );
+          }
+          break;
+        }
+        index++;
+      }
+    })
 
     const removeFriend = async (user: User) => {
       if (store.state.user.id != 0) {
@@ -154,6 +198,7 @@ export default defineComponent({
                 friendship.adresseeId == user.id
               ) {
                 relationships.value.splice(index, 1);
+                chatSocket.emit("removeFriendship", user.id, store.state.user.id);
                 break;
               }
               index++;
