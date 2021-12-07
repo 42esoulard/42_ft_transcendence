@@ -156,6 +156,7 @@
                     <i class="fas fa-envelope link link--neutral" />
                   </button>
                   <button
+                    v-if="userStatus(message.author) == 'online' && userStatus(user) == 'online'"
                     class="button"
                     title="Challenge"
                     @click="challengeUser(message.author)"
@@ -370,7 +371,22 @@ export const ChatComponent = defineComponent({
     store.state.chatOn = true;
     const chatReady = ref(false);
 
-
+    const userStatus = (user: User): "online" | "offline" | "ingame" => {
+      if (user != undefined) {
+        const inGameUser = store.state.inGameUsers.find(
+          (u) => u === user.username
+        );
+        const onlineUser = store.state.onlineUsers.find(
+          (u) => u.id === user.id
+        );
+        if (inGameUser) {
+          return "ingame";
+        } else if (onlineUser) {
+          return "online";
+        }
+      }
+      return "offline";
+    };
 
     const getDefaultChannel = async () => {
       await api
@@ -988,6 +1004,7 @@ export const ChatComponent = defineComponent({
       directMessage,
       channelsListOn,
       toggleChannelsList,
+      userStatus
     };
   },
 });

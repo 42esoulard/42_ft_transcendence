@@ -12,17 +12,17 @@
     <span class="profile-left__name">{{ user.username }} </span>
     <span class="profile-left__since">member since {{ formatedDate }}</span>
     <span
-      v-if="userStatus == 'online' && relationState(user) >= -1"
+      v-if="userStatus(user) == 'online' && relationState(user) >= -1"
       class="profile-left__status"
       ><i class="status status--online fas fa-circle" /> online</span
     >
     <span
-      v-else-if="userStatus == 'offline' && relationState(user) >= -1"
+      v-else-if="userStatus(user) == 'offline' && relationState(user) >= -1"
       class="profile-left__status"
       ><i class="status status--offline fas fa-circle" /> offline</span
     >
     <span
-      v-else-if="userStatus == 'ingame' && relationState(user) >= -1"
+      v-else-if="userStatus(user) == 'ingame' && relationState(user) >= -1"
       class="profile-left__status"
       ><i class="status status--in-game fas fa-circle" /> in game</span
     >
@@ -64,7 +64,7 @@
       <i class="upload-icon fas fa-envelope" /> send message
     </button>
     <button
-      v-if="user.id != self.id && userStatus == 'online'"
+      v-if="user.id != self.id && userStatus(user) == 'online' && userStatus(self) == 'online'"
       @click="challengeUser"
       class="button button--primary"
     >
@@ -191,7 +191,7 @@ export default defineComponent({
     const formatedDate = computed(() => {
       return moment(user.created_at).format("MM-DD-YYYY");
     });
-    const userStatus = computed((): "online" | "offline" | "ingame" => {
+    const userStatus = (user: User): "online" | "offline" | "ingame" => {
       if (user != undefined) {
         const inGameUser = store.state.inGameUsers.find(
           (u) => u === user.username
@@ -206,7 +206,7 @@ export default defineComponent({
         }
       }
       return "offline";
-    });
+    };
 
     onMounted(() => {
       showModal2.value = store.state.firstTimeConnect;

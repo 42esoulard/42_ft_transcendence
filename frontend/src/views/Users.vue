@@ -78,7 +78,7 @@
                 <i class="link link--neutral fas fa-envelope" />
               </button>
               <button
-                v-if="userStatus(user) == 'online'"
+                v-if="userStatus(user) == 'online' && userStatus(self) == 'online'"
                 class="link link--neutral"
                 @click="challengeUser(user)"
                 title="challenge"
@@ -288,6 +288,7 @@ export default defineComponent({
       userStatus,
       challengeUser,
       sendDM,
+      self: computed(() => store.state.user)
     };
   },
 });
