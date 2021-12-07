@@ -492,7 +492,6 @@ export const ChatComponent = defineComponent({
           })
           .catch((err) => {
             if (err && err.response) {
-              console.log('hEREEE')
               store.dispatch("setErrorMessage", err.response.data.message);
             }
           });
@@ -667,7 +666,6 @@ export const ChatComponent = defineComponent({
               "]"
           );
           await getDefaultChannel()
-          // .then(() => updateChannelsList());
           chatSocket.emit("update-channels");
         })
         .catch((err) => {
@@ -887,6 +885,7 @@ export const ChatComponent = defineComponent({
       console.log("in switchChannel", cm);
       activeChannel.value = cm;
       activeChannel.value.new_message = false;
+      channelMessages.value = [];
       await getMessagesUpdate(cm.channel.id).then(() => { chatReady.value = true; })
     };
 
