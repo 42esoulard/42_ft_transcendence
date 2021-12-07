@@ -2,7 +2,7 @@
   <div class="user-account" v-if="user.id != 0">
     <div class="users users--admin">
       <div class="users__title">Manage users</div>
-      <div class="users-list-selectors" :key="userList">
+      <div class="users-list-selectors">
         <button
           @click="toggleOnline"
           :class="[
@@ -132,7 +132,7 @@
 
     <div class="users users--admin">
       <div class="users__title">Manage channels</div>
-      <div class="users-list-selectors" :key="channelList">
+      <div class="users-list-selectors">
         <button
           @click="togglePublic"
           :class="[

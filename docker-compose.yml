@@ -51,7 +51,7 @@ services:
     - game.env
     command: sh -c "npm install --loglevel=error && npm run serve"
     depends_on:
-      - postgres
+      - backend
       - sdk
 
   # PostgreSQL Service

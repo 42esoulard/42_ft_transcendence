@@ -14,7 +14,7 @@
         >
         <SideBarLink
           v-if="role != 'user'"
-          :key="role"
+        
           to="/admin"
           icon="fas fa-crown"
           >admin</SideBarLink
