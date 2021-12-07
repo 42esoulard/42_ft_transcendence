@@ -220,7 +220,7 @@ router.beforeEach(async (to, from) => {
       await getProfile();
     }
     if (store.state.user.id) {
-      return true;
+      return "/";
     }
   } else if (to.matched.some((record) => record.meta.requiresAdmin)) {
     if (store.state.user.id === 0) {

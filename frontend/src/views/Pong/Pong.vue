@@ -99,7 +99,27 @@ export default defineComponent({
     const challengee = { id: props.challengeeId, name: props.challengeeName };
 
     const store = useStore();
+    const userStatus = (user: User): "online" | "offline" | "ingame" => {
+      if (user != undefined) {
+        const inGameUser = store.state.inGameUsers.find(
+          (u) => u === user.username
+        );
+        const onlineUser = store.state.onlineUsers.find(
+          (u) => u.id === user.id
+        );
+        if (inGameUser) {
+          return "ingame";
+        } else if (onlineUser) {
+          return "online";
+        }
+      }
+      return "offline";
+    };
     const JoinQueue = () => {
+      if (userStatus(store.state.user) == "ingame"){
+        store.dispatch("setErrorMessage", "you're already playing!");
+        return ;
+      }
       pongSocket.emit("joinGame", {
         userId: store.state.user.id,
         userName: store.state.user.username,
