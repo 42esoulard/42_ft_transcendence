@@ -653,8 +653,8 @@ export const ChatComponent = defineComponent({
       toggleConfirmation.value = "";
       const name = activeChannel.value!.channel.name;
       newMessage.value = " has left";
-      await send();
-      await api
+      await send().then(async () => {
+        await api
         .leaveChannel("self", activeChannel.value!.id, {
           withCredentials: true,
         })
@@ -672,6 +672,7 @@ export const ChatComponent = defineComponent({
           if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
+      })
     };
 
     chatSocket.on("create-direct-message", (recipient: User) => {
