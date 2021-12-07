@@ -43,13 +43,13 @@ let AuthService = class AuthService {
             });
         }
     }
-    async validateJwtUser(username) {
-        const user = await this.usersService.getUserByUsername(username);
+    async validateJwtUser(login) {
+        const user = await this.usersService.getUserByLogin(login);
         return user;
     }
     async generateAccessToken(user, isTwoFAauthenticated = false) {
         const payload = {
-            username: user.username,
+            username: user.forty_two_login,
             sub: user.id,
             isTwoFAauthenticated,
         };
