@@ -180,7 +180,11 @@ const refreshToken = async () => {
     .then(async (response) => {
       await getProfile();
     })
-    .catch((err: any) => console.log(err.response.data.message));
+    .catch((err: any) => {
+      if (err && err.response) {
+        console.log(err.response.data.message)
+      }
+    });
 };
 
 const getProfile = async () => {

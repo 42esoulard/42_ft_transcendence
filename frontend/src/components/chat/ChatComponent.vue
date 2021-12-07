@@ -381,6 +381,7 @@ export const ChatComponent = defineComponent({
               await api
                 .setNewMessage("false", chan.data.id, { withCredentials: true })
                 .then(async (res) => {
+                  activeChannel.value = res.data;
                   await updateChannelsList()
                   .then (() => {
                     chatSocket.emit('ready');
@@ -490,8 +491,10 @@ export const ChatComponent = defineComponent({
             return res;
           })
           .catch((err) => {
-            if (err && err.response)
+            if (err && err.response) {
+              console.log('hEREEE')
               store.dispatch("setErrorMessage", err.response.data.message);
+            }
           });
       }
     };
@@ -651,7 +654,7 @@ export const ChatComponent = defineComponent({
       toggleConfirmation.value = "";
       const name = activeChannel.value!.channel.name;
       newMessage.value = " has left";
-      send();
+      await send();
       await api
         .leaveChannel("self", activeChannel.value!.id, {
           withCredentials: true,
@@ -663,8 +666,8 @@ export const ChatComponent = defineComponent({
               name.substring(0, 15) +
               "]"
           );
-          await switchChannel(joinedChannels.value[0])
-          .then(() => updateChannelsList());
+          await getDefaultChannel()
+          // .then(() => updateChannelsList());
           chatSocket.emit("update-channels");
         })
         .catch((err) => {
