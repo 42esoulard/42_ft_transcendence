@@ -46,11 +46,13 @@ export default defineComponent({
       if (store.state.challengesReceived.filter((chall) => chall.challenger == challengerName).length){
         store.commit("removeChallenge", challengerName);
         pongSocket.emit("challengeAccepted", challengerName);
+        store.dispatch("setMessage", "");
       }
     };
     const refuse = (challengerName: string) => {
       store.commit("removeChallenge", challengerName);
       pongSocket.emit("challengeDeclined", challengerName);
+      store.dispatch("setMessage", "");
     };
 
     pongSocket.on("challengeCancelled", (challengerName: string) => {
