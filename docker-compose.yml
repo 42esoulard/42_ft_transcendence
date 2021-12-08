@@ -48,15 +48,10 @@ services:
       VUE_APP_42_AUTH_URL: ${AUTH_URL}
       NODE_OPTIONS: --openssl-legacy-provider
     env_file:
-<<<<<<< HEAD
     - game.env
     # command: sh -c "npm install --loglevel=error && npm run serve"
     # command: sh -c "npm install && http-server --cors --proxy http://localhost:8080? dist"
     # command: sh -c "nginx -g daemon off;"
-=======
-      - game.env
-    command: sh -c "npm install --loglevel=error && npm run serve"
->>>>>>> main
     depends_on:
       - postgres
       - backend
@@ -97,7 +92,6 @@ services:
 
     # container_name: "${ADMINER_NAME}"
 
-<<<<<<< HEAD
   # # API watcher and SDK rebuilder
   # sdk:
   #   build:
@@ -108,16 +102,6 @@ services:
   #     - backend
     
 
-=======
-  # API watcher and SDK rebuilder
-  sdk:
-    build:
-      context: "./frontend/sdk"
-    volumes:
-      - ./:/usr/src/app/
-    depends_on:
-      - backend
->>>>>>> main
 
   # # Pgadmin Service (database management tool)
   # pgadmin:
