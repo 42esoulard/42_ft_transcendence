@@ -425,59 +425,58 @@ export const ChatComponent = defineComponent({
         .getUserChannels({ withCredentials: true })
         .then(async (res) => {
           joinedChannels.value = res.data;
-          if (isMember.value) {
-            await api
-              .getChannelMember(
-                activeChannel.value!.channel.id,
-                activeChannel.value!.member.id,
-                { withCredentials: true }
+          await api
+            .getChannelMember(
+              activeChannel.value!.channel.id,
+              activeChannel.value!.member.id,
+              { withCredentials: true }
+            )
+            .then((res) => {
+              activeChannel.value = res.data;
+              if (
+                !activeChannel.value.is_admin &&
+                user.value.role !== "admin" &&
+                user.value.role !== "owner"
               )
-              .then((res) => {
-                activeChannel.value = res.data;
-                if (
-                  !activeChannel.value.is_admin &&
-                  user.value.role !== "admin" &&
-                  user.value.role !== "owner"
-                )
-                  channelSettings.value = false;
-              })
-              .catch(async (err) => {
-                {
-                  if (
-                    err &&
-                    err.response &&
-                    err.response.data.message !== "banned"
-                  )
-                    store.dispatch(
-                      "setErrorMessage",
-                      err.response.data.message
-                    );
-                }
-                if (
-                  user.value.role !== "admin" &&
-                  user.value.role !== "owner"
-                ) {
-                  getDefaultChannel();
-                } else {
-                  await api
-                    .getChannelPreview(activeChannel.value!.channel.id, {
-                      withCredentials: true,
-                    })
-                    .then((res) => {
-                      activeChannel.value!.channel = res.data;
-                      channelMessages.value = res.data.messages;
-                      return res;
-                    })
-                    .catch((err) => {
-                      if (err && err.response)
-                        store.dispatch(
-                          "setErrorMessage",
-                          err.response.data.message
-                        );
-                    });
-                }
-              });
-          }
+                channelSettings.value = false;
+            })
+            .catch(async (err) => {
+              // {
+              //   if (
+              //     err &&
+              //     err.response &&
+              //     err.response.data.message !== "banned" && 
+              //     user.value.role == "user"
+              //   )
+              //     store.dispatch(
+              //       "setErrorMessage",
+              //       err.response.data.message
+              //     );
+              // }
+              if (
+                user.value.role !== "admin" &&
+                user.value.role !== "owner"
+              ) {
+                getDefaultChannel();
+              } else {
+                await api
+                  .getChannelPreview(activeChannel.value!.channel.id, {
+                    withCredentials: true,
+                  })
+                  .then((res) => {
+                    activeChannel.value!.channel = res.data;
+                    channelMessages.value = res.data.messages;
+                    return res;
+                  })
+                  .catch((err) => {
+                    if (err && err.response)
+                      store.dispatch(
+                        "setErrorMessage",
+                        err.response.data.message
+                      );
+                  });
+              }
+            });
           await api
             .getAvailableChannels({ withCredentials: true })
             .then((res) => {
@@ -540,8 +539,12 @@ export const ChatComponent = defineComponent({
           },
           { withCredentials: true }
         )
-        .then(() => {
-          getMessagesUpdate(newContent.channel.id);
+        .then((res) => {
+          if (isMember.value) {
+            getMessagesUpdate(newContent.channel.id);
+          } else {
+            channelMessages.value.push(res.data);
+          }
           chatSocket.emit("chat-message", newContent, store.state.onlineUsers);
         })
         .catch(async (err: any) => {
