@@ -19,24 +19,14 @@
           </router-link>
           <div class="friendship__buttons">
             <button
-              class="
-                button
-                button--third
-                button--invitation
-                button--invitation--pending
-              "
+              class="button button--third button--invitation button--invitation--pending"
               @click="acceptFriend(friendship.requester)"
               title="accept"
             >
               <i class="friendship__icon fas fa-user-check" />
             </button>
             <button
-              class="
-                button
-                button--third
-                button--invitation
-                button--invitation--decline
-              "
+              class="button button--third button--invitation button--invitation--decline"
               @click="removeFriend(friendship.requester)"
               title="decline"
             >
@@ -64,9 +54,7 @@
             {{ friendship.adressee.username }}
           </router-link>
           <button
-            class="
-              button button--third button--invitation button--invitation--cancel
-            "
+            class="button button--third button--invitation button--invitation--cancel"
             @click="removeFriend(friendship.adressee)"
             title="cancel"
           >
@@ -107,38 +95,41 @@ export default defineComponent({
         });
     });
 
-    chatSocket.on('addFriendship', async (relationship: Relationship) => {
-      await relationshipApi.getRelationship(relationship.requesterId, relationship.adresseeId)
-      .then((res) => {
-        relationships.value.push(res.data);
-      })
-      .catch((err: any) => {
+    chatSocket.on("addFriendship", async (relationship: Relationship) => {
+      await relationshipApi
+        .getRelationship(relationship.requesterId, relationship.adresseeId)
+        .then((res) => {
+          relationships.value.push(res.data);
+        })
+        .catch((err: any) => {
           if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
-      });
-    })
+        });
+    });
 
-    chatSocket.on('rmFriendship', (friendId: number) => {
+    chatSocket.on("rmFriendship", (friendId: number) => {
       let index = 0;
       for (const friendship of relationships.value) {
-        if (friendship.adresseeId == friendId || 
-          friendship.requesterId == friendId) {
+        if (
+          friendship.adresseeId == friendId ||
+          friendship.requesterId == friendId
+        ) {
           relationships.value.splice(index, 1);
           updateSidebar();
           break;
         }
         index++;
       }
-    })
+    });
 
     const updateSidebar = () => {
       store.state.toggleFriendship = false;
-      
+
       for (const friendship of relationships.value) {
         if (friendship.adresseeId == store.state.user.id)
           store.state.toggleFriendship = true;
       }
-    }
+    };
 
     const acceptFriend = async (user: User) => {
       if (store.state.user.id != 0) {
@@ -159,9 +150,14 @@ export default defineComponent({
                   relationships.value.indexOf(friendship),
                   1
                 );
-                updateSidebar();
-                chatSocket.emit('acceptFriendship', user.id, user.username, 
-                store.state.user.id, store.state.user.username)
+              updateSidebar();
+              chatSocket.emit(
+                "acceptFriendship",
+                user.id,
+                user.username,
+                store.state.user.id,
+                store.state.user.username
+              );
             }
           })
           .catch((err: any) => {
@@ -171,23 +167,25 @@ export default defineComponent({
       }
     };
 
-    chatSocket.on('updateFriendship', (friendId: number) => {
+    chatSocket.on("updateFriendship", (friendId: number) => {
       let index = 0;
       for (const friendship of relationships.value) {
-        if (friendship.adresseeId == friendId || 
-          friendship.requesterId == friendId) {
+        if (
+          friendship.adresseeId == friendId ||
+          friendship.requesterId == friendId
+        ) {
           friendship.pending = !friendship.pending;
           if (!friendship.pending) {
             relationships.value.splice(
-                  relationships.value.indexOf(friendship),
-                  1
-                );
+              relationships.value.indexOf(friendship),
+              1
+            );
           }
           break;
         }
         index++;
       }
-    })
+    });
 
     const removeFriend = async (user: User) => {
       if (store.state.user.id != 0) {
@@ -210,7 +208,11 @@ export default defineComponent({
               ) {
                 relationships.value.splice(index, 1);
                 updateSidebar();
-                chatSocket.emit("removeFriendship", user.id, store.state.user.id);
+                chatSocket.emit(
+                  "removeFriendship",
+                  user.id,
+                  store.state.user.id
+                );
                 break;
               }
               index++;

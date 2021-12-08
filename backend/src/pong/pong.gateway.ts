@@ -161,7 +161,6 @@ export class PongGateway
     client: Socket,
     message: joinGameMessage,
   ): Promise<void> {
-
     if (this.userIsAlreadyInQueue(client, message.userId)) return;
 
     if (message.gameMode === 'classic') {

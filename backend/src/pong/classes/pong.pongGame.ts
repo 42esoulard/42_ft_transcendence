@@ -94,7 +94,6 @@ export class pongGame {
   }
 
   async createGame(): Promise<void> {
-
     // push Game and GameUsers intoDB
     await this.pushGameintoDB();
     await this.pushGameUsersintoDB();

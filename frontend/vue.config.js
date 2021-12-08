@@ -1,5 +1,5 @@
 module.exports = {
   configureWebpack: {
-    devtool: 'cheap-module-eval-source-map',
+    devtool: "cheap-module-eval-source-map",
   },
-}
+};

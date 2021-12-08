@@ -182,7 +182,7 @@ const refreshToken = async () => {
     })
     .catch((err: any) => {
       if (err && err.response) {
-        console.log(err.response.data.message)
+        console.log(err.response.data.message);
       }
     });
 };

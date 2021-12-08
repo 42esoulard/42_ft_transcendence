@@ -26,9 +26,7 @@ export class RelationshipsService {
 
   async getPendingRelationships(adresseeId: number): Promise<Relationship[]> {
     return await this.relationshipsRepository.find({
-      where: [
-        { adresseeId: adresseeId, pending: 'true' },
-      ],
+      where: [{ adresseeId: adresseeId, pending: 'true' }],
     });
   }
 

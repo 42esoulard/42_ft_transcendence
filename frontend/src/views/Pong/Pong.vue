@@ -116,9 +116,9 @@ export default defineComponent({
       return "offline";
     };
     const JoinQueue = () => {
-      if (userStatus(store.state.user) == "ingame"){
+      if (userStatus(store.state.user) == "ingame") {
         store.dispatch("setErrorMessage", "you're already playing!");
-        return ;
+        return;
       }
       pongSocket.emit("joinGame", {
         userId: store.state.user.id,

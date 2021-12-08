@@ -78,7 +78,9 @@
                 <i class="link link--neutral fas fa-envelope" />
               </button>
               <button
-                v-if="userStatus(user) == 'online' && userStatus(self) == 'online'"
+                v-if="
+                  userStatus(user) == 'online' && userStatus(self) == 'online'
+                "
                 class="link link--neutral"
                 @click="challengeUser(user)"
                 title="challenge"
@@ -193,46 +195,51 @@ export default defineComponent({
       }
     });
 
-    chatSocket.on('updateFriendshipList', (friendsInfo) => {
+    chatSocket.on("updateFriendshipList", (friendsInfo) => {
       if (friendsInfo.length == 4) {
-        const newFriend = (friendsInfo[0] == store.state.user.id
-                        ? friendsInfo[2]
-                        : friendsInfo[0])
+        const newFriend =
+          friendsInfo[0] == store.state.user.id
+            ? friendsInfo[2]
+            : friendsInfo[0];
         if (Number(newFriend)) {
           friendList.value.push(newFriend);
         }
       } else if (Number(friendsInfo)) {
         friendList.value.push(friendsInfo);
       }
-    })
+    });
 
     chatSocket.on("newBlocked", (blocked) => {
       if (store.state.user.id == blocked[0].adresseeId) {
-        userList.value = userList.value.filter((usr: User) => usr.id != blocked[0].requesterId)
-      }
-      else if (store.state.user.id == blocked[0].requesterId) {
-        friendList.value = friendList.value.filter((fr: Number) => fr != blocked[0].adresseeId)
+        userList.value = userList.value.filter(
+          (usr: User) => usr.id != blocked[0].requesterId
+        );
+      } else if (store.state.user.id == blocked[0].requesterId) {
+        friendList.value = friendList.value.filter(
+          (fr: Number) => fr != blocked[0].adresseeId
+        );
         blockedList.value.push(blocked[0].adresseeId);
       }
     });
 
-    chatSocket.on('removeBlocked', (infos) => {
+    chatSocket.on("removeBlocked", (infos) => {
       if (store.state.user.id == infos[1]) {
         userList.value.push(infos[0]);
-      }
-      else if (store.state.user.id == infos[0].id) {
-        blockedList.value = blockedList.value.filter((id: number) => id != infos[1]);
+      } else if (store.state.user.id == infos[0].id) {
+        blockedList.value = blockedList.value.filter(
+          (id: number) => id != infos[1]
+        );
       }
     });
 
-    chatSocket.on('rmFromFriendshipList', (friendsInfo) => {
+    chatSocket.on("rmFromFriendshipList", (friendsInfo) => {
       if (Number(friendsInfo)) {
         const index = friendList.value.indexOf(friendsInfo);
         if (index >= 0) {
           friendList.value.splice(index, 1);
         }
       }
-    })
+    });
 
     const toggleFriends = () => {
       friendlist.value = !friendlist.value;
@@ -313,8 +320,8 @@ export default defineComponent({
     };
 
     const sendDM = (recipient: User) => {
-      chatSocket.emit("userlist-dm", recipient)
-    }
+      chatSocket.emit("userlist-dm", recipient);
+    };
 
     return {
       userList,
@@ -329,7 +336,7 @@ export default defineComponent({
       userStatus,
       challengeUser,
       sendDM,
-      self: computed(() => store.state.user)
+      self: computed(() => store.state.user),
     };
   },
 });

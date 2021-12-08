@@ -30,20 +30,12 @@
             <div>
               <span v-if="cm.is_owner"
                 ><img
-                  class="
-                    fas
-                    fa-user-tie
-                    chat-channels__tag chat-channels__tag--owner
-                  "
+                  class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner"
                   title="Channel Owner"
               /></span>
               <span v-if="cm.is_admin"
                 ><img
-                  class="
-                    fas
-                    fa-user-shield
-                    chat-channels__tag chat-channels__tag--admin
-                  "
+                  class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin"
                   title="Channel Admin"
               /></span>
             </div>
@@ -56,20 +48,21 @@
       <div class="chat-channels__title">More channels</div>
       <ul class="chat-channels__list">
         <li v-for="chan in availableChannels" :key="chan.name">
-          <button :class="[
+          <button
+            :class="[
               'chat-channels__item',
-              activeChannel.channel.id === chan.id ? 'chat-channels__item--on' : '',
-            ]" @click="previewChannel(chan)">
+              activeChannel.channel.id === chan.id
+                ? 'chat-channels__item--on'
+                : '',
+            ]"
+            @click="previewChannel(chan)"
+          >
             <div class="chat-channels__name" :title="chan.name">
               #{{ chan.name }}
             </div>
             <span v-if="chan.password"
               ><img
-                class="
-                  fas
-                  fa-lock
-                  chat-channels__tag chat-channels__tag--locked
-                "
+                class="fas fa-lock chat-channels__tag chat-channels__tag--locked"
                 title="Password-protected"
             /></span>
           </button>

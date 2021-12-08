@@ -61,11 +61,15 @@ export default defineComponent({
     };
 
     const accept = (challengerName: string) => {
-      if (userStatus(store.state.user) == "ingame"){
+      if (userStatus(store.state.user) == "ingame") {
         store.dispatch("setErrorMessage", "you're already playing!");
-        return ;
+        return;
       }
-      if (store.state.challengesReceived.filter((chall) => chall.challenger == challengerName).length){
+      if (
+        store.state.challengesReceived.filter(
+          (chall) => chall.challenger == challengerName
+        ).length
+      ) {
         store.commit("removeChallenge", challengerName);
         pongSocket.emit("challengeAccepted", challengerName);
         store.dispatch("setMessage", "");

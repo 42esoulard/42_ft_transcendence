@@ -93,7 +93,7 @@ export default defineComponent({
           .catch((err: any) => {
             if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
-              return ;
+            return;
           });
 
         await getProfile();

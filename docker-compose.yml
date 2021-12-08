@@ -1,13 +1,12 @@
-version: '3'
+version: "3"
 
 services:
-
   # backend Service with nestjs-express framework
   backend:
     build:
       context: "./backend"
       args:
-       NODE_VERSION: ${NODE_VERSION}
+        NODE_VERSION: ${NODE_VERSION}
     volumes:
       - ./backend:/usr/src/app
     ports:
@@ -22,19 +21,19 @@ services:
       FRONT_URL: ${FRONT_URL}
       BASE_URL: ${API_URL}
     env_file:
-    - credentials.env
-    - game.env
+      - credentials.env
+      - game.env
     command: sh -c "rm -rf ./dist && npm install --loglevel=error && npm run start:dev:db:seed && npm run start:dev"
     # command: sh -c "npm install && npm run start:dev:db:seed && npm run start"
     depends_on:
       - postgres
-  
+
   # frontend Service with vuejs framework
   frontend:
     build:
       context: "./frontend"
       args:
-       NODE_VERSION: ${NODE_VERSION}
+        NODE_VERSION: ${NODE_VERSION}
     volumes:
       - ./frontend:/usr/src/app
     ports:
@@ -48,7 +47,7 @@ services:
       VUE_APP_42_AUTH_URL: ${AUTH_URL}
       NODE_OPTIONS: --openssl-legacy-provider
     env_file:
-    - game.env
+      - game.env
     command: sh -c "npm install --loglevel=error && npm run serve"
     depends_on:
       - backend
@@ -86,7 +85,7 @@ services:
       ADMINER_DEFAULT_DB_NAME: ${DB_NAME}
     depends_on:
       - postgres
-      
+
     # container_name: "${ADMINER_NAME}"
 
   # API watcher and SDK rebuilder
@@ -97,8 +96,6 @@ services:
       - ./:/usr/src/app/
     depends_on:
       - backend
-    
-
 
   # # Pgadmin Service (database management tool)
   # pgadmin:
@@ -111,7 +108,7 @@ services:
   #   environment:
   #     PGADMIN_DEFAULT_PASSWORD: ${DB_PASSWORD}
   #     PGADMIN_DEFAULT_EMAIL: test@test.fr
-  #   networks: 
+  #   networks:
   #     - backend
   #   depends_on:
   #     - postgres
@@ -119,7 +116,6 @@ services:
   # Networks
 networks:
   network:
-
 #  # Volumes
 # volumes:
-  # postgresdata:
+# postgresdata:
