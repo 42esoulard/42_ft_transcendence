@@ -291,7 +291,9 @@ export class PongGateway
 
   async stopWatching(client: Socket, room: string)
   {
-    client.leave(room)
+    const game: pongGame = this.games.get(room);
+    if (!game) return;
+    game.removeSpectator(client)
   }
 
   clearQueue(client: Socket) {

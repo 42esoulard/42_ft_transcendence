@@ -49,6 +49,8 @@ export class pongGame {
   public interval = null;
   public timeout = null;
 
+  public spectators: Socket[] = [];
+
   initPositions() {
     this.player1.position = CANVAS_HEIGHT / 2 - this.player1.racquetLenght / 2;
     this.player2.position = CANVAS_HEIGHT / 2 - this.player2.racquetLenght / 2;
@@ -125,6 +127,7 @@ export class pongGame {
     }, INITAL_DELAY_IN_MS);
   }
 
+  // add game into game list in pong/watch
   async spectatorWarnNewGame() {
     const game = await this.gameRepo.findOne(this.gameId, {
       relations: ['users', 'users.user'],
@@ -134,6 +137,7 @@ export class pongGame {
 
   async addSpectator(client: Socket) {
     client.join(this.room);
+    this.spectators.push(client)
     client.emit(
       'GoToGame',
       this.room,
@@ -144,6 +148,11 @@ export class pongGame {
     // update score for spectator if score is not 0-0 (else spectator will need to wait for next score)
     if (this.player1.score || this.player2.score)
       client.emit('score', this.getPlayerScores());
+  }
+
+  removeSpectator(client: Socket) {
+    client.leave(this.room);
+    this.spectators = this.spectators.filter((spectator) => spectator.id != client.id)
   }
 
   startFromCenter() {
@@ -179,6 +188,7 @@ export class pongGame {
     ]);
   }
 
+  // remove game from game list in pong/watch
   async spectatorWarnEndGame() {
     const game = await this.gameRepo.findOne(this.gameId, {
       relations: ['users', 'users.user'],
