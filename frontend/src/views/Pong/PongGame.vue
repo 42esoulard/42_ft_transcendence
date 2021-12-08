@@ -166,6 +166,7 @@ export default defineComponent({
       if (props.userType === "player") {
         pongSocket.emit("leaveGame", props.room);
         window.removeEventListener("keydown", onKeyDown);
+        window.removeEventListener("keydown", preventScroll);
       }
       // remove event listener, else it will be registered as many times as we entered the component
       pongSocket.off("position");
