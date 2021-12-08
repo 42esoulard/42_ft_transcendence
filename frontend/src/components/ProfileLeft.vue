@@ -299,7 +299,7 @@ export default defineComponent({
           )
           .then((res: any) => {
             userFriendships.value.push(res.data);
-            chatSocket.emit("newFriendshipRequest", res.data, user.username);
+            chatSocket.emit("newFriendshipRequest", res.data, store.state.user.username);
           })
           .catch((err: any) => {
             if (err && err.response)
@@ -388,7 +388,7 @@ export default defineComponent({
       for (const friendship of userFriendships.value) {
         if (friendship.adresseeId == friendId || 
           friendship.requesterId == friendId) {
-          friendship.pending = !friendship.pending;
+          friendship.pending = false;
           break;
         }
         index++;
