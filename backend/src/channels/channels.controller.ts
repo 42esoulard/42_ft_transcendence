@@ -448,7 +448,9 @@ export class ChannelsController {
                 request.user.id,
               );
               if (user == undefined) {
-                throw new NotFoundException('Couldnt identify request account');
+                throw new NotFoundException(
+                  "Couldn't identify request account",
+                );
               }
               if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
                 throw new ForbiddenException(
@@ -497,7 +499,7 @@ export class ChannelsController {
       if (cm == undefined) {
         const user: User = await this.channelService.getUser(request.user.id);
         if (user == undefined) {
-          throw new NotFoundException('Couldnt identify request account');
+          throw new NotFoundException("Couldn't identify request account");
         }
         if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
           throw new ForbiddenException(
@@ -528,13 +530,21 @@ export class ChannelsController {
     @Param('end_date') end_date: number,
     @Req() request: Request,
   ): Promise<ChannelMember> {
+    if (end_date.toString() !== '0' && !Number(end_date)) {
+      throw new BadRequestException('Bad date format!');
+    }
     const user_cm: ChannelMember = await this.channelService.getCmById(cm_id);
-    if (
-      user_cm == undefined ||
-      (action == 'unban' && !user_cm.ban) ||
-      (action == 'unmute' && !user_cm.mute)
-    ) {
-      throw new NotFoundException('Failed to find or act on member');
+    if (user_cm == undefined) {
+      throw new NotFoundException('Failed to find this member');
+    }
+    if (action == 'unban' && !user_cm.ban) {
+      throw new BadRequestException("This member isn't banned");
+    } else if (action == 'unmute' && !user_cm.mute) {
+      throw new BadRequestException("This member isn't muted");
+    } else if (action == 'muted' && user_cm.mute) {
+      throw new BadRequestException('This member is already muted');
+    } else if (action == 'banned' && user_cm.ban) {
+      throw new BadRequestException('This member is already banned');
     }
     if (
       (action == 'banned' || action == 'muted') &&
@@ -552,11 +562,11 @@ export class ChannelsController {
     if (req_cm == undefined) {
       const user: User = await this.channelService.getUser(request.user.id);
       if (user == undefined) {
-        throw new NotFoundException('Couldnt identify request account');
+        throw new NotFoundException("Couldn't identify request account");
       }
       if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
         throw new ForbiddenException(
-          'You dont have the right to act on this channels members',
+          "You don't have the right to act on this channels members",
         );
       }
     } else if (
@@ -566,7 +576,7 @@ export class ChannelsController {
       req_cm.member.role !== Role.OWNER
     ) {
       throw new ForbiddenException(
-        'You dont have the right to act on this channels members',
+        "You don't have the right to act on this channels members",
       );
     }
 
@@ -635,10 +645,16 @@ export class ChannelsController {
       request.user.id,
     );
     if (req_cm == undefined) {
-      throw new ForbiddenException(
-        'You dont have the right to edit this channel',
-      );
-    } else if (!req_cm.is_owner) {
+      const user: User = await this.channelService.getUser(request.user.id);
+      if (user == undefined) {
+        throw new NotFoundException("Couldn't identify request account");
+      }
+      if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
+        throw new ForbiddenException(
+          'You dont have the right to delete this channel',
+        );
+      }
+    } else if (!req_cm.is_owner && req_cm.member.role == Role.USER) {
       throw new ForbiddenException(
         'You dont have the right to edit this channel',
       );

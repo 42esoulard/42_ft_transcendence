@@ -26,6 +26,7 @@
         class="chat-channel-form__input"
         required
         type="datetime-local"
+        id="date"
         v-model="endDate"
       />
       <button class="button button--join-locked-chan" type="submit">
@@ -37,6 +38,7 @@
 
 <script lang="ts">
 import { ref, defineComponent, computed } from "vue";
+import { store } from "@/store";
 
 export default defineComponent({
   name: "MuteBanTimer",
@@ -44,7 +46,7 @@ export default defineComponent({
   emits: ["close", "update-mute-ban"],
   setup(props, context) {
     const dateInput = computed(
-      () => <HTMLInputElement>document.querySelector("input")!
+      () => <HTMLInputElement>document.querySelector("input#date")!
     );
     const curDate = new Date(Date.now() + 3600000);
     const tz = curDate.toLocaleString("sv-SE");
@@ -59,8 +61,8 @@ export default defineComponent({
     const checkEndDate = async () => {
       const parsedDate = Date.parse(endDate.value);
       if (parsedDate - Date.now() <= 0) {
-        dateInput.value.setCustomValidity("Please select a future date!");
-        dateInput.value.reportValidity();
+        store.dispatch("setErrorMessage", "Please select a future date!");
+        closeModal();
         return;
       }
       context.emit(

@@ -167,49 +167,6 @@ export default {
       }
     });
 
-    chatSocket.on(
-      "chat-action",
-      (action: string, userId: number, chanName: string) => {
-        if (store.state.user.id == userId) {
-          store.dispatch(
-            "setMessage",
-            "You have been " + action + " [" + chanName.substring(0, 15) + "]"
-          );
-          // if (action == 'banned') {
-          //   chatSocket.emit("get-default");
-          // }
-        }
-      }
-    );
-
-    chatSocket.on("newFriendshipRequest", (friendship: Relationship) => {
-      if (store.state.user.id == friendship.adresseeId) {
-        if (friendship.requester) {
-          store.state.toggleFriendship = true;
-          store.dispatch(
-            "setMessage",
-            `${friendship.requester.username} sent you a friend request!`
-          );
-        }
-      }
-    });
-
-    chatSocket.on("friendshipAccepted", (friendship: Relationship) => {
-      if (store.state.user.id == friendship.adresseeId) {
-        if (friendship.requester)
-          store.dispatch(
-            "setMessage",
-            `You're now friends with ${friendship.requester.username}`
-          );
-      } else if (store.state.user.id == friendship.requesterId) {
-        if (friendship.adressee)
-          store.dispatch(
-            "setMessage",
-            `You're now friends with ${friendship.adressee.username}`
-          );
-      }
-    });
-
     chatSocket.on("newFriendshipRequest", (friendship) => {
       if (friendship.length == 2) {
         if (store.state.user.id == friendship[0].adresseeId) {
@@ -266,6 +223,9 @@ export default {
             "setMessage",
             "You have been " + action + " [" + chanName.substring(0, 15) + "]"
           );
+          // if (action == 'kicked from') {
+          //   chatSocket.emit('app-get-default');
+          // }
         }
       }
     );
