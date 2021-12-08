@@ -153,7 +153,7 @@ export default defineComponent({
 
     // lifecycle hooks
     onMounted(() => {
-      if (props.userType === "player"){
+      if (props.userType === "player") {
         window.addEventListener("keydown", preventScroll, false);
         window.addEventListener("keydown", onKeyDown);
       }
@@ -223,7 +223,7 @@ export default defineComponent({
     const winningPlayer = ref<string>("");
     const gameIsOver = ref(false);
     pongSocket.on("gameOver", (player1Won: boolean) => {
-      if (props.userType === "player"){
+      if (props.userType === "player") {
         window.removeEventListener("keydown", onKeyDown);
         window.removeEventListener("keydown", preventScroll);
       }
@@ -253,10 +253,14 @@ export default defineComponent({
     };
 
     const preventScroll = (event: KeyboardEvent) => {
-      if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(event.code) > -1) {
-          event.preventDefault();
+      if (
+        ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(
+          event.code
+        ) > -1
+      ) {
+        event.preventDefault();
       }
-    }
+    };
 
     const toggleAnimations = () => {
       animations.value = !animations.value;

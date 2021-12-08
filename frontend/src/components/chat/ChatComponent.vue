@@ -51,11 +51,7 @@
         <div>
           <span v-if="activeChannel.channel.type === 'private'"
             ><img
-              class="
-                fas
-                fa-eye-slash
-                chat-channels__tag chat-channels__tag--private
-              "
+              class="fas fa-eye-slash chat-channels__tag chat-channels__tag--private"
               title="This community is private"
           /></span>
           <span v-if="activeChannel.channel.password"
@@ -75,29 +71,17 @@
         >
           <span v-if="activeChannel.is_owner"
             ><img
-              class="
-                fas
-                fa-user-tie
-                chat-channels__tag chat-channels__tag--owner
-              "
+              class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner"
               title="Channel Owner"
           /></span>
           <span v-if="activeChannel.is_admin"
             ><img
-              class="
-                fas
-                fa-user-shield
-                chat-channels__tag chat-channels__tag--admin
-              "
+              class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin"
               title="Channel Admin"
           /></span>
           <span @click="channelSettings = true"
             ><img
-              class="
-                fas
-                fa-lg fa-cogs
-                chat-channels__tag chat-channels__tag--settings
-              "
+              class="fas fa-lg fa-cogs chat-channels__tag chat-channels__tag--settings"
               title="Channel Settings"
           /></span>
         </div>
@@ -105,11 +89,7 @@
           v-if="isMember && activeChannel.channel.name !== 'General'"
           @click="toggleConfirmationModal('leave', null)"
           ><img
-            class="
-              fas
-              fa-lg fa-sign-out-alt
-              chat-channels__tag chat-channels__tag--leave
-            "
+            class="fas fa-lg fa-sign-out-alt chat-channels__tag chat-channels__tag--leave"
             title="Leave Channel"
         /></span>
       </div>
@@ -156,7 +136,10 @@
                     <i class="fas fa-envelope link link--neutral" />
                   </button>
                   <button
-                    v-if="userStatus(message.author) == 'online' && userStatus(user) == 'online'"
+                    v-if="
+                      userStatus(message.author) == 'online' &&
+                      userStatus(user) == 'online'
+                    "
                     class="button"
                     title="Challenge"
                     @click="challengeUser(message.author)"
@@ -195,10 +178,7 @@
           /></span>
           <span v-else @click="applyForMembership(activeChannel.channel)"
             ><img
-              class="
-                fa fa-unlock fa-10x
-                chat-channels__lock-img chat-channels__lock-img--unlocked
-              "
+              class="fa fa-unlock fa-10x chat-channels__lock-img chat-channels__lock-img--unlocked"
               title="This channel is password-protected"
           /></span>
         </div>
@@ -290,7 +270,14 @@
 
 <script lang="ts">
 import { useStore } from "@/store";
-import { defineComponent, reactive, ref, watch, computed, onMounted } from "vue";
+import {
+  defineComponent,
+  reactive,
+  ref,
+  watch,
+  computed,
+  onMounted,
+} from "vue";
 import { Info } from "@/types/Info";
 import {
   ChatApi,
@@ -398,11 +385,10 @@ export const ChatComponent = defineComponent({
                 .setNewMessage("false", chan.data.id, { withCredentials: true })
                 .then(async (res) => {
                   activeChannel.value = res.data;
-                  await updateChannelsList()
-                  .then (() => {
-                    chatSocket.emit('ready');
+                  await updateChannelsList().then(() => {
+                    chatSocket.emit("ready");
                     chatReady.value = true;
-                  })
+                  });
                   activeChannel.value = res.data;
                 })
                 .catch((err) => {
@@ -423,7 +409,7 @@ export const ChatComponent = defineComponent({
             store.dispatch("setErrorMessage", err.response.data.message);
         });
     };
-    onMounted(() => getDefaultChannel())
+    onMounted(() => getDefaultChannel());
     // getDefaultChannel()
 
     /*
@@ -454,7 +440,11 @@ export const ChatComponent = defineComponent({
             })
             .catch(async (err) => {
               {
-                if (err && err.response && err.response.data.message !== 'banned')
+                if (
+                  err &&
+                  err.response &&
+                  err.response.data.message !== "banned"
+                )
                   store.dispatch("setErrorMessage", err.response.data.message);
               }
               if (user.value.role !== "admin" && user.value.role !== "owner") {
@@ -641,13 +631,17 @@ export const ChatComponent = defineComponent({
         });
     };
 
-    chatSocket.on("chat-action-del", async (message: string, members: number[]) => {
-      if (members.includes(store.state.user.id)) {
-        store.dispatch("setMessage", message);
-        await switchChannel(joinedChannels.value[0])
-          .then(() => updateChannelsList());
+    chatSocket.on(
+      "chat-action-del",
+      async (message: string, members: number[]) => {
+        if (members.includes(store.state.user.id)) {
+          store.dispatch("setMessage", message);
+          await switchChannel(joinedChannels.value[0]).then(() =>
+            updateChannelsList()
+          );
+        }
       }
-    });
+    );
 
     // chatSocket.on("get-default", () => {
     //   getDefaultChannel();
@@ -660,8 +654,9 @@ export const ChatComponent = defineComponent({
           activeChannel.value!.channel.name.substring(0, 15) +
           "] has been deleted"
       );
-      await switchChannel(joinedChannels.value[0])
-      .then(() => updateChannelsList());
+      await switchChannel(joinedChannels.value[0]).then(() =>
+        updateChannelsList()
+      );
       chatSocket.emit("update-channels");
     };
 
@@ -671,31 +666,31 @@ export const ChatComponent = defineComponent({
       newMessage.value = " has left";
       await send().then(async () => {
         await api
-        .leaveChannel("self", activeChannel.value!.id, {
-          withCredentials: true,
-        })
-        .then(async (res) => {
-          store.dispatch(
-            "setMessage",
-            "You're no longer a member of channel [" +
-              name.substring(0, 15) +
-              "]"
-          );
-          await getDefaultChannel()
-          chatSocket.emit("update-channels");
-        })
-        .catch((err) => {
-          if (err && err.response)
-            store.dispatch("setErrorMessage", err.response.data.message);
-        });
-      })
+          .leaveChannel("self", activeChannel.value!.id, {
+            withCredentials: true,
+          })
+          .then(async (res) => {
+            store.dispatch(
+              "setMessage",
+              "You're no longer a member of channel [" +
+                name.substring(0, 15) +
+                "]"
+            );
+            await getDefaultChannel();
+            chatSocket.emit("update-channels");
+          })
+          .catch((err) => {
+            if (err && err.response)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
+      });
     };
 
     chatSocket.on("create-direct-message", (recipient: User) => {
       if (!chatReady.value) {
-        chatSocket.on('ready', () => {
+        chatSocket.on("ready", () => {
           directMessage(recipient);
-          chatSocket.off('ready')
+          chatSocket.off("ready");
         });
       } else {
         directMessage(recipient);
@@ -710,59 +705,66 @@ export const ChatComponent = defineComponent({
           joinedChannels.value = res.data;
           if (joinedChannels.value.length) {
             joinedChannels.value.forEach(async (cm) => {
-              if ((cm.channel.name == user.value.username + " to " + recipient.username ||
-              cm.channel.name == recipient.username + " to " + user.value.username) &&
-              cm.channel.channel_members.length == 2 &&
-              ((cm.channel.channel_members[0].member.id == user.value.id &&
-              cm.channel.channel_members[1].member.id == recipient.id) ||
-              (cm.channel.channel_members[1].member.id == user.value.id &&
-              cm.channel.channel_members[0].member.id == recipient.id))) {
+              if (
+                (cm.channel.name ==
+                  user.value.username + " to " + recipient.username ||
+                  cm.channel.name ==
+                    recipient.username + " to " + user.value.username) &&
+                cm.channel.channel_members.length == 2 &&
+                ((cm.channel.channel_members[0].member.id == user.value.id &&
+                  cm.channel.channel_members[1].member.id == recipient.id) ||
+                  (cm.channel.channel_members[1].member.id == user.value.id &&
+                    cm.channel.channel_members[0].member.id == recipient.id))
+              ) {
                 exists = true;
                 switchChannel(cm);
                 activeChannel.value = cm;
               }
-            })
+            });
           }
           if (exists) {
             return;
           }
 
-          await api.saveDmChannel(
-          {
-            name: user.value.username + " to " + recipient.username,
-            owner_id: user.value.id,
-            type: "private",
-            notification: true,
-            password: "",
-            recipient_id: recipient.id,
-          }, {
-            withCredentials: true,
-          }
-          ).then(async (cm) => {
-            updateChannelsList();
-            activeChannel.value = cm.data;
-            isMember.value = true;
-            newMessage.value = recipient.username + " has been added";
-            send();
-            store.dispatch(
-              "setMessage",
-              "You're now a member of channel [" +
-                cm.data.channel.name.substring(0, 15) +
-                "]"
-            );
-            chatSocket.emit("update-channels", cm.data);
-            chatSocket.emit(
-              "chat-action",
-              "added to",
-              recipient.id,
-              cm.data.channel.name
-            );
-          })
-          .catch((err) => {
-            if (err) {
-              store.dispatch("setErrorMessage", err.response.data.message);
-            }
-          });
+          await api
+            .saveDmChannel(
+              {
+                name: user.value.username + " to " + recipient.username,
+                owner_id: user.value.id,
+                type: "private",
+                notification: true,
+                password: "",
+                recipient_id: recipient.id,
+              },
+              {
+                withCredentials: true,
+              }
+            )
+            .then(async (cm) => {
+              updateChannelsList();
+              activeChannel.value = cm.data;
+              isMember.value = true;
+              newMessage.value = recipient.username + " has been added";
+              send();
+              store.dispatch(
+                "setMessage",
+                "You're now a member of channel [" +
+                  cm.data.channel.name.substring(0, 15) +
+                  "]"
+              );
+              chatSocket.emit("update-channels", cm.data);
+              chatSocket.emit(
+                "chat-action",
+                "added to",
+                recipient.id,
+                cm.data.channel.name
+              );
+            })
+            .catch((err) => {
+              if (err) {
+                store.dispatch("setErrorMessage", err.response.data.message);
+              }
+            });
         })
         .catch((err) => {
           if (err && err.response)
@@ -892,7 +894,7 @@ export const ChatComponent = defineComponent({
         .setNewMessage("false", cm.channel.id, { withCredentials: true })
         .then(() => {
           store.state.chatNotification = false;
-          chatSocket.emit('get-notifications', user.value.id)
+          chatSocket.emit("get-notifications", user.value.id);
         })
         .catch((err) => {
           if (err && err.response)
@@ -903,7 +905,9 @@ export const ChatComponent = defineComponent({
       activeChannel.value = cm;
       activeChannel.value.new_message = false;
       channelMessages.value = [];
-      await getMessagesUpdate(cm.channel.id).then(() => { chatReady.value = true; })
+      await getMessagesUpdate(cm.channel.id).then(() => {
+        chatReady.value = true;
+      });
     };
 
     chatSocket.on("chat-message-on", async (data: any) => {
@@ -928,7 +932,10 @@ export const ChatComponent = defineComponent({
               updateChannelsList();
             })
             .catch((err) => {
-              if (err.response.data && err.response.data.message !== 'Not a member of this channel') {
+              if (
+                err.response.data &&
+                err.response.data.message !== "Not a member of this channel"
+              ) {
                 store.dispatch("setErrorMessage", err.response.data.message);
               }
             });
@@ -939,7 +946,7 @@ export const ChatComponent = defineComponent({
     chatSocket.on("created-channel", async (cm: ChannelMember) => {
       await switchChannel(cm)
         .then(() => {
-          updateChannelsList()
+          updateChannelsList();
         })
         .catch((err) => {
           if (err && err.response)
@@ -1004,7 +1011,7 @@ export const ChatComponent = defineComponent({
       directMessage,
       channelsListOn,
       toggleChannelsList,
-      userStatus
+      userStatus,
     };
   },
 });

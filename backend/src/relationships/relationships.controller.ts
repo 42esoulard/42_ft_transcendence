@@ -40,7 +40,10 @@ export class RelationshipsController {
     @Param('userA') userAId: number,
     @Param('userB') userBId: number,
   ): Promise<Relationship> {
-    const relationship = await this.relationshipService.getRelationship(userAId, userBId);
+    const relationship = await this.relationshipService.getRelationship(
+      userAId,
+      userBId,
+    );
     if (!relationship) throw new NotFoundException("relatioship doesn't exist");
     return relationship;
   }
@@ -95,7 +98,10 @@ export class RelationshipsController {
       newRelationship.adresseeId,
     );
     if (relationship) {
-      await this.relationshipService.removeRelationship({userId1: relationship.requesterId, userId2: relationship.adresseeId});
+      await this.relationshipService.removeRelationship({
+        userId1: relationship.requesterId,
+        userId2: relationship.adresseeId,
+      });
     }
     return await this.relationshipService.saveRelationship(newRelationship);
   }

@@ -12,10 +12,7 @@
         <SideBarLink to="/pong/watch" icon="fas fa-play-circle"
           >live</SideBarLink
         >
-        <SideBarLink
-          v-if="role != 'user'"
-          to="/admin"
-          icon="fas fa-crown"
+        <SideBarLink v-if="role != 'user'" to="/admin" icon="fas fa-crown"
           >admin</SideBarLink
         >
         <SideBarLink to="/adduser" icon="fas fa-toolbox">add</SideBarLink>

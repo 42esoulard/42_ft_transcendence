@@ -5,13 +5,9 @@
   "username": "root",
   "password": "password",
   "database": "ft_transcendence_db",
-  "entities": [
-    "/usr/src/app/src/config/../**/entity/*.{ts,js}"
-  ],
+  "entities": ["/usr/src/app/src/config/../**/entity/*.{ts,js}"],
   "migrationsTableName": "migration",
-  "migrations": [
-    "/usr/src/app/src/config/../**/migration/*.{ts,js}"
-  ],
+  "migrations": ["/usr/src/app/src/config/../**/migration/*.{ts,js}"],
   "cli": {
     "migrationsDir": "src/migration"
   },

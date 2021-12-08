@@ -21,11 +21,7 @@
       <div>
         <span v-if="activeChannel.channel.type === 'private'"
           ><img
-            class="
-              fas
-              fa-eye-slash
-              chat-channels__tag chat-channels__tag--private
-            "
+            class="fas fa-eye-slash chat-channels__tag chat-channels__tag--private"
             title="This community is private"
         /></span>
         <span v-if="activeChannel.channel.password"
@@ -45,20 +41,12 @@
         /></span>
         <span v-if="activeChannel.is_admin"
           ><img
-            class="
-              fas
-              fa-user-shield
-              chat-channels__tag chat-channels__tag--admin
-            "
+            class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin"
             title="Channel Admin"
         /></span>
         <span @click="closeChannelSettings()"
           ><img
-            class="
-              fas
-              fa-lg fa-arrow-left
-              chat-channels__tag chat-channels__tag--settings
-            "
+            class="fas fa-lg fa-arrow-left chat-channels__tag chat-channels__tag--settings"
             title="Back to Channel"
         /></span>
       </div>
@@ -150,20 +138,12 @@
             >
               <span v-if="cm.is_owner"
                 ><img
-                  class="
-                    fas
-                    fa-user-tie
-                    chat-channels__tag chat-channels__tag--owner
-                  "
+                  class="fas fa-user-tie chat-channels__tag chat-channels__tag--owner"
                   title="Channel Owner"
               /></span>
               <span v-if="cm.is_admin"
                 ><img
-                  class="
-                    fas
-                    fa-user-shield
-                    chat-channels__tag chat-channels__tag--admin
-                  "
+                  class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin"
                   title="Channel Admin"
               /></span>
             </div>
@@ -179,11 +159,7 @@
             >
               <span @click="askConfirmation(cm, 'deadminize')"
                 ><img
-                  class="
-                    fas
-                    fa-user-shield
-                    chat-channels__tag chat-channels__tag--admin-togglable
-                  "
+                  class="fas fa-user-shield chat-channels__tag chat-channels__tag--admin-togglable"
                   title="Remove from Admins"
               /></span>
             </div>
@@ -196,56 +172,32 @@
                 "
                 @click="askConfirmation(cm, 'adminize')"
                 ><img
-                  class="
-                    fas
-                    fa-user-shield
-                    chat-channels__tag chat-channels__tag--greyed
-                  "
+                  class="fas fa-user-shield chat-channels__tag chat-channels__tag--greyed"
                   title="Promote to Admin"
               /></span>
               <span v-if="cm.mute" @click="toggleModal('unmute', cm)"
                 ><img
-                  class="
-                    fas
-                    fa-comment-slash
-                    chat-channels__tag chat-channels__tag--mute
-                  "
+                  class="fas fa-comment-slash chat-channels__tag chat-channels__tag--mute"
                   title="Unmute user"
               /></span>
               <span v-else @click="toggleModal('muted', cm)"
                 ><img
-                  class="
-                    fas
-                    fa-comment-slash
-                    chat-channels__tag chat-channels__tag--greyed
-                  "
+                  class="fas fa-comment-slash chat-channels__tag chat-channels__tag--greyed"
                   title="Mute user"
               /></span>
               <span v-if="cm.ban" @click="toggleModal('unban', cm)"
                 ><img
-                  class="
-                    fas
-                    fa-skull-crossbones
-                    chat-channels__tag chat-channels__tag--ban
-                  "
+                  class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--ban"
                   title="Unban user"
               /></span>
               <span v-else @click="toggleModal('banned', cm)"
                 ><img
-                  class="
-                    fas
-                    fa-skull-crossbones
-                    chat-channels__tag chat-channels__tag--greyed
-                  "
+                  class="fas fa-skull-crossbones chat-channels__tag chat-channels__tag--greyed"
                   title="Ban user"
               /></span>
               <span @click="askConfirmation(cm, 'kick')"
                 ><img
-                  class="
-                    fas
-                    fa-user-times
-                    chat-channels__tag chat-channels__tag--greyed
-                  "
+                  class="fas fa-user-times chat-channels__tag chat-channels__tag--greyed"
                   title="Kick user"
               /></span>
             </div>
@@ -256,9 +208,7 @@
             @submit.prevent="considerMember()"
           >
             <input
-              class="
-                chat-channel-form__input chat-channel-form__add-member-input
-              "
+              class="chat-channel-form__input chat-channel-form__add-member-input"
               required
               type="text"
               name="name"
@@ -501,7 +451,7 @@ export default defineComponent({
         .then((res) => {
           targetCm.value = res.data;
           context.emit("update-channels-list");
-          
+
           if (action == "unmute") {
             action = "unmuted";
           } else if (action == "unban") {
@@ -686,8 +636,12 @@ export default defineComponent({
 
     const addMember = async (userId: number) => {
       wasSubmitted.value = true;
-      if (props.activeChannel.channel.channel_members.map((cm: ChannelMember) => cm.member.id).includes(userId)) {
-        store.dispatch("setErrorMessage", "Already a member!")
+      if (
+        props.activeChannel.channel.channel_members
+          .map((cm: ChannelMember) => cm.member.id)
+          .includes(userId)
+      ) {
+        store.dispatch("setErrorMessage", "Already a member!");
         return;
       }
       const newMember = api

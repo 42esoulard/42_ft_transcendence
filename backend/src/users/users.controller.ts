@@ -181,7 +181,10 @@ export class UsersController {
 
   @Post('update-user')
   @UseGuards(JwtTwoFactorGuard)
-  async updateUser(@Body() updatedUser: UpdateUserDto, @Req() request: Request) {
+  async updateUser(
+    @Body() updatedUser: UpdateUserDto,
+    @Req() request: Request,
+  ) {
     const id = updatedUser.id;
     if (request.user.id != id) {
       const reqUser = await this.userService.getUserbyId(request.user.id);
