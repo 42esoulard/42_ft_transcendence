@@ -64,12 +64,6 @@
 
     <Ruleset />
   </div>
-
-  <div v-if="alreadyInQueue" class="header__title">
-    <p>
-      You are already in queue ! You will be redirected to Homepage shortly...
-    </p>
-  </div>
 </template>
 
 <script lang="ts">
@@ -131,12 +125,9 @@ export default defineComponent({
       queuing.value = true;
     });
 
-    const alreadyInQueue = ref(false);
     pongSocket.on("alreadyInQueue", () => {
-      alreadyInQueue.value = true;
-      setTimeout(() => {
-        router.push({ name: "Pong" });
-      }, 3000);
+      store.dispatch("setErrorMessage", "you're already in queue!");
+      return;
     });
 
     const router = useRouter();
@@ -164,7 +155,6 @@ export default defineComponent({
       queuing,
       JoinQueue,
       gameMode,
-      alreadyInQueue,
       users,
       classicMode,
       toggleClassic,
