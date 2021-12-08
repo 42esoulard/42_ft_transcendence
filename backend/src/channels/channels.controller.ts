@@ -231,7 +231,8 @@ export class ChannelsController {
       request.user.id,
     );
     if (cm == undefined) {
-      throw new NotFoundException('Not a member of this channel');
+      return undefined;
+      // throw new NotFoundException('Not a member of this channel');
     } else if (!cm.notification) {
       return cm;
     }

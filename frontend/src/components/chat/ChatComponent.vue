@@ -384,12 +384,14 @@ export const ChatComponent = defineComponent({
               await api
                 .setNewMessage("false", chan.data.id, { withCredentials: true })
                 .then(async (res) => {
-                  activeChannel.value = res.data;
-                  await updateChannelsList().then(() => {
-                    chatSocket.emit("ready");
-                    chatReady.value = true;
-                  });
-                  activeChannel.value = res.data;
+                  if (res) {
+                    activeChannel.value = res.data;
+                    await updateChannelsList().then(() => {
+                      chatSocket.emit("ready");
+                      chatReady.value = true;
+                    });
+                    activeChannel.value = res.data;
+                  }
                 })
                 .catch((err) => {
                   if (err && err.response)
@@ -423,51 +425,59 @@ export const ChatComponent = defineComponent({
         .getUserChannels({ withCredentials: true })
         .then(async (res) => {
           joinedChannels.value = res.data;
-          await api
-            .getChannelMember(
-              activeChannel.value!.channel.id,
-              activeChannel.value!.member.id,
-              { withCredentials: true }
-            )
-            .then((res) => {
-              activeChannel.value = res.data;
-              if (
-                !activeChannel.value.is_admin &&
-                user.value.role !== "admin" &&
-                user.value.role !== "owner"
+          if (isMember.value) {
+            await api
+              .getChannelMember(
+                activeChannel.value!.channel.id,
+                activeChannel.value!.member.id,
+                { withCredentials: true }
               )
-                channelSettings.value = false;
-            })
-            .catch(async (err) => {
-              {
+              .then((res) => {
+                activeChannel.value = res.data;
                 if (
-                  err &&
-                  err.response &&
-                  err.response.data.message !== "banned"
+                  !activeChannel.value.is_admin &&
+                  user.value.role !== "admin" &&
+                  user.value.role !== "owner"
                 )
-                  store.dispatch("setErrorMessage", err.response.data.message);
-              }
-              if (user.value.role !== "admin" && user.value.role !== "owner") {
-                getDefaultChannel();
-              } else {
-                await api
-                  .getChannelPreview(activeChannel.value!.channel.id, {
-                    withCredentials: true,
-                  })
-                  .then((res) => {
-                    activeChannel.value!.channel = res.data;
-                    channelMessages.value = res.data.messages;
-                    return res;
-                  })
-                  .catch((err) => {
-                    if (err && err.response)
-                      store.dispatch(
-                        "setErrorMessage",
-                        err.response.data.message
-                      );
-                  });
-              }
-            });
+                  channelSettings.value = false;
+              })
+              .catch(async (err) => {
+                {
+                  if (
+                    err &&
+                    err.response &&
+                    err.response.data.message !== "banned"
+                  )
+                    store.dispatch(
+                      "setErrorMessage",
+                      err.response.data.message
+                    );
+                }
+                if (
+                  user.value.role !== "admin" &&
+                  user.value.role !== "owner"
+                ) {
+                  getDefaultChannel();
+                } else {
+                  await api
+                    .getChannelPreview(activeChannel.value!.channel.id, {
+                      withCredentials: true,
+                    })
+                    .then((res) => {
+                      activeChannel.value!.channel = res.data;
+                      channelMessages.value = res.data.messages;
+                      return res;
+                    })
+                    .catch((err) => {
+                      if (err && err.response)
+                        store.dispatch(
+                          "setErrorMessage",
+                          err.response.data.message
+                        );
+                    });
+                }
+              });
+          }
           await api
             .getAvailableChannels({ withCredentials: true })
             .then((res) => {
@@ -892,9 +902,11 @@ export const ChatComponent = defineComponent({
       // activeChannel.value.new_message = false;
       await api
         .setNewMessage("false", cm.channel.id, { withCredentials: true })
-        .then(() => {
-          store.state.chatNotification = false;
-          chatSocket.emit("get-notifications", user.value.id);
+        .then((res) => {
+          if (res) {
+            store.state.chatNotification = false;
+            chatSocket.emit("get-notifications", user.value.id);
+          }
         })
         .catch((err) => {
           if (err && err.response)
@@ -928,8 +940,10 @@ export const ChatComponent = defineComponent({
           await api
             .setNewMessage("true", data.channel.id, { withCredentials: true })
             .then((res) => {
-              store.state.chatNotification = true;
-              updateChannelsList();
+              if (res) {
+                store.state.chatNotification = true;
+                updateChannelsList();
+              }
             })
             .catch((err) => {
               if (
