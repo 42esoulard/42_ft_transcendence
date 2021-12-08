@@ -67,11 +67,11 @@ export class PongGateway
     });
   }
 
-  removeSpectatorIfWatching(client: Socket){
+  removeSpectatorIfWatching(client: Socket) {
     this.games.forEach((game: pongGame) => {
       if (game.spectators.includes(client))
-        this.stopWatching(client, game.room)
-    })
+        this.stopWatching(client, game.room);
+    });
   }
 
   cancelChallengeIfChallenging(client: Socket) {
@@ -169,7 +169,6 @@ export class PongGateway
     client: Socket,
     message: joinGameMessage,
   ): Promise<void> {
-
     if (this.userIsAlreadyInQueue(client, message.userId)) return;
 
     if (message.gameMode === 'classic') {
@@ -297,11 +296,10 @@ export class PongGateway
     // this.server.emit("removeInGameUsers", [game.player1.userName, game.player2.userName]);
   }
 
-  async stopWatching(client: Socket, room: string)
-  {
+  async stopWatching(client: Socket, room: string) {
     const game: pongGame = this.games.get(room);
     if (!game) return;
-    game.removeSpectator(client)
+    game.removeSpectator(client);
   }
 
   clearQueue(client: Socket) {

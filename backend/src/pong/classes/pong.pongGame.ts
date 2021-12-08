@@ -96,7 +96,6 @@ export class pongGame {
   }
 
   async createGame(): Promise<void> {
-
     // push Game and GameUsers intoDB
     await this.pushGameintoDB();
     await this.pushGameUsersintoDB();
@@ -137,7 +136,7 @@ export class pongGame {
 
   async addSpectator(client: Socket) {
     client.join(this.room);
-    this.spectators.push(client)
+    this.spectators.push(client);
     client.emit(
       'GoToGame',
       this.room,
@@ -152,7 +151,9 @@ export class pongGame {
 
   removeSpectator(client: Socket) {
     client.leave(this.room);
-    this.spectators = this.spectators.filter((spectator) => spectator.id != client.id)
+    this.spectators = this.spectators.filter(
+      (spectator) => spectator.id != client.id,
+    );
   }
 
   startFromCenter() {
