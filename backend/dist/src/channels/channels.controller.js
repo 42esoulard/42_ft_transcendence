@@ -219,7 +219,7 @@ let ChannelsController = class ChannelsController {
             throw new common_1.NotFoundException('Channel Member not found');
         }
         else if (cm.ban) {
-            throw new common_1.NotFoundException('banned');
+            throw new common_1.ForbiddenException('banned');
         }
         return cm;
     }
@@ -229,17 +229,13 @@ let ChannelsController = class ChannelsController {
             throw new common_1.NotFoundException('Channel Member not found');
         }
         if (cm.channel.id == 1) {
-            throw new common_1.NotFoundException('Thou shalt not leave General!!');
+            throw new common_1.ForbiddenException('Thou shalt not leave General!!');
         }
         switch (type) {
             case 'kick':
-                await this.channelService
-                    .checkBlocked(cm.member.id, request.user.id)
-                    .then((res) => {
-                    if (res == true) {
-                        throw new common_1.ForbiddenException('Failed to leave channel: missing authorization to act for this user: active block');
-                    }
-                });
+                if (cm.member.id == request.user.id) {
+                    throw new common_1.ForbiddenException("You can't kick yourself..!");
+                }
                 await this.channelService
                     .getChannelMember(cm.channel.id, request.user.id)
                     .then(async (res) => {
@@ -302,8 +298,12 @@ let ChannelsController = class ChannelsController {
             (action == 'unmute' && !user_cm.mute)) {
             throw new common_1.NotFoundException('Failed to find or act on member');
         }
+        if ((action == 'banned' || action == 'muted') &&
+            user_cm.member.id == request.user.id) {
+            throw new common_1.ForbiddenException("You can't mute or ban yourself..!");
+        }
         if (action == 'banned' && user_cm.channel.name == 'General') {
-            throw new common_1.NotFoundException("Can't ban a user from General!");
+            throw new common_1.ForbiddenException("Can't ban a user from General!");
         }
         const req_cm = await this.channelService.getChannelMember(user_cm.channel.id, request.user.id);
         if (req_cm == undefined) {

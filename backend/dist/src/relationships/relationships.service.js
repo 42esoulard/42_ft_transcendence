@@ -32,9 +32,7 @@ let RelationshipsService = class RelationshipsService {
     }
     async getPendingRelationships(adresseeId) {
         return await this.relationshipsRepository.find({
-            where: [
-                { adresseeId: adresseeId, pending: 'true' },
-            ],
+            where: [{ adresseeId: adresseeId, pending: 'true' }],
         });
     }
     async getUserFriendships(id) {

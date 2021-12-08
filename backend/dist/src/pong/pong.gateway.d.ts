@@ -18,6 +18,7 @@ export declare class PongGateway implements OnGatewayInit, OnGatewayConnection, 
     afterInit(server: Server): void;
     handleDisconnect(client: Socket): void;
     leaveGameIfPlaying(client: Socket): void;
+    removeSpectatorIfWatching(client: Socket): void;
     cancelChallengeIfChallenging(client: Socket): void;
     handleConnection(client: Socket, ...args: any[]): void;
     sendPlayingUsers(client: Socket): void;
@@ -31,6 +32,7 @@ export declare class PongGateway implements OnGatewayInit, OnGatewayConnection, 
     handleWatchGame(client: Socket, gameId: string): Promise<void>;
     handleLeaveQueue(client: Socket): void;
     handleLeaveGame(client: Socket, room: string): void;
+    handleStopWatching(client: Socket, room: string): void;
     handleEnlargeRacquet(client: Socket, room: string): void;
     handleMoveRacquet(client: Socket, message: {
         room: string;
@@ -39,6 +41,7 @@ export declare class PongGateway implements OnGatewayInit, OnGatewayConnection, 
     userIsAlreadyInQueue(client: Socket, userId: number): boolean;
     createGame(player1: player, player2: player, gameMode: gameMode): Promise<void>;
     leaveGame(clientWhoLeft: Socket, room: string): Promise<void>;
+    stopWatching(client: Socket, room: string): Promise<void>;
     clearQueue(client: Socket): void;
     cancelChallenge(challengerName: string): void;
 }

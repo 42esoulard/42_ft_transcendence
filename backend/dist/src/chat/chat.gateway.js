@@ -17,6 +17,7 @@ const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const channels_service_1 = require("../channels/channels.service");
 const messages_entity_1 = require("../messages/entity/messages.entity");
+const relationship_interface_1 = require("../relationships/interfaces/relationship.interface");
 const user_interface_1 = require("../users/interfaces/user.interface");
 let ChatGateway = class ChatGateway {
     constructor(channelsService) {
@@ -27,6 +28,15 @@ let ChatGateway = class ChatGateway {
         client.on('newConnection', async (user) => {
             if (user) {
                 await this.channelsService.getNotifications(user.id).then((res) => {
+                    if (res) {
+                        client.emit('chatNotifications');
+                    }
+                });
+            }
+        });
+        client.on('get-notifications', async (userId) => {
+            if (userId) {
+                await this.channelsService.getNotifications(userId).then((res) => {
                     if (res) {
                         client.emit('chatNotifications');
                     }
@@ -79,6 +89,9 @@ let ChatGateway = class ChatGateway {
                 client.emit('app-dm', recipient);
             }
         });
+        client.on('ready', () => {
+            client.emit('ready');
+        });
         client.on('init-direct-message', (recipient) => {
             if (recipient) {
                 client.emit('create-direct-message', recipient);
@@ -117,8 +130,32 @@ let ChatGateway = class ChatGateway {
     handlePromotedUser(client, user) {
         client.broadcast.emit('promotedUser', user);
     }
-    handleNewFriendshipRequest(client, adressee) {
-        client.broadcast.emit('newFriendshipRequest', adressee);
+    handleNewFriendshipRequest(client, relationship, requester) {
+        client.broadcast.emit('newFriendshipRequest', relationship, requester);
+    }
+    handleNewBlocked(client, relationship, requester) {
+        client.broadcast.emit('newBlocked', relationship, requester);
+    }
+    handleRemoveBlocked(client, requester, adresseeId) {
+        client.broadcast.emit('removeBlocked', requester, adresseeId);
+    }
+    acceptFriendship(client, user1Id, user1Name, user2Id, user2Name) {
+        client.broadcast.emit('friendshipAccepted', user1Id, user1Name, user2Id, user2Name);
+        client.emit('updateFriendshipList', user1Id);
+    }
+    updateFriendship(client, friendId) {
+        client.emit('updateFriendship', friendId);
+        client.emit('updateFriendshipList', friendId);
+    }
+    removeFriendship(client, user1Id, user2Id) {
+        client.broadcast.emit('removeFriendship', user1Id, user2Id);
+    }
+    handleAddFriendship(client, relationship) {
+        client.emit('addFriendship', relationship);
+    }
+    handleRmFriendship(client, friendId) {
+        client.emit('rmFriendship', friendId);
+        client.emit('rmFromFriendshipList', friendId);
     }
     handleIsAlreadyConnected(client, user) {
         client.broadcast.emit('isAlreadyConnected', user);
@@ -205,9 +242,53 @@ __decorate([
 __decorate([
     (0, websockets_1.SubscribeMessage)('newFriendshipRequest'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket, user_interface_1.User]),
+    __metadata("design:paramtypes", [socket_io_1.Socket,
+        relationship_interface_1.Relationship, String]),
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleNewFriendshipRequest", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('newBlocked'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket,
+        relationship_interface_1.Relationship, String]),
+    __metadata("design:returntype", void 0)
+], ChatGateway.prototype, "handleNewBlocked", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('removeBlocked'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket, user_interface_1.User, Number]),
+    __metadata("design:returntype", void 0)
+], ChatGateway.prototype, "handleRemoveBlocked", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('acceptFriendship'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket, Number, String, Number, String]),
+    __metadata("design:returntype", void 0)
+], ChatGateway.prototype, "acceptFriendship", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('app-updateFriendship'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket, Number]),
+    __metadata("design:returntype", void 0)
+], ChatGateway.prototype, "updateFriendship", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('removeFriendship'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket, Number, Number]),
+    __metadata("design:returntype", void 0)
+], ChatGateway.prototype, "removeFriendship", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('app-addFriendship'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket, relationship_interface_1.Relationship]),
+    __metadata("design:returntype", void 0)
+], ChatGateway.prototype, "handleAddFriendship", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('app-rmFriendship'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket, Number]),
+    __metadata("design:returntype", void 0)
+], ChatGateway.prototype, "handleRmFriendship", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('isAlreadyConnected'),
     __metadata("design:type", Function),

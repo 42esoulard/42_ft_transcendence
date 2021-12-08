@@ -30,6 +30,7 @@ class pongGame {
         this.ballSpeed = 0;
         this.interval = null;
         this.timeout = null;
+        this.spectators = [];
         this.initRacquetLength();
     }
     initPositions() {
@@ -93,9 +94,14 @@ class pongGame {
     }
     async addSpectator(client) {
         client.join(this.room);
+        this.spectators.push(client);
         client.emit('GoToGame', this.room, this.player1.userName, this.player2.userName, this.gameMode);
         if (this.player1.score || this.player2.score)
             client.emit('score', this.getPlayerScores());
+    }
+    removeSpectator(client) {
+        client.leave(this.room);
+        this.spectators = this.spectators.filter((spectator) => spectator.id != client.id);
     }
     startFromCenter() {
         this.initPositions();

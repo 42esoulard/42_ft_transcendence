@@ -22,6 +22,7 @@ export declare class pongGame {
     ballSpeed: number;
     interval: any;
     timeout: any;
+    spectators: Socket[];
     initPositions(): void;
     initBallDirection(): void;
     initRacquetLength(): void;
@@ -30,6 +31,7 @@ export declare class pongGame {
     createGame(): Promise<void>;
     spectatorWarnNewGame(): Promise<void>;
     addSpectator(client: Socket): Promise<void>;
+    removeSpectator(client: Socket): void;
     startFromCenter(): void;
     endGame(player1Won: boolean): Promise<void>;
     spectatorWarnEndGame(): Promise<void>;

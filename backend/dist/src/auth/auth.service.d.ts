@@ -9,7 +9,7 @@ export declare class AuthService implements AuthProvider {
     private readonly jwtService;
     constructor(usersService: UsersService, jwtService: JwtService);
     validateUser(userProfile: FortyTwoUser): Promise<User>;
-    validateJwtUser(username: string): Promise<User>;
+    validateJwtUser(login: string): Promise<User>;
     generateAccessToken(user: User, isTwoFAauthenticated?: boolean): Promise<string>;
     generateRefreshToken(id: number): Promise<string>;
     validRefreshToken(login: string, refresh_token: string): Promise<User> | null;

@@ -9,6 +9,7 @@ export declare class RelationshipsController {
     private readonly userService;
     constructor(relationshipService: RelationshipsService, userService: UsersService);
     getUserFriendships(id: number): Promise<Relationship[]>;
+    getRelationship(userAId: number, userBId: number): Promise<Relationship>;
     getPendingRelationships(id: number): Promise<Relationship[]>;
     getAllUserFriendships(id: number): Promise<Relationship[]>;
     getUserBlocked(id: number): Promise<Relationship[]>;

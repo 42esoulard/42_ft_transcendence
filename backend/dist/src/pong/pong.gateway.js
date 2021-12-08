@@ -39,6 +39,7 @@ let PongGateway = class PongGateway {
         this.logger.log('Client disconected ' + client.id);
         this.clearQueue(client);
         this.leaveGameIfPlaying(client);
+        this.removeSpectatorIfWatching(client);
         this.cancelChallengeIfChallenging(client);
     }
     leaveGameIfPlaying(client) {
@@ -46,6 +47,12 @@ let PongGateway = class PongGateway {
             if (game.player1.clientSocket.id === client.id ||
                 game.player2.clientSocket.id === client.id)
                 this.leaveGame(client, game.room);
+        });
+    }
+    removeSpectatorIfWatching(client) {
+        this.games.forEach((game) => {
+            if (game.spectators.includes(client))
+                this.stopWatching(client, game.room);
         });
     }
     cancelChallengeIfChallenging(client) {
@@ -144,6 +151,9 @@ let PongGateway = class PongGateway {
     handleLeaveGame(client, room) {
         this.leaveGame(client, room);
     }
+    handleStopWatching(client, room) {
+        this.stopWatching(client, room);
+    }
     handleEnlargeRacquet(client, room) {
         const game = this.games.get(room);
         if (!game) {
@@ -185,6 +195,12 @@ let PongGateway = class PongGateway {
         const player1Won = clientWhoLeft === game.player2.clientSocket;
         await game.endGame(player1Won);
         this.games.delete(room);
+    }
+    async stopWatching(client, room) {
+        const game = this.games.get(room);
+        if (!game)
+            return;
+        game.removeSpectator(client);
     }
     clearQueue(client) {
         if (this.waitingPlayerClassic &&
@@ -255,6 +271,12 @@ __decorate([
     __metadata("design:paramtypes", [socket_io_1.Socket, String]),
     __metadata("design:returntype", void 0)
 ], PongGateway.prototype, "handleLeaveGame", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('stopWatching'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket, String]),
+    __metadata("design:returntype", void 0)
+], PongGateway.prototype, "handleStopWatching", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('enlargeRacquet'),
     __metadata("design:type", Function),

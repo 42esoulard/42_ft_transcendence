@@ -33,6 +33,12 @@ let RelationshipsController = class RelationshipsController {
             throw new common_1.BadRequestException("user doesn't exist");
         return await this.relationshipService.getUserFriendships(id);
     }
+    async getRelationship(userAId, userBId) {
+        const relationship = await this.relationshipService.getRelationship(userAId, userBId);
+        if (!relationship)
+            throw new common_1.NotFoundException("relatioship doesn't exist");
+        return relationship;
+    }
     async getPendingRelationships(id) {
         const currentUser = await this.userService.getUserbyId(id);
         if (!currentUser)
@@ -64,6 +70,13 @@ let RelationshipsController = class RelationshipsController {
         const user2 = await this.userService.getUserbyId(newRelationship.adresseeId);
         if (!user2)
             throw new common_1.BadRequestException("user doesn't exist");
+        const relationship = await this.relationshipService.getRelationship(newRelationship.requesterId, newRelationship.adresseeId);
+        if (relationship) {
+            await this.relationshipService.removeRelationship({
+                userId1: relationship.requesterId,
+                userId2: relationship.adresseeId,
+            });
+        }
         return await this.relationshipService.saveRelationship(newRelationship);
     }
     async validateRelationship(toMajRelationship) {
@@ -85,6 +98,15 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], RelationshipsController.prototype, "getUserFriendships", null);
+__decorate([
+    (0, common_1.Get)('/relationship/:userA/:userB'),
+    openapi.ApiResponse({ status: 200, type: require("./interfaces/relationship.interface").Relationship }),
+    __param(0, (0, common_1.Param)('userA')),
+    __param(1, (0, common_1.Param)('userB')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number]),
+    __metadata("design:returntype", Promise)
+], RelationshipsController.prototype, "getRelationship", null);
 __decorate([
     (0, common_1.Get)('/pending/:id'),
     openapi.ApiResponse({ status: 200, type: [require("./interfaces/relationship.interface").Relationship] }),

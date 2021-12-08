@@ -11,7 +11,6 @@ services:
       - ./backend:/usr/src/app
     ports:
       - "3000:3000"
-      # - "9229:9229" #debug address
     networks:
       - network
     environment:
@@ -23,9 +22,7 @@ services:
     env_file:
     - credentials.env
     - game.env
-    # command: sh -c "npm install --loglevel=error && npm run start:dev:db:seed && npm run start:dev"
     command: sh -c "npm install && npm run start:dev:db:seed && npm run start:prod"
-    # command: sh -c "npm install && npm run start:dev:db:seed && npm run start"
     depends_on:
       - postgres
 
@@ -39,7 +36,6 @@ services:
       - ./frontend:/usr/src/app
     ports:
       - "8080:8080"
-      # - "5000:3000" #For json-server (development)
     networks:
       - network
     environment:
@@ -49,21 +45,13 @@ services:
       NODE_OPTIONS: --openssl-legacy-provider
     env_file:
     - game.env
-    # command: sh -c "npm install --loglevel=error && npm run serve"
-    # command: sh -c "npm install && http-server --cors --proxy http://localhost:8080? dist"
-    # command: sh -c "nginx -g daemon off;"
     depends_on:
       - postgres
       - backend
-      # - sdk
 
   # PostgreSQL Service
   postgres:
     image: postgres:${POSTGRES_VERSION}
-    # build:
-    #   context: "./postgres"
-    #   args:
-    #    POSTGRES_VERSION: ${POSTGRES_VERSION}
     networks:
       - network
     restart: on-failure
@@ -90,38 +78,6 @@ services:
     depends_on:
       - postgres
 
-    # container_name: "${ADMINER_NAME}"
-
-  # # API watcher and SDK rebuilder
-  # sdk:
-  #   build:
-  #     context: "./frontend/sdk"
-  #   volumes:
-  #     - ./:/usr/src/app/
-  #   depends_on:
-  #     - backend
-    
-
-
-  # # Pgadmin Service (database management tool)
-  # pgadmin:
-  #   container_name: pgadmin
-  #   image: dpage/pgadmin4
-  #   ports:
-  #     - "8001:80"
-  #   links:
-  #     - "postgres"
-  #   environment:
-  #     PGADMIN_DEFAULT_PASSWORD: ${DB_PASSWORD}
-  #     PGADMIN_DEFAULT_EMAIL: test@test.fr
-  #   networks:
-  #     - backend
-  #   depends_on:
-  #     - postgres
-
   # Networks
 networks:
   network:
-#  # Volumes
-# volumes:
-# postgresdata:
