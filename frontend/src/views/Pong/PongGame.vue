@@ -153,8 +153,10 @@ export default defineComponent({
 
     // lifecycle hooks
     onMounted(() => {
-      if (props.userType === "player")
+      if (props.userType === "player"){
+        window.addEventListener("keydown", preventScroll, false);
         window.addEventListener("keydown", onKeyDown);
+      }
       window.addEventListener("resize", onResize);
       if (canvas.value) context.value = canvas.value.getContext("2d");
       initCanvas();
@@ -165,6 +167,7 @@ export default defineComponent({
         pongSocket.emit("leaveGame", props.room);
         window.removeEventListener("keydown", onKeyDown);
         // remove event listener, else it will be registered as many times as we entered the component
+        window.removeEventListener("keydown", preventScroll);
       }
       if (props.userType === "spectator")
         pongSocket.emit("stopWatching", props.room);
@@ -220,8 +223,10 @@ export default defineComponent({
     const winningPlayer = ref<string>("");
     const gameIsOver = ref(false);
     pongSocket.on("gameOver", (player1Won: boolean) => {
-      if (props.userType === "player")
+      if (props.userType === "player"){
         window.removeEventListener("keydown", onKeyDown);
+        window.removeEventListener("keydown", preventScroll);
+      }
       gameHasStarted.value = true;
       gameIsOver.value = true;
       if (player1Won) winningPlayer.value = props.player1UserName;
@@ -246,6 +251,12 @@ export default defineComponent({
       else if (event.code === "ArrowDown") SendMoveMsg("down");
       else if (event.code === "Space") EnlargeRacquet();
     };
+
+    const preventScroll = (event: KeyboardEvent) => {
+      if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(event.code) > -1) {
+          event.preventDefault();
+      }
+    }
 
     const toggleAnimations = () => {
       animations.value = !animations.value;

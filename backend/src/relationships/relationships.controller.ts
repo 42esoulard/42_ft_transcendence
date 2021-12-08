@@ -95,7 +95,7 @@ export class RelationshipsController {
       newRelationship.adresseeId,
     );
     if (relationship) {
-      return await this.relationshipService.validateRelationship(relationship);
+      await this.relationshipService.removeRelationship({userId1: relationship.requesterId, userId2: relationship.adresseeId});
     }
     return await this.relationshipService.saveRelationship(newRelationship);
   }

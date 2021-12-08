@@ -182,7 +182,36 @@ export default {
       }
     );
 
-    chatSocket.on("newFriendshipRequest", (friendship) => {
+    chatSocket.on("newFriendshipRequest", (friendship: Relationship) => {
+      if (store.state.user.id == friendship.adresseeId) {
+        if (friendship.requester) {
+          store.state.toggleFriendship = true;
+          store.dispatch(
+            "setMessage",
+            `${friendship.requester.username} sent you a friend request!`
+          );
+        }
+      }
+    });
+
+    chatSocket.on("friendshipAccepted", (friendship: Relationship) => {
+      if (store.state.user.id == friendship.adresseeId) {
+        if (friendship.requester)
+          store.dispatch(
+            "setMessage",
+            `You're now friends with ${friendship.requester.username}`
+          );
+      }
+      else if (store.state.user.id == friendship.requesterId) {
+        if (friendship.adressee)
+          store.dispatch(
+            "setMessage",
+            `You're now friends with ${friendship.adressee.username}`
+          );
+      }
+    });
+
+        chatSocket.on("newFriendshipRequest", (friendship) => {
       if (friendship.length == 2) {
         if (store.state.user.id == friendship[0].adresseeId) {
           store.state.toggleFriendship = true;
@@ -194,7 +223,6 @@ export default {
         }
       }
     });
-
     chatSocket.on("removeFriendship", (usersId) => {
       if (usersId.length == 2) {
         if (store.state.user.id == usersId[0]) {
@@ -204,7 +232,6 @@ export default {
         }
       }
     });
-
     chatSocket.on("friendshipAccepted", (usersInfo) => {
       if (usersInfo.length == 4) {
         if (store.state.user.id == usersInfo[0]) {
@@ -227,6 +254,7 @@ export default {
         }
       }
     });
+
 
     chatSocket.on("app-dm", (recipient: User) => {
       router.push("/chat")
