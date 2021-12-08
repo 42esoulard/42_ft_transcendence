@@ -223,6 +223,11 @@ export class PongGateway
     this.leaveGame(client, room);
   }
 
+  @SubscribeMessage('stopWatching')
+  handleStopWatching(client: Socket, room: string): void {
+    this.stopWatching(client, room);
+  }
+
   @SubscribeMessage('enlargeRacquet')
   handleEnlargeRacquet(client: Socket, room: string) {
     const game: pongGame = this.games.get(room);
@@ -282,6 +287,11 @@ export class PongGateway
     await game.endGame(player1Won);
     this.games.delete(room);
     // this.server.emit("removeInGameUsers", [game.player1.userName, game.player2.userName]);
+  }
+
+  async stopWatching(client: Socket, room: string)
+  {
+    client.leave(room)
   }
 
   clearQueue(client: Socket) {
