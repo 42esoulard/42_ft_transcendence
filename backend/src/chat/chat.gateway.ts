@@ -184,6 +184,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.broadcast.emit('newFriendshipRequest', relationship, requester);
   }
 
+  @SubscribeMessage('newBlocked')
+  handleNewBlocked(
+    client: Socket,
+    relationship: Relationship,
+    requester: string,
+  ) {
+    client.broadcast.emit('newBlocked', relationship, requester);
+  }
+
+  @SubscribeMessage('removeBlocked')
+  handleRemoveBlocked(client: Socket, requester: User, adresseeId: number) {
+    client.broadcast.emit('removeBlocked', requester, adresseeId);
+  }
+
   @SubscribeMessage('acceptFriendship')
   acceptFriendship(
     client: Socket,

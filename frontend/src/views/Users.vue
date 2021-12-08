@@ -195,8 +195,8 @@ export default defineComponent({
 
     chatSocket.on('updateFriendshipList', (friendsInfo) => {
       if (friendsInfo.length == 4) {
-        const newFriend = (friendsInfo[0] == store.state.user.id 
-                        ? friendsInfo[2] 
+        const newFriend = (friendsInfo[0] == store.state.user.id
+                        ? friendsInfo[2]
                         : friendsInfo[0])
         if (Number(newFriend)) {
           friendList.value.push(newFriend);
@@ -205,6 +205,25 @@ export default defineComponent({
         friendList.value.push(friendsInfo);
       }
     })
+
+    chatSocket.on("newBlocked", (blocked) => {
+      if (store.state.user.id == blocked[0].adresseeId) {
+        userList.value = userList.value.filter((usr: User) => usr.id != blocked[0].requesterId)
+      }
+      else if (store.state.user.id == blocked[0].requesterId) {
+        friendList.value = friendList.value.filter((fr: Number) => fr != blocked[0].adresseeId)
+        blockedList.value.push(blocked[0].adresseeId);
+      }
+    });
+
+    chatSocket.on('removeBlocked', (infos) => {
+      if (store.state.user.id == infos[1]) {
+        userList.value.push(infos[0]);
+      }
+      else if (store.state.user.id == infos[0].id) {
+        blockedList.value = blockedList.value.filter((id: number) => id != infos[1]);
+      }
+    });
 
     chatSocket.on('rmFromFriendshipList', (friendsInfo) => {
       if (Number(friendsInfo)) {

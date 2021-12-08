@@ -182,49 +182,32 @@ export default {
       }
     );
 
-    chatSocket.on("newFriendshipRequest", (friendship) => {
-      if (friendship.length == 2) {
-        if (store.state.user.id == friendship[0].adresseeId) {
+    chatSocket.on("newFriendshipRequest", (friendship: Relationship) => {
+      if (store.state.user.id == friendship.adresseeId) {
+        if (friendship.requester) {
           store.state.toggleFriendship = true;
           store.dispatch(
             "setMessage",
-            `${ friendship[1] } sent you a friend request!`
+            `${friendship.requester.username} sent you a friend request!`
           );
-          chatSocket.emit('app-addFriendship', friendship[0]);
         }
       }
     });
 
-    chatSocket.on("removeFriendship", (usersId) => {
-      if (usersId.length == 2) {
-        if (store.state.user.id == usersId[0]) {
-          chatSocket.emit('app-rmFriendship', usersId[1]);
-        } else if (store.state.user.id == usersId[1]) {
-          chatSocket.emit('app-rmFriendship', usersId[0]);
-        }
+    chatSocket.on("friendshipAccepted", (friendship: Relationship) => {
+      if (store.state.user.id == friendship.adresseeId) {
+        if (friendship.requester)
+          store.dispatch(
+            "setMessage",
+            `You're now friends with ${friendship.requester.username}`
+          );
       }
-    });
-
-    chatSocket.on("friendshipAccepted", (usersInfo) => {
-      if (usersInfo.length == 4) {
-        if (store.state.user.id == usersInfo[0]) {
-          if (usersInfo[3]) {
-            store.dispatch(
-              "setMessage",
-              `You're now friends with ${usersInfo[3]}`
-            );
-            chatSocket.emit('app-updateFriendship', usersInfo[2]);
-          }
-        }
-        else if (store.state.user.id == usersInfo[2]) {
-          if (usersInfo[1]) {
-            store.dispatch(
-              "setMessage",
-              `You're now friends with ${usersInfo[1]}`
-            );
-            chatSocket.emit('app-updateFriendship', usersInfo[0]);
-          }
-        }
+      else if (store.state.user.id == friendship.requesterId) {
+        if (friendship.adressee)
+          store.dispatch(
+            "setMessage",
+            `You're now friends with ${friendship.adressee.username}`
+          );
       }
     });
 
