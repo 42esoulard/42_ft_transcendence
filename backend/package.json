@@ -13,7 +13,7 @@
     "start:dev": "nest start --watch",
     "start:dev-hmr": "nest build --webpack --webpackPath webpack-hmr.config.js --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -57,6 +57,8 @@
     "rimraf": "3.0.2",
     "rxjs": "7.4.0",
     "swagger-ui-express": "4.2.0",
+    "ts-node": "10.4.0",
+    "tsconfig-paths": "3.12.0",
     "typeorm": "0.2.41"
   },
   "devDependencies": {
@@ -85,8 +87,6 @@
     "supertest": "6.1.6",
     "ts-jest": "27.0.7",
     "ts-loader": "9.2.6",
-    "ts-node": "10.4.0",
-    "tsconfig-paths": "3.12.0",
     "typescript": "4.5.2"
   },
   "jest": {
