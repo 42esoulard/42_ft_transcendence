@@ -397,13 +397,15 @@ export const ChatComponent = defineComponent({
               await api
                 .setNewMessage("false", chan.data.id, { withCredentials: true })
                 .then(async (res) => {
-                  activeChannel.value = res.data;
-                  await updateChannelsList()
-                  .then (() => {
-                    chatSocket.emit('ready');
-                    chatReady.value = true;
-                  })
-                  activeChannel.value = res.data;
+                  if (res) {
+                    activeChannel.value = res.data;
+                    await updateChannelsList()
+                    .then (() => {
+                      chatSocket.emit('ready');
+                      chatReady.value = true;
+                    })
+                    activeChannel.value = res.data;
+                  }
                 })
                 .catch((err) => {
                   if (err && err.response)
@@ -437,7 +439,8 @@ export const ChatComponent = defineComponent({
         .getUserChannels({ withCredentials: true })
         .then(async (res) => {
           joinedChannels.value = res.data;
-          await api
+          if (isMember.value) {
+            await api
             .getChannelMember(
               activeChannel.value!.channel.id,
               activeChannel.value!.member.id,
@@ -478,6 +481,7 @@ export const ChatComponent = defineComponent({
                   });
               }
             });
+          }
           await api
             .getAvailableChannels({ withCredentials: true })
             .then((res) => {
@@ -890,9 +894,11 @@ export const ChatComponent = defineComponent({
       // activeChannel.value.new_message = false;
       await api
         .setNewMessage("false", cm.channel.id, { withCredentials: true })
-        .then(() => {
-          store.state.chatNotification = false;
-          chatSocket.emit('get-notifications', user.value.id)
+        .then((res) => {
+          if (res) {
+            store.state.chatNotification = false;
+            chatSocket.emit('get-notifications', user.value.id)
+          }
         })
         .catch((err) => {
           if (err && err.response)
@@ -924,8 +930,10 @@ export const ChatComponent = defineComponent({
           await api
             .setNewMessage("true", data.channel.id, { withCredentials: true })
             .then((res) => {
-              store.state.chatNotification = true;
-              updateChannelsList();
+              if (res) {
+                store.state.chatNotification = true;
+                updateChannelsList();
+              }
             })
             .catch((err) => {
               if (err.response.data && err.response.data.message !== 'Not a member of this channel') {
