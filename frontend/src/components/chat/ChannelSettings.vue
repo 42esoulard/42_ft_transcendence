@@ -31,7 +31,8 @@
         /></span>
       </div>
       <div
-        v-if="activeChannel.is_admin || activeChannel.is_owner"
+        v-if="activeChannel.is_admin || activeChannel.is_owner || 
+        activeChannel.member.role == 'admin' || activeChannel.member.role == 'owner'"
         class="chat-channels__tag-container"
       >
         <span v-if="activeChannel.is_owner"

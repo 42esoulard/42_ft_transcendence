@@ -645,10 +645,16 @@ export class ChannelsController {
       request.user.id,
     );
     if (req_cm == undefined) {
-      throw new ForbiddenException(
-        'You dont have the right to edit this channel',
-      );
-    } else if (!req_cm.is_owner) {
+      const user: User = await this.channelService.getUser(request.user.id);
+      if (user == undefined) {
+        throw new NotFoundException("Couldn't identify request account");
+      }
+      if (user.role !== Role.ADMIN && user.role !== Role.OWNER) {
+        throw new ForbiddenException(
+          'You dont have the right to delete this channel',
+        );
+      }
+    } else if (!req_cm.is_owner && req_cm.member.role == Role.USER) {
       throw new ForbiddenException(
         'You dont have the right to edit this channel',
       );
