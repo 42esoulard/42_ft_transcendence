@@ -23,7 +23,7 @@ services:
     env_file:
     - credentials.env
     - game.env
-    command: sh -c "npm install --loglevel=error && npm run start:dev:db:seed && npm run start:dev"
+    command: sh -c "rm -rf ./dist && npm install --loglevel=error && npm run start:dev:db:seed && npm run start:dev"
     depends_on:
       - postgres
 
@@ -47,7 +47,7 @@ services:
       NODE_OPTIONS: --openssl-legacy-provider
     env_file:
     - game.env
-    command: sh -c "npm install --loglevel=error && npm run serve"
+    command: sh -c "rm -rf ./dist && npm install --loglevel=error && npm run serve"
     depends_on:
       - postgres
       - backend
