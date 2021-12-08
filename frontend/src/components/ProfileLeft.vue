@@ -310,7 +310,7 @@ export default defineComponent({
 
     const updateSidebar = () => {
       store.state.toggleFriendship = false;
-      
+
       for (const friendship of userFriendships.value) {
         if (friendship.pending && friendship.adresseeId == store.state.user.id)
           store.state.toggleFriendship = true;
