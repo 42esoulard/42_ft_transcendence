@@ -136,7 +136,6 @@ export const store = createStore<State>({
       );
     },
     allPendingChallenges(state: State, challenges: challengeExport[]) {
-      console.log("allPendingChallenges");
       if (challenges.length) state.allPendingChallenges = challenges;
     },
     userPendingChallenges(state: State) {

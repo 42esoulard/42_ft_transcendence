@@ -459,9 +459,7 @@ export class ChannelsService {
           dmInfo.recipient_id,
         ).then(async (res) => {
           if (res == true) {
-            throw new ForbiddenException(
-              'Failed to create DM: active block',
-            );
+            throw new ForbiddenException('Failed to create DM: active block');
           }
           const recipient = await this.userService.getUserbyId(
             dmInfo.recipient_id,

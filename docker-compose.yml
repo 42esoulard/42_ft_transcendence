@@ -1,13 +1,12 @@
-version: '3'
+version: "3"
 
 services:
-
   # backend Service with nestjs-express framework
   backend:
     build:
       context: "./backend"
       args:
-       NODE_VERSION: ${NODE_VERSION}
+        NODE_VERSION: ${NODE_VERSION}
     volumes:
       - ./backend:/usr/src/app
     ports:
@@ -29,13 +28,13 @@ services:
     # command: sh -c "npm install && npm run start:dev:db:seed && npm run start"
     depends_on:
       - postgres
-  
+
   # frontend Service with vuejs framework
   frontend:
     build:
       context: "./frontend"
       args:
-       NODE_VERSION: ${NODE_VERSION}
+        NODE_VERSION: ${NODE_VERSION}
     volumes:
       - ./frontend:/usr/src/app
     ports:
@@ -49,10 +48,15 @@ services:
       VUE_APP_42_AUTH_URL: ${AUTH_URL}
       NODE_OPTIONS: --openssl-legacy-provider
     env_file:
+<<<<<<< HEAD
     - game.env
     # command: sh -c "npm install --loglevel=error && npm run serve"
     # command: sh -c "npm install && http-server --cors --proxy http://localhost:8080? dist"
     # command: sh -c "nginx -g daemon off;"
+=======
+      - game.env
+    command: sh -c "npm install --loglevel=error && npm run serve"
+>>>>>>> main
     depends_on:
       - postgres
       - backend
@@ -90,9 +94,10 @@ services:
       ADMINER_DEFAULT_DB_NAME: ${DB_NAME}
     depends_on:
       - postgres
-      
+
     # container_name: "${ADMINER_NAME}"
 
+<<<<<<< HEAD
   # # API watcher and SDK rebuilder
   # sdk:
   #   build:
@@ -103,6 +108,16 @@ services:
   #     - backend
     
 
+=======
+  # API watcher and SDK rebuilder
+  sdk:
+    build:
+      context: "./frontend/sdk"
+    volumes:
+      - ./:/usr/src/app/
+    depends_on:
+      - backend
+>>>>>>> main
 
   # # Pgadmin Service (database management tool)
   # pgadmin:
@@ -115,7 +130,7 @@ services:
   #   environment:
   #     PGADMIN_DEFAULT_PASSWORD: ${DB_PASSWORD}
   #     PGADMIN_DEFAULT_EMAIL: test@test.fr
-  #   networks: 
+  #   networks:
   #     - backend
   #   depends_on:
   #     - postgres
@@ -123,7 +138,6 @@ services:
   # Networks
 networks:
   network:
-
 #  # Volumes
 # volumes:
-  # postgresdata:
+# postgresdata:

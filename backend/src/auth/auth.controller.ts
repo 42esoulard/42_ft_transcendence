@@ -183,7 +183,6 @@ export class AuthController {
     @Req() request: Request,
     @Body() { code: twoFACode }: TwoFactorDto,
   ) {
-
     const isCodeValid = this.authService.isTwoFACodeValid(
       twoFACode,
       request.user,

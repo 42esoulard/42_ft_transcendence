@@ -64,7 +64,11 @@
       <i class="upload-icon fas fa-envelope" /> send message
     </button>
     <button
-      v-if="user.id != self.id && userStatus(user) == 'online' && userStatus(self) == 'online'"
+      v-if="
+        user.id != self.id &&
+        userStatus(user) == 'online' &&
+        userStatus(self) == 'online'
+      "
       @click="challengeUser"
       class="button button--primary"
     >
@@ -299,12 +303,25 @@ export default defineComponent({
           )
           .then((res: any) => {
             userFriendships.value.push(res.data);
-            chatSocket.emit("newFriendshipRequest", res.data);
+            chatSocket.emit(
+              "newFriendshipRequest",
+              res.data,
+              store.state.user.username
+            );
           })
           .catch((err: any) => {
             if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
+      }
+    };
+
+    const updateSidebar = () => {
+      store.state.toggleFriendship = false;
+
+      for (const friendship of userFriendships.value) {
+        if (friendship.pending && friendship.adresseeId == store.state.user.id)
+          store.state.toggleFriendship = true;
       }
     };
 
@@ -327,7 +344,13 @@ export default defineComponent({
                 friendship.requesterId == user.id ||
                 friendship.adresseeId == user.id
               ) {
-                if (friendship.pending) userFriendships.value.splice(index, 1);
+                userFriendships.value.splice(index, 1);
+                chatSocket.emit(
+                  "removeFriendship",
+                  user.id,
+                  store.state.user.id
+                );
+                updateSidebar();
                 break;
               }
               index++;
@@ -356,6 +379,13 @@ export default defineComponent({
             for (const friendship of userFriendships.value) {
               if (friendship.requesterId == user.id) {
                 friendship.pending = false;
+                chatSocket.emit(
+                  "acceptFriendship",
+                  user.id,
+                  user.username,
+                  store.state.user.id,
+                  store.state.user.username
+                );
               }
             }
           })
@@ -365,6 +395,38 @@ export default defineComponent({
           });
       }
     };
+
+    chatSocket.on("addFriendship", (relationship: Relationship) => {
+      userFriendships.value.push(relationship);
+    });
+
+    chatSocket.on("updateFriendship", (friendId: number) => {
+      let index = 0;
+      for (const friendship of userFriendships.value) {
+        if (
+          friendship.adresseeId == friendId ||
+          friendship.requesterId == friendId
+        ) {
+          friendship.pending = false;
+          break;
+        }
+        index++;
+      }
+    });
+
+    chatSocket.on("rmFriendship", (friendId: number) => {
+      let index = 0;
+      for (const friendship of userFriendships.value) {
+        if (
+          friendship.adresseeId == friendId ||
+          friendship.requesterId == friendId
+        ) {
+          userFriendships.value.splice(index, 1);
+          break;
+        }
+        index++;
+      }
+    });
 
     // 1 == friends, 2 == self invited, 3 == other invited, 0 == no relationship
     // 4 == blocked && self is requester, -2 == blocked && self is adressee
@@ -410,7 +472,14 @@ export default defineComponent({
               withCredentials: true,
             }
           )
-          .then((res: any) => window.location.reload())
+          .then((res: any) => {
+            userBlocked.value.push(res.data);
+            userFriendships.value = userFriendships.value.filter(
+              (fr: Relationship) =>
+                fr.adresseeId != user.id && fr.requesterId != user.id
+            );
+            chatSocket.emit("newBlocked", res.data, user.username);
+          })
           .catch((err: any) => {
             if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
@@ -430,13 +499,40 @@ export default defineComponent({
               withCredentials: true,
             }
           )
-          .then((res: any) => window.location.reload())
+          .then((res: any) => {
+            let index = 0;
+            for (const blocked of userBlocked.value) {
+              if (
+                blocked.requesterId == user.id ||
+                blocked.adresseeId == user.id
+              ) {
+                userBlocked.value.splice(index, 1);
+                chatSocket.emit("removeBlocked", store.state.user, user.id);
+                break;
+              }
+              index++;
+            }
+          })
           .catch((err: any) => {
             if (err && err.response)
               store.dispatch("setErrorMessage", err.response.data.message);
           });
       }
     };
+
+    chatSocket.on("newBlocked", (blocked) => {
+      if (store.state.user.id == blocked[0].adresseeId) {
+        userBlocked.value.push(blocked[0]);
+      }
+    });
+
+    chatSocket.on("removeBlocked", (infos) => {
+      if (store.state.user.id == infos[1]) {
+        userBlocked.value = userBlocked.value.filter(
+          (blocked: Relationship) => blocked.requesterId != infos[0].id
+        );
+      }
+    });
 
     const challengeUser = () => {
       for (const challenge of store.state.challengesReceived) {

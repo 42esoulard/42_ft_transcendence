@@ -64,12 +64,6 @@
 
     <Ruleset />
   </div>
-
-  <div v-if="alreadyInQueue" class="header__title">
-    <p>
-      You are already in queue ! You will be redirected to Homepage shortly...
-    </p>
-  </div>
 </template>
 
 <script lang="ts">
@@ -99,7 +93,27 @@ export default defineComponent({
     const challengee = { id: props.challengeeId, name: props.challengeeName };
 
     const store = useStore();
+    const userStatus = (user: User): "online" | "offline" | "ingame" => {
+      if (user != undefined) {
+        const inGameUser = store.state.inGameUsers.find(
+          (u) => u === user.username
+        );
+        const onlineUser = store.state.onlineUsers.find(
+          (u) => u.id === user.id
+        );
+        if (inGameUser) {
+          return "ingame";
+        } else if (onlineUser) {
+          return "online";
+        }
+      }
+      return "offline";
+    };
     const JoinQueue = () => {
+      if (userStatus(store.state.user) == "ingame") {
+        store.dispatch("setErrorMessage", "you're already playing!");
+        return;
+      }
       pongSocket.emit("joinGame", {
         userId: store.state.user.id,
         userName: store.state.user.username,
@@ -111,12 +125,9 @@ export default defineComponent({
       queuing.value = true;
     });
 
-    const alreadyInQueue = ref(false);
     pongSocket.on("alreadyInQueue", () => {
-      alreadyInQueue.value = true;
-      setTimeout(() => {
-        router.push({ name: "Pong" });
-      }, 3000);
+      store.dispatch("setErrorMessage", "you're already in queue!");
+      return;
     });
 
     const router = useRouter();
@@ -144,7 +155,6 @@ export default defineComponent({
       queuing,
       JoinQueue,
       gameMode,
-      alreadyInQueue,
       users,
       classicMode,
       toggleClassic,

@@ -10,6 +10,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ChannelsService } from 'src/channels/channels.service';
 import { Messages } from 'src/messages/entity/messages.entity';
+import { Relationship } from 'src/relationships/interfaces/relationship.interface';
 import { User } from 'src/users/interfaces/user.interface';
 
 @WebSocketGateway({
@@ -175,8 +176,66 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('newFriendshipRequest')
-  handleNewFriendshipRequest(client: Socket, adressee: User) {
-    client.broadcast.emit('newFriendshipRequest', adressee);
+  handleNewFriendshipRequest(
+    client: Socket,
+    relationship: Relationship,
+    requester: string,
+  ) {
+    client.broadcast.emit('newFriendshipRequest', relationship, requester);
+  }
+
+  @SubscribeMessage('newBlocked')
+  handleNewBlocked(
+    client: Socket,
+    relationship: Relationship,
+    requester: string,
+  ) {
+    client.broadcast.emit('newBlocked', relationship, requester);
+  }
+
+  @SubscribeMessage('removeBlocked')
+  handleRemoveBlocked(client: Socket, requester: User, adresseeId: number) {
+    client.broadcast.emit('removeBlocked', requester, adresseeId);
+  }
+
+  @SubscribeMessage('acceptFriendship')
+  acceptFriendship(
+    client: Socket,
+    user1Id: number,
+    user1Name: string,
+    user2Id: number,
+    user2Name: string,
+  ) {
+    client.broadcast.emit(
+      'friendshipAccepted',
+      user1Id,
+      user1Name,
+      user2Id,
+      user2Name,
+    );
+    client.emit('updateFriendshipList', user1Id);
+  }
+
+  @SubscribeMessage('app-updateFriendship')
+  updateFriendship(client: Socket, friendId: number) {
+    client.emit('updateFriendship', friendId);
+    client.emit('updateFriendshipList', friendId);
+  }
+
+  @SubscribeMessage('removeFriendship')
+  removeFriendship(client: Socket, user1Id: number, user2Id: number) {
+    client.broadcast.emit('removeFriendship', user1Id, user2Id);
+  }
+
+  @SubscribeMessage('app-addFriendship')
+  handleAddFriendship(client: Socket, relationship: Relationship) {
+    client.emit('addFriendship', relationship);
+  }
+
+  @SubscribeMessage('app-rmFriendship')
+  handleRmFriendship(client: Socket, friendId: number) {
+    client.emit('rmFriendship', friendId);
+    client.emit('rmFromFriendshipList', friendId);
   }
 
   @SubscribeMessage('isAlreadyConnected')

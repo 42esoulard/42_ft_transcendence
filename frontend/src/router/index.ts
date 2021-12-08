@@ -182,7 +182,7 @@ const refreshToken = async () => {
     })
     .catch((err: any) => {
       if (err && err.response) {
-        console.log(err.response.data.message)
+        console.log(err.response.data.message);
       }
     });
 };
@@ -220,7 +220,7 @@ router.beforeEach(async (to, from) => {
       await getProfile();
     }
     if (store.state.user.id) {
-      return true;
+      return "/";
     }
   } else if (to.matched.some((record) => record.meta.requiresAdmin)) {
     if (store.state.user.id === 0) {

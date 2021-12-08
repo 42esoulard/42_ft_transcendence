@@ -7,6 +7,7 @@ import {
   Param,
   UseGuards,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { RelationshipsService } from './relationships.service';
 import { Relationship } from './interfaces/relationship.interface';
@@ -34,8 +35,23 @@ export class RelationshipsController {
     return await this.relationshipService.getUserFriendships(id);
   }
 
+  @Get('/relationship/:userA/:userB')
+  async getRelationship(
+    @Param('userA') userAId: number,
+    @Param('userB') userBId: number,
+  ): Promise<Relationship> {
+    const relationship = await this.relationshipService.getRelationship(
+      userAId,
+      userBId,
+    );
+    if (!relationship) throw new NotFoundException("relatioship doesn't exist");
+    return relationship;
+  }
+
   @Get('/pending/:id')
-  async getPendingRelationships(@Param('id') id: number): Promise<Relationship[]> {
+  async getPendingRelationships(
+    @Param('id') id: number,
+  ): Promise<Relationship[]> {
     const currentUser = await this.userService.getUserbyId(id);
     if (!currentUser) throw new BadRequestException("user doesn't exist");
     return await this.relationshipService.getPendingRelationships(id);
@@ -68,9 +84,7 @@ export class RelationshipsController {
 
   @Post()
   @UseGuards(JwtTwoFactorGuard)
-  async saveRelationship(
-    @Body() newRelationship: CreateRelationshipDto,
-  ) {
+  async saveRelationship(@Body() newRelationship: CreateRelationshipDto) {
     const user1 = await this.userService.getUserbyId(
       newRelationship.requesterId,
     );
@@ -83,8 +97,11 @@ export class RelationshipsController {
       newRelationship.requesterId,
       newRelationship.adresseeId,
     );
-    if (relationship){
-      return await this.relationshipService.validateRelationship(relationship);
+    if (relationship) {
+      await this.relationshipService.removeRelationship({
+        userId1: relationship.requesterId,
+        userId2: relationship.adresseeId,
+      });
     }
     return await this.relationshipService.saveRelationship(newRelationship);
   }

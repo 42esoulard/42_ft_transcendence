@@ -5,8 +5,8 @@ paths:
       operationId: AppController_getHello
       parameters: []
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
           content:
             application/json:
               schema:
@@ -16,14 +16,14 @@ paths:
       operationId: UsersController_getUsers
       parameters: []
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: "#/components/schemas/User"
     post:
       operationId: UsersController_saveUser
       parameters: []
@@ -32,14 +32,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUserDto'
+              $ref: "#/components/schemas/CreateUserDto"
       responses:
-        '201':
-          description: ''
+        "201":
+          description: ""
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
   /users/{id}:
     get:
       operationId: UsersController_getUser
@@ -50,20 +50,20 @@ paths:
           schema:
             type: number
       responses:
-        '200':
+        "200":
           description: The user has been found in database
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '400':
+                $ref: "#/components/schemas/User"
+        "400":
           description: Invalid ID supplied
-        '404':
+        "404":
           description: User not found
 info:
   title: ft_transcendence API
   description: Because we are the best
-  version: '1.0'
+  version: "1.0"
   contact: {}
 tags: []
 servers: []

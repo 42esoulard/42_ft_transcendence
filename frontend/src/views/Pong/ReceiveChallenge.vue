@@ -39,11 +39,37 @@
 import { computed, defineComponent, onUpdated, ref } from "vue";
 import { pongSocket } from "@/App.vue";
 import { store } from "@/store";
+import { User } from "sdk/typescript-axios-client-generated";
 
 export default defineComponent({
   setup() {
+    const userStatus = (user: User): "online" | "offline" | "ingame" => {
+      if (user != undefined) {
+        const inGameUser = store.state.inGameUsers.find(
+          (u) => u === user.username
+        );
+        const onlineUser = store.state.onlineUsers.find(
+          (u) => u.id === user.id
+        );
+        if (inGameUser) {
+          return "ingame";
+        } else if (onlineUser) {
+          return "online";
+        }
+      }
+      return "offline";
+    };
+
     const accept = (challengerName: string) => {
-      if (store.state.challengesReceived.filter((chall) => chall.challenger == challengerName).length){
+      if (userStatus(store.state.user) == "ingame") {
+        store.dispatch("setErrorMessage", "you're already playing!");
+        return;
+      }
+      if (
+        store.state.challengesReceived.filter(
+          (chall) => chall.challenger == challengerName
+        ).length
+      ) {
         store.commit("removeChallenge", challengerName);
         pongSocket.emit("challengeAccepted", challengerName);
         store.dispatch("setMessage", "");
