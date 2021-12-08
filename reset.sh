@@ -17,7 +17,7 @@ rm -rf frontend/node_modules
 docker system prune --all
 # rm -rf backend/dist
 # rm -rf frontend/dist
-docker-compose up --build
+# docker-compose up --build
 
 # To reset Auto-increment on table "users"
 # ALTER SEQUENCE users_id_seq RESTART WITH 1;

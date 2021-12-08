@@ -65,8 +65,14 @@ export const store = createStore<State>({
 
     tagAvatar(state: State) {
       if (state.user) {
-        const tag = `?tag=${Date.now().toString()}`;
-        state.user.avatar = `${state.user.avatar}${tag}`;
+        if (state.user.avatar?.search("https://cdn.intra.42.fr") != -1) {
+          state.user.avatar = `${process.env['VUE_APP_API_URL']}/users/avatars/${state.user.forty_two_login}.jpg`;
+          console.log('avatar', state.user.avatar);
+        }
+        else {
+          const tag = `?tag=${Date.now().toString()}`;
+          state.user.avatar = `${state.user.avatar}${tag}`;
+        }
       }
     },
 
