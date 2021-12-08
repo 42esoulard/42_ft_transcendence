@@ -124,11 +124,21 @@ export default defineComponent({
         if (friendship.adresseeId == friendId || 
           friendship.requesterId == friendId) {
           relationships.value.splice(index, 1);
+          updateSidebar();
           break;
         }
         index++;
       }
     })
+
+    const updateSidebar = () => {
+      store.state.toggleFriendship = false;
+      
+      for (const friendship of relationships.value) {
+        if (friendship.adresseeId == store.state.user.id)
+          store.state.toggleFriendship = true;
+      }
+    }
 
     const acceptFriend = async (user: User) => {
       if (store.state.user.id != 0) {
@@ -149,6 +159,7 @@ export default defineComponent({
                   relationships.value.indexOf(friendship),
                   1
                 );
+                updateSidebar();
                 chatSocket.emit('acceptFriendship', user.id, user.username, 
                 store.state.user.id, store.state.user.username)
             }
@@ -198,6 +209,7 @@ export default defineComponent({
                 friendship.adresseeId == user.id
               ) {
                 relationships.value.splice(index, 1);
+                updateSidebar();
                 chatSocket.emit("removeFriendship", user.id, store.state.user.id);
                 break;
               }

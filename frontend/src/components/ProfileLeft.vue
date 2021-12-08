@@ -308,6 +308,15 @@ export default defineComponent({
       }
     };
 
+    const updateSidebar = () => {
+      store.state.toggleFriendship = false;
+      
+      for (const friendship of userFriendships.value) {
+        if (friendship.pending && friendship.adresseeId == store.state.user.id)
+          store.state.toggleFriendship = true;
+      }
+    }
+
     const removeFriend = async (user: User) => {
       if (store.state.user.id != 0) {
         await relationshipApi
@@ -329,6 +338,7 @@ export default defineComponent({
               ) {
                 userFriendships.value.splice(index, 1);
                 chatSocket.emit("removeFriendship", user.id, store.state.user.id);
+                updateSidebar();
                 break;
               }
               index++;
