@@ -138,6 +138,7 @@ export class PongGateway
     const challenge = this.pendingChallenges.get(challengerName);
     if (!challenge) {
       this.logger.log('challenge does not exist');
+      return;
     }
     const player1 = new player(
       challenge.challengeeId,
@@ -159,6 +160,7 @@ export class PongGateway
     const challenge = this.pendingChallenges.get(challengerName);
     if (!challenge) {
       this.logger.log('challenge does not exist');
+      return;
     }
     challenge.challengerSocket.emit('challengeDeclined');
     this.pendingChallenges.delete(challengerName);
@@ -216,6 +218,7 @@ export class PongGateway
     const game: pongGame = this.games.get(gameId);
     if (!game) {
       this.logger.log('game does not exist');
+      return;
     }
     game.addSpectator(client);
   }
@@ -240,6 +243,7 @@ export class PongGateway
     const game: pongGame = this.games.get(room);
     if (!game) {
       this.logger.log('game does not exist');
+      return;
     }
     game.enlargeRacquet(client);
   }
@@ -252,6 +256,7 @@ export class PongGateway
     const game: pongGame = this.games.get(message.room);
     if (!game) {
       this.logger.log('game does not exist');
+      return;
     }
     game.moveRacquet(client, message.text);
   }
