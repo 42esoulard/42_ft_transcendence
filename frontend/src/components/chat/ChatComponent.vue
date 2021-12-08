@@ -441,18 +441,18 @@ export const ChatComponent = defineComponent({
                 channelSettings.value = false;
             })
             .catch(async (err) => {
-              {
-                if (
-                  err &&
-                  err.response &&
-                  err.response.data.message !== "banned" && 
-                  user.value.role == "user"
-                )
-                  store.dispatch(
-                    "setErrorMessage",
-                    err.response.data.message
-                  );
-              }
+              // {
+              //   if (
+              //     err &&
+              //     err.response &&
+              //     err.response.data.message !== "banned" && 
+              //     user.value.role == "user"
+              //   )
+              //     store.dispatch(
+              //       "setErrorMessage",
+              //       err.response.data.message
+              //     );
+              // }
               if (
                 user.value.role !== "admin" &&
                 user.value.role !== "owner"

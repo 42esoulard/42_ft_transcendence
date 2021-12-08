@@ -689,18 +689,17 @@ export default defineComponent({
       const newMember = api
         .leaveChannel("kick", cm.id, { withCredentials: true })
         .then((res) => {
-          context.emit("update-channels-list");
-          chatSocket.emit("update-channels");
-          wasSubmitted.value = false;
-          context.emit(
-            "post-message",
-            exMemberName + " has been kicked from this channel"
-          );
           chatSocket.emit(
             "chat-action",
             "kicked from",
             exMemberId,
             props.activeChannel.channel.name
+          );
+          context.emit("update-channels-list");
+          wasSubmitted.value = false;
+          context.emit(
+            "post-message",
+            exMemberName + " has been kicked from this channel"
           );
           store.dispatch(
             "setMessage",
@@ -710,6 +709,7 @@ export default defineComponent({
               props.activeChannel.channel.name.substring(0, 15) +
               "]"
           );
+          chatSocket.emit("update-channels");
         })
         .catch((err) => {
           {
