@@ -494,6 +494,7 @@ export default defineComponent({
           closeModal();
         })
         .catch((err) => {
+          closeModal();
           if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
         });
