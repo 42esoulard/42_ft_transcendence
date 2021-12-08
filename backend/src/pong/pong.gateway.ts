@@ -53,6 +53,7 @@ export class PongGateway
     this.logger.log('Client disconected ' + client.id);
     this.clearQueue(client);
     this.leaveGameIfPlaying(client);
+    this.removeSpectatorIfWatching(client);
     this.cancelChallengeIfChallenging(client);
   }
 
@@ -64,6 +65,13 @@ export class PongGateway
       )
         this.leaveGame(client, game.room);
     });
+  }
+
+  removeSpectatorIfWatching(client: Socket){
+    this.games.forEach((game: pongGame) => {
+      if (game.spectators.includes(client))
+        this.stopWatching(client, game.room)
+    })
   }
 
   cancelChallengeIfChallenging(client: Socket) {
