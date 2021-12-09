@@ -279,6 +279,10 @@ export class ChannelsController {
      ** "dm": check that req hasn't been blocked
      ** "self": check that user_id == request.user.id
      */
+    const joinee: User = await this.channelService.getUser(user_id);
+    if (joinee == undefined) {
+      throw new NotFoundException('Couldnt identify user');
+    }
     switch (type) {
       case 'added':
         await this.channelService
@@ -414,7 +418,8 @@ export class ChannelsController {
       user_id,
     );
     if (cm == undefined) {
-      throw new NotFoundException('Channel Member not found');
+      // throw new NotFoundException('Channel Member not found');
+      return undefined;
     } else if (cm.ban) {
       throw new ForbiddenException('banned');
     }
