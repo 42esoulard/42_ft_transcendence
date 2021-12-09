@@ -450,6 +450,9 @@ export default defineComponent({
       await api
         .muteBanMember(action, cmId, endDate, { withCredentials: true })
         .then((res) => {
+          if (!res) {
+            return;
+          }
           targetCm.value = res.data;
           context.emit("update-channels-list");
 
@@ -483,12 +486,15 @@ export default defineComponent({
           );
           if (action === "muted") {
             setTimeout(
-              () => updateMuteBan("unmute", cmId, 0),
+              () =>  {
+
+                updateMuteBan("unmute", cmId, endDate)
+              },
               endDate - Date.now()
             );
           } else if (action === "banned") {
             setTimeout(
-              () => updateMuteBan("unban", cmId, 0),
+              () => updateMuteBan("unban", cmId, endDate),
               endDate - Date.now()
             );
           }

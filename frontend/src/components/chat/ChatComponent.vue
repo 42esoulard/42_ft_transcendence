@@ -435,6 +435,7 @@ export const ChatComponent = defineComponent({
               if (!res.data) {
                 previewChannel(activeChannel.value!.channel);
               } else {
+                activeChannel.value = res.data;
                 if (
                   !activeChannel.value!.is_admin &&
                   !activeChannel.value!.is_owner &&
@@ -447,11 +448,15 @@ export const ChatComponent = defineComponent({
               }
             })
             .catch(async (err) => {
-              if (err && err.response)
+              if (err && err.response && err.response.data.message !== 'banned') {
                 store.dispatch(
                   "setErrorMessage",
                   err.response.data.message
                 );
+              } else if (err && err.response && err.response.data.message == 'banned' &&
+              user.value.role == 'user') {
+                getDefaultChannel();
+              }
             });
           await api
             .getAvailableChannels({ withCredentials: true })
@@ -524,11 +529,9 @@ export const ChatComponent = defineComponent({
           chatSocket.emit("chat-message", newContent, store.state.onlineUsers);
         })
         .catch(async (err: any) => {
-          {
-            if (err && err.response)
-              store.dispatch("setErrorMessage", err.response.data.message);
-          }
-          if (err.response.data.message == "muted") {
+          if (err && err.response && err.response.data.message !== "muted") {
+            store.dispatch("setErrorMessage", err.response.data.message);
+          } else if (err && err.response && err.response.data.message == "muted") {
             mutePopup.value = true;
           }
           return;
@@ -562,7 +565,7 @@ export const ChatComponent = defineComponent({
           return res;
         })
         .catch((err) => {
-          if (err && err.response)
+          if (err && err.response && err.response.data.message !== 'Channel not found')
             store.dispatch("setErrorMessage", err.response.data.message);
           getDefaultChannel();
         });

@@ -331,10 +331,9 @@ export class ChannelsService {
         if (channel == undefined) {
           return undefined;
         }
-        if (
-          user.role == Role.USER &&
-          (channel.type == 'private' || channel.password)
-        ) {
+        if (user.role == Role.USER && channel.type == 'private') {
+          return undefined;
+        } else if (user.role == Role.USER && channel.password) {
           channel.messages = [];
           return channel;
         }
