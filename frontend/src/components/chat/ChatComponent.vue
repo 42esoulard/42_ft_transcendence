@@ -897,7 +897,6 @@ export const ChatComponent = defineComponent({
             store.dispatch("setErrorMessage", err.response.data.message);
         });
       isMember.value = true;
-      console.log("in switchChannel", cm);
       activeChannel.value = cm;
       activeChannel.value.new_message = false;
       channelMessages.value = [];
