@@ -331,7 +331,6 @@ export class ChannelsService {
         if (channel == undefined) {
           return undefined;
         }
-        console.log('user.role, channel type', user.role, channel.type);
         if (
           user.role == Role.USER &&
           (channel.type == 'private' || channel.password)
