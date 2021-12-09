@@ -27,6 +27,8 @@
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
+import { useRelationshipApi } from "@/plugins/api.plugin";
+import { chatSocket } from "@/App.vue";
 
 export default defineComponent({
   name: "OtpInput",
@@ -36,6 +38,7 @@ export default defineComponent({
     const store = useStore();
     const otp = ref("");
     const error = ref("");
+    const relationshipApi = useRelationshipApi();
 
     function isDigit(str: string): boolean {
       return !isNaN(Number(str));
@@ -68,6 +71,19 @@ export default defineComponent({
           await authApi
             .authenticate({ code: otp.value }, { withCredentials: true })
             .then((res: any) => {
+              chatSocket.emit("isAlreadyConnected", res.data);
+              store.state.user = res.data;
+              if (store.state.user.id != 0) {
+                relationshipApi
+                  .getPendingRelationships(store.state.user.id)
+                  .then((res: any) => {
+                    if (res.data.length > 0) store.state.toggleFriendship = true;
+                  })
+                  .catch((err: any) => {
+                    if (err && err.response)
+                      store.dispatch("setErrorMessage", err.response.data.message);
+                  });
+              }
               router.push("/pong");
             })
             .catch((err: any) => (error.value = err.response.data.message));

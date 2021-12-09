@@ -34,7 +34,7 @@
             blocked
           </button>
         </div>
-        <div class="users-list">
+        <div class="users-list users-list--userlist">
           <tr v-for="user in selectList" :key="user.id" class="users-list__elt">
             <td>
               <img

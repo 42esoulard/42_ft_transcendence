@@ -96,17 +96,19 @@ export default defineComponent({
             return;
           });
 
-        await getProfile();
-        if (store.state.user.id != 0) {
-          relationshipApi
-            .getPendingRelationships(store.state.user.id)
-            .then((res: any) => {
-              if (res.data.length > 0) store.state.toggleFriendship = true;
-            })
-            .catch((err: any) => {
-              if (err && err.response)
-                store.dispatch("setErrorMessage", err.response.data.message);
-            });
+        if (!isTwoFactorEnabled.value) {
+          await getProfile();
+          if (store.state.user.id != 0) {
+            relationshipApi
+              .getPendingRelationships(store.state.user.id)
+              .then((res: any) => {
+                if (res.data.length > 0) store.state.toggleFriendship = true;
+              })
+              .catch((err: any) => {
+                if (err && err.response)
+                  store.dispatch("setErrorMessage", err.response.data.message);
+              });
+          }
         }
       }
     });
