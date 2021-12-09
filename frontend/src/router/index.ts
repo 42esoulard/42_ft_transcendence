@@ -152,7 +152,7 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env['VUE_APP_API_URL']),
+  history: createWebHistory(),
   routes,
 });
 
