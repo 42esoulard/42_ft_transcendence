@@ -554,7 +554,10 @@ export const ChatComponent = defineComponent({
         mute: null,
       };
       isMember.value = false;
-      channelSettings.value = false;
+      if (user.value.role !== "admin" &&
+          user.value.role !== "owner") {
+        channelSettings.value = false;
+      }
       channelMessages.value = channel.messages;
       await api
         .getChannelPreview(channel.id, { withCredentials: true })
