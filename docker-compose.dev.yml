@@ -11,19 +11,20 @@ services:
     volumes:
       - ./backend:/usr/src/app
     ports:
-      - "3000:3000"
+      - "${BACK_PORT}:${BACK_PORT}"
     networks:
       - network
     environment:
       NODE_ENV: development
       MODE: DEV
-      PORT: 3000
+      PORT: ${BACK_PORT}
       FRONT_URL: ${FRONT_URL}
+      FRONT_URL_BIS: ${FRONT_URL_BIS}
       BASE_URL: ${API_URL}
     env_file:
     - credentials.env
     - game.env
-    command: sh -c "rm -rf ./dist && npm install --loglevel=error && npm run start:dev:db:seed && npm run start:dev"
+    command: sh -c "rm -rf ./dist && npm install --loglevel=error && npm run start:dev"
     depends_on:
       - postgres
 
@@ -37,7 +38,7 @@ services:
     volumes:
       - ./frontend:/usr/src/app
     ports:
-      - "8080:8080"
+      - "${FRONT_PORT}:${FRONT_PORT}"
     networks:
       - network
     environment:
@@ -74,7 +75,7 @@ services:
       - network
     restart: on-failure
     ports:
-      - "8000:8080"
+      - "8000:${FRONT_PORT}"
     environment:
       ADMINER_DEFAULT_DB_DRIVER: ${DB_DRIVER}
       ADMINER_DEFAULT_SERVER: ${DB_HOST}
@@ -90,7 +91,7 @@ services:
       - ./:/usr/src/app/
     depends_on:
       - backend
-    
+
   # Networks
 networks:
   network:

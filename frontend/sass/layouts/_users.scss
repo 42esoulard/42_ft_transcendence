@@ -67,11 +67,8 @@
 .users-list {
   display: flex;
   flex-direction: column;
-  padding: 0 6rem;
+  padding: 0 3rem;
   overflow-y: scroll;
-  &--watch {
-    padding: 0 4rem;
-  }
 }
 
 .users-list__elt {

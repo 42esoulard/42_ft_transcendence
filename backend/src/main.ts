@@ -13,13 +13,16 @@ import { TypeormStore } from 'connect-typeorm/out';
 import { getRepository } from 'typeorm';
 import * as cookieParser from 'cookie-parser';
 
+const FRONT_URL = `${process.env['FRONT_URL']}`;
+const FRONT_URL_BIS = `${process.env['FRONT_URL_BIS']}`;
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const sessionRepository = getRepository(TypeORMSession);
 
   app.enableCors({
     credentials: true,
-    origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
+    origin: [FRONT_URL, FRONT_URL_BIS],
   }); // Mandatory to interact w/ vue js which is on a different port
 
   //Setting up the OpenApi to generate client sdk
@@ -27,7 +30,7 @@ async function bootstrap() {
     .setTitle('ft_transcendence API')
     .setDescription('Because we will nail it !')
     .setVersion('1.0')
-    .addServer('http://localhost:' + process.env.PORT)
+    .addServer(`${process.env.BASE_URL}`)
     .addOAuth2()
     .addCookieAuth('tokens')
     .build();

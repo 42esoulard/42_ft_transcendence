@@ -75,31 +75,6 @@ export class AuthController {
     }
   }
 
-  @Post('fake-login')
-  async fakeLogin(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-    @Body() { username }: { username: string },
-  ) {
-    const user: User = await this.userService.getUserByUsername(username);
-    if (user == undefined) {
-      throw new NotFoundException("User doesn't exist");
-    }
-    const access_token = await this.authService.generateAccessToken(user);
-    const refresh_token = await this.authService.generateRefreshToken(user.id);
-    user.refresh_token = refresh_token;
-    res.cookie(
-      'tokens',
-      { access_token: access_token, refresh_token },
-      {
-        httpOnly: true,
-        expires: new Date(Date.now() + 1000 * 86400),
-        sameSite: true,
-      },
-    );
-    return { message: 'Logged in successfully' };
-  }
-
   @ApiCookieAuth()
   @Get('refreshtoken')
   @UseGuards(RefreshTwoFactorGuard)

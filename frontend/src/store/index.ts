@@ -133,7 +133,8 @@ export const store = createStore<State>({
     },
 
     addChallenge(state: State, challenge: ChallengeReceived) {
-      state.challengesReceived.push(challenge);
+      if (!state.challengesReceived.filter((chall: ChallengeReceived) => chall.challenger == challenge.challenger).length)
+        state.challengesReceived.push(challenge);
     },
     removeChallenge(state: State, challenger: string) {
       state.challengesReceived = state.challengesReceived.filter(

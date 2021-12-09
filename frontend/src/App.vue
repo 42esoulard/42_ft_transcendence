@@ -23,11 +23,11 @@ import { useStore } from "@/store";
 import { computed, onUpdated } from "vue";
 import { Relationship, User } from "sdk/typescript-axios-client-generated";
 import { challengeExport, challengeMessage, gameMode } from "./types/PongGame";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useAuthApi, useUserApi } from "@/plugins/api.plugin";
-export const pongSocket = io("http://localhost:3000/pong");
-export const presenceSocket = io("http://localhost:3000/presence");
-export const chatSocket = io("http://localhost:3000/chat");
+export const pongSocket = io(`${process.env['VUE_APP_API_URL']}/pong`);
+export const presenceSocket = io(`${process.env['VUE_APP_API_URL']}/presence`);
+export const chatSocket = io(`${process.env['VUE_APP_API_URL']}/chat`);
 
 export default {
   components: { SideBar, Header, Toast },
@@ -154,17 +154,24 @@ export default {
       store.commit("removeOnlineUser", user.id);
     });
 
+    const route = useRoute();
+
     chatSocket.on("promotedUser", (user: User) => {
       if (store.state.user.id == user.id) {
         store.state.user.role = user.role;
-        router.push("/pong");
+        if (route.path != "/pong/play")
+          router.push("/admin");
+        store.dispatch("setMessage", "You've been promoted!");
       }
     });
 
     chatSocket.on("demotedUser", (user: User) => {
       if (store.state.user.id == user.id) {
         store.state.user.role = "user";
-        router.push("/pong");
+        console.log("ROUTE", route.path);
+        if (route.path == "/admin")
+          router.push("/pong");
+        store.dispatch("setMessage", "You've been demoted!");
       }
     });
 
