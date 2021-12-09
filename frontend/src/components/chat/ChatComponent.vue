@@ -425,7 +425,6 @@ export const ChatComponent = defineComponent({
         .getUserChannels({ withCredentials: true })
         .then(async (res) => {
           joinedChannels.value = res.data;
-          console.log('in UCL')
           await api
             .getChannelMember(
               activeChannel.value!.channel.id,
@@ -434,26 +433,30 @@ export const ChatComponent = defineComponent({
             )
             .then(async (res) => {
               if (!res.data) {
-                console.log('bf bug')
                 previewChannel(activeChannel.value!.channel);
               } else {
-                console.log('in UCL res', res.data)
                 activeChannel.value = res.data;
                 if (
-                  !activeChannel.value.is_admin &&
+                  !activeChannel.value!.is_admin &&
+                  !activeChannel.value!.is_owner &&
                   user.value.role !== "admin" &&
                   user.value.role !== "owner"
-                )
-                channelSettings.value = false;
+                ) {
+                  channelSettings.value = false;
+                }
+                getMessagesUpdate(activeChannel.value!.channel.id);
               }
             })
             .catch(async (err) => {
-              console.log('in UCL catch')
-              if (err && err.response)
+              if (err && err.response && err.response.data.message !== 'banned') {
                 store.dispatch(
                   "setErrorMessage",
                   err.response.data.message
                 );
+              } else if (err && err.response && err.response.data.message == 'banned' &&
+              user.value.role == 'user') {
+                getDefaultChannel();
+              }
             });
           await api
             .getAvailableChannels({ withCredentials: true })
@@ -526,11 +529,9 @@ export const ChatComponent = defineComponent({
           chatSocket.emit("chat-message", newContent, store.state.onlineUsers);
         })
         .catch(async (err: any) => {
-          {
-            if (err && err.response)
-              store.dispatch("setErrorMessage", err.response.data.message);
-          }
-          if (err.response.data.message == "muted") {
+          if (err && err.response && err.response.data.message !== "muted") {
+            store.dispatch("setErrorMessage", err.response.data.message);
+          } else if (err && err.response && err.response.data.message == "muted") {
             mutePopup.value = true;
           }
           return;
@@ -564,7 +565,7 @@ export const ChatComponent = defineComponent({
           return res;
         })
         .catch((err) => {
-          if (err && err.response)
+          if (err && err.response && err.response.data.message !== 'Channel not found')
             store.dispatch("setErrorMessage", err.response.data.message);
           getDefaultChannel();
         });

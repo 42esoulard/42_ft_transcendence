@@ -420,7 +420,7 @@ export class ChannelsController {
     if (cm == undefined) {
       // throw new NotFoundException('Channel Member not found');
       return undefined;
-    } else if (cm.ban) {
+    } else if (cm.ban && cm.member.role == 'user') {
       throw new ForbiddenException('banned');
     }
     return cm;
@@ -542,6 +542,14 @@ export class ChannelsController {
     if (user_cm == undefined) {
       throw new NotFoundException('Failed to find this member');
     }
+    if (end_date.toString() !== '0') {
+      if (action == 'unban' && end_date.toString() !== user_cm.ban) {
+        return undefined;
+      } else if (action == 'unmute' && end_date.toString() !== user_cm.mute) {
+        return undefined;
+      }
+    }
+
     if (action == 'unban' && !user_cm.ban) {
       throw new BadRequestException("This member isn't banned");
     } else if (action == 'unmute' && !user_cm.mute) {
