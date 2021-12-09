@@ -425,57 +425,35 @@ export const ChatComponent = defineComponent({
         .getUserChannels({ withCredentials: true })
         .then(async (res) => {
           joinedChannels.value = res.data;
+          console.log('in UCL')
           await api
             .getChannelMember(
               activeChannel.value!.channel.id,
               activeChannel.value!.member.id,
               { withCredentials: true }
             )
-            .then((res) => {
-              activeChannel.value = res.data;
-              if (
-                !activeChannel.value.is_admin &&
-                user.value.role !== "admin" &&
-                user.value.role !== "owner"
-              )
+            .then(async (res) => {
+              if (!res.data) {
+                console.log('bf bug')
+                previewChannel(activeChannel.value!.channel);
+              } else {
+                console.log('in UCL res', res.data)
+                activeChannel.value = res.data;
+                if (
+                  !activeChannel.value.is_admin &&
+                  user.value.role !== "admin" &&
+                  user.value.role !== "owner"
+                )
                 channelSettings.value = false;
+              }
             })
             .catch(async (err) => {
-              // {
-              //   if (
-              //     err &&
-              //     err.response &&
-              //     err.response.data.message !== "banned" && 
-              //     user.value.role == "user"
-              //   )
-              //     store.dispatch(
-              //       "setErrorMessage",
-              //       err.response.data.message
-              //     );
-              // }
-              if (
-                user.value.role !== "admin" &&
-                user.value.role !== "owner"
-              ) {
-                getDefaultChannel();
-              } else {
-                await api
-                  .getChannelPreview(activeChannel.value!.channel.id, {
-                    withCredentials: true,
-                  })
-                  .then((res) => {
-                    activeChannel.value!.channel = res.data;
-                    channelMessages.value = res.data.messages;
-                    return res;
-                  })
-                  .catch((err) => {
-                    if (err && err.response)
-                      store.dispatch(
-                        "setErrorMessage",
-                        err.response.data.message
-                      );
-                  });
-              }
+              console.log('in UCL catch')
+              if (err && err.response)
+                store.dispatch(
+                  "setErrorMessage",
+                  err.response.data.message
+                );
             });
           await api
             .getAvailableChannels({ withCredentials: true })
@@ -580,6 +558,7 @@ export const ChatComponent = defineComponent({
       await api
         .getChannelPreview(channel.id, { withCredentials: true })
         .then((res) => {
+          isMember.value = false;
           activeChannel.value!.channel = res.data;
           channelMessages.value = res.data.messages;
           return res;
@@ -587,6 +566,7 @@ export const ChatComponent = defineComponent({
         .catch((err) => {
           if (err && err.response)
             store.dispatch("setErrorMessage", err.response.data.message);
+          getDefaultChannel();
         });
     };
 

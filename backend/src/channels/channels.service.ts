@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { Channel } from './interfaces/channel.interface';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -330,7 +331,11 @@ export class ChannelsService {
         if (channel == undefined) {
           return undefined;
         }
-        if (user.role == Role.USER && channel.type == 'private') {
+        console.log('user.role, channel type', user.role, channel.type);
+        if (
+          user.role == Role.USER &&
+          (channel.type == 'private' || channel.password)
+        ) {
           channel.messages = [];
           return channel;
         }
@@ -465,6 +470,11 @@ export class ChannelsService {
             dmInfo.recipient_id,
           );
           const owner = await this.userService.getUserbyId(dmInfo.owner_id);
+          if (recipient == undefined || owner == undefined) {
+            throw new ForbiddenException(
+              'Failed to create DM: unknown recipient or sender',
+            );
+          }
           return await this.channelsRepository
             .save(dmInfo)
             .then(async (res) => {

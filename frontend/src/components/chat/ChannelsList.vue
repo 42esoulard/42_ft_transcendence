@@ -14,7 +14,7 @@
     <div>
       <div class="chat-channels__title">Joined channels</div>
       <ul class="chat-channels__list">
-        <li v-for="cm in joinedChannels" :key="cm.channel.name">
+        <li v-for="cm in joinedChannels" :key="cm.channel.id">
           <button
             :class="[
               'chat-channels__item',
@@ -47,7 +47,7 @@
     <div>
       <div class="chat-channels__title">More channels</div>
       <ul class="chat-channels__list">
-        <li v-for="chan in availableChannels" :key="chan.name">
+        <li v-for="chan in availableChannels" :key="chan.id">
           <button
             :class="[
               'chat-channels__item',
