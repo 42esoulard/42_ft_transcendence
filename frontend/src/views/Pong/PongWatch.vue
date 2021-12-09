@@ -1,6 +1,5 @@
 <template>
   <div class="users-main users-main--watch">
-    <div class="users-div">
       <div class="users users--ladder">
         <div class="users__title">Ongoing games</div>
         <div class="users-list users-list--watch">
@@ -24,7 +23,6 @@
           </tr>
         </div>
       </div>
-    </div>
   </div>
 </template>
 

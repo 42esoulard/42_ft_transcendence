@@ -12,9 +12,13 @@
     justify-content: flex-start;
     height: 1200px;
     width: 100%;
-    background-color: $div-bg-color;
-    margin-top: 0;
+    margin: 0;
+    padding: 2rem;
   }
+}
+
+.users-div {
+    width: 100%;
 }
 
 .users {
@@ -24,20 +28,11 @@
   height: $users-height;
   background-color: $users-bg-color;
   border-radius: 10px;
-  &--admin {
-    margin-top: 0;
-    @media (max-width: 800px) {
-      width: 100%;
-      border-radius: 0;
-    }
-  }
   &--ladder {
     grid-template: 8% 82% 10% / 100%;
   }
   @media (max-width: 600px) {
     width: 100%;
-    padding: 0;
-    margin: 0;
   }
 }
 
@@ -121,6 +116,9 @@
   display: flex;
   gap: 2rem;
   flex-direction: column;
+  @media (max-width: 600px) {
+    width: 100%;
+  }
 }
 
 .friendships-panel {

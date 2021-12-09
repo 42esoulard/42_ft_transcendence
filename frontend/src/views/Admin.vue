@@ -1,134 +1,134 @@
 <template>
-  <div class="user-account" v-if="user.id != 0">
-    <div class="users users--admin">
-      <div class="users__title">Manage users</div>
-      <div class="users-list-selectors">
-        <button
-          @click="toggleOnline"
-          :class="[
-            'button',
-            'button--selector',
-            onlinelist ? 'button--selector--on' : '',
-          ]"
-        >
-          online
-        </button>
-        <button
-          @click="toggleAdmin"
-          :class="[
-            'button',
-            'button--selector',
-            adminlist ? 'button--selector--on' : '',
-          ]"
-        >
-          admin
-        </button>
-        <button
-          @click="toggleBanned"
-          :class="[
-            'button',
-            'button--selector',
-            bannedlist ? 'button--selector--on' : '',
-          ]"
-        >
-          banned
-        </button>
-      </div>
-      <div class="users-list">
-        <tr
-          v-for="member in selectList"
-          :key="member.id"
-          class="users-list__elt"
-        >
-          <td>
-            <img
-              v-if="isOnline(member)"
-              class="users-list__avatar users-list__avatar--online"
-              :src="member.avatar"
-            />
-            <img
-              v-else
-              class="users-list__avatar users-list__avatar--offline"
-              :src="member.avatar"
-            />
-          </td>
-          <td>
-            <router-link
-              :class="[
-                'link',
-                'link--user-list',
-                member.role == 'user' ? '' : 'link--admin',
-              ]"
-              :to="{
-                name: 'UserProfile',
-                params: { username: member.username },
-              }"
-            >
-              {{ member.username }}
-            </router-link>
-          </td>
-          <td class="users-list__interactions">
-            <button
-              v-if="bannedlist"
-              class="link link--neutral"
-              @click="toggleConfirmModal('unban', member)"
-              title="unban"
-            >
-              <i class="fas fa-user-slash" />
-            </button>
-            <button
-              v-else-if="member.role == 'user'"
-              class="link link--neutral"
-              @click="toggleConfirmModal('ban', member)"
-              title="ban"
-            >
-              <i class="fas fa-ban" />
-            </button>
-            <button
-              class="link link--neutral"
-              v-if="member.role == 'user'"
-              @click="toggleConfirmModal('delete', member)"
-              title="delete"
-            >
-              <i class="fas fa-trash" />
-            </button>
-            <button
-              v-if="!bannedlist && user.role == 'owner' && !isAdmin(member)"
-              class="link link--neutral"
-              @click="toggleConfirmModal('promote', member)"
-              title="promote"
-            >
-              <i class="fas fa-crown" />
-            </button>
-            <button
-              v-if="!bannedlist && user.role == 'owner' && isAdmin(member)"
-              class="link link--neutral"
-              @click="toggleConfirmModal('promote owner', member)"
-              title="promote owner"
-            >
-              <i class="fas fa-chess-king" />
-            </button>
-            <button
-              v-if="isAdmin(member) && user.role == 'owner'"
-              class="link link--neutral"
-              @click="toggleConfirmModal('demote', member)"
-              title="demote"
-            >
-              <i class="fas fa-arrow-down" />
-            </button>
-          </td>
-        </tr>
-      </div>
+    <div class="users-main" v-if="user.id != 0">
+      <div class="users">
+        <div class="users__title">Manage users</div>
+        <div class="users-list-selectors">
+          <button
+            @click="toggleOnline"
+            :class="[
+              'button',
+              'button--selector',
+              onlinelist ? 'button--selector--on' : '',
+            ]"
+          >
+            online
+          </button>
+          <button
+            @click="toggleAdmin"
+            :class="[
+              'button',
+              'button--selector',
+              adminlist ? 'button--selector--on' : '',
+            ]"
+          >
+            admin
+          </button>
+          <button
+            @click="toggleBanned"
+            :class="[
+              'button',
+              'button--selector',
+              bannedlist ? 'button--selector--on' : '',
+            ]"
+          >
+            banned
+          </button>
+        </div>
+        <div class="users-list">
+          <tr
+            v-for="member in selectList"
+            :key="member.id"
+            class="users-list__elt"
+          >
+            <td>
+              <img
+                v-if="isOnline(member)"
+                class="users-list__avatar users-list__avatar--online"
+                :src="member.avatar"
+              />
+              <img
+                v-else
+                class="users-list__avatar users-list__avatar--offline"
+                :src="member.avatar"
+              />
+            </td>
+            <td>
+              <router-link
+                :class="[
+                  'link',
+                  'link--user-list',
+                  member.role == 'user' ? '' : 'link--admin',
+                ]"
+                :to="{
+                  name: 'UserProfile',
+                  params: { username: member.username },
+                }"
+              >
+                {{ member.username }}
+              </router-link>
+            </td>
+            <td class="users-list__interactions">
+              <button
+                v-if="bannedlist"
+                class="link link--neutral"
+                @click="toggleConfirmModal('unban', member)"
+                title="unban"
+              >
+                <i class="fas fa-user-slash" />
+              </button>
+              <button
+                v-else-if="member.role == 'user'"
+                class="link link--neutral"
+                @click="toggleConfirmModal('ban', member)"
+                title="ban"
+              >
+                <i class="fas fa-ban" />
+              </button>
+              <button
+                class="link link--neutral"
+                v-if="member.role == 'user'"
+                @click="toggleConfirmModal('delete', member)"
+                title="delete"
+              >
+                <i class="fas fa-trash" />
+              </button>
+              <button
+                v-if="!bannedlist && user.role == 'owner' && !isAdmin(member)"
+                class="link link--neutral"
+                @click="toggleConfirmModal('promote', member)"
+                title="promote"
+              >
+                <i class="fas fa-crown" />
+              </button>
+              <button
+                v-if="!bannedlist && user.role == 'owner' && isAdmin(member)"
+                class="link link--neutral"
+                @click="toggleConfirmModal('promote owner', member)"
+                title="promote owner"
+              >
+                <i class="fas fa-chess-king" />
+              </button>
+              <button
+                v-if="isAdmin(member) && user.role == 'owner'"
+                class="link link--neutral"
+                @click="toggleConfirmModal('demote', member)"
+                title="demote"
+              >
+                <i class="fas fa-arrow-down" />
+              </button>
+            </td>
+          </tr>
+        </div>
 
-      <div class="users-search">
-        <input
-          class="users-search__bar"
-          type="text"
-          maxlength="10"
-          v-model="searchQuery"
-        />
+        <div class="users-search">
+          <input
+            class="users-search__bar"
+            type="text"
+            maxlength="10"
+            v-model="searchQuery"
+          />
+        </div>
       </div>
-    </div>
   </div>
 
   <teleport to="#modals">

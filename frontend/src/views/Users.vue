@@ -1,6 +1,5 @@
 <template>
   <div v-if="userList.length" class="users-main">
-    <div class="users-div">
       <div class="users">
         <div class="users__title">Userlist</div>
         <div class="users-list-selectors" :key="friendlist">
@@ -100,7 +99,6 @@
           />
         </div>
       </div>
-    </div>
     <Pending />
   </div>
   <div v-else>

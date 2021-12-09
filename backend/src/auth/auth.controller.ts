@@ -83,7 +83,7 @@ export class AuthController {
   ) {
     const user: User = await this.userService.getUserByUsername(username);
     if (user == undefined) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User doesn't exist");
     }
     const access_token = await this.authService.generateAccessToken(user);
     const refresh_token = await this.authService.generateRefreshToken(user.id);

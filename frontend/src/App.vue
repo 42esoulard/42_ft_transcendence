@@ -24,7 +24,7 @@ import { computed, onUpdated } from "vue";
 import { Relationship, User } from "sdk/typescript-axios-client-generated";
 import { challengeExport, challengeMessage, gameMode } from "./types/PongGame";
 import { useRouter } from "vue-router";
-import { useAuthApi } from "@/plugins/api.plugin";
+import { useAuthApi, useUserApi } from "@/plugins/api.plugin";
 export const pongSocket = io("http://localhost:3000/pong");
 export const presenceSocket = io("http://localhost:3000/presence");
 export const chatSocket = io("http://localhost:3000/chat");
@@ -35,6 +35,7 @@ export default {
     const store = useStore();
     const router = useRouter();
     const authApi = useAuthApi();
+    const userApi = useUserApi();
 
     onUpdated(() => {
       if (store.state.user.id != 0) {
@@ -211,8 +212,16 @@ export default {
     });
 
     chatSocket.on("app-dm", (recipient: User) => {
-      router.push("/chat");
-      chatSocket.emit("init-direct-message", recipient);
+      userApi
+        .getUser(recipient.id)
+        .then((res: any) => {
+          router.push("/chat");
+          chatSocket.emit("init-direct-message", recipient);
+        })
+        .catch((err) => {
+          if (err && err.response)
+            store.dispatch("setErrorMessage", err.response.data.message);
+        });
     });
 
     chatSocket.on(

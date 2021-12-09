@@ -83,7 +83,7 @@ export class UsersController {
   async getUser(@Param('id') id: number): Promise<User> {
     const user: User = await this.userService.getUserbyId(id);
     if (user == undefined) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User doesn't exist");
     }
     return user;
   }
@@ -91,7 +91,7 @@ export class UsersController {
   async getUserByUsername(@Param('username') username: string): Promise<User> {
     const user: User = await this.userService.getUserByUsername(username);
     if (user == undefined) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User doesn't exist");
     }
     return user;
   }
@@ -100,7 +100,7 @@ export class UsersController {
   async getUserByLogin(@Param('login') login: string): Promise<User> {
     const user: User = await this.userService.getUserByLogin(login);
     if (user == undefined) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User doesn't exist");
     }
     return user;
   }

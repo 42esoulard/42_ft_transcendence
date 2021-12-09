@@ -1,6 +1,5 @@
 <template>
   <div v-if="userList.length" class="users-main">
-    <div class="users-div">
       <div class="users users--ladder">
         <div class="users__title">Ladder</div>
         <div class="users-list">
@@ -50,7 +49,6 @@
           />
         </div>
       </div>
-    </div>
   </div>
   <div v-else>
     <p>Loading some data...</p>
