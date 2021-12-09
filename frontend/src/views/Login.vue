@@ -18,9 +18,6 @@
           alt=""
         />
       </button>
-      <button class="button button--log-in" @click="$router.push('fake-login')">
-        Fake login
-      </button>
     </div>
     <div class="log-in-stat">
       <span class="log-in-stat__text log-in-stat__text--number">{{

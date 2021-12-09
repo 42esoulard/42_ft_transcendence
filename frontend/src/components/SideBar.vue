@@ -15,7 +15,6 @@
         <SideBarLink v-if="role != 'user'" to="/admin" icon="fas fa-crown"
           >admin</SideBarLink
         >
-        <SideBarLink to="/adduser" icon="fas fa-toolbox">add</SideBarLink>
       </div>
     </div>
   </transition>

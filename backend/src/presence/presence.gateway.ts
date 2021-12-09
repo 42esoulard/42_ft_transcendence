@@ -14,10 +14,13 @@ type ConnectedUser = {
   socket_ids?: string[];
 };
 
+const FRONT_URL = `${process.env['FRONT_URL']}`;
+const FRONT_URL_BIS = `${process.env['FRONT_URL_BIS']}`;
+
 @WebSocketGateway({
   namespace: '/presence',
   cors: {
-    origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
+    origin: [FRONT_URL, FRONT_URL_BIS],
     credentials: true,
   },
 })

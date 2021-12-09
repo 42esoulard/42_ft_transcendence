@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import AddUser from "../views/AddUser.vue";
 import Users from "../views/Users.vue";
 import Chat from "../views/Chat.vue";
 import Banned from "../views/Banned.vue";
@@ -10,7 +9,6 @@ import PongGame from "../views/Pong/PongGame.vue";
 import PongWatch from "../views/Pong/PongWatch.vue";
 import ReceiveChallenge from "../views/Pong/ReceiveChallenge.vue";
 import SendChallenge from "../views/Pong/SendChallenge.vue";
-import FakeLogin from "../views/FakeLogin.vue";
 import Login from "../views/Login.vue";
 import { store } from "@/store";
 import axios from "axios";
@@ -45,11 +43,6 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: "/fake-login",
-    name: "FakeLogin",
-    component: FakeLogin,
-  },
-  {
     path: "/users",
     name: "Users",
     component: Users,
@@ -64,11 +57,6 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       requiresAuth: true,
     },
-  },
-  {
-    path: "/adduser",
-    name: "AddUser",
-    component: AddUser,
   },
   {
     path: "/chat",
@@ -164,7 +152,7 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(process.env['VUE_APP_API_URL']),
   routes,
 });
 
@@ -176,7 +164,7 @@ axios.defaults.withCredentials = true;
 const refreshToken = async () => {
   // await authApi.refreshToken({ withCredentials: true })
   await axios
-    .get("http://localhost:3000/auth/refreshtoken")
+    .get(`${process.env['VUE_APP_API_URL']}/auth/refreshtoken`)
     .then(async (response) => {
       await getProfile();
     })
@@ -190,7 +178,7 @@ const refreshToken = async () => {
 const getProfile = async () => {
   // await authApi.profile()
   await axios
-    .get<User>("http://localhost:3000/auth/profile")
+    .get<User>(`${process.env['VUE_APP_API_URL']}/auth/profile`)
     .then((response) => {
       store.state.user = response.data;
       store.dispatch("setPendingChallenges");

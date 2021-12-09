@@ -55,7 +55,7 @@ export default defineComponent({
   name: "InitTwoFactor",
   components: { OtpInput },
   setup(props, { emit }) {
-    const qrcodeURL = ref("http://localhost:3000/auth/2fa/generate");
+    const qrcodeURL = ref(`${process.env['VUE_APP_API_URL']}/auth/2fa/generate`);
     const codeSendToUrl = ref("turn-on");
     const key = ref("No key available");
     const authApi = useAuthApi();

@@ -68,14 +68,6 @@
           </SideBarLink>
           <SideBarLink
             class="menu__link"
-            @click="isActive = !isActive"
-            to="/adduser"
-            icon="fas fa-toolbox"
-          >
-            add
-          </SideBarLink>
-          <SideBarLink
-            class="menu__link"
             @click="logOut"
             to="/log-out"
             icon="fas fa-power-off"
