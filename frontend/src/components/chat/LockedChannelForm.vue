@@ -59,7 +59,6 @@ export default defineComponent({
           withCredentials: true,
         })
         .then((res) => {
-          console.log("password match res", res);
           if (res.data) {
             context.emit("join-channel", props.channel);
             closeModal();
