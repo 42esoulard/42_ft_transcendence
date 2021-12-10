@@ -5,6 +5,7 @@
   flex-direction: row;
   height: $chat-height;
   width: $chat-width;
+  max-width: 850px;
   margin-left: $chat-margin-left;
   margin-top: 2rem;
   background-color: $chat-bg;
@@ -14,6 +15,7 @@
   width: $chat-box-width;
   min-width: $chat-min-width;
   border-radius: $chat-border-radius;
+  max-width: 850px;
 }
 
 .chat-box__input {
@@ -209,6 +211,7 @@
   height: $chans-height;
   width: $chans-width;
   min-width: $chans-min-width;
+  max-width: 450px;
   overflow-x: hidden;
   // border-right: solid;
   // border-color:$chans-item-hover-bg;

@@ -657,12 +657,8 @@ export default defineComponent({
           withCredentials: true,
         })
         .then((res) => {
-          context.emit("update-channels-list");
           chatSocket.emit("update-channels");
-          context.emit(
-            "post-message",
-            res.data.member.username + " has been added"
-          );
+          context.emit("update-channels-list");
           chatSocket.emit(
             "chat-action",
             "added to",
@@ -671,6 +667,13 @@ export default defineComponent({
           );
           username.value = "";
           wasSubmitted.value = false;
+
+          setTimeout(() => {
+            context.emit(
+              "post-message",
+              res.data.member.username + " has been added"
+            );
+          }, 500);
         })
         .catch((err) => {
           {

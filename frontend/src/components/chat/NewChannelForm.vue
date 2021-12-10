@@ -153,7 +153,6 @@ export default defineComponent({
       } else {
         nameInput.setCustomValidity("");
         validName = true;
-        console.log(channelName.value + "not found");
       }
       nameInput.reportValidity();
     };

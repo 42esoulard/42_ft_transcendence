@@ -435,6 +435,7 @@ export const ChatComponent = defineComponent({
               if (!res.data) {
                 previewChannel(activeChannel.value!.channel);
               } else {
+                isMember.value = true;
                 activeChannel.value = res.data;
                 if (
                   !activeChannel.value!.is_admin &&
@@ -534,13 +535,9 @@ export const ChatComponent = defineComponent({
           chatSocket.emit("chat-message", newContent, store.state.onlineUsers);
         })
         .catch(async (err: any) => {
-          if (err && err.response && err.response.data.message !== "muted") {
-            store.dispatch("setErrorMessage", err.response.data.message);
-          } else if (
-            err &&
-            err.response &&
-            err.response.data.message == "muted"
-          ) {
+          // if (err && err.response && err.response.data.message !== "muted") {
+          //   store.dispatch("setErrorMessage", err.response.data.message);
+          if (err && err.response && err.response.data.message == "muted") {
             mutePopup.value = true;
           }
           return;
@@ -616,7 +613,7 @@ export const ChatComponent = defineComponent({
         .joinChannel("self", channel.id, user.value.id, {
           withCredentials: true,
         })
-        .then((res) => {
+        .then(async (res) => {
           updateChannelsList();
           activeChannel.value = res.data;
           isMember.value = true;
@@ -629,8 +626,9 @@ export const ChatComponent = defineComponent({
                 "]"
             );
             newMessage.value = " has joined";
-            send();
-            chatSocket.emit("update-channels");
+            await send().then(() => {
+              chatSocket.emit("update-channels");
+            });
           }
           return res;
         })
