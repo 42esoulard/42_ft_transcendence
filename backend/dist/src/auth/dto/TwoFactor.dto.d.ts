@@ -1,3 +1,3 @@
 export declare class TwoFactorDto {
-    readonly code: string;
+  readonly code: string;
 }

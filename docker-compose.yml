@@ -20,8 +20,8 @@ services:
       FRONT_URL: ${FRONT_URL}
       BASE_URL: ${API_URL}
     env_file:
-    - credentials.env
-    - game.env
+      - credentials.env
+      - game.env
     command: sh -c "npm install && npm run start:dev:db:seed && npm run start:prod"
     depends_on:
       - postgres
@@ -44,7 +44,7 @@ services:
       VUE_APP_42_AUTH_URL: ${AUTH_URL}
       NODE_OPTIONS: --openssl-legacy-provider
     env_file:
-    - game.env
+      - game.env
     depends_on:
       - postgres
       - backend

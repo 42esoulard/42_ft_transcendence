@@ -1,4 +1,9 @@
-import { BadRequestException, CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
@@ -8,9 +13,8 @@ export class FortyTwoAuthGuard extends AuthGuard('FortyTwoStrategy') {
 
     try {
       activate = (await super.canActivate(context)) as boolean;
-    }
-    catch(err: any) {
-      throw new BadRequestException("invalid code");
+    } catch (err: any) {
+      throw new BadRequestException('invalid code');
     }
     const request = context.switchToHttp().getRequest();
     await super.logIn(request);

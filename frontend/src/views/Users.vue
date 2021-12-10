@@ -1,104 +1,100 @@
 <template>
   <div v-if="userList.length" class="users-main">
-      <div class="users">
-        <div class="users__title">Userlist</div>
-        <div class="users-list-selectors" :key="friendlist">
-          <button
-            @click="toggleOnline"
-            :class="[
-              'button',
-              'button--selector',
-              onlinelist ? 'button--selector--on' : '',
-            ]"
-          >
-            online
-          </button>
-          <button
-            @click="toggleFriends"
-            :class="[
-              'button',
-              'button--selector',
-              friendlist ? 'button--selector--on' : '',
-            ]"
-          >
-            friends
-          </button>
-          <button
-            @click="toggleBlocked"
-            :class="[
-              'button',
-              'button--selector',
-              blockedlist ? 'button--selector--on' : '',
-            ]"
-          >
-            blocked
-          </button>
-        </div>
-        <div class="users-list users-list--userlist">
-          <tr v-for="user in selectList" :key="user.id" class="users-list__elt">
-            <td>
-              <img
-                v-if="userStatus(user) == 'online'"
-                class="users-list__avatar users-list__avatar--online"
-                :src="user.avatar"
-              />
-              <img
-                v-else-if="userStatus(user) == 'ingame'"
-                class="users-list__avatar users-list__avatar--in-game"
-                :src="user.avatar"
-              />
-              <img
-                v-else
-                class="users-list__avatar users-list__avatar--offline"
-                :src="user.avatar"
-              />
-            </td>
-            <td>
-              <router-link
-                :class="[
-                  'link',
-                  'link--user-list',
-                  user.role == 'user' ? '' : 'link--admin',
-                ]"
-                :to="{
-                  name: 'UserProfile',
-                  params: { username: user.username },
-                }"
-              >
-                {{ user.username }}
-              </router-link>
-            </td>
-            <td class="users-list__interactions">
-              <button
-                class="link link--neutral"
-                @click="sendDM(user)"
-                title="dm"
-              >
-                <i class="link link--neutral fas fa-envelope" />
-              </button>
-              <button
-                v-if="
-                  userStatus(user) == 'online' && userStatus(self) == 'online'
-                "
-                class="link link--neutral"
-                @click="challengeUser(user)"
-                title="challenge"
-              >
-                <i class="fas fa-table-tennis" />
-              </button>
-            </td>
-          </tr>
-        </div>
-
-        <div class="users-search">
-          <input
-            class="users-search__bar"
-            type="text"
-            maxlength="10"
-            v-model="searchQuery"
-          />
-        </div>
+    <div class="users">
+      <div class="users__title">Userlist</div>
+      <div class="users-list-selectors" :key="friendlist">
+        <button
+          @click="toggleOnline"
+          :class="[
+            'button',
+            'button--selector',
+            onlinelist ? 'button--selector--on' : '',
+          ]"
+        >
+          online
+        </button>
+        <button
+          @click="toggleFriends"
+          :class="[
+            'button',
+            'button--selector',
+            friendlist ? 'button--selector--on' : '',
+          ]"
+        >
+          friends
+        </button>
+        <button
+          @click="toggleBlocked"
+          :class="[
+            'button',
+            'button--selector',
+            blockedlist ? 'button--selector--on' : '',
+          ]"
+        >
+          blocked
+        </button>
       </div>
+      <div class="users-list users-list--userlist">
+        <tr v-for="user in selectList" :key="user.id" class="users-list__elt">
+          <td>
+            <img
+              v-if="userStatus(user) == 'online'"
+              class="users-list__avatar users-list__avatar--online"
+              :src="user.avatar"
+            />
+            <img
+              v-else-if="userStatus(user) == 'ingame'"
+              class="users-list__avatar users-list__avatar--in-game"
+              :src="user.avatar"
+            />
+            <img
+              v-else
+              class="users-list__avatar users-list__avatar--offline"
+              :src="user.avatar"
+            />
+          </td>
+          <td>
+            <router-link
+              :class="[
+                'link',
+                'link--user-list',
+                user.role == 'user' ? '' : 'link--admin',
+              ]"
+              :to="{
+                name: 'UserProfile',
+                params: { username: user.username },
+              }"
+            >
+              {{ user.username }}
+            </router-link>
+          </td>
+          <td class="users-list__interactions">
+            <button class="link link--neutral" @click="sendDM(user)" title="dm">
+              <i class="link link--neutral fas fa-envelope" />
+            </button>
+            <button
+              v-if="
+                userStatus(user) == 'online' && userStatus(self) == 'online'
+              "
+              class="link link--neutral"
+              @click="challengeUser(user)"
+              title="challenge"
+            >
+              <i class="fas fa-table-tennis" />
+            </button>
+          </td>
+        </tr>
+      </div>
+
+      <div class="users-search">
+        <input
+          class="users-search__bar"
+          type="text"
+          maxlength="10"
+          v-model="searchQuery"
+        />
+      </div>
+    </div>
     <Pending />
   </div>
   <div v-else>

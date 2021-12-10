@@ -1,2 +1,1 @@
-export declare class PresenceModule {
-}
+export declare class PresenceModule {}

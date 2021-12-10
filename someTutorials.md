@@ -40,22 +40,23 @@
    2.1. (optional) If like me you're afraid of losing your local work but not ready to push to main yet, while in your branch you can always push to your remote branch: `git push origin my_branch`  
    2.2. (optional) if you actually lost your local branch for some unfortunate reason, dry your tears, create and checkout a new local branch and pull your remote branch from there (/!\ not in the main branch):  
     `git checkout -b my_branch`  
-    `git pull origin my_branch`  
+    `git pull origin my_branch`
 
 3. Once you're ready to push to the main branch, go to the main branch:  
-    `git checkout main`  
+   `git checkout main`
 
 4. Get the freshest version of the main branch (to avoid unleashing hell if you haven't pulled your friend's latest glorious commit)  
-    `git pull`  
+   `git pull`
 
 5. Try to merge your branch with main  
     `git merge my_branch`  
-   5.1. IF THERE'S CONFLICTS:  
-    - git and VSCode are letting you know which files and lines are conflicting. Stay on main, solve each conflict appropriately, commit the now fixed versions and try again from step 4!  
-    - If your attempt at merging is a mess and you panic (like I often do), you can always `git reset --hard`: /!\ **this will delete all the non-committed local changes** (the main branch will go back to its last committed state, your friend's latest glorious commit will be safe, and your committed work is still safe in your branch). Take a deep breath and try again from step 4.  
+   5.1. IF THERE'S CONFLICTS:
+
+   - git and VSCode are letting you know which files and lines are conflicting. Stay on main, solve each conflict appropriately, commit the now fixed versions and try again from step 4!
+   - If your attempt at merging is a mess and you panic (like I often do), you can always `git reset --hard`: /!\ **this will delete all the non-committed local changes** (the main branch will go back to its last committed state, your friend's latest glorious commit will be safe, and your committed work is still safe in your branch). Take a deep breath and try again from step 4.
 
 6. Once no conflicts are encountered upon merging our branch with main, we can push!  
-    `git push origin main`
+   `git push origin main`
 
 # CHECKLIST
 

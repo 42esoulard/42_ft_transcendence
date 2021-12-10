@@ -1,3 +1,2 @@
 export { RelationshipsService } from './relationships.service';
-export declare class RelationshipsModule {
-}
+export declare class RelationshipsModule {}

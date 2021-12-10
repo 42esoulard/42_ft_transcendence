@@ -288,7 +288,7 @@ export class ChannelsController {
         await this.channelService
           .checkBlocked(user_id, request.user.id)
           .then((res) => {
-            if (res == true) {
+            if (res == true && request.user.role == 'user') {
               throw new ForbiddenException(
                 'Failed to join channel: missing authorization to act for this user: active block',
               );

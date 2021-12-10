@@ -1,2 +1,1 @@
-export declare class PongModule {
-}
+export declare class PongModule {}

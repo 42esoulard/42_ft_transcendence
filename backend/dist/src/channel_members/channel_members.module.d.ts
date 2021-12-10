@@ -1,2 +1,1 @@
-export declare class ChannelMembersModule {
-}
+export declare class ChannelMembersModule {}

@@ -31,8 +31,12 @@
         /></span>
       </div>
       <div
-        v-if="activeChannel.is_admin || activeChannel.is_owner || 
-        activeChannel.member.role == 'admin' || activeChannel.member.role == 'owner'"
+        v-if="
+          activeChannel.is_admin ||
+          activeChannel.is_owner ||
+          activeChannel.member.role == 'admin' ||
+          activeChannel.member.role == 'owner'
+        "
         class="chat-channels__tag-container"
       >
         <span v-if="activeChannel.is_owner"
@@ -485,13 +489,9 @@ export default defineComponent({
               "]"
           );
           if (action === "muted") {
-            setTimeout(
-              () =>  {
-
-                updateMuteBan("unmute", cmId, endDate)
-              },
-              endDate - Date.now()
-            );
+            setTimeout(() => {
+              updateMuteBan("unmute", cmId, endDate);
+            }, endDate - Date.now());
           } else if (action === "banned") {
             setTimeout(
               () => updateMuteBan("unban", cmId, endDate),
@@ -657,12 +657,8 @@ export default defineComponent({
           withCredentials: true,
         })
         .then((res) => {
-          context.emit("update-channels-list");
           chatSocket.emit("update-channels");
-          context.emit(
-            "post-message",
-            res.data.member.username + " has been added"
-          );
+          context.emit("update-channels-list");
           chatSocket.emit(
             "chat-action",
             "added to",
@@ -671,6 +667,13 @@ export default defineComponent({
           );
           username.value = "";
           wasSubmitted.value = false;
+
+          setTimeout(() => {
+            context.emit(
+              "post-message",
+              res.data.member.username + " has been added"
+            );
+          }, 500);
         })
         .catch((err) => {
           {

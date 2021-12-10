@@ -1,3 +1,3 @@
 export declare class FortyTwoUser {
-    username: string;
+  username: string;
 }

@@ -99,7 +99,10 @@ export class UsersService {
     });
     const user = await this.usersRepository.findOne(id);
 
-    await this.usersRepository.update(owner[0].id == id ? owner[1].id : owner[0].id, { role: Role.ADMIN });
+    await this.usersRepository.update(
+      owner[0].id == id ? owner[1].id : owner[0].id,
+      { role: Role.ADMIN },
+    );
     await this.usersRepository.update(user.id, { role: Role.OWNER });
   }
 
