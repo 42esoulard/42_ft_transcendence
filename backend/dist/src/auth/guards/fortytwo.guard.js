@@ -11,7 +11,13 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 let FortyTwoAuthGuard = class FortyTwoAuthGuard extends (0, passport_1.AuthGuard)('FortyTwoStrategy') {
     async canActivate(context) {
-        const activate = (await super.canActivate(context));
+        let activate = false;
+        try {
+            activate = (await super.canActivate(context));
+        }
+        catch (err) {
+            throw new common_1.BadRequestException("invalid code");
+        }
         const request = context.switchToHttp().getRequest();
         await super.logIn(request);
         return activate;

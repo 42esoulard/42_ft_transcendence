@@ -125,6 +125,10 @@ let ChannelsController = class ChannelsController {
         return await this.channelService.toggleNotification(cm);
     }
     async joinChannel(type, channel_id, user_id, request) {
+        const joinee = await this.channelService.getUser(user_id);
+        if (joinee == undefined) {
+            throw new common_1.NotFoundException('Couldnt identify user');
+        }
         switch (type) {
             case 'added':
                 await this.channelService
@@ -216,9 +220,9 @@ let ChannelsController = class ChannelsController {
     async getChannelMember(channel_id, user_id) {
         const cm = await this.channelService.getChannelMember(channel_id, user_id);
         if (cm == undefined) {
-            throw new common_1.NotFoundException('Channel Member not found');
+            return undefined;
         }
-        else if (cm.ban) {
+        else if (cm.ban && cm.member.role == 'user') {
             throw new common_1.ForbiddenException('banned');
         }
         return cm;
@@ -298,6 +302,14 @@ let ChannelsController = class ChannelsController {
         const user_cm = await this.channelService.getCmById(cm_id);
         if (user_cm == undefined) {
             throw new common_1.NotFoundException('Failed to find this member');
+        }
+        if (end_date.toString() !== '0') {
+            if (action == 'unban' && end_date.toString() !== user_cm.ban) {
+                return undefined;
+            }
+            else if (action == 'unmute' && end_date.toString() !== user_cm.mute) {
+                return undefined;
+            }
         }
         if (action == 'unban' && !user_cm.ban) {
             throw new common_1.BadRequestException("This member isn't banned");

@@ -262,6 +262,9 @@ let ChannelsService = class ChannelsService {
                 return undefined;
             }
             if (user.role == role_enum_1.Role.USER && channel.type == 'private') {
+                return undefined;
+            }
+            else if (user.role == role_enum_1.Role.USER && channel.password) {
                 channel.messages = [];
                 return channel;
             }
@@ -362,6 +365,9 @@ let ChannelsService = class ChannelsService {
                     }
                     const recipient = await this.userService.getUserbyId(dmInfo.recipient_id);
                     const owner = await this.userService.getUserbyId(dmInfo.owner_id);
+                    if (recipient == undefined || owner == undefined) {
+                        throw new common_1.ForbiddenException('Failed to create DM: unknown recipient or sender');
+                    }
                     return await this.channelsRepository
                         .save(dmInfo)
                         .then(async (res) => {

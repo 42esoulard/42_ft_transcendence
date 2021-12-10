@@ -47,7 +47,8 @@ let MessagesService = class MessagesService {
                 this.channelMemberService.checkMute(res)) {
                 throw new common_1.ForbiddenException('muted');
             }
-            if (newMessage.author.role == 'user' && res.ban) {
+            if (newMessage.author.role == 'user' &&
+                this.channelMemberService.checkBan(res)) {
                 throw new common_1.ForbiddenException('banned');
             }
             if (newMessage.channel.messages.length > 50) {
