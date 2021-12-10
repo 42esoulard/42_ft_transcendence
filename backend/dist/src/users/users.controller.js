@@ -159,7 +159,6 @@ let UsersController = class UsersController {
         if (!currentUser)
             throw new common_1.BadRequestException("user doesn't exist");
         if (req.fileValidationError) {
-            console.log(req.fileValidationError);
             throw new common_1.BadRequestException(req.fileValidationError);
         }
         if (!file) {
@@ -175,7 +174,7 @@ let UsersController = class UsersController {
             newFilePath = newFilePath.replace(ext, '.jpg');
             file.filename = file.filename.replace(ext, '.jpg');
         }
-        (0, files_manipulation_utils_1.handleAvatar)(`./${file.path}`, `./${newFilePath}`);
+        await (0, files_manipulation_utils_1.handleAvatar)(`./${file.path}`, `./${newFilePath}`);
         file.filename = file.filename.replace('_tmp', '');
         this.userService.updateUser({
             id: req.user.id,

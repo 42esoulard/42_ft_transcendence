@@ -218,7 +218,6 @@ export class UsersController {
     const currentUser = await this.userService.getUserbyId(req.user.id);
     if (!currentUser) throw new BadRequestException("user doesn't exist");
     if (req.fileValidationError) {
-      console.log(req.fileValidationError);
       throw new BadRequestException(req.fileValidationError);
     }
     if (!file) {
@@ -236,7 +235,7 @@ export class UsersController {
       newFilePath = newFilePath.replace(ext, '.jpg');
       file.filename = file.filename.replace(ext, '.jpg');
     }
-    handleAvatar(`./${file.path}`, `./${newFilePath}`);
+    await handleAvatar(`./${file.path}`, `./${newFilePath}`);
 
     // Save the URL where the file will be accessible by frontend
     file.filename = file.filename.replace('_tmp', '');

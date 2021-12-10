@@ -27,7 +27,6 @@ function _editFileName(req, file, callback) {
     if ((_a = req.user) === null || _a === void 0 ? void 0 : _a.forty_two_login) {
         newName = req.user.forty_two_login;
     }
-    console.log('new name:', `${newName}_tmp${fileExtName}`);
     callback(null, `${newName}_tmp${fileExtName}`);
 }
 exports.saveImageToStorage = {
