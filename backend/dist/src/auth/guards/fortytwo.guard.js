@@ -16,7 +16,7 @@ let FortyTwoAuthGuard = class FortyTwoAuthGuard extends (0, passport_1.AuthGuard
             activate = (await super.canActivate(context));
         }
         catch (err) {
-            throw new common_1.BadRequestException("invalid code");
+            throw new common_1.BadRequestException('invalid code');
         }
         const request = context.switchToHttp().getRequest();
         await super.logIn(request);

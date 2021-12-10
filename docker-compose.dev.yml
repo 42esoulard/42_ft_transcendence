@@ -22,8 +22,8 @@ services:
       FRONT_URL_BIS: ${FRONT_URL_BIS}
       BASE_URL: ${API_URL}
     env_file:
-    - credentials.env
-    - game.env
+      - credentials.env
+      - game.env
     command: sh -c "rm -rf ./dist && npm install --loglevel=error && npm run start:dev"
     depends_on:
       - postgres
@@ -47,7 +47,7 @@ services:
       VUE_APP_42_AUTH_URL: ${AUTH_URL}
       NODE_OPTIONS: --openssl-legacy-provider
     env_file:
-    - game.env
+      - game.env
     command: sh -c "rm -rf ./dist && npm install --loglevel=error && npm run serve"
     depends_on:
       - postgres

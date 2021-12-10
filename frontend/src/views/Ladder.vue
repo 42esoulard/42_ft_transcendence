@@ -1,54 +1,52 @@
 <template>
   <div v-if="userList.length" class="users-main">
-      <div class="users users--ladder">
-        <div class="users__title">Ladder</div>
-        <div class="users-list">
-          <tr v-for="user in selectList" :key="user.id" class="users-list__elt">
-            <td class="ladder__td--rank">
-              #{{ selectList.indexOf(user) + 1 }}
-            </td>
-            <td class="ladder__td">
-              <img
-                v-if="userStatus(user) == 'online'"
-                class="users-list__avatar users-list__avatar--online"
-                :src="user.avatar"
-              />
-              <img
-                v-else-if="userStatus(user) == 'ingame'"
-                class="users-list__avatar users-list__avatar--in-game"
-                :src="user.avatar"
-              />
-              <img
-                v-else
-                class="users-list__avatar users-list__avatar--offline"
-                :src="user.avatar"
-              />
-              <router-link
-                :class="[
-                  'link',
-                  'link--user-list',
-                  user.role == 'user' ? '' : 'link--admin',
-                ]"
-                :to="{
-                  name: 'UserProfile',
-                  params: { username: user.username },
-                }"
-              >
-                {{ user.username }}
-              </router-link>
-            </td>
-          </tr>
-        </div>
-
-        <div class="users-search">
-          <input
-            class="users-search__bar"
-            type="text"
-            maxlength="10"
-            v-model="searchQuery"
-          />
-        </div>
+    <div class="users users--ladder">
+      <div class="users__title">Ladder</div>
+      <div class="users-list">
+        <tr v-for="user in selectList" :key="user.id" class="users-list__elt">
+          <td class="ladder__td--rank">#{{ selectList.indexOf(user) + 1 }}</td>
+          <td class="ladder__td">
+            <img
+              v-if="userStatus(user) == 'online'"
+              class="users-list__avatar users-list__avatar--online"
+              :src="user.avatar"
+            />
+            <img
+              v-else-if="userStatus(user) == 'ingame'"
+              class="users-list__avatar users-list__avatar--in-game"
+              :src="user.avatar"
+            />
+            <img
+              v-else
+              class="users-list__avatar users-list__avatar--offline"
+              :src="user.avatar"
+            />
+            <router-link
+              :class="[
+                'link',
+                'link--user-list',
+                user.role == 'user' ? '' : 'link--admin',
+              ]"
+              :to="{
+                name: 'UserProfile',
+                params: { username: user.username },
+              }"
+            >
+              {{ user.username }}
+            </router-link>
+          </td>
+        </tr>
       </div>
+
+      <div class="users-search">
+        <input
+          class="users-search__bar"
+          type="text"
+          maxlength="10"
+          v-model="searchQuery"
+        />
+      </div>
+    </div>
   </div>
   <div v-else>
     <p>Loading some data...</p>

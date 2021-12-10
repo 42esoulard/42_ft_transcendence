@@ -31,8 +31,12 @@
         /></span>
       </div>
       <div
-        v-if="activeChannel.is_admin || activeChannel.is_owner || 
-        activeChannel.member.role == 'admin' || activeChannel.member.role == 'owner'"
+        v-if="
+          activeChannel.is_admin ||
+          activeChannel.is_owner ||
+          activeChannel.member.role == 'admin' ||
+          activeChannel.member.role == 'owner'
+        "
         class="chat-channels__tag-container"
       >
         <span v-if="activeChannel.is_owner"
@@ -485,13 +489,9 @@ export default defineComponent({
               "]"
           );
           if (action === "muted") {
-            setTimeout(
-              () =>  {
-
-                updateMuteBan("unmute", cmId, endDate)
-              },
-              endDate - Date.now()
-            );
+            setTimeout(() => {
+              updateMuteBan("unmute", cmId, endDate);
+            }, endDate - Date.now());
           } else if (action === "banned") {
             setTimeout(
               () => updateMuteBan("unban", cmId, endDate),

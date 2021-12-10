@@ -10,18 +10,20 @@ const TypeORMSession_entity_1 = require("./auth/entity/TypeORMSession.entity");
 const out_1 = require("connect-typeorm/out");
 const typeorm_1 = require("typeorm");
 const cookieParser = require("cookie-parser");
+const FRONT_URL = `${process.env['FRONT_URL']}`;
+const FRONT_URL_BIS = `${process.env['FRONT_URL_BIS']}`;
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const sessionRepository = (0, typeorm_1.getRepository)(TypeORMSession_entity_1.TypeORMSession);
     app.enableCors({
         credentials: true,
-        origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
+        origin: [FRONT_URL, FRONT_URL_BIS],
     });
     const config = new swagger_1.DocumentBuilder()
         .setTitle('ft_transcendence API')
         .setDescription('Because we will nail it !')
         .setVersion('1.0')
-        .addServer('http://localhost:' + process.env.PORT)
+        .addServer(`${process.env.BASE_URL}`)
         .addOAuth2()
         .addCookieAuth('tokens')
         .build();

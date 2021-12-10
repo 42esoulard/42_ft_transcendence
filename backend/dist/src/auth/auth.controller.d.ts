@@ -20,11 +20,6 @@ export declare class AuthController {
         username: string;
         newlyCreated: boolean;
     }>;
-    fakeLogin(req: Request, res: Response, { username }: {
-        username: string;
-    }): Promise<{
-        message: string;
-    }>;
     refreshToken(req: Request, res: Response): Promise<{
         message: string;
     }>;

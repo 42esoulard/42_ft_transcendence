@@ -39,7 +39,7 @@ let AuthService = class AuthService {
                 username: username,
                 forty_two_login: tmpUsername,
                 two_fa_enabled: false,
-                avatar: `http://localhost:3000/users/avatars/default.jpg`,
+                avatar: `${process.env.BASE_URL}/users/avatars/default.jpg`,
             });
         }
     }

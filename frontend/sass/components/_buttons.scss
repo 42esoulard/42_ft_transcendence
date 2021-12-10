@@ -49,6 +49,12 @@
     font-size: $button-log-in-size;
     padding: $button-log-in-padding;
     height: 4rem;
+    &--with-ft {
+      height: 6rem;
+      border-radius: 15px;
+      gap: 1rem;
+      font-size: 1.5rem;
+    }
   }
   &--create-chan {
     margin: 10px;
@@ -102,6 +108,6 @@
 }
 
 .button-log-in__logo {
-  width: $button-log-in-logo-width;
+  width: 3rem;
   height: auto;
 }

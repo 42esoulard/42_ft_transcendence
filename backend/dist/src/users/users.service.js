@@ -88,10 +88,12 @@ let UsersService = class UsersService {
     async saveUser(userDto) {
         const newUser = this.usersRepository.create(userDto);
         if (!newUser.avatar)
-            newUser.avatar = 'http://localhost:3000/users/avatars/default.jpg';
-        if (newUser.id == 1)
-            newUser.role = role_enum_1.Role.OWNER;
-        return await this.usersRepository.save(newUser);
+            newUser.avatar = `${process.env.BASE_URL}/users/avatars/default.jpg`;
+        const createdUser = await this.usersRepository.save(newUser);
+        if (createdUser.id == 1) {
+            await this.usersRepository.update(createdUser.id, { role: role_enum_1.Role.OWNER });
+        }
+        return createdUser;
     }
     async changeOwner(id) {
         const owner = await this.usersRepository.find({

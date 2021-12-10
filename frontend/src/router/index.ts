@@ -164,7 +164,7 @@ axios.defaults.withCredentials = true;
 const refreshToken = async () => {
   // await authApi.refreshToken({ withCredentials: true })
   await axios
-    .get(`${process.env['VUE_APP_API_URL']}/auth/refreshtoken`)
+    .get(`${process.env["VUE_APP_API_URL"]}/auth/refreshtoken`)
     .then(async (response) => {
       await getProfile();
     })
@@ -178,7 +178,7 @@ const refreshToken = async () => {
 const getProfile = async () => {
   // await authApi.profile()
   await axios
-    .get<User>(`${process.env['VUE_APP_API_URL']}/auth/profile`)
+    .get<User>(`${process.env["VUE_APP_API_URL"]}/auth/profile`)
     .then((response) => {
       store.state.user = response.data;
       store.dispatch("setPendingChallenges");

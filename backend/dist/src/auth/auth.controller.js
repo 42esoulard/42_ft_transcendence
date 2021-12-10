@@ -55,21 +55,6 @@ let AuthController = class AuthController {
             };
         }
     }
-    async fakeLogin(req, res, { username }) {
-        const user = await this.userService.getUserByUsername(username);
-        if (user == undefined) {
-            throw new common_1.NotFoundException("User doesn't exist");
-        }
-        const access_token = await this.authService.generateAccessToken(user);
-        const refresh_token = await this.authService.generateRefreshToken(user.id);
-        user.refresh_token = refresh_token;
-        res.cookie('tokens', { access_token: access_token, refresh_token }, {
-            httpOnly: true,
-            expires: new Date(Date.now() + 1000 * 86400),
-            sameSite: true,
-        });
-        return { message: 'Logged in successfully' };
-    }
     async refreshToken(req, res) {
         let access_token;
         if (req.user.two_fa_enabled) {
@@ -159,16 +144,6 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
-__decorate([
-    (0, common_1.Post)('fake-login'),
-    openapi.ApiResponse({ status: 201 }),
-    __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Res)({ passthrough: true })),
-    __param(2, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, Object]),
-    __metadata("design:returntype", Promise)
-], AuthController.prototype, "fakeLogin", null);
 __decorate([
     (0, swagger_1.ApiCookieAuth)(),
     (0, common_1.Get)('refreshtoken'),

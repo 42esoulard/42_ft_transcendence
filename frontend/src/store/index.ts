@@ -66,9 +66,8 @@ export const store = createStore<State>({
     tagAvatar(state: State) {
       if (state.user) {
         if (state.user.avatar?.search("default.jpg") != -1) {
-          state.user.avatar = `${process.env['VUE_APP_API_URL']}/users/avatars/${state.user.forty_two_login}.jpg`;
-        }
-        else {
+          state.user.avatar = `${process.env["VUE_APP_API_URL"]}/users/avatars/${state.user.forty_two_login}.jpg`;
+        } else {
           const tag = `?tag=${Date.now().toString()}`;
           state.user.avatar = `${state.user.avatar}${tag}`;
         }
@@ -133,7 +132,11 @@ export const store = createStore<State>({
     },
 
     addChallenge(state: State, challenge: ChallengeReceived) {
-      if (!state.challengesReceived.filter((chall: ChallengeReceived) => chall.challenger == challenge.challenger).length)
+      if (
+        !state.challengesReceived.filter(
+          (chall: ChallengeReceived) => chall.challenger == challenge.challenger
+        ).length
+      )
         state.challengesReceived.push(challenge);
     },
     removeChallenge(state: State, challenger: string) {

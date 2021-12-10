@@ -261,9 +261,10 @@ let ChannelsService = class ChannelsService {
             if (channel == undefined) {
                 return undefined;
             }
-            console.log('user.role, channel type', user.role, channel.type);
-            if (user.role == role_enum_1.Role.USER &&
-                (channel.type == 'private' || channel.password)) {
+            if (user.role == role_enum_1.Role.USER && channel.type == 'private') {
+                return undefined;
+            }
+            else if (user.role == role_enum_1.Role.USER && channel.password) {
                 channel.messages = [];
                 return channel;
             }

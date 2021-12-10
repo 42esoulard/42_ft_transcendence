@@ -19,6 +19,8 @@ const channels_service_1 = require("../channels/channels.service");
 const messages_entity_1 = require("../messages/entity/messages.entity");
 const relationship_interface_1 = require("../relationships/interfaces/relationship.interface");
 const user_interface_1 = require("../users/interfaces/user.interface");
+const FRONT_URL = `${process.env['FRONT_URL']}`;
+const FRONT_URL_BIS = `${process.env['FRONT_URL_BIS']}`;
 let ChatGateway = class ChatGateway {
     constructor(channelsService) {
         this.channelsService = channelsService;
@@ -307,7 +309,7 @@ ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         namespace: '/chat',
         cors: {
-            origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
+            origin: [FRONT_URL, FRONT_URL_BIS],
             credentials: true,
         },
     }),

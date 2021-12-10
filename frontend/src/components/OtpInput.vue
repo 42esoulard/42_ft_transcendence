@@ -77,11 +77,15 @@ export default defineComponent({
                 relationshipApi
                   .getPendingRelationships(store.state.user.id)
                   .then((res: any) => {
-                    if (res.data.length > 0) store.state.toggleFriendship = true;
+                    if (res.data.length > 0)
+                      store.state.toggleFriendship = true;
                   })
                   .catch((err: any) => {
                     if (err && err.response)
-                      store.dispatch("setErrorMessage", err.response.data.message);
+                      store.dispatch(
+                        "setErrorMessage",
+                        err.response.data.message
+                      );
                   });
               }
               router.push("/pong");

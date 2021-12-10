@@ -25,9 +25,9 @@ import { Relationship, User } from "sdk/typescript-axios-client-generated";
 import { challengeExport, challengeMessage, gameMode } from "./types/PongGame";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthApi, useUserApi } from "@/plugins/api.plugin";
-export const pongSocket = io(`${process.env['VUE_APP_API_URL']}/pong`);
-export const presenceSocket = io(`${process.env['VUE_APP_API_URL']}/presence`);
-export const chatSocket = io(`${process.env['VUE_APP_API_URL']}/chat`);
+export const pongSocket = io(`${process.env["VUE_APP_API_URL"]}/pong`);
+export const presenceSocket = io(`${process.env["VUE_APP_API_URL"]}/presence`);
+export const chatSocket = io(`${process.env["VUE_APP_API_URL"]}/chat`);
 
 export default {
   components: { SideBar, Header, Toast },
@@ -159,8 +159,7 @@ export default {
     chatSocket.on("promotedUser", (user: User) => {
       if (store.state.user.id == user.id) {
         store.state.user.role = user.role;
-        if (route.path != "/pong/play")
-          router.push("/admin");
+        if (route.path != "/pong/play") router.push("/admin");
         store.dispatch("setMessage", "You've been promoted!");
       }
     });
@@ -169,8 +168,7 @@ export default {
       if (store.state.user.id == user.id) {
         store.state.user.role = "user";
         console.log("ROUTE", route.path);
-        if (route.path == "/admin")
-          router.push("/pong");
+        if (route.path == "/admin") router.push("/pong");
         store.dispatch("setMessage", "You've been demoted!");
       }
     });

@@ -13,6 +13,8 @@ exports.PresenceGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const user_interface_1 = require("../users/interfaces/user.interface");
+const FRONT_URL = `${process.env['FRONT_URL']}`;
+const FRONT_URL_BIS = `${process.env['FRONT_URL_BIS']}`;
 let PresenceGateway = class PresenceGateway {
     constructor() {
         this.connectedUsers = [];
@@ -68,7 +70,7 @@ PresenceGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         namespace: '/presence',
         cors: {
-            origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
+            origin: [FRONT_URL, FRONT_URL_BIS],
             credentials: true,
         },
     })

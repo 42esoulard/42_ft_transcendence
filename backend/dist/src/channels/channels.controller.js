@@ -222,7 +222,7 @@ let ChannelsController = class ChannelsController {
         if (cm == undefined) {
             return undefined;
         }
-        else if (cm.ban) {
+        else if (cm.ban && cm.member.role == 'user') {
             throw new common_1.ForbiddenException('banned');
         }
         return cm;
@@ -302,6 +302,14 @@ let ChannelsController = class ChannelsController {
         const user_cm = await this.channelService.getCmById(cm_id);
         if (user_cm == undefined) {
             throw new common_1.NotFoundException('Failed to find this member');
+        }
+        if (end_date.toString() !== '0') {
+            if (action == 'unban' && end_date.toString() !== user_cm.ban) {
+                return undefined;
+            }
+            else if (action == 'unmute' && end_date.toString() !== user_cm.mute) {
+                return undefined;
+            }
         }
         if (action == 'unban' && !user_cm.ban) {
             throw new common_1.BadRequestException("This member isn't banned");

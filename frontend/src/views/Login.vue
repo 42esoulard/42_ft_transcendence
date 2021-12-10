@@ -10,7 +10,10 @@
       <span class="log-in-stat__text">games</span>
     </div>
     <div class="log-in-buttons">
-      <button class="button button--log-in" @click="logInWith42">
+      <button
+        class="button button--log-in button--log-in--with-ft"
+        @click="logInWith42"
+      >
         <span>Login with </span>
         <img
           class="button-log-in__logo"
