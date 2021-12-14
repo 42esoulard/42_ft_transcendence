@@ -84,23 +84,24 @@ export default defineComponent({
 
     const updateUsername = async (): Promise<boolean> => {
       let ret = false;
-      if (!/^[a-zA-Z]+$/.test(username.value))
+      const newUsername = username.value;
+      if (!/^[a-zA-Z]+$/.test(newUsername))
         error_username.value = "Username should only contains letters";
-      else if (users.value.find((user) => user.username == username.value))
+      else if (users.value.find((user) => user.username == newUsername))
         error_username.value = "Username already taken";
       else
         await userApi
           .updateUser(
             {
               id: store.state.user.id,
-              username: username.value,
+              username: newUsername,
             },
             {
               withCredentials: true,
             }
           )
           .then((res) => {
-            store.commit("updateUsername", username.value);
+            store.commit("updateUsername", newUsername);
             ret = true;
           })
           .catch((err) => {
@@ -150,7 +151,7 @@ export default defineComponent({
       }
       if (usernameUpdated && avatarUpdated) {
         closeModal();
-        if (usernameUpdated)
+        if (usernameUpdated && store.state.user.username)
           router.push({ path: `/profile/${store.state.user.username}` });
         store.dispatch(
           "setMessage",

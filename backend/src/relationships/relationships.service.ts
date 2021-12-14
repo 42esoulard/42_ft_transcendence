@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Relationship } from './interfaces/relationship.interface';
 import { Relationships } from './entity/relationships.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -82,7 +82,16 @@ export class RelationshipsService {
     const newRelationship: Relationship =
       this.relationshipsRepository.create(relationshipDto);
     if (relationshipDto.nature != 'blocked') newRelationship.pending = true;
-    return await this.relationshipsRepository.save(newRelationship);
+    return await this.relationshipsRepository
+      .save(newRelationship)
+      .then((res) => {
+        return res;
+      })
+      .catch(() => {
+        throw new BadRequestException(
+          'Relationship did not comply database requirements',
+        );
+      });
   }
 
   async validateRelationship(relationship: Relationship) {
@@ -97,6 +106,8 @@ export class RelationshipsService {
       relationshipDto.userId1,
       relationshipDto.userId2,
     );
+    if (!relationship)
+      throw new BadRequestException("relationship doesn't exist");
     return await this.relationshipsRepository.delete(relationship.id);
   }
 }

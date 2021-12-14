@@ -30,7 +30,7 @@
 import { defineComponent, onMounted, ref } from "vue";
 import { pongSocket } from "@/App.vue";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
-import { usePongApi } from "@/plugins/api.plugin";
+import { usePongApi, useUserApi } from "@/plugins/api.plugin";
 import { Game } from "sdk/typescript-axios-client-generated";
 import { store } from "@/store";
 
@@ -38,15 +38,39 @@ export default defineComponent({
   setup() {
     const games = ref<Game[]>([]);
     const api = usePongApi();
+    const userApi = useUserApi();
 
     onMounted(() => {
-      api
-        .getOnGoingGames()
-        .then((res: any) => (games.value = res.data))
-        .catch((err) => {
-          if (err && err.response)
-            store.dispatch("setErrorMessage", err.response.data.message);
-        });
+      if (store.state.user.id !== 0) {
+        userApi
+          .getUser(store.state.user.id)
+          .then(() => {
+            api
+              .getOnGoingGames()
+              .then((res: any) => {
+                games.value = res.data;
+                let i = 0;
+                games.value.forEach((game) => {
+                  if (
+                    game.users.length !== 2 ||
+                    !game.users[0].user ||
+                    !game.users[1].user
+                  ) {
+                    games.value.splice(i, 1);
+                  }
+                });
+              })
+              .catch((err) => {
+                if (err && err.response)
+                  store.dispatch("setErrorMessage", err.response.data.message);
+              });
+          })
+          .catch((err: any) => {
+            if (err && err.response)
+              store.dispatch("setErrorMessage", err.response.data.message);
+            window.location.reload();
+          });
+      }
     });
 
     const WatchGame = (id: number) => {

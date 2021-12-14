@@ -130,28 +130,37 @@ export default {
       }
     });
 
-    chatSocket.on("isAlreadyConnected", (user: User) => {
+    chatSocket.on("isAlreadyConnected", async (user: User) => {
       if (store.state.user.id == user.id) {
         logOut();
       }
     });
 
-    chatSocket.on("bannedUser", (user: User) => {
-      if (store.state.user.id == user.id) {
-        logOut();
-      }
-      store.commit("removeOnlineUser", user.id);
-    });
-
-    chatSocket.on("deletedUser", (user: User) => {
+    chatSocket.on("bannedUser", async (user: User) => {
       if (store.state.user.id == user.id) {
         logOut();
       }
       store.commit("removeOnlineUser", user.id);
     });
 
-    chatSocket.on("selfdeletedUser", (user: User) => {
-      store.commit("removeOnlineUser", user.id);
+    chatSocket.on("deletedUser", async (info) => {
+      if (info.length == 2 && info[0].id && store.state.user.id == info[0].id) {
+        await logOut().then(() => chatSocket.emit("finishDeletion", info));
+      }
+    });
+
+    chatSocket.on("finishDeletion", async (info) => {
+      if (info.length == 2 && info[0].id && store.state.user.id == info[1]) {
+        await userApi
+          .removeUser(info[0].id, { withCredentials: true })
+          .then(() => store.commit("removeOnlineUser", info[0].id))
+          .catch((err: any) => {
+            {
+              if (err && err.response)
+                store.dispatch("setErrorMessage", err.response.data.message);
+            }
+          });
+      }
     });
 
     const route = useRoute();
@@ -159,7 +168,9 @@ export default {
     chatSocket.on("promotedUser", (user: User) => {
       if (store.state.user.id == user.id) {
         store.state.user.role = user.role;
-        if (route.path != "/pong/play") router.push("/admin");
+        if (user.role == "owner" && route.path != "/pong/play")
+          window.location.reload();
+        else if (route.path != "/pong/play") router.push("/admin");
         store.dispatch("setMessage", "You've been promoted!");
       }
     });
@@ -167,9 +178,9 @@ export default {
     chatSocket.on("demotedUser", (user: User) => {
       if (store.state.user.id == user.id) {
         store.state.user.role = "user";
-        console.log("ROUTE", route.path);
         if (route.path == "/admin") router.push("/pong");
         store.dispatch("setMessage", "You've been demoted!");
+        chatSocket.emit("self-update-channels");
       }
     });
 
@@ -244,8 +255,8 @@ export default {
       }
     );
 
-    const logOut = () => {
-      authApi
+    const logOut = async () => {
+      await authApi
         .logout({ withCredentials: true })
         .then((response) => {
           presenceSocket.emit("closeConnection", store.state.user);

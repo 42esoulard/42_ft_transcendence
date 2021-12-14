@@ -99,13 +99,6 @@
     <button v-else class="button button--third" @click="deactivateTwoFactor">
       Disable 2FA
     </button>
-    <button
-      v-if="user.role !== 'owner'"
-      class="button button--grey"
-      @click="toggleConfirmModal('delete', user)"
-    >
-      Delete account
-    </button>
     <teleport to="#modals">
       <transition name="fade--error">
         <div v-if="showBackdrop" class="backdrop"></div>
@@ -259,23 +252,7 @@ export default defineComponent({
       return showModal.value || showModal2.value;
     });
 
-    const deleteAccount = async () => {
-      if (store.state.user.id != 0) {
-        chatSocket.emit("selfDeletedUser", store.state.user);
-        logOut();
-        await userApi
-          .removeUser(store.state.user.id, {
-            withCredentials: true,
-          })
-          .then((res: any) => {})
-          .catch((err: any) => {
-            if (err && err.response)
-              store.dispatch("setErrorMessage", err.response.data.message);
-          });
-      }
-    };
-
-    const logOut = () => {
+    const logOut = async () => {
       authApi
         .logout({ withCredentials: true })
         .then((response) => {
@@ -453,7 +430,11 @@ export default defineComponent({
           relationship.adresseeId == user.id
         )
           return 4;
-        if (store.state.user.id == relationship.adresseeId) return -2;
+        if (
+          store.state.user.id == relationship.adresseeId &&
+          relationship.requesterId == user.id
+        )
+          return -2;
       }
 
       return 0;
@@ -523,6 +504,11 @@ export default defineComponent({
     chatSocket.on("newBlocked", (blocked) => {
       if (store.state.user.id == blocked[0].adresseeId) {
         userBlocked.value.push(blocked[0]);
+        userFriendships.value = userFriendships.value.filter(
+          (fr: Relationship) =>
+            fr.requesterId != blocked[0].requesterId &&
+            fr.adresseeId != blocked[0].requesterId
+        );
       }
     });
 
@@ -564,9 +550,6 @@ export default defineComponent({
 
     const executeAction = (action: string, entity: User) => {
       toggleModalBis();
-      if (action == "delete") {
-        deleteAccount();
-      }
     };
 
     const sendDM = (recipient: User) => {
@@ -590,7 +573,6 @@ export default defineComponent({
       showBackdrop,
       block,
       unblock,
-      deleteAccount,
       challengeUser,
       toggleConfirmModal,
       toggleConfirm,

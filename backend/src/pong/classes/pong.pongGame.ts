@@ -1,11 +1,12 @@
 import { coordinates, gameMode } from './pong.types';
 import { player } from './pong.player';
-import { Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Game } from '../entity/games.entity';
 import { GameUser } from '../entity/gameUser.entity';
 import { Server } from 'socket.io';
 import { Socket } from 'socket.io';
+import { Users } from 'src/users/entity/users.entity';
 
 var CANVAS_WIDTH = 1 / Number(process.env['CANVAS_WIDTH']);
 var CANVAS_HEIGHT = 1 / Number(process.env['CANVAS_HEIGHT']);
@@ -30,6 +31,7 @@ export class pongGame {
     public player2: player,
     private readonly gameRepo: Repository<Game>,
     private readonly gameUserRepo: Repository<GameUser>,
+    private readonly userRepo: Repository<Users>,
     public server: Server,
     public gameMode: gameMode,
   ) {
@@ -96,6 +98,12 @@ export class pongGame {
   }
 
   async createGame(): Promise<void> {
+    const usr1 = await this.userRepo.findOne(this.player1.userId);
+    if (!usr1) throw new BadRequestException("user doesn't exist");
+
+    const usr2 = await this.userRepo.findOne(this.player2.userId);
+    if (!usr2) throw new BadRequestException("user doesn't exist");
+
     // push Game and GameUsers intoDB
     await this.pushGameintoDB();
     await this.pushGameUsersintoDB();

@@ -34,6 +34,7 @@ export default defineComponent({
     const username = route.params.username;
 
     onMounted(() => {
+      if (!username || !username.length) return;
       userApi
         .getUserByUsername(username.toString())
         .then((res: any) => {

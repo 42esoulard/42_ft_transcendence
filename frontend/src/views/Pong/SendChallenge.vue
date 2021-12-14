@@ -31,6 +31,7 @@ import { defineComponent, onMounted, ref } from "vue";
 import { pongSocket } from "@/App.vue";
 import { useStore } from "@/store";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
+import { useUserApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
   props: {
@@ -40,10 +41,20 @@ export default defineComponent({
   inheritAttrs: false, // we dont need it, and not setting it to false a warning: "extraneous non prop attributes (authorized) were passed to component but could not be automatically inherited..."
   setup(props) {
     const store = useStore();
+    const userApi = useUserApi();
     onMounted(() => {
-      challenge(Number(props.challengeeId), props.challengeeName);
+      if (store.state.user.id !== 0) {
+        userApi
+          .getUser(store.state.user.id)
+          .then(() =>
+            challenge(Number(props.challengeeId), props.challengeeName)
+          )
+          .catch((err: any) => {
+            if (err && err.response)
+              store.dispatch("setErrorMessage", err.response.data.message);
+          });
+      }
     });
-
     const challengeStatus = ref("");
     const challenge = (id: number, name: string) => {
       challengeStatus.value = "challenge sent to " + name;

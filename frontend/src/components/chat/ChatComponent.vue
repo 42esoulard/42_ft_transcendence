@@ -919,38 +919,48 @@ export const ChatComponent = defineComponent({
     };
 
     chatSocket.on("chat-message-on", async (data: any) => {
-      await relApi.getBlockedByUser(user.value.id).then(async (blocked) => {
-        if (
-          blocked.data
-            .map((blocked) => blocked.adresseeId)
-            .includes(data.author.id)
-        ) {
-          return;
-        }
-        if (
-          activeChannel.value!.channel &&
-          activeChannel.value!.channel.id === data.channel.id
-        ) {
-          channelMessages.value.push(data);
-        } else if (activeChannel.value!.channel) {
-          await api
-            .setNewMessage("true", data.channel.id, { withCredentials: true })
-            .then((res) => {
-              if (res) {
-                store.state.chatNotification = true;
-                updateChannelsList();
-              }
-            })
-            .catch((err) => {
-              if (
-                err.response.data &&
-                err.response.data.message !== "Not a member of this channel"
-              ) {
-                store.dispatch("setErrorMessage", err.response.data.message);
-              }
-            });
-        }
-      });
+      await relApi
+        .getBlockedByUser(user.value.id)
+        .then(async (blocked) => {
+          if (
+            blocked.data
+              .map((blocked) => blocked.adresseeId)
+              .includes(data.author.id)
+          ) {
+            return;
+          }
+          if (
+            activeChannel.value!.channel &&
+            activeChannel.value!.channel.id === data.channel.id
+          ) {
+            channelMessages.value.push(data);
+          } else if (activeChannel.value!.channel) {
+            await api
+              .setNewMessage("true", data.channel.id, { withCredentials: true })
+              .then((res) => {
+                if (res) {
+                  store.state.chatNotification = true;
+                  updateChannelsList();
+                }
+              })
+              .catch((err) => {
+                if (
+                  err &&
+                  err.response.data &&
+                  err.response.data.message !== "Not a member of this channel"
+                ) {
+                  store.dispatch("setErrorMessage", err.response.data.message);
+                }
+              });
+          }
+        })
+        .catch((err) => {
+          if (err && err.response.data) {
+            if (err.response.data.message == "user doesn't exist")
+              window.location.reload();
+            store.dispatch("setErrorMessage", err.response.data.message);
+          }
+        });
     });
 
     chatSocket.on("created-channel", async (cm: ChannelMember) => {

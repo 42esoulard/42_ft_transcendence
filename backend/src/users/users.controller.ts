@@ -166,19 +166,6 @@ export class UsersController {
     return await this.userService.changeOwner(id);
   }
 
-  @Post()
-  async saveUser(@Body() newUser: CreateUserDto): Promise<User> {
-    if (!/^[a-zA-Z]+$/.test(newUser.username)) {
-      throw new BadRequestException('invalid username');
-    }
-    if (await this.userService.getUserByUsername(newUser.username))
-      newUser.username =
-        (newUser.username.length < 8
-          ? newUser.username
-          : newUser.username.substr(0, newUser.username.length - 1)) + '1';
-    return await this.userService.saveUser(newUser);
-  }
-
   @Post('update-user')
   @UseGuards(JwtTwoFactorGuard)
   async updateUser(
@@ -218,6 +205,7 @@ export class UsersController {
     const currentUser = await this.userService.getUserbyId(req.user.id);
     if (!currentUser) throw new BadRequestException("user doesn't exist");
     if (req.fileValidationError) {
+      console.log(req.fileValidationError);
       throw new BadRequestException(req.fileValidationError);
     }
     if (!file) {
@@ -235,7 +223,7 @@ export class UsersController {
       newFilePath = newFilePath.replace(ext, '.jpg');
       file.filename = file.filename.replace(ext, '.jpg');
     }
-    await handleAvatar(`./${file.path}`, `./${newFilePath}`);
+    handleAvatar(`./${file.path}`, `./${newFilePath}`);
 
     // Save the URL where the file will be accessible by frontend
     file.filename = file.filename.replace('_tmp', '');

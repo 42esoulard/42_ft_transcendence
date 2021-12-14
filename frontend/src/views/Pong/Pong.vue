@@ -91,6 +91,7 @@ export default defineComponent({
     const users = ref<User[]>([]);
     const classicMode = ref(true);
     const challengee = { id: props.challengeeId, name: props.challengeeName };
+    const userApi = useUserApi();
 
     const store = useStore();
     const userStatus = (user: User): "online" | "offline" | "ingame" => {
@@ -109,16 +110,28 @@ export default defineComponent({
       }
       return "offline";
     };
+
     const JoinQueue = () => {
-      if (userStatus(store.state.user) == "ingame") {
-        store.dispatch("setErrorMessage", "you're already playing!");
-        return;
+      if (store.state.user.id !== 0) {
+        userApi
+          .getUser(store.state.user.id)
+          .then(() => {
+            if (userStatus(store.state.user) == "ingame") {
+              store.dispatch("setErrorMessage", "you're already playing!");
+              return;
+            }
+            pongSocket.emit("joinGame", {
+              userId: store.state.user.id,
+              userName: store.state.user.username,
+              gameMode: classicMode.value ? "classic" : "transcendence",
+            });
+          })
+          .catch((err: any) => {
+            if (err && err.response)
+              store.dispatch("setErrorMessage", err.response.data.message);
+            window.location.reload();
+          });
       }
-      pongSocket.emit("joinGame", {
-        userId: store.state.user.id,
-        userName: store.state.user.username,
-        gameMode: classicMode.value ? "classic" : "transcendence",
-      });
     };
 
     pongSocket.on("addedToQueue", () => {

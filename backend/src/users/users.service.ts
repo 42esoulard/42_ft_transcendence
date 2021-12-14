@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { User } from './interfaces/user.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -67,6 +71,7 @@ export class UsersService {
 
   async removeUser(id: number) {
     const user = await this.usersRepository.findOne(id);
+    if (!user) throw new BadRequestException("user doesn't exist");
     if (user.role == Role.OWNER) throw ForbiddenException;
     else return await this.usersRepository.delete(user.id);
   }

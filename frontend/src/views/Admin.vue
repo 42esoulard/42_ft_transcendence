@@ -265,6 +265,8 @@ export default defineComponent({
         demote(<User>entity);
       } else if (action == "promote owner") {
         changeOwner(<User>entity);
+        (<User>entity).role = "owner";
+        chatSocket.emit("promotedUser", <User>entity);
       }
     };
 
@@ -296,21 +298,26 @@ export default defineComponent({
     });
 
     const deleteUser = async (user: User) => {
-      chatSocket.emit("deletedUser", user);
       await userApi
-        .removeUser(user.id, { withCredentials: true })
-        .then((res: any) => {
-          userList.value = userList.value.filter(
-            (usr: User) => usr.id != user.id
-          );
-          bannedList.value = bannedList.value.filter(
-            (usr: User) => usr.id != user.id
-          );
+        .getUser(store.state.user.id)
+        .then((res) => {
+          if (!res || res.data.role == "user") {
+            store.dispatch("setErrorMessage", "Unauthorized");
+            window.location.reload();
+          } else {
+            chatSocket.emit("deletedUser", user, store.state.user.id);
+            userList.value = userList.value.filter(
+              (usr: User) => usr.id != user.id
+            );
+            bannedList.value = bannedList.value.filter(
+              (usr: User) => usr.id != user.id
+            );
+          }
         })
-        .catch((err: any) => {
-          {
-            if (err && err.response)
-              store.dispatch("setErrorMessage", err.response.data.message);
+        .catch((err) => {
+          if (err && err.response) {
+            window.location.reload();
+            store.dispatch("setErrorMessage", err.response.data.message);
           }
         });
     };
@@ -324,8 +331,11 @@ export default defineComponent({
         })
         .catch((err: any) => {
           {
-            if (err && err.response)
+            if (err && err.response) {
+              if (err.response.data.message == "Unauthorized")
+                window.location.reload();
               store.dispatch("setErrorMessage", err.response.data.message);
+            }
           }
         });
     };
@@ -339,8 +349,11 @@ export default defineComponent({
         })
         .catch((err: any) => {
           {
-            if (err && err.response)
+            if (err && err.response) {
+              if (err.response.data.message == "Unauthorized")
+                window.location.reload();
               store.dispatch("setErrorMessage", err.response.data.message);
+            }
           }
         });
     };
@@ -354,8 +367,11 @@ export default defineComponent({
         })
         .catch((err: any) => {
           {
-            if (err && err.response)
+            if (err && err.response) {
+              if (err.response.data.message == "Unauthorized")
+                window.location.reload();
               store.dispatch("setErrorMessage", err.response.data.message);
+            }
           }
         });
     };
@@ -386,8 +402,11 @@ export default defineComponent({
           chatSocket.emit("bannedUser", user);
         })
         .catch((err: any) => {
-          if (err && err.response)
+          if (err && err.response) {
+            if (err.response.data.message == "Unauthorized")
+              window.location.reload();
             store.dispatch("setErrorMessage", err.response.data.message);
+          }
         });
     };
 
@@ -395,14 +414,17 @@ export default defineComponent({
       await userApi
         .unbanUser(user.id, { withCredentials: true })
         .then((res: any) => {
-          userList.value.push(user);
           bannedList.value = bannedList.value.filter(
             (usr: User) => usr.id != user.id
           );
+          userList.value.push(user);
         })
         .catch((err: any) => {
-          if (err && err.response)
+          if (err && err.response) {
+            if (err.response.data.message == "Unauthorized")
+              window.location.reload();
             store.dispatch("setErrorMessage", err.response.data.message);
+          }
         });
     };
 

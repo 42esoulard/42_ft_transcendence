@@ -40,9 +40,11 @@ import { computed, defineComponent, onUpdated, ref } from "vue";
 import { pongSocket } from "@/App.vue";
 import { store } from "@/store";
 import { User } from "sdk/typescript-axios-client-generated";
+import { useUserApi } from "@/plugins/api.plugin";
 
 export default defineComponent({
   setup() {
+    const userApi = useUserApi();
     const userStatus = (user: User): "online" | "offline" | "ingame" => {
       if (user != undefined) {
         const inGameUser = store.state.inGameUsers.find(
@@ -61,20 +63,32 @@ export default defineComponent({
     };
 
     const accept = (challengerName: string) => {
-      if (userStatus(store.state.user) == "ingame") {
-        store.dispatch("setErrorMessage", "you're already playing!");
-        return;
-      }
-      if (
-        store.state.challengesReceived.filter(
-          (chall) => chall.challenger == challengerName
-        ).length
-      ) {
-        store.commit("removeChallenge", challengerName);
-        pongSocket.emit("challengeAccepted", challengerName);
-        store.dispatch("setMessage", "");
+      if (store.state.user.id !== 0) {
+        userApi
+          .getUser(store.state.user.id)
+          .then(() => {
+            if (userStatus(store.state.user) == "ingame") {
+              store.dispatch("setErrorMessage", "you're already playing!");
+              return;
+            }
+            if (
+              store.state.challengesReceived.filter(
+                (chall) => chall.challenger == challengerName
+              ).length
+            ) {
+              store.commit("removeChallenge", challengerName);
+              pongSocket.emit("challengeAccepted", challengerName);
+              store.dispatch("setMessage", "");
+            }
+          })
+          .catch((err: any) => {
+            if (err && err.response)
+              store.dispatch("setErrorMessage", err.response.data.message);
+            window.location.reload();
+          });
       }
     };
+
     const refuse = (challengerName: string) => {
       store.commit("removeChallenge", challengerName);
       pongSocket.emit("challengeDeclined", challengerName);

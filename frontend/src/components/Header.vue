@@ -127,7 +127,7 @@ export default defineComponent({
       window.addEventListener("resize", onResize);
     });
 
-    const logOut = () => {
+    const logOut = async () => {
       pongSocket.off("challengeDeclined");
       pongSocket.emit("cancelChallenge", store.state.user.username);
       authApi

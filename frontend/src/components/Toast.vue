@@ -16,6 +16,7 @@
 
 <script lang="ts">
 import { pongSocket } from "@/App.vue";
+import { useUserApi } from "@/plugins/api.plugin";
 import { store } from "@/store";
 import { computed, defineComponent, ref } from "vue";
 
@@ -27,13 +28,26 @@ export default defineComponent({
     const errorMessage = props.errorMessage;
     const pongLink =
       message != undefined ? ref(message.includes("[PONG-LINK]")) : ref();
+    const userApi = useUserApi();
 
     const accept = () => {
-      store.commit("removeChallenge", message.substr(0, message.indexOf(" ")));
-      pongSocket.emit(
-        "challengeAccepted",
-        message.substr(0, message.indexOf(" "))
-      );
+      userApi
+        .getUser(store.state.user.id)
+        .then(() => {
+          store.commit(
+            "removeChallenge",
+            message.substr(0, message.indexOf(" "))
+          );
+          pongSocket.emit(
+            "challengeAccepted",
+            message.substr(0, message.indexOf(" "))
+          );
+        })
+        .catch((err: any) => {
+          if (err && err.response)
+            store.dispatch("setErrorMessage", err.response.data.message);
+          window.location.reload();
+        });
     };
 
     const toDisplay = computed(() => {

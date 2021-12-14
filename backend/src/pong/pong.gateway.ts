@@ -22,6 +22,7 @@ import {
   joinGameMessage,
 } from './classes/pong.types';
 import { challenge } from './classes/pong.challenge';
+import { Users } from 'src/users/entity/users.entity';
 
 @WebSocketGateway({ namespace: '/pong' })
 export class PongGateway
@@ -32,6 +33,8 @@ export class PongGateway
     private readonly gameRepo: Repository<Game>,
     @InjectRepository(GameUser)
     private readonly gameUserRepo: Repository<GameUser>,
+    @InjectRepository(Users)
+    private readonly userRepo: Repository<Users>,
   ) {}
 
   @WebSocketServer()
@@ -152,7 +155,7 @@ export class PongGateway
       challenge.challengerSocket,
       2,
     );
-    this.createGame(player1, player2, challenge.gameMode);
+    this.createGame(client, player1, player2, challenge.gameMode).catch();
   }
 
   @SubscribeMessage('challengeDeclined')
@@ -177,7 +180,12 @@ export class PongGateway
       if (!this.waitingPlayerClassic) this.addPlayerToQueue(client, message);
       else {
         const player2 = new player(message.userId, message.userName, client, 2);
-        this.createGame(this.waitingPlayerClassic, player2, message.gameMode);
+        this.createGame(
+          client,
+          this.waitingPlayerClassic,
+          player2,
+          message.gameMode,
+        ).catch();
       }
     }
     if (message.gameMode === 'transcendence') {
@@ -186,10 +194,11 @@ export class PongGateway
       else {
         const player2 = new player(message.userId, message.userName, client, 2);
         this.createGame(
+          client,
           this.waitingPlayerTranscendence,
           player2,
           message.gameMode,
-        );
+        ).catch();
       }
     }
   }
@@ -274,18 +283,48 @@ export class PongGateway
     return false;
   }
 
-  async createGame(player1: player, player2: player, gameMode: gameMode) {
+  async createGame(
+    client: Socket,
+    player1: player,
+    player2: player,
+    gameMode: gameMode,
+  ) {
+    let enemy: Socket;
+    if (gameMode == 'classic' && this.waitingPlayerClassic) {
+      enemy = this.waitingPlayerClassic.clientSocket;
+    } else if (gameMode == 'transcendence' && this.waitingPlayerTranscendence) {
+      enemy = this.waitingPlayerTranscendence.clientSocket;
+    }
+    const usr1 = await this.userRepo.findOne(player1.userId);
+    if (!usr1) {
+      if (enemy) this.handleDisconnect(enemy);
+      return;
+    }
+    const usr2 = await this.userRepo.findOne(player2.userId);
+    if (!usr2) {
+      if (enemy) this.handleDisconnect(enemy);
+      return;
+    }
+
     const game = new pongGame(
       player1,
       player2,
       this.gameRepo,
       this.gameUserRepo,
+      this.userRepo,
       this.server,
       gameMode,
     );
-    await game.createGame();
-    this.games.set(game.room, game);
-    this.server.emit('newInGameUsers', [player1.userName, player2.userName]);
+    await game
+      .createGame()
+      .then(() => {
+        this.games.set(game.room, game);
+        this.server.emit('newInGameUsers', [
+          player1.userName,
+          player2.userName,
+        ]);
+      })
+      .catch();
   }
 
   async leaveGame(clientWhoLeft: Socket, room: string) {

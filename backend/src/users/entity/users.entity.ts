@@ -1,5 +1,4 @@
 import { Game } from 'src/pong/entity/games.entity';
-import { GameStats } from 'src/pong/entity/gameStats.entity';
 import { GameUser } from 'src/pong/entity/gameUser.entity';
 import { Messages } from 'src/messages/entity/messages.entity';
 import {
@@ -52,9 +51,6 @@ export class Users {
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
   created_at: Date;
-
-  @OneToOne(() => GameStats, (gamestats) => gamestats.user)
-  gameStats: GameStats;
 
   @OneToMany(() => GameUser, (gameuser) => gameuser.user, {
     cascade: true,

@@ -2,20 +2,26 @@
   <div class="chat-channel-form chat-channel-form--popup">
     <div @click="closeModal()" class="close-cross">&times;</div>
     Do you really want to {{ action }} {{ computedTarget }} ?
-    <button class="button button--third" type="submit" @click="confirm">
+    <button
+      class="button button--third"
+      type="submit"
+      @click="confirm"
+      :disabled="confirmed"
+    >
       Confirm
     </button>
   </div>
 </template>
 
 <script>
-import { defineComponent, computed } from "vue";
+import { defineComponent, computed, ref } from "vue";
 
 export default defineComponent({
   name: "Confirm",
   props: ["action", "target"],
   emits: ["close", "confirm"],
   setup(props, context) {
+    const confirmed = ref(false);
     const confirm = () => {
       context.emit("confirm", props.action, props.target);
     };
@@ -33,6 +39,7 @@ export default defineComponent({
       confirm,
       closeModal,
       computedTarget,
+      confirmed,
     };
   },
 });

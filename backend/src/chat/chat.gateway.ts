@@ -143,6 +143,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.broadcast.emit('update-channels', info);
   }
 
+  @SubscribeMessage('self-update-channels')
+  handleSelfUpdateChannels(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() info,
+  ) {
+    client.emit('update-channels', info);
+  }
+
   @SubscribeMessage('joinChannel')
   handleJoinChannel(client: Socket, channel: string) {
     client.join(channel);
@@ -163,9 +171,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.broadcast.emit('deletedUser', user);
   }
 
-  @SubscribeMessage('selfdeletedUser')
-  handleSelfDeletedUser(client: Socket, user: User) {
-    client.broadcast.emit('selfdeletedUser', user);
+  @SubscribeMessage('finishDeletion')
+  handleFinishDeletion(client: Socket, user: User, reqId) {
+    client.broadcast.emit('finishDeletion', user, reqId);
   }
 
   @SubscribeMessage('demotedUser')

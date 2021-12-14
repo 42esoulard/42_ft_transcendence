@@ -98,10 +98,13 @@ export class RelationshipsController {
       newRelationship.adresseeId,
     );
     if (relationship) {
-      await this.relationshipService.removeRelationship({
-        userId1: relationship.requesterId,
-        userId2: relationship.adresseeId,
-      });
+      await this.relationshipService
+        .removeRelationship({
+          userId1: relationship.requesterId,
+          userId2: relationship.adresseeId,
+        })
+        .then()
+        .catch();
     }
     return await this.relationshipService.saveRelationship(newRelationship);
   }
@@ -115,6 +118,8 @@ export class RelationshipsController {
       toMajRelationship.requesterId,
       toMajRelationship.adresseeId,
     );
+    if (!relationship)
+      throw new BadRequestException("relationship doesn't exist");
     return await this.relationshipService.validateRelationship(relationship);
   }
 

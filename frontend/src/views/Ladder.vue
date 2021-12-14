@@ -109,15 +109,19 @@ export default defineComponent({
           entity.username.toLowerCase().startsWith(searchQuery.value)
         );
       }
-      list.value.sort(
-        (a: User, b: User) =>
-          (a.games
-            ? a.games.filter((game: GameUser) => game.won == true).length
-            : 0) <
-          (b.games
-            ? b.games.filter((game: GameUser) => game.won == true).length
-            : 0)
-      );
+      let userA = 0;
+      let userB = 0;
+      list.value.sort((a: User, b: User) => {
+        userA = a.games
+          ? a.games.filter((game: GameUser) => game.won == true).length
+          : 0;
+        userB = b.games
+          ? b.games.filter((game: GameUser) => game.won == true).length
+          : 0;
+        if (userA < userB) return 1;
+        else if (userA > userB) return -1;
+        return 0;
+      });
       return list.value;
     });
 
